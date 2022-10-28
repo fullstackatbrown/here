@@ -1,14 +1,35 @@
-import {createContext, useContext, useEffect, useState, useRef} from "react";
-import AuthAPI, {Notification, User} from "@util/auth/api";
-import {collection, doc, getFirestore, onSnapshot} from "@firebase/firestore";
-import {useAsyncEffect} from "@util/hooks/useAsyncEffect";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
+import AuthAPI, { Notification, User } from "@util/auth/api";
+import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
+import { useAsyncEffect } from "@util/hooks/useAsyncEffect";
 
-type AuthState = { loading: boolean, isAuthenticated: boolean, currentUser: User | undefined, isTA: (courseID: string) => boolean };
-const initialAuthState: AuthState = {
+type AuthState = {
+    loading: boolean;
+    isAuthenticated: boolean;
+    currentUser: User | undefined;
+    isTA: (courseID: string) => boolean;
+};
+const actualInitialAuthState: AuthState = {
     loading: true,
     isAuthenticated: false,
     currentUser: undefined,
-    isTA: () => false
+    isTA: () => false,
+};
+
+const initialAuthState: AuthState = {
+    loading: false,
+    isAuthenticated: true,
+    currentUser: {
+        id: "1",
+        email: "blueno@brown.edu",
+        displayName: "Blueno",
+        photoUrl:
+            "https://www.brown.edu/sites/default/files/styles/wide_xlrg/public/2020-09/20191015_COMM_Bruno010_0.jpg?h=04531eed&itok=06s1nX88",
+        isAdmin: true,
+        coursePermissions: {},
+        notifications: [],
+    },
+    isTA: () => true,
 };
 
 const authContext = createContext(initialAuthState);
@@ -19,28 +40,45 @@ export const AuthProvider = authContext.Provider;
 /** useSession is a hook that fetches a user session from the Acropolis API */
 export function useSession(): AuthState {
     const [authState, setAuthState] = useState(initialAuthState);
-    let unsubscribe = () => {
-    };
+    let unsubscribe = () => {};
 
-    useAsyncEffect(async (): Promise<void> => {
-        try {
-            const sessionUser = await AuthAPI.getCurrentUser();
-            const db = getFirestore();
-            unsubscribe = onSnapshot(doc(db, "user_profiles", sessionUser.id), (doc) => {
-                if (doc.exists()) {
-                    const user = doc.data() as User;
-                    setAuthState({
-                        loading: false,
-                        isAuthenticated: true,
-                        currentUser: {...user, notifications: user.notifications.reverse()},
-                        isTA: courseID => (user.coursePermissions != null) && (user.coursePermissions[courseID] != undefined)
-                    });
-                }
-            });
-        } catch {
-            setAuthState({loading: false, isAuthenticated: false, currentUser: undefined, isTA: () => false});
-        }
-    }, [], () => unsubscribe());
+    // useAsyncEffect(
+    //     async (): Promise<void> => {
+    //         try {
+    //             const sessionUser = await AuthAPI.getCurrentUser();
+    //             const db = getFirestore();
+    //             unsubscribe = onSnapshot(
+    //                 doc(db, "user_profiles", sessionUser.id),
+    //                 (doc) => {
+    //                     if (doc.exists()) {
+    //                         const user = doc.data() as User;
+    //                         setAuthState({
+    //                             loading: false,
+    //                             isAuthenticated: true,
+    //                             currentUser: {
+    //                                 ...user,
+    //                                 notifications: user.notifications.reverse(),
+    //                             },
+    //                             isTA: (courseID) =>
+    //                                 user.coursePermissions != null &&
+    //                                 user.coursePermissions[courseID] !=
+    //                                     undefined,
+    //                         });
+    //                     }
+    //                 }
+    //             );
+    //         } catch {
+    //             setAuthState({
+    //                 loading: false,
+    //                 isAuthenticated: false,
+    //                 currentUser: undefined,
+    //                 isTA: () => false,
+    //             });
+    //         }
+    //     },
+    //     [],
+    //     () => unsubscribe()
+    // );
 
     return authState;
 }
@@ -50,22 +88,26 @@ export function useAuth(): AuthState {
     return useContext(authContext);
 }
 
-
 /** useUser is a hook that fetches a user session from the Acropolis API */
-export function useUser(userID: string | undefined): [User | undefined, boolean] {
+export function useUser(
+    userID: string | undefined
+): [User | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<User | undefined>(undefined);
 
     useEffect(() => {
         if (userID) {
             const db = getFirestore();
-            const unsubscribe = onSnapshot(doc(db, "user_profiles", userID), (doc) => {
-                if (doc.exists()) {
-                    const user = doc.data();
-                    setUser({id: user.id, ...doc.data()} as User);
-                    setLoading(false);
+            const unsubscribe = onSnapshot(
+                doc(db, "user_profiles", userID),
+                (doc) => {
+                    if (doc.exists()) {
+                        const user = doc.data();
+                        setUser({ id: user.id, ...doc.data() } as User);
+                        setLoading(false);
+                    }
                 }
-            });
+            );
             return () => unsubscribe();
         }
     }, [userID]);
@@ -81,15 +123,19 @@ export function useAdmins(): [User[] | undefined, boolean] {
 
     useEffect(() => {
         const db = getFirestore();
-        const unsubscribe = onSnapshot(collection(db, "user_profiles"), (querySnapshot) => {
-            const res: User[] = [];
-            querySnapshot.forEach((doc) => {
-                if (doc.data().isAdmin) res.push({id: doc.id, ...doc.data()} as User);
-            });
+        const unsubscribe = onSnapshot(
+            collection(db, "user_profiles"),
+            (querySnapshot) => {
+                const res: User[] = [];
+                querySnapshot.forEach((doc) => {
+                    if (doc.data().isAdmin)
+                        res.push({ id: doc.id, ...doc.data() } as User);
+                });
 
-            setUsers(res);
-            setLoading(false);
-        });
+                setUsers(res);
+                setLoading(false);
+            }
+        );
 
         return () => unsubscribe();
     }, []);
@@ -97,7 +143,10 @@ export function useAdmins(): [User[] | undefined, boolean] {
     return [users, loading];
 }
 
-export function useNotifications(user: User | undefined, cb: (a: Notification) => void): void {
+export function useNotifications(
+    user: User | undefined,
+    cb: (a: Notification) => void
+): void {
     const prevNotifications = useRef<number | null>(null);
 
     useEffect(() => {
@@ -120,14 +169,18 @@ export function useNotifications(user: User | undefined, cb: (a: Notification) =
         // Notifications we currently have, we can run the callback.
         if (prevNotifications.current < notifications.length) {
             // Run the callback for all Notifications starting at prevNotifications.current.
-            for (let i = prevNotifications.current; i < notifications.length; i++) {
+            for (
+                let i = prevNotifications.current;
+                i < notifications.length;
+                i++
+            ) {
                 cb(notifications[i]);
             }
 
             // First, set prevNotifications to prevent race conditions of the effect firing multiple
             // times, between which the following line isn't called. Thus, we run this first before
             // calling cb.
-            // 
+            //
             // (Consider the alternative case: we run the callbacks and then set prev.
             // An execution could be:
             //      1. Prev is 1
@@ -139,4 +192,4 @@ export function useNotifications(user: User | undefined, cb: (a: Notification) =
             prevNotifications.current = notifications.length;
         }
     }, [user, cb]);
-};
+}
