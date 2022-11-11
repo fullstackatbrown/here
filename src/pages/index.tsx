@@ -8,10 +8,12 @@ import { useAuth } from "util/auth/hooks";
 import Button from "components/shared/Button";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import BouncingCubesAnimation from "components/animations/BouncingCubesAnimation";
+import { useSections } from "@util/section/hooks";
+import SectionCard from "@components/home/SectionCard";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
-    const [queues, loading] = useQueues();
+    const [sections, loading] = useSections();
     const [createQueueDialog, setCreateQueueDialog] = useState(false);
 
     const isTA =
@@ -26,7 +28,7 @@ export default function Home() {
                 open={createQueueDialog}
                 onClose={() => setCreateQueueDialog(false)}
             />
-            {queues && queues.length > 0 && isTA && (
+            {sections && sections.length > 0 && isTA && (
                 <Box mb={2}>
                     <Button
                         startIcon={<AddCircleIcon />}
@@ -36,21 +38,21 @@ export default function Home() {
                     </Button>
                 </Box>
             )}
-            {queues && queues.length > 0 && (
+            {sections && sections.length > 0 && (
                 <Grid
                     spacing={3}
                     container
                     direction="row"
                     alignItems="stretch"
                 >
-                    {queues.map((queue) => (
+                    {sections.map((queue) => (
                         <Grid key={queue.id} item xs={12} md={6} lg={4} xl={3}>
-                            <QueueCard queue={queue} />
+                            <SectionCard section={queue} />
                         </Grid>
                     ))}
                 </Grid>
             )}
-            {queues && queues.length === 0 && (
+            {sections && sections.length === 0 && (
                 <Stack
                     mt={4}
                     spacing={2}
