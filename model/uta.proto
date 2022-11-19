@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option go_package = "backend/pb";
+import "model/general.proto";
+import "google/protobuf/empty.proto";
+
+package here;
+
+service UTA {
+  rpc Checkoff (CheckoffRequest) returns (CheckoffReply) {}
+  rpc AddGradeOption (GradeOption) returns (google.protobuf.Empty) {}
+  rpc DeleteGradeOption (GradeOption) returns (google.protobuf.Empty) {}
+  rpc GetAllSwapRequests (google.protobuf.Empty) returns (GetAllSwapRequestsReply) {}
+  rpc HandleSwapRequests (HandleSwapRequest) returns (google.protobuf.Empty) {}
+}
+
+message CheckoffRequest {
+  string name = 1;
+}
+
+message CheckoffReply {
+  string ok = 1;
+}
+
+message GetAllSwapRequestsReply {
+  repeated SwapRequest swapRequests = 1;
+}
+
+message HandleSwapRequest {
+  SwapRequest request = 1;
+  bool result = 2;
+  string reason = 3;
+}
