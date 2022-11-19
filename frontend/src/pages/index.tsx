@@ -10,6 +10,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import BouncingCubesAnimation from "components/animations/BouncingCubesAnimation";
 import { useSections } from "@util/section/hooks";
 import SectionCard from "@components/home/SectionCard";
+import CourseCard from "@components/home/CourseCard";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
@@ -47,7 +48,7 @@ export default function Home() {
                 >
                     {sections.map((queue) => (
                         <Grid key={queue.id} item xs={12} md={6} lg={4} xl={3}>
-                            <SectionCard section={queue} />
+                            <CourseCard section={queue} />
                         </Grid>
                     ))}
                 </Grid>
