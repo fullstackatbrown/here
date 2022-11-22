@@ -14,11 +14,12 @@ enum Day {
 }
     
 message Course {
-      string id = 1;
-      repeated Section sections = 2;
-      repeated Assignment assignments = 3;
-      repeated GradeOption gradeOptions = 4;
-      repeated Student students = 5;
+      string code = 1;
+      string title = 2;
+      repeated Section sections = 3;
+      repeated Assignment assignments = 4;
+      repeated GradeOption gradeOptions = 5;
+      repeated Student students = 6;
 }
 
 message Section {
@@ -28,7 +29,8 @@ message Section {
       string endTime = 4;
       string location = 5;
       int32 capacity = 6;
-      repeated string students = 7; // student id
+      int32 enrollment = 7;
+      repeated string students = 8; // student id
 }
 
 message Assignment {
