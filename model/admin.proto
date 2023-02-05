@@ -8,7 +8,7 @@ package here;
 
 service Admin {
   rpc GetAllSections (google.protobuf.Empty) returns (GetAllSectionsReply) {}
-  rpc AddSection (Section) returns (google.protobuf.Empty) {}
+  rpc CreateSection (Section) returns (google.protobuf.Empty) {}
   rpc EditSection (Section) returns (google.protobuf.Empty) {}
   rpc DeleteSection (Section) returns (google.protobuf.Empty) {}
 }

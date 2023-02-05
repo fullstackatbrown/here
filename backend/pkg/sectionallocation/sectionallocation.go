@@ -1,0 +1,5 @@
+package sectionallocation
+
+func AssignSections() {
+	
+}
