@@ -7,13 +7,6 @@ import AppLayout from "@components/shared/AppLayout";
 import QueueOptions from "@components/queue/QueueOptions";
 import QueueList from "@components/queue/QueueList";
 import { useSection } from "@util/section/hooks";
-import CourseAdminView from "@components/course/CourseAdminView";
-import {Course, Section} from "../../model/general_pb"
-import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
-import {
-    AdminClient,
-    AdminGetAllSections
-  } from "../../model/admin_pb_service";
 
 export default function Queue() {
     const router = useRouter();
@@ -28,38 +21,10 @@ export default function Queue() {
                 .then(() => toast.error("We couldn't find the queue you were looking for."));
         }
     }, [router, section, sectionLoading]);
-
-    function getAllSections() {
-        const client = new AdminClient("https://my.grpc/server");
-        client.getAllSections(new google_protobuf_empty_pb.Empty, null, (err, response) => {
-            console.log(response)
-        })
-    }
     
-    // let section1: Section = {
-    //     id: "1",
-    //     day: 1,
-    //     location: "CIT 477",
-    //     startTime: "1230",
-    //     endTime: "1430",
-    //     capacity: 100,
-    //     enrollment: 50,
-    //     students: [],
-    // }
-
-    // let course: Course = {
-    //     code: "cs1300",
-    //     title: "User Interface and User Experience",
-    //     sections: [section1],
-    //     assignments: [],
-    //     gradeOptions: [],
-    //     students: [],
-    // }
-
     return (
         <AppLayout title={section?.title} maxWidth="lg" loading={sectionLoading}>
-             <button onClick={() => {getAllSections()}}>hi</button>
-            {/* {section && !sectionLoading && <><CourseAdminView course={course} /> */}
+            {section && !sectionLoading && <></>}
            
                 {/* <QueuePageHeader queue={section}/>
                 <Grid container spacing={4} marginTop={1}>
@@ -70,7 +35,6 @@ export default function Queue() {
                                showCompletedTickets={showCompletedTickets}/>
                 </Grid> */}
                 {/* TODO: Implement section page */}
-            {/* </>} */}
         </AppLayout>
     );
 }
