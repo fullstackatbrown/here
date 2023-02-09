@@ -33,7 +33,6 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 		fr.coursesLock.Lock()
 		defer fr.coursesLock.Unlock()
 		fr.courses = newCourses
-		fmt.Println(fr.courses)
 
 		return nil
 	}
@@ -93,36 +92,36 @@ func (fr *FirebaseRepository) CreateCourse(c *models.CreateCourseRequest) (cours
 	return course, nil
 }
 
-// func (fr *FirebaseRepository) DeleteCourse(c *models.DeleteCourseRequest) error {
-// 	// Get this course's info.
-// 	course, err := fr.GetCourseByID(c.CourseID)
-// 	if err != nil {
-// 		return err
-// 	}
+func (fr *FirebaseRepository) DeleteCourse(c *models.DeleteCourseRequest) error {
+	// Get this course's info.
+	_, err := fr.GetCourseByID(c.CourseID)
+	if err != nil {
+		return err
+	}
 
-// 	// Delete this course from all users with permissions.
-// 	for k := range course.CoursePermissions {
-// 		_, err = fr.firestoreClient.Collection(models.FirestoreUserProfilesCollection).Doc(k).Update(firebase.Context, []firestore.Update{
-// 			{
-// 				Path:  "coursePermissions." + course.ID,
-// 				Value: firestore.Delete,
-// 			},
-// 		})
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
+	// Delete this course from all users with permissions.
+	// for k := range course.CoursePermissions {
+	// 	_, err = fr.firestoreClient.Collection(models.FirestoreUserProfilesCollection).Doc(k).Update(firebase.Context, []firestore.Update{
+	// 		{
+	// 			Path:  "coursePermissions." + course.ID,
+	// 			Value: firestore.Delete,
+	// 		},
+	// 	})
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
 
-// 	// Delete the course.
-// 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(c.CourseID).Delete(firebase.Context)
-// 	return err
-// }
+	// Delete the course.
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(c.CourseID).Delete(firebase.Context)
+	return err
+}
 
-// func (fr *FirebaseRepository) EditCourse(c *models.EditCourseRequest) error {
-// 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(c.CourseID).Update(firebase.Context, []firestore.Update{
-// 		{Path: "title", Value: c.Title},
-// 		{Path: "term", Value: c.Term},
-// 		{Path: "code", Value: c.Code},
-// 	})
-// 	return err
-// }
+func (fr *FirebaseRepository) EditCourse(c *models.EditCourseRequest) error {
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(c.CourseID).Update(firebase.Context, []firestore.Update{
+		{Path: "title", Value: c.Title},
+		{Path: "term", Value: c.Term},
+		{Path: "code", Value: c.Code},
+	})
+	return err
+}

@@ -24,19 +24,12 @@ func CourseRoutes() *chi.Mux {
 
 		r.Get("/", getCourseHandler)
 
-		// Anybody authed can read a course
-
 		// Only Admins can delete a course
 		// router.With(auth.RequireAdmin()).Delete("/", deleteCourseHandler)
-		// router.Delete("/", deleteCourseHandler)
+		r.Delete("/", deleteCourseHandler)
 
-		// // Course modification
-		// router.With(auth.RequireCourseAdmin()).Post("/edit", editCourseHandler)
-		// router.With(auth.RequireCourseAdmin()).Post("/addPermission", addCoursePermissionHandler)
-		// router.With(auth.RequireCourseAdmin()).Post("/removePermission", removeCoursePermissionHandler)
 		r.Mount("/sections", SectionRoutes())
 	})
-	// router.With(auth.RequireAdmin()).Post("/bulkUpload", bulkUploadHandler)
 
 	return router
 }
@@ -54,22 +47,16 @@ func getCourseHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, course)
 }
 
-// POST: /create
+// POST: /
 func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	var req *models.CreateCourseRequest
-
-	// user, err := auth.GetUserFromRequest(r)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusUnauthorized)
-	// }
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// req.CreatedBy = user
 
 	c, err := repo.Repository.CreateCourse(req)
 	if err != nil {
@@ -80,16 +67,16 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, c)
 }
 
-// // DELETE: /{courseID}
-// func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
-// 	courseID := r.Context().Value("courseID").(string)
+// DELETE: /{courseID}
+func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 
-// 	err := repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: courseID})
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+	err := repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: courseID})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-// 	w.WriteHeader(200)
-// 	w.Write([]byte("Successfully deleted course " + courseID))
-// }
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully deleted course " + courseID))
+}
