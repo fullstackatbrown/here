@@ -21,10 +21,10 @@ type GetCourseRequest struct {
 }
 
 type CreateCourseRequest struct {
-	Title     string
-	Code      string
-	Term      string
-	CreatedBy *User
+	Title string
+	Code  string
+	Term  string
+	// CreatedBy *User
 }
 
 type DeleteCourseRequest struct {

@@ -20,24 +20,23 @@ func (fr *FirebaseRepository) GetCourseByID(ID string) (*models.Course, error) {
 	}
 }
 
-// func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models.Course, error) {
-// 	fr.coursesLock.RLock()
-// 	defer fr.coursesLock.RUnlock()
+func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models.Course, error) {
+	fr.coursesLock.RLock()
+	defer fr.coursesLock.RUnlock()
 
-// 	for _, course := range fr.courses {
-// 		if course.Code == code && course.Term == term {
-// 			return course, nil
-// 		}
-// 	}
-// 	return nil, qerrors.CourseNotFoundError
-// }
+	for _, course := range fr.courses {
+		if course.Code == code && course.Term == term {
+			return course, nil
+		}
+	}
+	return nil, qerrors.CourseNotFoundError
+}
 
-func (fr *FirebaseRepository) CreateCourse() (course *models.Course, err error) {
-	// func (fr *FirebaseRepository) CreateCourse(c *models.CreateCourseRequest) (course *models.Course, err error) {
+func (fr *FirebaseRepository) CreateCourse(c *models.CreateCourseRequest) (course *models.Course, err error) {
 	course = &models.Course{
-		Title: "Operating Systems",
-		Code:  "cs1670",
-		Term:  "spring 2023",
+		Title: c.Title,
+		Code:  c.Code,
+		Term:  c.Term,
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Add(firebase.Context, map[string]interface{}{
