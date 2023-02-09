@@ -1,16 +1,14 @@
 package models
 
-import "time"
-
 var (
 	FirestoreSectionsCollection = "sections"
 )
 
 type Section struct {
 	ID         string
-	Day        string
-	StartTime  time.Time
-	EndTime    time.Time
+	Day        int
+	StartTime  string
+	EndTime    string
 	Location   string
 	Capacity   int
 	Enrollment int
@@ -22,7 +20,8 @@ type GetSectionRequest struct {
 }
 
 type CreateSectionRequest struct {
-	Day       string
+	Day int
+	// must be ISO8601 compliant
 	StartTime string
 	EndTime   string
 	Location  string

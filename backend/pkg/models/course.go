@@ -23,7 +23,6 @@ type CreateCourseRequest struct {
 	Title string
 	Code  string
 	Term  string
-	// CreatedBy *User
 }
 
 type DeleteCourseRequest struct {

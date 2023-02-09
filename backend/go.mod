@@ -31,6 +31,7 @@ require (
 	github.com/go-chi/render v1.0.2
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/relvacode/iso8601 v1.3.0
 	github.com/rs/cors v1.8.3
 	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783 // indirect

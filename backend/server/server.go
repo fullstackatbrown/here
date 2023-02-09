@@ -24,6 +24,7 @@ func Routes() *chi.Mux {
 
 	router.Route("/v1", func(r chi.Router) {
 		r.Mount("/courses", rtr.CourseRoutes())
+		r.Mount("/surveys", rtr.SurveyRoutes())
 	})
 
 	return router

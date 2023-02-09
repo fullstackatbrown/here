@@ -72,6 +72,17 @@ func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models
 	return nil, qerrors.CourseNotFoundError
 }
 
+func (fr *FirebaseRepository) ListCourseSections(courseID string) (sections *[]models.Section, err error) {
+	fr.coursesLock.RLock()
+	defer fr.coursesLock.RUnlock()
+
+	if val, ok := fr.courses[courseID]; ok {
+		return &val.Sections, nil
+	} else {
+		return nil, qerrors.CourseNotFoundError
+	}
+}
+
 func (fr *FirebaseRepository) CreateCourse(c *models.CreateCourseRequest) (course *models.Course, err error) {
 	course = &models.Course{
 		Title: c.Title,
