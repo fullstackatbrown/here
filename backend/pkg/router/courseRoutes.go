@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
@@ -15,15 +14,15 @@ import (
 func CourseRoutes() *chi.Mux {
 	router := chi.NewRouter()
 	// All course routes require authentication.
-	// router.Use(middleware.CourseCtx())
+	// router.Use(middleware.AuthCtx())
 
 	// router.With(auth.RequireAdmin()).Post("/", createCourseHandler)
 	router.Post("/", createCourseHandler)
 	// Get metadata about a course
-	router.Route("/{courseID}", func(router chi.Router) {
-		router.Use(middleware.CourseCtx())
+	router.Route("/{courseID}", func(r chi.Router) {
+		r.Use(middleware.CourseCtx())
 
-		router.Get("/", getCourseHandler)
+		r.Get("/", getCourseHandler)
 
 		// Anybody authed can read a course
 
@@ -35,6 +34,7 @@ func CourseRoutes() *chi.Mux {
 		// router.With(auth.RequireCourseAdmin()).Post("/edit", editCourseHandler)
 		// router.With(auth.RequireCourseAdmin()).Post("/addPermission", addCoursePermissionHandler)
 		// router.With(auth.RequireCourseAdmin()).Post("/removePermission", removeCoursePermissionHandler)
+		r.Mount("/sections", SectionRoutes())
 	})
 	// router.With(auth.RequireAdmin()).Post("/bulkUpload", bulkUploadHandler)
 
@@ -44,15 +44,14 @@ func CourseRoutes() *chi.Mux {
 // // GET: /{courseID}
 func getCourseHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
-	fmt.Println(courseID)
 
-	// course, err := repo.Repository.GetCourseByID(courseID)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
+	course, err := repo.Repository.GetCourseByID(courseID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	render.JSON(w, r, fmt.Sprintf("course %s", courseID))
+	render.JSON(w, r, course)
 }
 
 // POST: /create

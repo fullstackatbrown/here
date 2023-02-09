@@ -1,12 +1,53 @@
-package database
+package repository
 
 import (
 	"fmt"
+	"log"
 
+	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
+	"github.com/mitchellh/mapstructure"
 )
+
+func (fr *FirebaseRepository) initializeCoursesListener() {
+	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
+		newCourses := make(map[string]*models.Course)
+		for _, doc := range docs {
+			if !doc.Exists() {
+				continue
+			}
+
+			var c models.Course
+			err := mapstructure.Decode(doc.Data(), &c)
+			if err != nil {
+				log.Panicf("Error destructuring document: %v", err)
+				return err
+			}
+
+			c.ID = doc.Ref.ID
+			newCourses[doc.Ref.ID] = &c
+		}
+
+		fr.coursesLock.Lock()
+		defer fr.coursesLock.Unlock()
+		fr.courses = newCourses
+		fmt.Println(fr.courses)
+
+		return nil
+	}
+
+	done := make(chan bool)
+	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Query
+	go func() {
+		err := fr.createCollectionInitializer(query, &done, handleDocs)
+		if err != nil {
+			log.Panicf("error creating course collection listner: %v\n", err)
+		}
+	}()
+	<-done
+}
 
 // GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
 func (fr *FirebaseRepository) GetCourseByID(ID string) (*models.Course, error) {
