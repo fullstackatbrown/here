@@ -1,5 +1,10 @@
 package models
 
+var (
+	FirestoreCoursesCollection = "courses"
+	FirestoreInvitesCollection = "invites"
+)
+
 type Course struct {
 	ID           string
 	Title        string

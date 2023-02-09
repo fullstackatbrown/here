@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
+	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -16,6 +17,7 @@ func CourseRoutes() *chi.Mux {
 
 	// Modifying courses themselves
 	// router.With(auth.RequireAdmin()).Post("/create", createCourseHandler)
+	router.Post("/", createCourseHandler)
 	// Get metadata about a course
 	router.Route("/{courseID}", func(router chi.Router) {
 		router.Use(middleware.CourseCtx())
@@ -53,6 +55,7 @@ func getCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 // POST: /create
 func createCourseHandler(w http.ResponseWriter, r *http.Request) {
+
 	// var req *models.CreateCourseRequest
 
 	// user, err := auth.GetUserFromRequest(r)
@@ -67,13 +70,13 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	// req.CreatedBy = user
 
-	// c, err := repo.Repository.CreateCourse(req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
+	c, err := repo.Repository.CreateCourse()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	// render.JSON(w, r, c)
+	render.JSON(w, r, c)
 }
 
 // // DELETE: /{courseID}
