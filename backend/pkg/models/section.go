@@ -21,20 +21,21 @@ type Section struct {
 }
 
 type GetSectionRequest struct {
-	SectionID string
+	SectionID string `json:"sectionid"`
 }
 
 type CreateSectionRequest struct {
-	Day int
+	// (Sunday = 0, ...)
+	Day int `json:"day"`
 	// must be ISO8601 compliant
-	StartTime string
-	EndTime   string
-	Location  string
-	Capacity  int
+	StartTime string `json:"starttime"`
+	EndTime   string `json:"endtime"`
+	Location  string `json:"location"`
+	Capacity  int    `json:"capacity"`
 }
 
 type DeleteSectionRequest struct {
-	SectionID string
+	SectionID string `json:"sectionid"`
 }
 
 func (section *Section) TimeAsString() string {

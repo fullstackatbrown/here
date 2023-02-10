@@ -16,22 +16,22 @@ type Course struct {
 }
 
 type GetCourseRequest struct {
-	CourseID string
+	CourseID string `json:"courseid"`
 }
 
 type CreateCourseRequest struct {
-	Title string
-	Code  string
-	Term  string
+	Title string `json:"title"`
+	Code  string `json:"code"`
+	Term  string `json:"term"`
 }
 
 type DeleteCourseRequest struct {
-	CourseID string
+	CourseID string `json:"courseid"`
 }
 
 type EditCourseRequest struct {
-	CourseID string
-	Title    string
-	Code     string
-	Term     string
+	CourseID string `json:"courseid"`
+	Title    string `json:"title"`
+	Code     string `json:"code"`
+	Term     string `json:"name"`
 }

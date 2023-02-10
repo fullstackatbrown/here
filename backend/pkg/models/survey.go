@@ -26,8 +26,8 @@ type Times struct {
 }
 
 type CreateSurveyRequest struct {
-	CourseID string
-	Name     string
+	CourseID string `json:"courseid"`
+	Name     string `json:"name"`
 }
 
 type CreateSurveyResponseRequest struct {
