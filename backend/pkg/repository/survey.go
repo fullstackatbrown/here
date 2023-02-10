@@ -12,7 +12,6 @@ func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Surve
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Add(firebase.Context, map[string]interface{}{
 		"name":     survey.Name,
 		"courseID": survey.CourseID,
-		"times":    survey.Times,
 		"capacity": survey.Capacity,
 	})
 	if err != nil {

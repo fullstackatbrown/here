@@ -9,8 +9,7 @@ type Survey struct {
 	ID        string
 	CourseID  string
 	Name      string
-	Times     []string
-	Capacity  []int
+	Capacity  map[string]int
 	Responses []SurveyResponse
 }
 
@@ -38,26 +37,17 @@ type CreateSurveyResponseRequest struct {
 
 func InitSurvey(name string, courseID string, sections []Section) *Survey {
 	// Get all the unique times
-	sectionTimes := make(map[string]int)
+	capacity := make(map[string]int)
 	for _, s := range sections {
-		sectionTimes[s.TimeAsString()] = 0
+		capacity[s.TimeAsString()] = 0
 	}
 	for _, s := range sections {
-		sectionTimes[s.TimeAsString()] += s.Capacity
-	}
-
-	times := make([]string, 0)
-	capacity := make([]int, 0)
-
-	for k, v := range sectionTimes {
-		times = append(times, k)
-		capacity = append(capacity, v)
+		capacity[s.TimeAsString()] += s.Capacity
 	}
 
 	return &Survey{
 		Name:     name,
 		CourseID: courseID,
-		Times:    times,
 		Capacity: capacity,
 	}
 }

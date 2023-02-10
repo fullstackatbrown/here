@@ -27,6 +27,7 @@ func CourseRoutes() *chi.Mux {
 		// Only Admins can delete a course
 		// router.With(auth.RequireAdmin()).Delete("/", deleteCourseHandler)
 		r.Delete("/", deleteCourseHandler)
+		r.Post("/assignSections", assignSectionsHandler)
 
 		r.Mount("/sections", SectionRoutes())
 	})
@@ -79,4 +80,8 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully deleted course " + courseID))
+}
+
+func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {
+	// courseID := r.Context().Value("courseID").(string)
 }
