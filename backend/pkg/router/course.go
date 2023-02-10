@@ -7,7 +7,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
-	"github.com/fullstackatbrown/here/pkg/sectionallocation"
+	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -97,7 +97,7 @@ func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, _, err := sectionallocation.AssignSections(survey.Capacity, survey.Responses)
+	res, _, err := utils.AssignSections(survey.Capacity, survey.Responses)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

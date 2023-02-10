@@ -1,4 +1,4 @@
-package sectionallocation
+package utils
 
 // Algorithm for assigning sections
 // Capacity: map from sections to their capacity
