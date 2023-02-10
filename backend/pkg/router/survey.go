@@ -29,7 +29,7 @@ func ResponsesRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Post("/", createSurveyResponseHandler)
-	router.Get("/", getSurveyResponseHandler)
+	router.Get("/", listSurveyResponseHandler)
 	return router
 }
 
@@ -84,5 +84,12 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, s)
 }
 
-func getSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
+func listSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
+	surveyID := r.Context().Value("surveyID").(string)
+	responses, err := repo.Repository.ListSurveyResponse(surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	render.JSON(w, r, responses)
 }

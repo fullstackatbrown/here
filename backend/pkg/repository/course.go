@@ -93,7 +93,7 @@ func (fr *FirebaseRepository) ListCourseSections(courseID string) (sections []mo
 			break
 		}
 		if err != nil {
-			return nil, fmt.Errorf("error creating course: %v\n", err)
+			return nil, fmt.Errorf("error listing course sections: %v\n", err)
 		}
 
 		var c models.Section
@@ -102,6 +102,7 @@ func (fr *FirebaseRepository) ListCourseSections(courseID string) (sections []mo
 			log.Panicf("Error destructuring document: %v", err)
 			return nil, err
 		}
+		c.ID = doc.Ref.ID
 		sections = append(sections, c)
 	}
 	return sections, nil
