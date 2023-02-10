@@ -22,7 +22,7 @@ func (fr *FirebaseRepository) CreateSection(courseID string, c *models.CreateSec
 	// TODO: check if c.Day is a valid weekday constant
 
 	section = &models.Section{
-		Day:        c.Day,
+		Day:        time.Weekday(c.Day),
 		StartTime:  startTime.Format(time.Kitchen),
 		EndTime:    endTime.Format(time.Kitchen),
 		Location:   c.Location,

@@ -1,12 +1,17 @@
 package models
 
+import (
+	"fmt"
+	"time"
+)
+
 var (
 	FirestoreSectionsCollection = "sections"
 )
 
 type Section struct {
 	ID         string
-	Day        int
+	Day        time.Weekday
 	StartTime  string
 	EndTime    string
 	Location   string
@@ -30,4 +35,8 @@ type CreateSectionRequest struct {
 
 type DeleteSectionRequest struct {
 	SectionID string
+}
+
+func (section *Section) TimeAsString() string {
+	return fmt.Sprintf("%d", int(section.Day)) + "|" + section.StartTime + "|" + section.EndTime
 }

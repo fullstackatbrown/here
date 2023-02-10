@@ -9,6 +9,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/mitchellh/mapstructure"
+	"google.golang.org/api/iterator"
 )
 
 func (fr *FirebaseRepository) initializeCoursesListener() {
@@ -72,15 +73,38 @@ func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models
 	return nil, qerrors.CourseNotFoundError
 }
 
-func (fr *FirebaseRepository) ListCourseSections(courseID string) (sections *[]models.Section, err error) {
-	fr.coursesLock.RLock()
-	defer fr.coursesLock.RUnlock()
+func (fr *FirebaseRepository) ListCourseSections(courseID string) (sections []models.Section, err error) {
+	// TODO: add listener for sections
 
-	if val, ok := fr.courses[courseID]; ok {
-		return &val.Sections, nil
-	} else {
-		return nil, qerrors.CourseNotFoundError
+	// fr.coursesLock.RLock()
+	// defer fr.coursesLock.RUnlock()
+
+	// if val, ok := fr.courses[courseID]; ok {
+	// 	return &val.Sections, nil
+	// } else {
+	// 	return nil, qerrors.CourseNotFoundError
+	// }
+
+	iter := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(models.FirestoreSectionsCollection).Documents(firebase.Context)
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error creating course: %v\n", err)
+		}
+
+		var c models.Section
+		err = mapstructure.Decode(doc.Data(), &c)
+		if err != nil {
+			log.Panicf("Error destructuring document: %v", err)
+			return nil, err
+		}
+		sections = append(sections, c)
 	}
+	return sections, nil
 }
 
 func (fr *FirebaseRepository) CreateCourse(c *models.CreateCourseRequest) (course *models.Course, err error) {
