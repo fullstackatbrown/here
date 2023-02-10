@@ -13,6 +13,7 @@ type Course struct {
 	Assignments  []Assignment
 	GradeOptions []string
 	Students     []string
+	SurveyID     string
 }
 
 type GetCourseRequest struct {

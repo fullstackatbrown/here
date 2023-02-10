@@ -18,7 +18,7 @@ func SurveyRoutes() *chi.Mux {
 	router.Post("/", createSurveyHandler)
 	router.Route("/{surveyID}", func(router chi.Router) {
 		router.Use(middleware.SurveyCtx())
-
+		router.Get("/", getSurveyHandler)
 		router.Mount("/responses", ResponsesRoutes())
 
 	})
@@ -29,8 +29,18 @@ func ResponsesRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Post("/", createSurveyResponseHandler)
-	router.Get("/", listSurveyResponseHandler)
 	return router
+}
+
+func getSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	surveyID := r.Context().Value("surveyID").(string)
+
+	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	render.JSON(w, r, survey)
 }
 
 func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +67,8 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: add the survey id to the course
+
 	render.JSON(w, r, s)
 
 }
@@ -82,14 +94,4 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, s)
-}
-
-func listSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
-	surveyID := r.Context().Value("surveyID").(string)
-	responses, err := repo.Repository.ListSurveyResponse(surveyID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	render.JSON(w, r, responses)
 }

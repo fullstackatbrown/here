@@ -4,18 +4,39 @@ import (
 	"fmt"
 	"log"
 
+	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/mitchellh/mapstructure"
-	"google.golang.org/api/iterator"
 )
+
+func (fr *FirebaseRepository) GetSurveyByID(ID string) (*models.Survey, error) {
+
+	doc, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(ID).Get(firebase.Context)
+	if err != nil {
+		return nil, err
+	}
+
+	var s models.Survey
+	err = mapstructure.Decode(doc.Data(), &s)
+	if err != nil {
+		log.Panicf("Error destructuring document: %v", err)
+		return nil, err
+	}
+
+	s.ID = doc.Ref.ID
+
+	return &s, nil
+}
 
 func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Survey, error) {
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Add(firebase.Context, map[string]interface{}{
-		"name":     survey.Name,
-		"courseID": survey.CourseID,
-		"capacity": survey.Capacity,
+		"name":         survey.Name,
+		"courseID":     survey.CourseID,
+		"capacity":     survey.Capacity,
+		"responses":    survey.Responses,
+		"numresponses": survey.NumResponses,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error creating survey: %v\n", err)
@@ -25,48 +46,32 @@ func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Surve
 	return survey, nil
 }
 
-func (fr *FirebaseRepository) CreateSurveyResponse(c *models.CreateSurveyResponseRequest) (response *models.SurveyResponse, err error) {
+func (fr *FirebaseRepository) CreateSurveyResponse(c *models.CreateSurveyResponseRequest) (survey *models.Survey, err error) {
 
-	response = &models.SurveyResponse{
-		UserID: c.UserID,
-		Times:  c.Times,
+	survey, err = fr.GetSurveyByID(c.SurveyID)
+	if err != nil {
+		return nil, fmt.Errorf("error getting survey: %v\n", err)
 	}
 
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(c.SurveyID).Collection(models.FirestoreSurveyResponsesCollection).Add(firebase.Context, map[string]interface{}{
-		"userID": response.UserID,
-		"times":  response.Times,
+	if survey.Responses == nil {
+		survey.Responses = make(map[string][]string)
+	}
+	// override previous response
+	survey.Responses[c.UserID] = c.Availability
+	survey.NumResponses += 1
+
+	_, err = fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(c.SurveyID).Update(firebase.Context, []firestore.Update{
+		{
+			Path:  "responses",
+			Value: survey.Responses,
+		},
+		{Path: "numresponses",
+			Value: survey.NumResponses,
+		},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error creating survey: %v\n", err)
-	}
-	response.ID = ref.ID
-
-	return response, nil
-}
-
-func (fr *FirebaseRepository) ListSurveyResponse(surveyID string) (responses []models.SurveyResponse, err error) {
-
-	responses = make([]models.SurveyResponse, 0)
-	iter := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(surveyID).Collection(models.FirestoreSurveyResponsesCollection).Documents(firebase.Context)
-
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, fmt.Errorf("error listing survey response: %v\n", err)
-		}
-
-		var res models.SurveyResponse
-		err = mapstructure.Decode(doc.Data(), &res)
-		if err != nil {
-			log.Panicf("Error destructuring document: %v", err)
-			return nil, err
-		}
-		res.ID = doc.Ref.ID
-		responses = append(responses, res)
+		return nil, fmt.Errorf("error updating survey: %v\n", err)
 	}
 
-	return responses, nil
+	return survey, nil
 }

@@ -1,22 +1,16 @@
 package models
 
 var (
-	FirestoreSurveysCollection         = "surveys"
-	FirestoreSurveyResponsesCollection = "responses"
+	FirestoreSurveysCollection = "surveys"
 )
 
 type Survey struct {
-	ID        string
-	CourseID  string
-	Name      string
-	Capacity  map[string]int
-	Responses []SurveyResponse
-}
-
-type SurveyResponse struct {
-	ID     string
-	UserID string
-	Times  []string
+	ID           string
+	CourseID     string
+	Name         string
+	Capacity     map[string]int
+	Responses    map[string][]string
+	NumResponses int
 }
 
 type Times struct {
@@ -30,9 +24,9 @@ type CreateSurveyRequest struct {
 }
 
 type CreateSurveyResponseRequest struct {
-	UserID   string   `json:"omitempty"`
-	SurveyID string   `json:"omitempty"`
-	Times    []string `json:"times"`
+	UserID       string   `json:"omitempty"`
+	SurveyID     string   `json:"omitempty"`
+	Availability []string `json:"availability"`
 }
 
 func InitSurvey(name string, courseID string, sections []Section) *Survey {
@@ -46,8 +40,10 @@ func InitSurvey(name string, courseID string, sections []Section) *Survey {
 	}
 
 	return &Survey{
-		Name:     name,
-		CourseID: courseID,
-		Capacity: capacity,
+		Name:         name,
+		CourseID:     courseID,
+		Capacity:     capacity,
+		NumResponses: 0,
+		Responses:    make(map[string][]string),
 	}
 }

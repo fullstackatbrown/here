@@ -7,6 +7,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
+	"github.com/fullstackatbrown/here/pkg/sectionallocation"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -83,5 +84,23 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("courseID").(string)
+	courseID := r.Context().Value("courseID").(string)
+	course, err := repo.Repository.GetCourseByID(courseID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	survey, err := repo.Repository.GetSurveyByID(course.SurveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	res, _, err := sectionallocation.AssignSections(survey.Capacity, survey.Responses)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	render.JSON(w, r, res)
 }
