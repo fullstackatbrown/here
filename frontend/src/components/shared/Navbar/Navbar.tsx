@@ -70,7 +70,7 @@ const Navbar: FC<NavbarProps> = ({
                                 <Box mr={1} width={32} height={32}>
                                     <Logo/>
                                 </Box>
-                                Hours
+                                Here
                             </Link>
                         </NextLink>
                         {startItems}

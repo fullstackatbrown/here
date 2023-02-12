@@ -1,28 +1,48 @@
 import {useEffect, useState} from "react";
-import {Course} from "@util/course/api";
+import {Course} from "model/general"
 import {collection, doc, getFirestore, onSnapshot} from "@firebase/firestore";
 import AuthAPI, {User} from "@util/auth/api";
+
+const dummyCourse: Course = {
+    code: "CSCI 1470",
+    title: "Deep Learning",
+    sections: [],
+    assignments: [],
+    gradeOptions: [],
+    students: [],
+};
+
+const dummyCourses: Course[] = [dummyCourse]
+
 
 export function useCourses(): [Course[] | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [courses, setCourses] = useState<Course[] | undefined>(undefined);
 
-    useEffect(() => {
-        const db = getFirestore();
-        const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
-            const res: Course[] = [];
-            querySnapshot.forEach((doc) => {
-                res.push({id: doc.id, ...doc.data()} as Course);
-            });
 
-            setCourses(res);
-            setLoading(false);
-        });
+    // TODO: make call to backend to get courses
+    // useEffect(() => {
+    //     const db = getFirestore();
+    //     const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
+    //         const res: Course[] = [];
+    //         querySnapshot.forEach((doc) => {
+    //             res.push({id: doc.id, ...doc.data()} as Course);
+    //         });
 
-        return () => unsubscribe();
-    }, []);
+    //         setCourses(res);
+    //         setLoading(false);
+    //     });
 
-    return [courses, loading];
+    //     return () => unsubscribe();
+    // }, []);
+
+    // return [courses, loading];
+
+    return [dummyCourses, false];
+}
+
+export function useCourse(courseID: string): [Course | undefined, boolean] {
+    return [dummyCourse, false];
 }
 
 export function useCourseStaff(courseID: string): [User[], boolean] {

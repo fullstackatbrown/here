@@ -1,27 +1,27 @@
 import React, { FC } from "react";
 import { Box, ButtonBase, Paper, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { Section } from "@util/section/api";
-import getSectionColor from "@util/shared/getSectionColor";
+import { Course } from "model/general";
+import getCourseColor from "@util/shared/getCourseColor";
 import BackpackIcon from "@mui/icons-material/Backpack";
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import { AccessTime } from "@mui/icons-material";
 
 export interface CourseCardProps {
-  section: Section;
+  course: Course;
 }
 
 /**
  * CourseCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const CourseCard: FC<CourseCardProps> = ({ section }) => {
+const CourseCard: FC<CourseCardProps> = ({ course }) => {
   const router = useRouter();
 
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden" }}>
       <ButtonBase
-        onClick={() => router.push("/section/" + section.id)}
+        onClick={() => router.push("/course/" + course.code)}
         sx={{ width: "100%", textAlign: "left" }}
         focusRipple
       >
@@ -30,13 +30,13 @@ const CourseCard: FC<CourseCardProps> = ({ section }) => {
           height={125}
           p={2}
           color="#fff"
-          sx={{ bgcolor: getSectionColor(section) }}
+          sx={{ bgcolor: getCourseColor(course) }}
         >
           <Typography variant="body1" noWrap>
-            {section.course.code}
+            {course.code}
           </Typography>
           <Typography variant="h5" fontWeight={600}>
-            {section.course.title}
+            {course.title}
           </Typography>
         </Box>
       </ButtonBase>

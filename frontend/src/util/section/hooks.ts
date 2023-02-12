@@ -1,28 +1,21 @@
-import { Section } from "@util/section/api";
+import { Section } from "model/general";
+
+const dummySection: Section = {
+  id: "csci1470",
+  day: 1,
+  startTime: "2021-09-01T00:00:00.000Z",
+  endTime: "2021-09-01T00:00:00.000Z",
+  location: "CIT 201",
+  capacity: 30,
+  enrollment: 3,
+  /** student id */
+  students: ["1", "2", "3"],
+}
 
 export function useSection(id: string): [Section | undefined, boolean] {
   return [
-    {
-      id: "1",
-      title: "Section 1",
-      color: "#123456",
-      description: "This is a section",
-      course: {
-        id: "1",
-        title: "Deep Learning",
-        code: "CSCI 1470",
-        term: "Fall 2022",
-        coursePermissions: {},
-      },
-      day: 1,
-      location: "CIT 477",
-      startTime: new Date(),
-      endTime: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-      capacity: 100,
-      enrollment: 50,
-    },
-    false,
-  ];
+    dummySection, false
+  ]
 }
 
 export function useSections(): [Section[] | undefined, boolean] {
@@ -30,25 +23,7 @@ export function useSections(): [Section[] | undefined, boolean] {
   // TODO: implement with util/queue/hooks.ts as reference
   return [
     [
-      {
-        id: "1",
-        title: "Section 1",
-        color: "#123456",
-        description: "This is a section",
-        course: {
-          id: "1",
-          title: "Deep Learning",
-          code: "CSCI 1470",
-          term: "Fall 2022",
-          coursePermissions: {},
-        },
-        day: 1,
-        location: "CIT 477",
-        startTime: new Date(),
-        endTime: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-        capacity: 100,
-        enrollment: 50,
-      },
+      dummySection
     ],
     false,
   ];

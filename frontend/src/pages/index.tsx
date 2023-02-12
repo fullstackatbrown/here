@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import { Box, Grid, Stack, Typography } from "@mui/material";
-import { useQueues } from "util/queue/hooks";
 import AppLayout from "components/shared/AppLayout";
-import QueueCard from "components/home/QueueCard";
 import CreateQueueDialog from "components/home/CreateQueueDialog";
 import { useAuth } from "util/auth/hooks";
 import Button from "components/shared/Button";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import BouncingCubesAnimation from "components/animations/BouncingCubesAnimation";
-import { useSections } from "@util/section/hooks";
-import SectionCard from "@components/home/SectionCard";
 import CourseCard from "@components/home/CourseCard";
+import { useCourses } from "@util/course/hooks";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
-    const [sections, loading] = useSections();
+    const [courses, loading] = useCourses();
     const [createQueueDialog, setCreateQueueDialog] = useState(false);
 
     const isTA =
@@ -29,7 +26,7 @@ export default function Home() {
                 open={createQueueDialog}
                 onClose={() => setCreateQueueDialog(false)}
             />
-            {sections && sections.length > 0 && isTA && (
+            {courses && courses.length > 0 && isTA && (
                 <Box mb={2}>
                     <Button
                         startIcon={<AddCircleIcon />}
@@ -39,21 +36,21 @@ export default function Home() {
                     </Button>
                 </Box>
             )}
-            {sections && sections.length > 0 && (
+            {courses && courses.length > 0 && (
                 <Grid
                     spacing={3}
                     container
                     direction="row"
                     alignItems="stretch"
                 >
-                    {sections.map((queue) => (
-                        <Grid key={queue.id} item xs={12} md={6} lg={4} xl={3}>
-                            <CourseCard section={queue} />
+                    {courses.map((course) => (
+                        <Grid key={course.code} item xs={12} md={6} lg={4} xl={3}>
+                            <CourseCard course={course} />
                         </Grid>
                     ))}
                 </Grid>
             )}
-            {sections && sections.length === 0 && (
+            {courses && courses.length === 0 && (
                 <Stack
                     mt={4}
                     spacing={2}

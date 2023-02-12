@@ -1,4 +1,4 @@
-import { Section } from "@util/section/api";
+import { Section } from "model/general";
 
 function hashCodeFromString(str: string): number {
     let hash = 0;
@@ -11,11 +11,11 @@ function hashCodeFromString(str: string): number {
 }
 
 export default function getSectionColor(section: Section): string {
-    if (section.endTime < new Date()) {
+    if (new Date(section.endTime) < new Date()) {
         return "#1f1f1f";
     } else {
         const colors = ["#3f51b5", "#2196f3", "#673ab7", "#00838f", "#880e4f", "#4a148c", "#b71c1c", "#004d40"];
-        const hash = hashCodeFromString((section.course.id + section.course.title + section.title));
+        const hash = hashCodeFromString((section.id));
         const colorIndex = Math.abs(hash % (colors.length - 1));
         return colors[colorIndex];
     }
