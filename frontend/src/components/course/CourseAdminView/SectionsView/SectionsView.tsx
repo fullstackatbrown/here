@@ -1,8 +1,8 @@
 import { Stack } from "@mui/material";
 import { Course } from "model/general";
-import AllSections from "./AllSections/AllSections";
+import Assignments from "./Assignments/Assignments";
 import GradeOptions from "./GradeOptions/GradeOptions";
-import SectionAssignments from "./SectionAssignments/SectionAssignments";
+import Sections from "./Sections/Sections";
 
 export interface SectionsViewProps {
   course: Course;
@@ -11,9 +11,9 @@ export interface SectionsViewProps {
 export default function SectionsView(props: SectionsViewProps) {
   return (
     <Stack>
-      <SectionAssignments course={props.course} />
-      <AllSections course={props.course} />
-      <GradeOptions course={props.course}/>
+      <Sections course={props.course} />
+      <Assignments course={props.course} />
+      <GradeOptions course={props.course} />
     </Stack>
   );
 }
