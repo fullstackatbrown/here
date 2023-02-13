@@ -9,7 +9,7 @@ export default function Sections(props: SectionsProps) {
   return (
     <>
       <Typography variant="h6" fontWeight={600}>
-        Section
+        Sections
       </Typography>
       <Box height={300}>Fill this in...</Box>
     </>
