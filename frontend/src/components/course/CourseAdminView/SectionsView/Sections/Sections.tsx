@@ -9,7 +9,8 @@ export interface SectionsProps {
 }
 
 export default function Sections(props: SectionsProps) {
-  const [sections, res] = useSections();
+  const [maybeSections, _] = useSections();
+  const sections = maybeSections ?? [];
   return (
     <>
       <Stack direction="row" justifyContent="space-between">
@@ -19,7 +20,9 @@ export default function Sections(props: SectionsProps) {
         <Button>+ New</Button>
       </Stack>
       <Box height={300}>
-        <HTASectionCard section={sections![0]} />
+        {sections.map((s, index) => (
+          <HTASectionCard key={index} section={s} />
+        ))}
       </Box>
     </>
   );
