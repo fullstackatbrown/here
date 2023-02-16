@@ -23,7 +23,9 @@ export function useSections(): [Section[] | undefined, boolean] {
   // TODO: implement with util/queue/hooks.ts as reference
   return [
     [
-      dummySection
+      dummySection,
+      dummySection,
+      dummySection,
     ],
     false,
   ];

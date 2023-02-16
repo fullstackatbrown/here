@@ -19,11 +19,11 @@ export default function Sections(props: SectionsProps) {
         </Typography>
         <Button>+ New</Button>
       </Stack>
-      <Box height={300}>
+      <Stack height={180} direction="row" overflow="scroll" spacing={3}>
         {sections.map((s, index) => (
           <HTASectionCard key={index} section={s} />
         ))}
-      </Box>
+      </Stack>
     </>
   );
 }
