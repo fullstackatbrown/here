@@ -23,6 +23,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.37.0",
     "react-hot-toast": "^2.4.0",
+    "react-lottie": "^1.2.3",
     "ts-proto": "^1.133.0",
     "ts-protoc-gen": "^0.15.0"
   },
