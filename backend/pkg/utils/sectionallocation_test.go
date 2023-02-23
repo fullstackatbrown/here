@@ -6,6 +6,12 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func assertEquals(got interface{}, want interface{}, t *testing.T) {
+	if !cmp.Equal(got, want) {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
 func TestSimpleAllocation(t *testing.T) {
 	capacity := map[string]int{
 		"L1": 1,
@@ -23,8 +29,6 @@ func TestSimpleAllocation(t *testing.T) {
 		"E": {"L5"},
 	}
 
-	allocated_got, missing_got := AssignSections(capacity, availability)
-
 	allocated_want := map[string][]string{
 		"L1": {"A"},
 		"L2": {"B"},
@@ -35,11 +39,11 @@ func TestSimpleAllocation(t *testing.T) {
 
 	missing_want := []string{}
 
-	if !cmp.Equal(allocated_got, allocated_want) {
-		t.Errorf("got %q, wanted %q", allocated_got, allocated_want)
-	}
+	allocated_got, missing_got := AssignSections(capacity, availability)
 
-	if !cmp.Equal(missing_got, missing_want) {
-		t.Errorf("got %q, wanted %q", missing_got, missing_want)
-	}
+	assertEquals(allocated_got, allocated_want, t)
+	assertEquals(missing_got, missing_want, t)
+}
+
+func TestNonPerfectMatching(t *testing.T) {
 }
