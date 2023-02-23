@@ -46,7 +46,7 @@ Make sure you have Go and npm installed on your device
             studentID: int                  # the id of the student the grade is for
             grade: string                   # the grade in gradeOptions
             taId: int                       # id of the TA that graded the assignment
-            timeUpdated: string             # when the time was updated
+            timeUpdated: Timestamp             # when the time was updated
 
 <b>students (collection)</b>
     id: int
