@@ -75,25 +75,25 @@ Make sure you have Go and npm installed on your device
 <pre>
 <b>courses (collection)</b>
     id: string                     # unique id of the course
-    title: string               # name of the course
-    courseCode: string          # course's course code
-    term: string                # semester this course is offered
-    gradeOptions: []string      # list of grade options for the course default: [completed, incomplete, ungraded]
-    students: map[int]int       # map from studentIDs to sectionIDs
-    surveyID: string            # id of the survey attached to this course
+    title: string                  # name of the course
+    courseCode: string             # course's course code
+    term: string                   # semester this course is offered
+    gradeOptions: []string         # list of grade options for the course default: [completed, incomplete, ungraded]
+    students: map[int]int          # map from studentIDs to sectionIDs
+    surveyID: string               # id of the survey attached to this course
     <b>sections (sub-collection)</b>
-        id: string                             # unique id of the section
+        id: string                          # unique id of the section
         day: string                         # the day this section runs
         startTime: string                   # the time the section starts
         endTime: string                     # the time the section ends
         location: string                    # where the section takes place
         sectionCapacity: int                # max section capacity
         numStudentsEnrolled: int            # how full the current section is
-        enrolledStudents: []string       # studentIDs enrolled in the section
+        enrolledStudents: []string          # studentIDs enrolled in the section
         swappedInStudents: map[int][]int    # maps assignmentIDs to studentIDs that swap into this section
         swappedOutStudents: map[int]int     # maps assignmentIDs to studentIDs that swapped out of this section
     <b>assignments (sub-collection)</b>
-        id: string                             # unique assignment id
+        id: string                          # unique assignment id
         name: string                        # name of the assignment
         mandatory: bool                     # whether or not this assignment is mandatory to complete
         startDate: string                   # when the assignment is released
