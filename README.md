@@ -79,19 +79,19 @@ Make sure you have Go and npm installed on your device
     courseCode: string             # course's course code
     term: string                   # semester this course is offered
     gradeOptions: []string         # list of grade options for the course default: [completed, incomplete, ungraded]
-    students: map[int]int          # map from studentIDs to sectionIDs
+    students: map[string]string    # map from studentIDs to sectionIDs
     surveyID: string               # id of the survey attached to this course
     <b>sections (sub-collection)</b>
-        id: string                          # unique id of the section
-        day: string                         # the day this section runs
-        startTime: string                   # the time the section starts
-        endTime: string                     # the time the section ends
-        location: string                    # where the section takes place
-        sectionCapacity: int                # max section capacity
-        numStudentsEnrolled: int            # how full the current section is
-        enrolledStudents: []string          # studentIDs enrolled in the section
-        swappedInStudents: map[int][]int    # maps assignmentIDs to studentIDs that swap into this section
-        swappedOutStudents: map[int]int     # maps assignmentIDs to studentIDs that swapped out of this section
+        id: string                                # unique id of the section
+        day: string                               # the day this section runs
+        startTime: string                         # the time the section starts
+        endTime: string                           # the time the section ends
+        location: string                          # where the section takes place
+        capacity: int                             # max section capacity
+        numStudentsEnrolled: int                  # how full the current section is
+        enrolledStudents: []string                # studentIDs enrolled in the section
+        swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
+        swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
     <b>assignments (sub-collection)</b>
         id: string                          # unique assignment id
         name: string                        # name of the assignment
@@ -103,29 +103,31 @@ Make sure you have Go and npm installed on your device
             id: string                         # unique grade id
             studentID: string                  # the id of the student the grade is for
             grade: string                      # the grade in gradeOptions
-            taId: string                       # id of the TA that graded the assignment
+            gradedBy: string                   # id of the TA that graded the assignment
             timeUpdated: Timestamp             # when the time was updated
     <b>swapRequest (sub-collection)</b>
         id: string
         studentID: string                      # ID of student
         oldSectionID: string                   # ID of the section the student is swapping out of
         newSectionID: string                   # ID of the section the student is swapping into
+        isTemporary: bool                      # if this is a temporary swap or not
+        requestTime: timestamp                 # when the request was submitted
         reason: string                         # reason for the swap
         approved: bool                         # if the swap was approved or not
         handledBy: string                      # automatic or taID
-        isTemporary: bool                      # if this is a temporary swap or not
+        
 
 
 <b>students (collection)</b>
     id: string
-    defaultSection: map[int]int                # map from courseID to sectionID
-    actualSection: map[int]map[int]int         # map from courseID to map from assignmentID to sectionID
+    defaultSection: map[string]string                # map from courseID to sectionID
+    actualSection: map[string]map[string]string      # map from courseID to map from assignmentID to sectionID
 
 <b>surveys (collection)</b>
     id: string
     courseID: string
     name: string
     capacity: map[string]int                   # map from time to section capacity
-    responses: map[int][]string                # map from studentID to available times
+    responses: map[string][]string                # map from studentID to available times
     numResponses: int
 </pre>
