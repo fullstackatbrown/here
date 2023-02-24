@@ -47,7 +47,7 @@ Make sure you have Go and npm installed on your device
 
 | Description               | Route                                                 | Body                          | Auth  |
 | ------------------------- | ----------------------------------------------------- | ----------------------------- | ----- |
-| Get all student responses | `GET /v1/surveys/{surveyID}/`                         |                               | Staff |
+| Get survey by id          | `GET /v1/surveys/{surveyID}/`                         |                               | Staff |
 | Create survey             | `POST /v1/surveys`                                    | Mandatory: `courseID`, `name` | Admin |
 | Publish                   | `POST /v1/surveys/{surveyID}/publish`                 |                               | Admin |
 | Create response           | `POST /v1/surveys/{surveyID}/responses`               | Mandatory: `times: []string`  | All   |
@@ -60,7 +60,7 @@ Make sure you have Go and npm installed on your device
 | Create a Swap Request | `POST /v1/courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All   |
 | Update Swap Request   | `PATCH /v1/courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                          |                           | Staff & Self|
 | Get all Swaps         | `GET /v1/courses/{courseId}/swaps/`            |                                                                                | JSON of swaps             | Staff |
-| Get swap by student   | `GET /v1/courses/{courseId}/swaps/{studentID}` |                                                                                |                           | All   |
+| Get swap by student   | `GET /v1/courses/{courseId}/swaps/me`          |                                                                                |                           | All   |
 
 ### Methods - Grades
 
@@ -129,7 +129,8 @@ Make sure you have Go and npm installed on your device
     id: string
     courseID: string
     name: string
+    published: bool                            # whether if the survey is published
     capacity: map[string]int                   # map from time to section capacity
-    responses: map[string][]string                # map from studentID to available times
+    responses: map[string][]string             # map from studentID to available times
     numResponses: int
 </pre>
