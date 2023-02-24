@@ -130,6 +130,7 @@ Make sure you have Go and npm installed on your device
     courseID: string
     name: string
     published: bool                            # whether if the survey is published
+    description: string
     capacity: map[string]int                   # map from time to section capacity
     responses: map[string][]string             # map from studentID to available times
     numResponses: int
