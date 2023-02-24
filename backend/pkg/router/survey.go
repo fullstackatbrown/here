@@ -19,6 +19,7 @@ func SurveyRoutes() *chi.Mux {
 	router.Route("/{surveyID}", func(router chi.Router) {
 		router.Use(middleware.SurveyCtx())
 		router.Get("/", getSurveyHandler)
+		router.Post("/", publishSurveyHandler)
 		router.Mount("/responses", ResponsesRoutes())
 
 	})
@@ -29,6 +30,7 @@ func ResponsesRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Post("/", createSurveyResponseHandler)
+	router.Patch("/", updateSurveyResponseHandler)
 	return router
 }
 
@@ -73,6 +75,10 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO:
+}
+
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	surveyID := r.Context().Value("surveyID").(string)
 
@@ -94,4 +100,10 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, s)
+}
+
+func updateSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
+	// surveyID := r.Context().Value("surveyID").(string)
+
+	// TODO:
 }
