@@ -27,6 +27,7 @@ Make sure you have Go and npm installed on your device
 
 | Description       | Route                                                | Body                                                                       | Auth  |
 | ----------------- | ---------------------------------------------------- | -------------------------------------------------------------------------- | ----- |
+| Get all sections  | `GET /v1/courses/{courseId}/sections`                |                                                                            | Staff |
 | Get section by id | `GET /v1/courses/{courseId}/sections/{sectionId}`    |                                                                            | All   |
 | Delete section    | `DELETE /v1/courses/{courseId}/sections/{sectionId}` |                                                                            | Admin |
 | Create section    | `POST /v1/courses/{courseId}/sections/`              | Mandatory: `day`, `startTime`, `endTime`; Optional: `location`, `capacity` | Admin |
@@ -36,6 +37,7 @@ Make sure you have Go and npm installed on your device
 
 | Description          | Route                                                      | Body                                                   | Auth  |
 | -------------------- | ---------------------------------------------------------- | ------------------------------------------------------ | ----- |
+| Get all assignments  | `GET /v1/courses/{courseId}/assignments`                   |                                                        | All   |
 | Get assignment by id | `GET /v1/courses/{courseId}/assignments/{assignmentId}`    |                                                        | All   |
 | Delete assignment    | `DELETE /v1/courses/{courseId}/assignments/{assignmentId}` |                                                        | Admin |
 | Create assignment    | `POST /v1/courses/{courseId}/assignments/`                 | Mandatory: `name`, `mandatory`, `startDate`, `endDate` | Admin |
@@ -45,7 +47,7 @@ Make sure you have Go and npm installed on your device
 
 | Description               | Route                                                 | Body                          | Auth  |
 | ------------------------- | ----------------------------------------------------- | ----------------------------- | ----- |
-| Get all student responses | `GET /v1/surveys/{surveyID}/`                         |                               | Staff |
+| Get survey by id          | `GET /v1/surveys/{surveyID}/`                         |                               | Staff |
 | Create survey             | `POST /v1/surveys`                                    | Mandatory: `courseID`, `name` | Admin |
 | Publish                   | `POST /v1/surveys/{surveyID}/publish`                 |                               | Admin |
 | Create response           | `POST /v1/surveys/{surveyID}/responses`               | Mandatory: `times: []string`  | All   |
@@ -55,10 +57,10 @@ Make sure you have Go and npm installed on your device
 
 | Description           | Route                                          | Body                                                                           | Response                  | Auth  |
 | --------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------- | ----- |
-| Create a Swap Request | `POST /v1/courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{ok: bool, msg: string}` | All   |
-| Handle Swap Request   | `PATCH /v1/courses/{courseId}/swaps/{swapID}/` | Mandatory: `approved`                                                          |                           | Staff |
+| Create a Swap Request | `POST /v1/courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All   |
+| Update Swap Request   | `PATCH /v1/courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                          |                           | Staff & Self|
 | Get all Swaps         | `GET /v1/courses/{courseId}/swaps/`            |                                                                                | JSON of swaps             | Staff |
-| Get swap by student   | `GET /v1/courses/{courseId}/swaps/{studentID}` |                                                                                |                           | All   |
+| Get swap by student   | `GET /v1/courses/{courseId}/swaps/me`          |                                                                                |                           | All   |
 
 ### Methods - Grades
 
@@ -113,7 +115,7 @@ Make sure you have Go and npm installed on your device
         isTemporary: bool                      # if this is a temporary swap or not
         requestTime: timestamp                 # when the request was submitted
         reason: string                         # reason for the swap
-        approved: bool                         # if the swap was approved or not
+        status: string                         # submitted, cancelled, approved, denied
         handledBy: string                      # automatic or taID
         
 
@@ -127,8 +129,9 @@ Make sure you have Go and npm installed on your device
     id: string
     courseID: string
     name: string
+    published: bool                            # whether if the survey is published
     description: string
     capacity: map[string]int                   # map from time to section capacity
-    responses: map[string][]string                # map from studentID to available times
+    responses: map[string][]string             # map from studentID to available times
     numResponses: int
 </pre>
