@@ -14,8 +14,8 @@ export default function SectionsView(props: SectionsViewProps) {
     <Stack>
       <Sections course={props.course} />
       <AvailabilitySurvey course={props.course} />
-      <Assignments course={props.course} />
       <GradeOptions course={props.course} />
+      <Assignments course={props.course} />
     </Stack>
   );
 }
