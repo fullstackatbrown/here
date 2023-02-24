@@ -9,7 +9,7 @@ import getSectionColor from "@util/shared/getSectionColor";
 import SectionStatusChip from "@components/course/CourseStatusChip";
 import formatSectionTime from "@util/shared/formatSectionTime";
 
-export interface HTASectionCardProps {
+export interface SectionCardProps {
   section: Section;
 }
 
@@ -17,7 +17,7 @@ export interface HTASectionCardProps {
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const HTASectionCard: FC<HTASectionCardProps> = ({ section }) => {
+const SectionCard: FC<SectionCardProps> = ({ section }) => {
   const startTime = new Date(section.startTime);
   const endTime = new Date(section.endTime);
   return (
@@ -46,13 +46,12 @@ const HTASectionCard: FC<HTASectionCardProps> = ({ section }) => {
       </ButtonBase>
       <Box width="100%" p={2} color={"#777777"}>
         <Stack direction="row" alignItems="center" spacing={1}>
-          {`${section.capacity - section.enrollment}/${
-            section.capacity
-          } Available`}
+          {`${section.capacity - section.enrollment}/${section.capacity
+            } Available`}
         </Stack>
       </Box>
     </Paper>
   );
 };
 
-export default HTASectionCard;
+export default SectionCard;
