@@ -97,10 +97,6 @@ func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, _, err := utils.AssignSections(survey.Capacity, survey.Responses)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	res, _ := utils.AssignSections(survey.Capacity, survey.Responses)
 	render.JSON(w, r, res)
 }

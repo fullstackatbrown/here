@@ -10,14 +10,16 @@ var (
 )
 
 type Section struct {
-	ID         string
-	Day        time.Weekday
-	StartTime  string
-	EndTime    string
-	Location   string
-	Capacity   int
-	Enrollment int
-	Students   []string // list of student ids
+	ID                  string
+	Day                 time.Weekday
+	StartTime           string
+	EndTime             string
+	Location            string
+	Capacity            int
+	NumStudentsEnrolled int
+	EntrolledStudents   []string
+	SwappedInStudents   map[string][]string
+	SwappedOutStudents  map[string][]string
 }
 
 type GetSectionRequest struct {
