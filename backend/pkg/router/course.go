@@ -14,29 +14,27 @@ import (
 
 func CourseRoutes() *chi.Mux {
 	router := chi.NewRouter()
-	// All course routes require authentication.
+	// TODO: All course routes require authentication.
 	// router.Use(middleware.AuthCtx())
 
 	// router.With(auth.RequireAdmin()).Post("/", createCourseHandler)
 	router.Post("/", createCourseHandler)
-	// Get metadata about a course
 	router.Route("/{courseID}", func(r chi.Router) {
 		r.Use(middleware.CourseCtx())
 
 		r.Get("/", getCourseHandler)
-
-		// Only Admins can delete a course
-		// router.With(auth.RequireAdmin()).Delete("/", deleteCourseHandler)
 		r.Delete("/", deleteCourseHandler)
+		r.Patch("/", updateCourseHandler)
 		r.Post("/assignSections", assignSectionsHandler)
 
 		r.Mount("/sections", SectionRoutes())
+		r.Mount("/assignments", AssignmentRoutes())
+		r.Mount("/swaps", SwapRoutes())
 	})
 
 	return router
 }
 
-// // GET: /{courseID}
 func getCourseHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
 
@@ -49,7 +47,6 @@ func getCourseHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, course)
 }
 
-// POST: /
 func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	var req *models.CreateCourseRequest
@@ -69,7 +66,6 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, c)
 }
 
-// DELETE: /{courseID}
 func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
 
@@ -81,6 +77,16 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully deleted course " + courseID))
+}
+
+// DELETE: /{courseID}
+func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+
+	// TODO:
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated course " + courseID))
 }
 
 func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {

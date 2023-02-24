@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -15,32 +16,35 @@ func SectionRoutes() *chi.Mux {
 	// All course routes require authentication.
 	// router.Use(middleware.AuthCtx())
 
-	// router.With(auth.RequireAdmin()).Post("/", createCourseHandler)
 	router.Post("/", createSectionHandler)
-	// Get metadata about a course
-	// router.Route("/{sectionID}", func(router chi.Router) {
-	// 	router.Use(middleware.SectionCtx())
-	// 	router.Get("/", getSectionHandler)
+	router.Get("/", getAllSectionsHandler)
+	router.Route("/{sectionID}", func(router chi.Router) {
+		router.Use(middleware.SectionCtx())
+		router.Get("/", getSectionHandler)
+		router.Delete("/", deleteSectionHandler)
+		router.Patch("/", updateSectionHandler)
 
-	// })
+	})
 
 	return router
 }
 
-// // GET: /{sectionID}
-func getSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("sectionID").(string)
+func getAllSectionsHandler(w http.ResponseWriter, r *http.Request) {
+	// courseID := r.Context().Value("sectionID").(string)
 
-	course, err := repo.Repository.GetCourseByID(courseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// TODO:
 
-	render.JSON(w, r, course)
+	// render.JSON(w, r, course)
 }
 
-// POST:
+func getSectionHandler(w http.ResponseWriter, r *http.Request) {
+	// courseID := r.Context().Value("sectionID").(string)
+
+	// TODO:
+
+	// render.JSON(w, r, course)
+}
+
 func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
 	var req *models.CreateSectionRequest
@@ -58,4 +62,24 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, c)
+}
+
+func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
+	// courseID := r.Context().Value("courseID").(string)
+	// var req *models.UpdateSectionRequest
+
+	// err := json.NewDecoder(r.Body).Decode(&req)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
+
+	// TODO:
+}
+
+func deleteSectionHandler(w http.ResponseWriter, r *http.Request) {
+	// courseID := r.Context().Value("courseID").(string)
+
+	// TODO:
+
 }
