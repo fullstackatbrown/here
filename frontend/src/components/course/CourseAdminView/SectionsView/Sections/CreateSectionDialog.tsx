@@ -44,12 +44,10 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) =>
             endtime: dayjs('2014-08-18T00:00:00'),
         }
     });
-    const [value, setValue] = useState<Dayjs | null>(
-        dayjs('2014-08-18T21:11:54'),
-    );
-    const onSubmit = handleSubmit(async data => {
-        console.log(data)
 
+    const onSubmit = handleSubmit(async data => {
+        // TODO: submit form 
+        console.log(data)
     });
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
