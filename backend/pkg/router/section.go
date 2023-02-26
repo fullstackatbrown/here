@@ -55,7 +55,9 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c, err := repo.Repository.CreateSection(courseID, req)
+	req.CourseID = courseID
+
+	c, err := repo.Repository.CreateSection(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
