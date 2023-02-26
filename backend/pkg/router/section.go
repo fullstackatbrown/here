@@ -32,20 +32,10 @@ func SectionRoutes() *chi.Mux {
 func getAllSectionsHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
 
-	course, err := repo.Repository.GetCourseByID(courseID)
+	sections, err := repo.Repository.GetSectionByCourse(courseID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	sections := make([]*models.Section, 0)
-	for _, sectionID := range course.SectionIDs {
-		section, err := repo.Repository.GetSectionByID(sectionID)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		sections = append(sections, section)
 	}
 
 	render.JSON(w, r, sections)

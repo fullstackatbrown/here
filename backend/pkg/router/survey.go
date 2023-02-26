@@ -55,7 +55,7 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get all the section times
-	sections, err := repo.Repository.ListCourseSections(req.CourseID)
+	sections, err := repo.Repository.GetSectionByCourse(req.CourseID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

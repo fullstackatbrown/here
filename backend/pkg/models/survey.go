@@ -29,7 +29,7 @@ type CreateSurveyResponseRequest struct {
 	Availability []string `json:"availability"`
 }
 
-func InitSurvey(name string, courseID string, sections []Section) *Survey {
+func InitSurvey(name string, courseID string, sections []*Section) *Survey {
 	// Get all the unique times
 	capacity := make(map[string]int)
 	for _, s := range sections {

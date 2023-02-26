@@ -63,6 +63,25 @@ func (fr *FirebaseRepository) GetSectionByID(ID string) (*models.Section, error)
 	}
 }
 
+func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Section, error) {
+	course, err := fr.GetCourseByID(courseID)
+	if err != nil {
+		return nil, err
+	}
+
+	sections := make([]*models.Section, 0)
+	for _, sectionID := range course.SectionIDs {
+		section, err := fr.GetSectionByID(sectionID)
+		if err != nil {
+			return nil, err
+		}
+		sections = append(sections, section)
+	}
+
+	return sections, nil
+
+}
+
 func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
 	startTime, err := iso8601.ParseString(req.StartTime)
 	if err != nil {
