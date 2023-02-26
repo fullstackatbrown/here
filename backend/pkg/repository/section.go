@@ -79,7 +79,6 @@ func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Sec
 	}
 
 	return sections, nil
-
 }
 
 func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {

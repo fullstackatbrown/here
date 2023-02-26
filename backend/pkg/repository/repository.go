@@ -36,14 +36,21 @@ type FirebaseRepository struct {
 
 	assignmentsLock *sync.RWMutex
 	assignments     map[string]*models.Assignment
+
+	surveysLock *sync.RWMutex
+	surveys     map[string]*models.Survey
 }
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {
 	fr := &FirebaseRepository{
 		coursesLock:     &sync.RWMutex{},
-		sectionsLock:    &sync.RWMutex{},
-		assignmentsLock: &sync.RWMutex{},
 		courses:         make(map[string]*models.Course),
+		sectionsLock:    &sync.RWMutex{},
+		sections:        make(map[string]*models.Section),
+		assignmentsLock: &sync.RWMutex{},
+		assignments:     make(map[string]*models.Assignment),
+		surveysLock:     &sync.RWMutex{},
+		surveys:         make(map[string]*models.Survey),
 	}
 
 	authClient, err := firebase.App.Auth(firebase.Context)
