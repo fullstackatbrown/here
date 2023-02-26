@@ -7,26 +7,72 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/mitchellh/mapstructure"
 )
 
+func (fr *FirebaseRepository) initializeSurveysListener() {
+	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
+		newSurveys := make(map[string]*models.Survey)
+		for _, doc := range docs {
+			if !doc.Exists() {
+				continue
+			}
+
+			var c models.Survey
+			err := mapstructure.Decode(doc.Data(), &c)
+			if err != nil {
+				log.Panicf("Error destructuring document: %v", err)
+				return err
+			}
+
+			c.ID = doc.Ref.ID
+			newSurveys[doc.Ref.ID] = &c
+		}
+
+		fr.surveysLock.Lock()
+		defer fr.surveysLock.Unlock()
+		fr.surveys = newSurveys
+
+		return nil
+	}
+
+	done := make(chan bool)
+	query := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Query
+	go func() {
+		err := fr.createCollectionInitializer(query, &done, handleDocs)
+		if err != nil {
+			log.Panicf("error creating surveys collection listner: %v\n", err)
+		}
+	}()
+	<-done
+}
+
 func (fr *FirebaseRepository) GetSurveyByID(ID string) (*models.Survey, error) {
+	fr.surveysLock.RLock()
+	defer fr.surveysLock.RUnlock()
 
-	doc, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(ID).Get(firebase.Context)
+	if val, ok := fr.surveys[ID]; ok {
+		return val, nil
+	} else {
+		return nil, qerrors.SurveyNotFoundError
+	}
+}
+
+func (fr *FirebaseRepository) GetSurveyByCourse(courseID string) (survey *models.Survey, err error) {
+	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
 
-	var s models.Survey
-	err = mapstructure.Decode(doc.Data(), &s)
-	if err != nil {
-		log.Panicf("Error destructuring document: %v", err)
-		return nil, err
+	if course.SurveyID != "" {
+		survey, err = fr.GetSurveyByID(course.SurveyID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	s.ID = doc.Ref.ID
-
-	return &s, nil
+	return survey, nil
 }
 
 func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Survey, error) {

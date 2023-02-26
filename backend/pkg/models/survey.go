@@ -5,12 +5,12 @@ var (
 )
 
 type Survey struct {
-	ID           string
-	CourseID     string
-	Name         string
-	Capacity     map[string]int
-	Responses    map[string][]string
-	NumResponses int
+	ID           string              `firestore:"id,omitempty"`
+	CourseID     string              `firestore:"courseID"`
+	Name         string              `firestore:"name"`
+	Capacity     map[string]int      `firestore:"capacity"`
+	Responses    map[string][]string `firestore:"responses"`
+	NumResponses int                 `firestore:"numResponses"`
 }
 
 type Times struct {
