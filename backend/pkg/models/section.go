@@ -13,8 +13,8 @@ type Section struct {
 	ID                  string              `firestore:"id,omitempty"`
 	CourseID            string              `firestore:"courseID"`
 	Day                 time.Weekday        `firestore:"day"`
-	StartTime           string              `firestore:"starttime"`
-	EndTime             string              `firestore:"endtime"`
+	StartTime           string              `firestore:"startTime"`
+	EndTime             string              `firestore:"endTime"`
 	Location            string              `firestore:"location"`
 	Capacity            int                 `firestore:"capacity"`
 	NumStudentsEnrolled int                 `firestore:"numStudentsEnrolled"`
@@ -32,8 +32,8 @@ type CreateSectionRequest struct {
 	// (Sunday = 0, ...)
 	Day int `json:"day"`
 	// must be ISO8601 compliant
-	StartTime string `json:"starttime"`
-	EndTime   string `json:"endtime"`
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
 	Location  string `json:"location"`
 	Capacity  int    `json:"capacity"`
 }

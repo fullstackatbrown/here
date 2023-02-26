@@ -45,7 +45,7 @@ func (fr *FirebaseRepository) initializeSectionsListener() {
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)
 		if err != nil {
-			log.Panicf("error creating course collection listner: %v\n", err)
+			log.Panicf("error creating sections collection listner: %v\n", err)
 		}
 	}()
 	<-done

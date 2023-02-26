@@ -7,8 +7,9 @@ var (
 	InvalidBody = errors.New("invalid body")
 
 	// Course errors
-	CourseNotFoundError  = errors.New("course not found")
-	SectionNotFoundError = errors.New("section not found")
+	CourseNotFoundError     = errors.New("course not found")
+	SectionNotFoundError    = errors.New("section not found")
+	AssignmentNotFoundError = errors.New("assignment not found")
 
 	// User errors
 	DeleteUserError    = errors.New("an error occurred while deleting user")
