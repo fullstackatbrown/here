@@ -39,7 +39,8 @@ type CreateSectionRequest struct {
 }
 
 type DeleteSectionRequest struct {
-	SectionID string `json:"sectionid"`
+	CourseID  string
+	SectionID string
 }
 
 func (section *Section) TimeAsString() string {

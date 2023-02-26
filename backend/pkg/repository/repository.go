@@ -40,8 +40,9 @@ type FirebaseRepository struct {
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {
 	fr := &FirebaseRepository{
-		coursesLock: &sync.RWMutex{},
-		courses:     make(map[string]*models.Course),
+		coursesLock:  &sync.RWMutex{},
+		sectionsLock: &sync.RWMutex{},
+		courses:      make(map[string]*models.Course),
 	}
 
 	authClient, err := firebase.App.Auth(firebase.Context)
@@ -59,7 +60,7 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 	// Execute the listeners sequentially, in case later listeners need to utilize data fetched
 	// by previous listeners
 	// initFns := []func(){fr.initializeCoursesListener, fr.initializeUserProfilesListener}
-	initFns := []func(){fr.initializeCoursesListener}
+	initFns := []func(){fr.initializeCoursesListener, fr.initializeSectionsListener}
 	for _, initFn := range initFns {
 		fmt.Println("Something was initialized!")
 		initFn()
