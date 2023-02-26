@@ -35,6 +35,8 @@ func (fr *FirebaseRepository) initializeSectionsListener() {
 		defer fr.sectionsLock.Unlock()
 		fr.sections = newSections
 
+		fmt.Println(newSections)
+
 		return nil
 	}
 
@@ -49,44 +51,54 @@ func (fr *FirebaseRepository) initializeSectionsListener() {
 	<-done
 }
 
-func (fr *FirebaseRepository) CreateSection(courseID string, c *models.CreateSectionRequest) (section *models.Section, err error) {
-	startTime, err := iso8601.ParseString(c.StartTime)
+func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
+	startTime, err := iso8601.ParseString(req.StartTime)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing start time: %v\n", err)
 	}
-	endTime, err := iso8601.ParseString(c.EndTime)
+	endTime, err := iso8601.ParseString(req.EndTime)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing end time: %v\n", err)
 	}
 
 	// TODO: check if c.Day is a valid weekday constant
+	// TODO: make this a transaction
 
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return nil, fmt.Errorf("error creating section: %v\n", err)
+	}
+
+	// Create a new section document
 	section = &models.Section{
-		Day:                 time.Weekday(c.Day),
+		Day:                 time.Weekday(req.Day),
+		CourseID:            req.CourseID,
 		StartTime:           startTime.Format(time.Kitchen),
 		EndTime:             endTime.Format(time.Kitchen),
-		Location:            c.Location,
-		Capacity:            c.Capacity,
+		Location:            req.Location,
+		Capacity:            req.Capacity,
 		NumStudentsEnrolled: 0,
+		EntrolledStudents:   make([]string, 0),
+		SwappedInStudents:   make(map[string][]string),
+		SwappedOutStudents:  make(map[string][]string),
 	}
 
-	_, err = fr.GetCourseByID(courseID)
+	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Add(firebase.Context, section)
 	if err != nil {
-		return nil, fmt.Errorf("error creating section: %v\n", err)
-	}
-
-	// TODO: standardize time formating
-
-	courseDoc := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID)
-	ref, _, err := courseDoc.Collection(models.FirestoreSectionsCollection).Add(firebase.Context, map[string]interface{}{
-		"day":       section.Day,
-		"starttime": section.StartTime,
-		"endtime":   section.EndTime,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error creating section: %v\n", err)
+		return nil, fmt.Errorf("error creating course: %v\n", err)
 	}
 	section.ID = ref.ID
+
+	// Add the section to the corresponding course
+	newSections := append(course.SectionIDs, section.ID)
+
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
+		{Path: "sectionIDs", Value: newSections},
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error creating section: %v\n", err)
+	}
 
 	return section, nil
 }
