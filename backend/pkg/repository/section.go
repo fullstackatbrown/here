@@ -8,6 +8,8 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
+	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/relvacode/iso8601"
 )
@@ -35,8 +37,6 @@ func (fr *FirebaseRepository) initializeSectionsListener() {
 		defer fr.sectionsLock.Unlock()
 		fr.sections = newSections
 
-		fmt.Println(newSections)
-
 		return nil
 	}
 
@@ -49,6 +49,18 @@ func (fr *FirebaseRepository) initializeSectionsListener() {
 		}
 	}()
 	<-done
+}
+
+// GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
+func (fr *FirebaseRepository) GetSectionByID(ID string) (*models.Section, error) {
+	fr.sectionsLock.RLock()
+	defer fr.sectionsLock.RUnlock()
+
+	if val, ok := fr.sections[ID]; ok {
+		return val, nil
+	} else {
+		return nil, qerrors.SectionNotFoundError
+	}
 }
 
 func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
@@ -101,4 +113,32 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 	}
 
 	return section, nil
+}
+
+func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) error {
+
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return err
+	}
+
+	_, err = fr.GetSectionByID(req.SectionID)
+	if err != nil {
+		return err
+	}
+
+	// TODO: make this a transaction
+	// Delete the section.
+	_, err = fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Doc(req.SectionID).Delete(firebase.Context)
+	if err != nil {
+		return err
+	}
+
+	// Delete the section from course
+	newSections := utils.Filter(course.SectionIDs, func(s string) bool { return s != req.SectionID })
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
+		{Path: "sectionIDs", Value: newSections},
+	})
+
+	return err
 }
