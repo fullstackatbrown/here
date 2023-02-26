@@ -30,6 +30,12 @@ type FirebaseRepository struct {
 
 	coursesLock *sync.RWMutex
 	courses     map[string]*models.Course
+
+	sectionsLock *sync.RWMutex
+	sections     map[string]*models.Section
+
+	assignmentsLock *sync.RWMutex
+	assignments     map[string]*models.Assignment
 }
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {

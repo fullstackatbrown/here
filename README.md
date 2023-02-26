@@ -21,7 +21,7 @@ Make sure you have Go and npm installed on your device
 | Delete course by id | `DELETE /v1/courses/{courseId}`              |                                                  | Admin |
 | Assign sections     | `POST /v1/courses/{courseId}/assignSections` | Optional: `studentId`, `sectionId`               | Admin |
 | Create course       | `POST /v1/courses`                           | Mandatory: `title`, `code`, `term`               | Admin |
-| Update course       | `PATCH /v1/courses/{courseId}`               | Optional: `gradeOptions`, `students`, `surveyID` | Admin |
+| Update course       | `PATCH /v1/courses/{courseId}`               | Optional: `gradeOptions`, `surveyID`             | Admin |
 
 ### Methods - Sections
 
@@ -72,6 +72,13 @@ Make sure you have Go and npm installed on your device
 | Update a grade           | `PATCH /v1/courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}` | Mandatory: `studentID`, `grade`, `taID` | Staff |
 | Export grades            | `POST /v1/courses/{courseId}/exportGrades`                                 |                                         | Admin |
 
+### Methods - Students
+
+| Description         | Route                                        | Body                                             | Auth  |
+| ------------------- | -------------------------------------------- | ------------------------------------------------ | ----- |
+| Join a course       | ``                                           |                                                  | All   |
+| Quit a course       | ``                                           |                                                  | All   |
+
 ## Data Schema
 
 <pre>
@@ -83,40 +90,50 @@ Make sure you have Go and npm installed on your device
     gradeOptions: []string         # list of grade options for the course default: [completed, incomplete, ungraded]
     students: map[string]string    # map from studentIDs to sectionIDs
     surveyID: string               # id of the survey attached to this course
-    <b>sections (sub-collection)</b>
-        id: string                                # unique id of the section
-        day: string                               # the day this section runs
-        startTime: string                         # the time the section starts
-        endTime: string                           # the time the section ends
-        location: string                          # where the section takes place
-        capacity: int                             # max section capacity
-        numStudentsEnrolled: int                  # how full the current section is
-        enrolledStudents: []string                # studentIDs enrolled in the section
-        swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
-        swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
-    <b>assignments (sub-collection)</b>
-        id: string                          # unique assignment id
-        name: string                        # name of the assignment
-        mandatory: bool                     # whether or not this assignment is mandatory to complete
-        startDate: string                   # when the assignment is released
-        endDate: string                     # when the assignment is due
-        gradesByStudent: map[string]string  # map from studentID to their gradeID
-        <b>grades (sub-sub-collection)</b>
-            id: string                         # unique grade id
-            studentID: string                  # the id of the student the grade is for
-            grade: string                      # the grade in gradeOptions
-            gradedBy: string                   # id of the TA that graded the assignment
-            timeUpdated: Timestamp             # when the time was updated
-    <b>swapRequest (sub-collection)</b>
-        id: string
-        studentID: string                      # ID of student
-        oldSectionID: string                   # ID of the section the student is swapping out of
-        newSectionID: string                   # ID of the section the student is swapping into
-        isTemporary: bool                      # if this is a temporary swap or not
-        requestTime: timestamp                 # when the request was submitted
-        reason: string                         # reason for the swap
-        status: string                         # submitted, cancelled, approved, denied
-        handledBy: string                      # automatic or taID
+    sectionIDs: []string           
+    assignmentIDs: []string       
+    swapRequests: []string 
+
+<b>sections (sub-collection)</b>
+    id: string                                # unique id of the section
+    courseID: string
+    day: string                               # the day this section runs
+    startTime: string                         # the time the section starts
+    endTime: string                           # the time the section ends
+    location: string                          # where the section takes place
+    capacity: int                             # max section capacity
+    numStudentsEnrolled: int                  # how full the current section is
+    enrolledStudents: []string                # studentIDs enrolled in the section
+    swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
+    swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
+
+<b>assignments (sub-collection)</b>
+    id: string                          # unique assignment id
+    courseID: string
+    name: string                        # name of the assignment
+    mandatory: bool                     # whether or not this assignment is mandatory to complete
+    startDate: string                   # when the assignment is released
+    endDate: string                     # when the assignment is due
+    gradesByStudent: map[string]string  # map from studentID to their gradeID
+
+<b>grades (sub-sub-collection)</b>
+    id: string                         # unique grade id
+    studentID: string                  # the id of the student the grade is for
+    assignmentID: string
+    grade: string                      # the grade in gradeOptions
+    gradedBy: string                   # id of the TA that graded the assignment
+    timeUpdated: Timestamp             # when the time was updated
+
+<b>swapRequest (sub-collection)</b>
+    id: string
+    studentID: string                      # ID of student
+    oldSectionID: string                   # ID of the section the student is swapping out of
+    newSectionID: string                   # ID of the section the student is swapping into
+    isTemporary: bool                      # if this is a temporary swap or not
+    requestTime: timestamp                 # when the request was submitted
+    reason: string                         # reason for the swap
+    status: string                         # submitted, cancelled, approved, denied
+    handledBy: string                      # automatic or taID
         
 
 
