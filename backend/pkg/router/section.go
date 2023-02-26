@@ -30,19 +30,37 @@ func SectionRoutes() *chi.Mux {
 }
 
 func getAllSectionsHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("sectionID").(string)
+	courseID := r.Context().Value("courseID").(string)
 
-	// TODO:
+	course, err := repo.Repository.GetCourseByID(courseID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	// render.JSON(w, r, course)
+	sections := make([]*models.Section, 0)
+	for _, sectionID := range course.SectionIDs {
+		section, err := repo.Repository.GetSectionByID(sectionID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		sections = append(sections, section)
+	}
+
+	render.JSON(w, r, sections)
 }
 
 func getSectionHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("sectionID").(string)
+	sectionID := r.Context().Value("sectionID").(string)
 
-	// TODO:
+	section, err := repo.Repository.GetSectionByID(sectionID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	// render.JSON(w, r, course)
+	render.JSON(w, r, section)
 }
 
 func createSectionHandler(w http.ResponseWriter, r *http.Request) {
