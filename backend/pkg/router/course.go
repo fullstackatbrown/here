@@ -79,11 +79,24 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Successfully deleted course " + courseID))
 }
 
-// DELETE: /{courseID}
 func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
 
-	// TODO:
+	var req *models.UpdateCourseRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	req.CourseID = &courseID
+
+	err = repo.Repository.UpdateCourse(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully updated course " + courseID))

@@ -2,12 +2,52 @@ package repository
 
 import (
 	"fmt"
+	"log"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/mitchellh/mapstructure"
 	"github.com/relvacode/iso8601"
 )
+
+func (fr *FirebaseRepository) initializeSectionsListener() {
+	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
+		newSections := make(map[string]*models.Section)
+		for _, doc := range docs {
+			if !doc.Exists() {
+				continue
+			}
+
+			var c models.Section
+			err := mapstructure.Decode(doc.Data(), &c)
+			if err != nil {
+				log.Panicf("Error destructuring document: %v", err)
+				return err
+			}
+
+			c.ID = doc.Ref.ID
+			newSections[doc.Ref.ID] = &c
+		}
+
+		fr.sectionsLock.Lock()
+		defer fr.sectionsLock.Unlock()
+		fr.sections = newSections
+
+		return nil
+	}
+
+	done := make(chan bool)
+	query := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Query
+	go func() {
+		err := fr.createCollectionInitializer(query, &done, handleDocs)
+		if err != nil {
+			log.Panicf("error creating course collection listner: %v\n", err)
+		}
+	}()
+	<-done
+}
 
 func (fr *FirebaseRepository) CreateSection(courseID string, c *models.CreateSectionRequest) (section *models.Section, err error) {
 	startTime, err := iso8601.ParseString(c.StartTime)
