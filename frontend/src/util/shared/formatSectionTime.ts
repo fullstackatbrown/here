@@ -20,5 +20,5 @@ export default function formatSectionTime(
 ): string {
   return `${
     daysOfTheWeek[startTime.getDay()]
-  } ${timeFormatter.format(startTime)} to ${timeFormatter.format(endTime)}`;
+  } ${timeFormatter.format(startTime)}-${timeFormatter.format(endTime)}`;
 }

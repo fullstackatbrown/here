@@ -8,6 +8,8 @@ import formatEndTime from "@util/shared/formatEndTime";
 import getSectionColor from "@util/shared/getSectionColor";
 import SectionStatusChip from "@components/course/CourseStatusChip";
 import formatSectionTime from "@util/shared/formatSectionTime";
+import CreateIcon from "@mui/icons-material/Create";
+import ClearIcon from "@mui/icons-material/Clear";
 
 export interface SectionCardProps {
   section: Section;
@@ -21,33 +23,45 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
   const startTime = new Date(section.startTime);
   const endTime = new Date(section.endTime);
   return (
-    <Paper variant="outlined" sx={{ overflow: "hidden" }}>
-      {/* TODO: handle what should happen on click */}
-      <ButtonBase
-        onClick={() => console.log("todo...")}
-        sx={{ width: "100%", textAlign: "left" }}
-        focusRipple
-      >
-        <Box
-          width="100%"
-          height={125}
-          p={2}
-          color="#fff"
-          sx={{ bgcolor: getSectionColor(section) }}
-        >
-          <Typography variant="h6" noWrap>
-            {/* {section.course.code}: {section.course.title} */}
+    <Paper
+      variant="elevation"
+      elevation={1}
+      style={{
+        padding: 16,
+      }}
+      square
+    >
+      <Box display="flex" flexDirection="row" justifyContent="space-between">
+        <Stack>
+          <Typography variant="body1" noWrap>
             {formatSectionTime(startTime, endTime)}
           </Typography>
-          <Typography variant="body2" fontWeight={400}>
-            {section.location}
-          </Typography>
-        </Box>
-      </ButtonBase>
-      <Box width="100%" p={2} color={"#777777"}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          {`${section.capacity - section.enrollment}/${section.capacity
-            } Available`}
+          {/* TODO: change color to an RGB or HSL value */}
+          <Stack direction="row" spacing={2} color="lightgray">
+            <Typography variant="body1" fontWeight={400}>
+              Location: {section.location}
+            </Typography>
+            <Typography variant="body1" fontWeight={400}>
+              Capacity: {section.capacity}
+            </Typography>
+            <Typography variant="body1" fontWeight={400}>
+              Registered: {section.enrollment}
+            </Typography>
+          </Stack>
+        </Stack>
+        <Stack display={"flex"} direction="row" spacing={1}>
+          <ButtonBase
+            onClick={() => console.log("handle editing section...")}
+            focusRipple
+          >
+            <CreateIcon />
+          </ButtonBase>
+          <ButtonBase
+            onClick={() => console.log("handle deleting section...")}
+            focusRipple
+          >
+            <ClearIcon />
+          </ButtonBase>
         </Stack>
       </Box>
     </Paper>

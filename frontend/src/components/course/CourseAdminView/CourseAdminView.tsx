@@ -20,8 +20,7 @@ export function CourseAdminView(props: CourseAdminViewProps) {
   return (
     <Stack paddingTop={12} gap={4}>
       <Grid container spacing={2}>
-        <Grid xs={2}>
-        </Grid>
+        <Grid xs={2} />
         <Grid xs={10}>
           <CourseHeader course={props.course} />
         </Grid>
@@ -30,11 +29,12 @@ export function CourseAdminView(props: CourseAdminViewProps) {
         <Grid xs={2}>
           <CourseAdminViewNavigation setView={setView}/>
         </Grid>
-        <Grid>
+        <Grid xs>
           {view === "sections" && <SectionsView course={props.course} />}
           {view === "checkoff" && <CheckoffView />}
           {view === "requests" && <RequestsView />}
         </Grid>
+        <Grid xs={2} />
       </Grid>
     </Stack>
   );
