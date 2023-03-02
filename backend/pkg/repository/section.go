@@ -115,7 +115,7 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Add(firebase.Context, section)
 	if err != nil {
-		return nil, fmt.Errorf("error creating course: %v\n", err)
+		return nil, fmt.Errorf("error creating section: %v\n", err)
 	}
 	section.ID = ref.ID
 

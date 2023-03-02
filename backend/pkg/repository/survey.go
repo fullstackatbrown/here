@@ -77,19 +77,39 @@ func (fr *FirebaseRepository) GetSurveyByCourse(courseID string) (survey *models
 
 func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Survey, error) {
 
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Add(firebase.Context, map[string]interface{}{
-		"name":         survey.Name,
-		"courseID":     survey.CourseID,
-		"capacity":     survey.Capacity,
-		"responses":    survey.Responses,
-		"numresponses": survey.NumResponses,
-	})
+	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Add(firebase.Context, survey)
 	if err != nil {
 		return nil, fmt.Errorf("error creating survey: %v\n", err)
 	}
 	survey.ID = ref.ID
 
+	// Add the survey to the corresponding course
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(survey.CourseID).Update(firebase.Context, []firestore.Update{
+		{Path: "surveyID", Value: survey.ID},
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error creating survey: %v\n", err)
+	}
+
 	return survey, nil
+}
+
+func (fr *FirebaseRepository) UpdateSurvey(surveyID string, newSurvey *models.Survey) error {
+
+	// override existing survey
+	_, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(surveyID).Set(firebase.Context, newSurvey)
+
+	return err
+}
+
+func (fr *FirebaseRepository) PublishSurvey(surveyID string) error {
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+		{Path: "published", Value: true},
+	})
+
+	return err
 }
 
 func (fr *FirebaseRepository) CreateSurveyResponse(c *models.CreateSurveyResponseRequest) (survey *models.Survey, err error) {
@@ -118,7 +138,7 @@ func (fr *FirebaseRepository) CreateSurveyResponse(c *models.CreateSurveyRespons
 		},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error updating survey: %v\n", err)
+		return nil, fmt.Errorf("error creating survey response: %v\n", err)
 	}
 
 	return survey, nil
