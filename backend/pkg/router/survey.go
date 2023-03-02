@@ -47,6 +47,7 @@ func getSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	var req *models.CreateSurveyRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -54,6 +55,10 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	req.CourseID = courseID
+
+	// TODO: deny the request if a survey already exists under the course
 
 	// Get all the section times
 	sections, err := repo.Repository.GetSectionByCourse(req.CourseID)
@@ -131,6 +136,8 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	req.SurveyID = surveyID
 
 	// TODO: get user from auth middleware
 	req.UserID = "USERID(Placeholder)"
