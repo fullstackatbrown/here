@@ -15,18 +15,18 @@ Make sure you have Go and npm installed on your device
 
 ### Methods - Courses
 
-| Description         | Route                                        | Body                                             | Auth  |
-| ------------------- | -------------------------------------------- | ------------------------------------------------ | ----- |
-| Get course by id    | `GET /v1/courses/{courseId}`                 |                                                  | All   |
-| Delete course by id | `DELETE /v1/courses/{courseId}`              |                                                  | Admin |
-| Assign sections     | `POST /v1/courses/{courseId}/assignSections` | Optional: `studentId`, `sectionId`               | Admin |
-| Create course       | `POST /v1/courses`                           | Mandatory: `title`, `code`, `term`               | Admin |
-| Update course       | `PATCH /v1/courses/{courseId}`               | Optional: `gradeOptions`, `surveyID`             | Admin |
+| Description         | Route                                        | Body                                 | Auth  |
+|---------------------|----------------------------------------------|--------------------------------------|-------|
+| Get course by id    | `GET /v1/courses/{courseId}`                 |                                      | All   |
+| Delete course by id | `DELETE /v1/courses/{courseId}`              |                                      | Admin |
+| Assign sections     | `POST /v1/courses/{courseId}/assignSections` | Optional: `studentId`, `sectionId`   | Admin |
+| Create course       | `POST /v1/courses`                           | Mandatory: `title`, `code`, `term`   | Admin |
+| Update course       | `PATCH /v1/courses/{courseId}`               | Optional: `gradeOptions`, `surveyID` | Admin |
 
 ### Methods - Sections
 
 | Description       | Route                                                | Body                                                                       | Auth  |
-| ----------------- | ---------------------------------------------------- | -------------------------------------------------------------------------- | ----- |
+|-------------------|------------------------------------------------------|----------------------------------------------------------------------------|-------|
 | Get all sections  | `GET /v1/courses/{courseId}/sections`                |                                                                            | Staff |
 | Get section by id | `GET /v1/courses/{courseId}/sections/{sectionId}`    |                                                                            | All   |
 | Delete section    | `DELETE /v1/courses/{courseId}/sections/{sectionId}` |                                                                            | Admin |
@@ -36,7 +36,7 @@ Make sure you have Go and npm installed on your device
 ### Methods - Assignments
 
 | Description          | Route                                                      | Body                                                   | Auth  |
-| -------------------- | ---------------------------------------------------------- | ------------------------------------------------------ | ----- |
+|----------------------|------------------------------------------------------------|--------------------------------------------------------|-------|
 | Get all assignments  | `GET /v1/courses/{courseId}/assignments`                   |                                                        | All   |
 | Get assignment by id | `GET /v1/courses/{courseId}/assignments/{assignmentId}`    |                                                        | All   |
 | Delete assignment    | `DELETE /v1/courses/{courseId}/assignments/{assignmentId}` |                                                        | Admin |
@@ -45,27 +45,27 @@ Make sure you have Go and npm installed on your device
 
 ### Methods - Surveys
 
-| Description               | Route                                                 | Body                          | Auth  |
-| ------------------------- | ----------------------------------------------------- | ----------------------------- | ----- |
-| Get survey by id          | `GET /v1/surveys/{surveyID}/`                         |                               | Staff |
-| Create survey             | `POST /v1/surveys`                                    | Mandatory: `courseID`, `name` | Admin |
-| Publish                   | `POST /v1/surveys/{surveyID}/publish`                 |                               | Admin |
-| Create response           | `POST /v1/surveys/{surveyID}/responses`               | Mandatory: `times: []string`  | All   |
-| Edit response             | `PATCH /v1/surveys/{surveyID}/responses/{responseId}` | Mandatory: `times: []string`  | All   |
+| Description      | Route                                                                    | Body                         | Auth  |
+|------------------|--------------------------------------------------------------------------|------------------------------|-------|
+| Get survey by id | `GET /v1/courses/{courseId}/surveys/{surveyID}/`                         |                              | Staff |
+| Create survey    | `POST /v1/courses/{courseId}/surveys`                                    | Mandatory: `name`            | Admin |
+| Publish          | `POST /v1/courses/{courseId}/surveys/{surveyID}/publish`                 |                              | Admin |
+| Create response  | `POST /v1/courses/{courseId}/surveys/{surveyID}/responses`               | Mandatory: `times: []string` | All   |
+| Edit response    | `PATCH /v1/courses/{courseId}/surveys/{surveyID}/responses/{responseId}` | Mandatory: `times: []string` | All   |
 
 ### Methods - Swaps
 
-| Description           | Route                                          | Body                                                                           | Response                  | Auth  |
-| --------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------- | ----- |
-| Create a Swap Request | `POST /v1/courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All   |
-| Update Swap Request   | `PATCH /v1/courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                          |                           | Staff & Self|
-| Get all Swaps         | `GET /v1/courses/{courseId}/swaps/`            |                                                                                | JSON of swaps             | Staff |
-| Get swap by student   | `GET /v1/courses/{courseId}/swaps/me`          |                                                                                |                           | All   |
+| Description           | Route                                          | Body                                                                           | Response                        | Auth         |
+|-----------------------|------------------------------------------------|--------------------------------------------------------------------------------|---------------------------------|--------------|
+| Create a Swap Request | `POST /v1/courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All          |
+| Update Swap Request   | `PATCH /v1/courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                            |                                 | Staff & Self |
+| Get all Swaps         | `GET /v1/courses/{courseId}/swaps/`            |                                                                                | JSON of swaps                   | Staff        |
+| Get swap by student   | `GET /v1/courses/{courseId}/swaps/me`          |                                                                                |                                 | All          |
 
 ### Methods - Grades
 
 | Description              | Route                                                                      | Body                                    | Auth  |
-| ------------------------ | -------------------------------------------------------------------------- | --------------------------------------- | ----- |
+|--------------------------|----------------------------------------------------------------------------|-----------------------------------------|-------|
 | Get grades by assignment | `GET /v1/courses/{courseId}/assignments/{assignmentID}/grades`             |                                         | Staff |
 | Get grades by student    | `GET /v1/courses/{courseId}/grades`                                        | Mandatory: `studentID`                  | All   |
 | Create a grade           | `POST /v1/courses/{courseId}/assignments/{assignmentID}/grades`            | Mandatory: `studentID`, `grade`, `taID` | Staff |
@@ -74,10 +74,10 @@ Make sure you have Go and npm installed on your device
 
 ### Methods - Students
 
-| Description         | Route                                        | Body                                             | Auth  |
-| ------------------- | -------------------------------------------- | ------------------------------------------------ | ----- |
-| Join a course       | ``                                           |                                                  | All   |
-| Quit a course       | ``                                           |                                                  | All   |
+| Description   | Route | Body | Auth |
+|---------------|-------|------|------|
+| Join a course | ``    |      | All  |
+| Quit a course | ``    |      | All  |
 
 ## Data Schema
 
