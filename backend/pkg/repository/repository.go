@@ -30,12 +30,27 @@ type FirebaseRepository struct {
 
 	coursesLock *sync.RWMutex
 	courses     map[string]*models.Course
+
+	sectionsLock *sync.RWMutex
+	sections     map[string]*models.Section
+
+	assignmentsLock *sync.RWMutex
+	assignments     map[string]*models.Assignment
+
+	surveysLock *sync.RWMutex
+	surveys     map[string]*models.Survey
 }
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {
 	fr := &FirebaseRepository{
-		coursesLock: &sync.RWMutex{},
-		courses:     make(map[string]*models.Course),
+		coursesLock:     &sync.RWMutex{},
+		courses:         make(map[string]*models.Course),
+		sectionsLock:    &sync.RWMutex{},
+		sections:        make(map[string]*models.Section),
+		assignmentsLock: &sync.RWMutex{},
+		assignments:     make(map[string]*models.Assignment),
+		surveysLock:     &sync.RWMutex{},
+		surveys:         make(map[string]*models.Survey),
 	}
 
 	authClient, err := firebase.App.Auth(firebase.Context)
@@ -53,7 +68,7 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 	// Execute the listeners sequentially, in case later listeners need to utilize data fetched
 	// by previous listeners
 	// initFns := []func(){fr.initializeCoursesListener, fr.initializeUserProfilesListener}
-	initFns := []func(){fr.initializeCoursesListener}
+	initFns := []func(){fr.initializeCoursesListener, fr.initializeSectionsListener, fr.initializeAssignmentsListener, fr.initializeSurveysListener}
 	for _, initFn := range initFns {
 		fmt.Println("Something was initialized!")
 		initFn()

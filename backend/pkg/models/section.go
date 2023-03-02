@@ -10,16 +10,17 @@ var (
 )
 
 type Section struct {
-	ID                  string
-	Day                 time.Weekday
-	StartTime           string
-	EndTime             string
-	Location            string
-	Capacity            int
-	NumStudentsEnrolled int
-	EntrolledStudents   []string
-	SwappedInStudents   map[string][]string
-	SwappedOutStudents  map[string][]string
+	ID                  string              `firestore:"id,omitempty"`
+	CourseID            string              `firestore:"courseID"`
+	Day                 time.Weekday        `firestore:"day"`
+	StartTime           string              `firestore:"startTime"`
+	EndTime             string              `firestore:"endTime"`
+	Location            string              `firestore:"location"`
+	Capacity            int                 `firestore:"capacity"`
+	NumStudentsEnrolled int                 `firestore:"numStudentsEnrolled"`
+	EntrolledStudents   []string            `firestore:"enrolledStudents"`
+	SwappedInStudents   map[string][]string `firestore:"swappedInStudents"`
+	SwappedOutStudents  map[string][]string `firestore:"swappedOutStudents"`
 }
 
 type GetSectionRequest struct {
@@ -27,19 +28,21 @@ type GetSectionRequest struct {
 }
 
 type CreateSectionRequest struct {
+	CourseID string `json:"courseid,omitempty"`
 	// (Sunday = 0, ...)
 	Day int `json:"day"`
 	// must be ISO8601 compliant
-	StartTime string `json:"starttime"`
-	EndTime   string `json:"endtime"`
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
 	Location  string `json:"location"`
 	Capacity  int    `json:"capacity"`
 }
 
 type DeleteSectionRequest struct {
-	SectionID string `json:"sectionid"`
+	CourseID  string
+	SectionID string
 }
 
 func (section *Section) TimeAsString() string {
-	return fmt.Sprintf("%d", int(section.Day)) + "|" + section.StartTime + "|" + section.EndTime
+	return fmt.Sprintf("%d", int(section.Day)) + " " + section.StartTime + "-" + section.EndTime
 }
