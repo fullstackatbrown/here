@@ -5,13 +5,12 @@ var (
 )
 
 type Survey struct {
-	ID           string              `firestore:"id,omitempty"`
-	CourseID     string              `firestore:"courseID"`
-	Name         string              `firestore:"name"`
-	Description  string              `firestore:"description"`
-	Capacity     map[string]int      `firestore:"capacity"`
-	Responses    map[string][]string `firestore:"responses"`
-	NumResponses int                 `firestore:"numResponses"`
+	ID          string              `firestore:"id,omitempty"`
+	CourseID    string              `firestore:"courseID"`
+	Name        string              `firestore:"name"`
+	Description string              `firestore:"description"`
+	Capacity    map[string]int      `firestore:"capacity"`
+	Responses   map[string][]string `firestore:"responses"`
 }
 
 type Times struct {
@@ -48,12 +47,11 @@ func InitSurvey(req *CreateSurveyRequest, sections []*Section) *Survey {
 	}
 
 	return &Survey{
-		Name:         req.Name,
-		Description:  req.Description,
-		CourseID:     req.CourseID,
-		Capacity:     capacity,
-		NumResponses: 0,
-		Responses:    make(map[string][]string),
+		Name:        req.Name,
+		Description: req.Description,
+		CourseID:    req.CourseID,
+		Capacity:    capacity,
+		Responses:   make(map[string][]string),
 	}
 }
 

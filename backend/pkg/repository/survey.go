@@ -122,9 +122,6 @@ func (fr *FirebaseRepository) CreateSurveyResponse(c *models.CreateSurveyRespons
 	if survey.Responses == nil {
 		survey.Responses = make(map[string][]string)
 	}
-	if _, ok := survey.Responses[c.UserID]; !ok {
-		survey.NumResponses += 1
-	}
 	// override previous response
 	survey.Responses[c.UserID] = c.Availability
 
@@ -132,9 +129,6 @@ func (fr *FirebaseRepository) CreateSurveyResponse(c *models.CreateSurveyRespons
 		{
 			Path:  "responses",
 			Value: survey.Responses,
-		},
-		{Path: "numresponses",
-			Value: survey.NumResponses,
 		},
 	})
 	if err != nil {

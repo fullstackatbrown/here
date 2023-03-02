@@ -101,16 +101,15 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 
 	// Create a new section document
 	section = &models.Section{
-		Day:                 time.Weekday(req.Day),
-		CourseID:            req.CourseID,
-		StartTime:           startTime.Format(time.Kitchen),
-		EndTime:             endTime.Format(time.Kitchen),
-		Location:            req.Location,
-		Capacity:            req.Capacity,
-		NumStudentsEnrolled: 0,
-		EntrolledStudents:   make([]string, 0),
-		SwappedInStudents:   make(map[string][]string),
-		SwappedOutStudents:  make(map[string][]string),
+		Day:                time.Weekday(req.Day),
+		CourseID:           req.CourseID,
+		StartTime:          startTime.Format(time.Kitchen),
+		EndTime:            endTime.Format(time.Kitchen),
+		Location:           req.Location,
+		Capacity:           req.Capacity,
+		EnrolledStudents:   make([]string, 0),
+		SwappedInStudents:  make(map[string][]string),
+		SwappedOutStudents: make(map[string][]string),
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Add(firebase.Context, section)

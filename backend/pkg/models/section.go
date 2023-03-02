@@ -10,17 +10,16 @@ var (
 )
 
 type Section struct {
-	ID                  string              `firestore:"id,omitempty"`
-	CourseID            string              `firestore:"courseID"`
-	Day                 time.Weekday        `firestore:"day"`
-	StartTime           string              `firestore:"startTime"`
-	EndTime             string              `firestore:"endTime"`
-	Location            string              `firestore:"location"`
-	Capacity            int                 `firestore:"capacity"`
-	NumStudentsEnrolled int                 `firestore:"numStudentsEnrolled"`
-	EntrolledStudents   []string            `firestore:"enrolledStudents"`
-	SwappedInStudents   map[string][]string `firestore:"swappedInStudents"`
-	SwappedOutStudents  map[string][]string `firestore:"swappedOutStudents"`
+	ID                 string              `firestore:"id,omitempty"`
+	CourseID           string              `firestore:"courseID"`
+	Day                time.Weekday        `firestore:"day"`
+	StartTime          string              `firestore:"startTime"`
+	EndTime            string              `firestore:"endTime"`
+	Location           string              `firestore:"location"`
+	Capacity           int                 `firestore:"capacity"`
+	EnrolledStudents   []string            `firestore:"enrolledStudents"`
+	SwappedInStudents  map[string][]string `firestore:"swappedInStudents"`
+	SwappedOutStudents map[string][]string `firestore:"swappedOutStudents"`
 }
 
 type GetSectionRequest struct {

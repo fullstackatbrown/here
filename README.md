@@ -66,18 +66,21 @@ Make sure you have Go and npm installed on your device
 
 | Description              | Route                                                                      | Body                                    | Auth  |
 |--------------------------|----------------------------------------------------------------------------|-----------------------------------------|-------|
-| Get grades by assignment | `GET /v1/courses/{courseId}/assignments/{assignmentID}/grades`             |                                         | Staff |
+| Get grades by assignment | `GET /v1/courses/{courseId}/assignments/{assignmentID}grades`              |                                         | Staff |
 | Get grades by student    | `GET /v1/courses/{courseId}/grades`                                        | Mandatory: `studentID`                  | All   |
 | Create a grade           | `POST /v1/courses/{courseId}/assignments/{assignmentID}/grades`            | Mandatory: `studentID`, `grade`, `taID` | Staff |
 | Update a grade           | `PATCH /v1/courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}` | Mandatory: `studentID`, `grade`, `taID` | Staff |
 | Export grades            | `POST /v1/courses/{courseId}/exportGrades`                                 |                                         | Admin |
 
-### Methods - Students
+### Methods - Users
 
-| Description   | Route | Body | Auth |
-|---------------|-------|------|------|
-| Join a course | ``    |      | All  |
-| Quit a course | ``    |      | All  |
+| Description      | Route                      | Body | Auth |
+|------------------|----------------------------|------|------|
+| Get current user | `GET /v1/users`            |      | All  |
+| Get user by ID   | `GET /v1/users/{userId}`   |      | All  |
+| Update user      | `PATCH /v1/users/{userId}` |      | All  |
+| Join a course    | ``                         |      | All  |
+| Quit a course    | ``                         |      | All  |
 
 ## Data Schema
 
@@ -103,7 +106,6 @@ Make sure you have Go and npm installed on your device
     location: string                          # where the section takes place
     capacity: int                             # max section capacity
     numStudentsEnrolled: int                  # how full the current section is
-    enrolledStudents: []string                # studentIDs enrolled in the section
     swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
     swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
 
@@ -134,13 +136,15 @@ Make sure you have Go and npm installed on your device
     reason: string                         # reason for the swap
     status: string                         # submitted, cancelled, approved, denied
     handledBy: string                      # automatic or taID
-        
 
+<b>profiles (collection)</b>
+    displayName: string
+    email: string
+    auth: map[string]string                          # map from courseID to "admin", or "staff", or "student"
+    defaultSections: map[string]string                # map from courseID to sectionID
+    actualSections: map[string]map[string]string      # map from courseID to map from assignmentID to sectionID
 
-<b>students (collection)</b>
-    id: string
-    defaultSection: map[string]string                # map from courseID to sectionID
-    actualSection: map[string]map[string]string      # map from courseID to map from assignmentID to sectionID
+<b>users (collection)</b>
 
 <b>surveys (collection)</b>
     id: string
