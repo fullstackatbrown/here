@@ -1,11 +1,11 @@
 export interface SwapRequest {
-  id: string;
-  studentId: string;
-  oldSectionId: string;
-  newSectionId: string;
+  ID: string;
+  studentID: string;
+  oldSectionID: string;
+  newSectionID: string;
   isTemporary: boolean;
   requestTime: Date;
   reason: string;
-  approved: boolean;
+  status: string;
   handledBy: string;
 }

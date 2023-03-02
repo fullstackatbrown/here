@@ -1,5 +1,5 @@
 export interface Student {
-  id: string;
+  ID: string;
   defaultSection: Record<string, string>;
   actualSection: Record<string, Record<string, string>>;
 }
