@@ -20,9 +20,6 @@ func Routes() *chi.Mux {
 
 	router.Route("/", func(r chi.Router) {
 		r.Mount("/", rtr.HealthRoutes())
-	})
-
-	router.Route("/v1", func(r chi.Router) {
 		r.Mount("/courses", rtr.CourseRoutes())
 	})
 

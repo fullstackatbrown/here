@@ -15,72 +15,71 @@ Make sure you have Go and npm installed on your device
 
 ### Methods - Courses
 
-| Description         | Route                                        | Body                                 | Auth  |
-|---------------------|----------------------------------------------|--------------------------------------|-------|
-| Get course by id    | `GET /v1/courses/{courseId}`                 |                                      | All   |
-| Delete course by id | `DELETE /v1/courses/{courseId}`              |                                      | Admin |
-| Assign sections     | `POST /v1/courses/{courseId}/assignSections` | Optional: `studentId`, `sectionId`   | Admin |
-| Create course       | `POST /v1/courses`                           | Mandatory: `title`, `code`, `term`   | Admin |
-| Update course       | `PATCH /v1/courses/{courseId}`               | Optional: `gradeOptions`, `surveyID` | Admin |
+| Description         | Route                                     | Body                                 | Auth  |
+|---------------------|-------------------------------------------|--------------------------------------|-------|
+| Get course by id    | `GET /courses/{courseId}`                 |                                      | All   |
+| Delete course by id | `DELETE /courses/{courseId}`              |                                      | Admin |
+| Assign sections     | `POST /courses/{courseId}/assignSections` | Optional: `studentId`, `sectionId`   | Admin |
+| Create course       | `POST /courses`                           | Mandatory: `title`, `code`, `term`   | Admin |
+| Update course       | `PATCH /courses/{courseId}`               | Optional: `gradeOptions`, `surveyID` | Admin |
 
 ### Methods - Sections
 
-| Description       | Route                                                | Body                                                                       | Auth  |
-|-------------------|------------------------------------------------------|----------------------------------------------------------------------------|-------|
-| Get all sections  | `GET /v1/courses/{courseId}/sections`                |                                                                            | Staff |
-| Get section by id | `GET /v1/courses/{courseId}/sections/{sectionId}`    |                                                                            | All   |
-| Delete section    | `DELETE /v1/courses/{courseId}/sections/{sectionId}` |                                                                            | Admin |
-| Create section    | `POST /v1/courses/{courseId}/sections/`              | Mandatory: `day`, `startTime`, `endTime`; Optional: `location`, `capacity` | Admin |
-| Update section    | `PATCH /v1/courses/{courseId}/sections/{sectionId}`  | Optional: `day`, `startTime`, `endTime`, `location`, `capacity`            | Admin |
+| Description       | Route                                             | Body                                                                       | Auth  |
+|-------------------|---------------------------------------------------|----------------------------------------------------------------------------|-------|
+| Get all sections  | `GET /courses/{courseId}/sections`                |                                                                            | Staff |
+| Get section by id | `GET /courses/{courseId}/sections/{sectionId}`    |                                                                            | All   |
+| Delete section    | `DELETE /courses/{courseId}/sections/{sectionId}` |                                                                            | Admin |
+| Create section    | `POST /courses/{courseId}/sections/`              | Mandatory: `day`, `startTime`, `endTime`; Optional: `location`, `capacity` | Admin |
+| Update section    | `PATCH /courses/{courseId}/sections/{sectionId}`  | Optional: `day`, `startTime`, `endTime`, `location`, `capacity`            | Admin |
 
 ### Methods - Assignments
 
-| Description          | Route                                                      | Body                                                   | Auth  |
-|----------------------|------------------------------------------------------------|--------------------------------------------------------|-------|
-| Get all assignments  | `GET /v1/courses/{courseId}/assignments`                   |                                                        | All   |
-| Get assignment by id | `GET /v1/courses/{courseId}/assignments/{assignmentId}`    |                                                        | All   |
-| Delete assignment    | `DELETE /v1/courses/{courseId}/assignments/{assignmentId}` |                                                        | Admin |
-| Create assignment    | `POST /v1/courses/{courseId}/assignments/`                 | Mandatory: `name`, `mandatory`, `startDate`, `endDate` | Admin |
-| Update assignment    | `PATCH /v1/courses/{courseId}/assignments/{assignmentId}`  | Optional: `name`, `mandatory`, `startDate`, `endDate`  | Admin |
+| Description          | Route                                                   | Body                                                   | Auth  |
+|----------------------|---------------------------------------------------------|--------------------------------------------------------|-------|
+| Get all assignments  | `GET /courses/{courseId}/assignments`                   |                                                        | All   |
+| Get assignment by id | `GET /courses/{courseId}/assignments/{assignmentId}`    |                                                        | All   |
+| Delete assignment    | `DELETE /courses/{courseId}/assignments/{assignmentId}` |                                                        | Admin |
+| Create assignment    | `POST /courses/{courseId}/assignments/`                 | Mandatory: `name`, `mandatory`, `startDate`, `endDate` | Admin |
+| Update assignment    | `PATCH /courses/{courseId}/assignments/{assignmentId}`  | Optional: `name`, `mandatory`, `startDate`, `endDate`  | Admin |
 
 ### Methods - Surveys
 
-| Description      | Route                                                                    | Body                         | Auth  |
-|------------------|--------------------------------------------------------------------------|------------------------------|-------|
-| Get survey by id | `GET /v1/courses/{courseId}/surveys/{surveyID}/`                         |                              | Staff |
-| Create survey    | `POST /v1/courses/{courseId}/surveys`                                    | Mandatory: `name`            | Admin |
-| Publish          | `POST /v1/courses/{courseId}/surveys/{surveyID}/publish`                 |                              | Admin |
-| Create response  | `POST /v1/courses/{courseId}/surveys/{surveyID}/responses`               | Mandatory: `times: []string` | All   |
-| Edit response    | `PATCH /v1/courses/{courseId}/surveys/{surveyID}/responses/{responseId}` | Mandatory: `times: []string` | All   |
+| Description      | Route                                                                 | Body                         | Auth  |
+|------------------|-----------------------------------------------------------------------|------------------------------|-------|
+| Get survey by id | `GET /courses/{courseId}/surveys/{surveyID}/`                         |                              | Staff |
+| Create survey    | `POST /courses/{courseId}/surveys`                                    | Mandatory: `name`            | Admin |
+| Publish          | `POST /courses/{courseId}/surveys/{surveyID}/publish`                 |                              | Admin |
+| Create response  | `POST /courses/{courseId}/surveys/{surveyID}/responses`               | Mandatory: `times: []string` | All   |
+| Edit response    | `PATCH /courses/{courseId}/surveys/{surveyID}/responses/{responseId}` | Mandatory: `times: []string` | All   |
 
 ### Methods - Swaps
 
-| Description           | Route                                          | Body                                                                           | Response                        | Auth         |
-|-----------------------|------------------------------------------------|--------------------------------------------------------------------------------|---------------------------------|--------------|
-| Create a Swap Request | `POST /v1/courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All          |
-| Update Swap Request   | `PATCH /v1/courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                            |                                 | Staff & Self |
-| Get all Swaps         | `GET /v1/courses/{courseId}/swaps/`            |                                                                                | JSON of swaps                   | Staff        |
-| Get swap by student   | `GET /v1/courses/{courseId}/swaps/me`          |                                                                                |                                 | All          |
+| Description           | Route                                       | Body                                                                           | Response                        | Auth         |
+|-----------------------|---------------------------------------------|--------------------------------------------------------------------------------|---------------------------------|--------------|
+| Create a Swap Request | `POST /courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All          |
+| Update Swap Request   | `PATCH /courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                            |                                 | Staff & Self |
+| Get all Swaps         | `GET /courses/{courseId}/swaps/`            |                                                                                | JSON of swaps                   | Staff        |
+| Get swap by student   | `GET /courses/{courseId}/swaps/me`          |                                                                                |                                 | All          |
 
 ### Methods - Grades
 
-| Description              | Route                                                                      | Body                                    | Auth  |
-|--------------------------|----------------------------------------------------------------------------|-----------------------------------------|-------|
-| Get grades by assignment | `GET /v1/courses/{courseId}/assignments/{assignmentID}grades`              |                                         | Staff |
-| Get grades by student    | `GET /v1/courses/{courseId}/grades`                                        | Mandatory: `studentID`                  | All   |
-| Create a grade           | `POST /v1/courses/{courseId}/assignments/{assignmentID}/grades`            | Mandatory: `studentID`, `grade`, `taID` | Staff |
-| Update a grade           | `PATCH /v1/courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}` | Mandatory: `studentID`, `grade`, `taID` | Staff |
-| Export grades            | `POST /v1/courses/{courseId}/exportGrades`                                 |                                         | Admin |
+| Description              | Route                                                                   | Body                                    | Auth  |
+|--------------------------|-------------------------------------------------------------------------|-----------------------------------------|-------|
+| Get grades by assignment | `GET /courses/{courseId}/assignments/{assignmentID}grades`              |                                         | Staff |
+| Get grades by student    | `GET /courses/{courseId}/grades`                                        | Mandatory: `studentID`                  | All   |
+| Create a grade           | `POST /courses/{courseId}/assignments/{assignmentID}/grades`            | Mandatory: `studentID`, `grade`, `taID` | Staff |
+| Update a grade           | `PATCH /courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}` | Mandatory: `studentID`, `grade`, `taID` | Staff |
+| Export grades            | `POST /courses/{courseId}/exportGrades`                                 |                                         | Admin |
 
 ### Methods - Users
 
-| Description      | Route                      | Body | Auth |
-|------------------|----------------------------|------|------|
-| Get current user | `GET /v1/users`            |      | All  |
-| Get user by ID   | `GET /v1/users/{userId}`   |      | All  |
-| Update user      | `PATCH /v1/users/{userId}` |      | All  |
-| Join a course    | ``                         |      | All  |
-| Quit a course    | ``                         |      | All  |
+| Description      | Route                           | Body                                            | Auth |
+|------------------|---------------------------------|-------------------------------------------------|------|
+| Get current user | `GET /users`                    |                                                 | All  |
+| Get user by ID   | `GET /users/{userId}`           |                                                 | All  |
+| Update user      | `PATCH /users/{userId}`         |                                                 | All  |
+| Join a course    | `PATCH /users/{userId}/courses` | Mandatory: `courseID`, Action: `join` or `quit` | All  |
 
 ## Data Schema
 
