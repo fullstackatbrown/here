@@ -3,8 +3,11 @@ package models
 import "time"
 
 type Assignment struct {
-	Name      string
-	Mandatory bool
-	startDate time.Time
-	endDate   time.Time
+	ID              string
+	Name            string
+	Mandatory       bool
+	StartDate       time.Time
+	EndDate         time.Time
+	GradesByStudent map[string]string
+	Grades          []Grade
 }

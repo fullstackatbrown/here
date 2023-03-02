@@ -12,7 +12,7 @@ type Course struct {
 	Sections     []Section
 	Assignments  []Assignment
 	GradeOptions []string
-	Students     []string
+	Students     map[string]string
 	SurveyID     string
 }
 
