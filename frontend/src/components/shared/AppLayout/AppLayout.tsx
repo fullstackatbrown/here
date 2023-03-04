@@ -21,7 +21,6 @@ import Button from "@components/shared/Button";
 import IconButton from "@components/shared/IconButton";
 import NotificationItem from "../NotificationItem";
 import toast from "react-hot-toast";
-import BellAnimation from "@components/animations/BellAnimation";
 import Head from "next/head";
 
 export interface AppLayoutProps {
@@ -157,7 +156,6 @@ const AppLayout: FC<AppLayoutProps> = ({
                             </Stack>
                         ) : (
                             <div>
-                                <BellAnimation />
                                 <Typography
                                     textAlign="center"
                                     maxWidth={250}

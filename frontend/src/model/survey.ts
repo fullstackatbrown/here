@@ -1,9 +1,8 @@
 export interface Survey {
-    id: string;
-    courseID: string;
-    name: string;
-    description: string;
-    capacity: Map<string, number>;
-    responses: Map<string, string[]>;
-    numResponses: number;
+  ID: string;
+  courseID: string;
+  name: string;
+  capacity: Record<string, number>;
+  description: string;
+  responses: Record<string, string[]>;
 }

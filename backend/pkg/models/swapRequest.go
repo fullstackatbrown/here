@@ -10,6 +10,6 @@ type SwapRequest struct {
 	IsTemporary  bool
 	RequestTime  time.Time
 	Reason       string
-	Approved     bool
+	Status       string
 	HandledBy    string
 }

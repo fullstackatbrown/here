@@ -2,18 +2,19 @@ package models
 
 var (
 	FirestoreCoursesCollection = "courses"
+	DefaultGradeOptions        = []string{"completed", "incomplete", "ungraded"}
 )
 
 type Course struct {
-	ID           string
-	Title        string
-	Code         string
-	Term         string
-	Sections     []Section
-	Assignments  []Assignment
-	GradeOptions []string
-	Students     map[string]string
-	SurveyID     string
+	ID            string            `firestore:"id,omitempty"`
+	Title         string            `firestore:"title"`
+	Code          string            `firestore:"code"`
+	Term          string            `firestore:"term"`
+	SectionIDs    []string          `firestore:"sectionIDs,omitempty"`
+	AssignmentIDs []string          `firestore:"assignmentIDs,omitempty"`
+	GradeOptions  []string          `firestore:"gradeOptions"`
+	Students      map[string]string `firestore:"students,omitempty"`
+	SurveyID      string            `firestore:"surveyID,omitempty"`
 }
 
 type GetCourseRequest struct {
@@ -30,9 +31,10 @@ type DeleteCourseRequest struct {
 	CourseID string `json:"courseid"`
 }
 
-type EditCourseRequest struct {
-	CourseID string `json:"courseid"`
-	Title    string `json:"title"`
-	Code     string `json:"code"`
-	Term     string `json:"name"`
+type UpdateCourseRequest struct {
+	CourseID     *string   `json:"courseid,omitempty"`
+	Title        *string   `json:"title,omitempty"`
+	Code         *string   `json:"code,omitempty"`
+	Term         *string   `json:"term,omitempty"`
+	GradeOptions *[]string `json:"gradeOptions,omitempty"`
 }

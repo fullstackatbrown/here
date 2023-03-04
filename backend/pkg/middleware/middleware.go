@@ -29,6 +29,28 @@ func SectionCtx() func(handler http.Handler) http.Handler {
 	}
 }
 
+func AssignmentCtx() func(handler http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			courseID := chi.URLParam(r, "assignmentID")
+
+			ctx := context.WithValue(r.Context(), "assignmentID", courseID)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func SwapCtx() func(handler http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			courseID := chi.URLParam(r, "swapID")
+
+			ctx := context.WithValue(r.Context(), "swapID", courseID)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
 func SurveyCtx() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
