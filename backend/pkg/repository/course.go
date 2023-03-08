@@ -82,7 +82,6 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 		Term:          req.Term,
 		SectionIDs:    make([]string, 0),
 		AssignmentIDs: make([]string, 0),
-		GradeOptions:  models.DefaultGradeOptions,
 		Students:      make(map[string]string),
 	}
 

@@ -106,6 +106,7 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		CourseID:        req.CourseID,
 		Name:            req.Name,
 		Mandatory:       req.Mandatory,
+		MaxScore:        req.MaxScore,
 		StartDate:       startDate.Format(time.DateOnly),
 		EndDate:         endDate.Format(time.DateOnly),
 		GradesByStudent: make(map[string]string),
