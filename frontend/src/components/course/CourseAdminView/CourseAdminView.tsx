@@ -29,12 +29,13 @@ export function CourseAdminView(props: CourseAdminViewProps) {
         <Grid xs={2}>
           <CourseAdminViewNavigation setView={setView} />
         </Grid>
-        <Grid>
+        <Grid xs>
           {view === "sections" && <SectionsView course={props.course} />}
           {view === "assignments" && <AssignmentsView />}
           {view === "people" && <PeopleView />}
           {view === "requests" && <RequestsView />}
         </Grid>
+        <Grid xs={2} />
       </Grid>
     </Stack>
   );

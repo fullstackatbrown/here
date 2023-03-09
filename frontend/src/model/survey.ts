@@ -5,4 +5,5 @@ export interface Survey {
   capacity: Record<string, number>;
   description: string;
   responses: Record<string, string[]>;
+    published: boolean;
 }
