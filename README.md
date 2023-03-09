@@ -4,12 +4,12 @@
 
 Make sure you have Go and npm installed on your device
 
--   Start backend: `cd backend`, `go run main.go`
--   Start frontend: `cd frontend`, `yarn dev`
+- Start backend: `cd backend`, `go run main.go`
+- Start frontend: `cd frontend`, `yarn dev`
 
 ## Firestore
 
--   Go to firebase project and follow the steps [here](https://firebase.google.com/docs/admin/setup#initialize-sdk) to generate a private key file. Put it in the root of backend folder and rename it as `dev-firebase-config.json`
+- Go to firebase project and follow the steps [here](https://firebase.google.com/docs/admin/setup#initialize-sdk) to generate a private key file. Put it in the root of backend folder and rename it as `dev-firebase-config.json`
 
 ## Backend APIs
 
@@ -85,18 +85,18 @@ Make sure you have Go and npm installed on your device
 ## Data Schema
 
 <pre>
-<b>courses (collection)</b>
+<b>courses</b>
     id: string                     # unique id of the course
     title: string                  # name of the course
     courseCode: string             # course's course code
     term: string                   # semester this course is offered
     students: map[string]string    # map from studentIDs to sectionIDs
     surveyID: string               # id of the survey attached to this course
-    sectionIDs: []string           
-    assignmentIDs: []string       
-    swapRequests: []string 
+    sectionIDs: []string
+    assignmentIDs: []string
+    swapRequests: []string
 
-<b>sections (sub-collection)</b>
+<b>sections</b>
     id: string                                # unique id of the section
     courseID: string
     day: string                               # the day this section runs
@@ -104,11 +104,11 @@ Make sure you have Go and npm installed on your device
     endTime: string                           # the time the section ends
     location: string                          # where the section takes place
     capacity: int                             # max section capacity
-    numStudentsEnrolled: int                  # how full the current section is
+    ---numStudentsEnrolled: int                  # how full the current section is
     swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
     swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
 
-<b>assignments (sub-collection)</b>
+<b>assignments</b>
     id: string                          # unique assignment id
     courseID: string
     name: string                        # name of the assignment
@@ -118,7 +118,7 @@ Make sure you have Go and npm installed on your device
     endDate: string                     # when the assignment is due
     gradesByStudent: map[string]string  # map from studentID to their gradeID
 
-<b>grades (sub-sub-collection)</b>
+<b>grades</b>
     id: string                         # unique grade id
     studentID: string                  # the id of the student the grade is for
     assignmentID: string
@@ -126,7 +126,7 @@ Make sure you have Go and npm installed on your device
     gradedBy: string                   # id of the TA that graded the assignment
     timeUpdated: Timestamp             # when the time was updated
 
-<b>swapRequest (sub-collection)</b>
+<b>swapRequest</b>
     id: string
     studentID: string                      # ID of student
     oldSectionID: string                   # ID of the section the student is swapping out of
@@ -137,7 +137,7 @@ Make sure you have Go and npm installed on your device
     status: string                         # pending, cancelled, approved, denied, archived
     handledBy: string                      # automatic or taID
 
-<b>profiles (collection)</b>
+<b>profiles</b>
     displayName: string
     email: string
     access: map[string]string                         # map from courseID to "admin", or "staff"
@@ -145,7 +145,7 @@ Make sure you have Go and npm installed on your device
     defaultSections: map[string]string                # map from courseID to sectionID
     actualSections: map[string]map[string]string      # map from courseID to map from assignmentID to sectionID
 
-<b>surveys (collection)</b>
+<b>surveys</b>
     id: string
     courseID: string
     name: string
