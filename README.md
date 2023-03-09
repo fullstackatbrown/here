@@ -50,6 +50,7 @@ Make sure you have Go and npm installed on your device
 | Get survey by id | `GET /courses/{courseId}/surveys/{surveyID}/`                         |                              | Staff |
 | Create survey    | `POST /courses/{courseId}/surveys`                                    | Mandatory: `name`            | Admin |
 | Publish          | `POST /courses/{courseId}/surveys/{surveyID}/publish`                 |                              | Admin |
+| Generate Result  | `POST /courses/{courseId}/surveys/{surveyID}/results`                 |                              | Admin |
 | Create response  | `POST /courses/{courseId}/surveys/{surveyID}/responses`               | Mandatory: `times: []string` | All   |
 | Edit response    | `PATCH /courses/{courseId}/surveys/{surveyID}/responses/{responseId}` | Mandatory: `times: []string` | All   |
 
@@ -150,7 +151,9 @@ Make sure you have Go and npm installed on your device
     name: string
     published: bool                            # whether if the survey is published
     description: string
+    sectionTimes: map[string][]string              # map from time to a list of sectionIDs (sections at that time)
     capacity: map[string]int                   # map from time to section capacity
     responses: map[string][]string             # map from studentID to available times
-    numResponses: int
+    results: map[string][]string               # final results: map from sectionID to list of studentIDs
+    exceptions: []string                       # list of studentIDs who cannot get a section assigned after running algorithm
 </pre>
