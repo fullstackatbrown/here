@@ -101,7 +101,7 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 
 	// Create a new section document
 	section = &models.Section{
-		Day:                time.Weekday(req.Day),
+		Day:                models.Day(req.Day),
 		CourseID:           req.CourseID,
 		StartTime:          startTime.Format(time.Kitchen),
 		EndTime:            endTime.Format(time.Kitchen),

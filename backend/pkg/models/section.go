@@ -1,18 +1,29 @@
 package models
 
 import (
-	"fmt"
-	"time"
+	"strings"
 )
 
 var (
 	FirestoreSectionsCollection = "sections"
 )
 
+type Day string
+
+const (
+	Sunday    Day = "Sunday"
+	Monday    Day = "Monday"
+	Tuesday   Day = "Tuesday"
+	Wednesday Day = "Wednesday"
+	Thursday  Day = "Thursday"
+	Friday    Day = "Friday"
+	Saturday  Day = "Saturday"
+)
+
 type Section struct {
 	ID                 string              `firestore:"id,omitempty"`
 	CourseID           string              `firestore:"courseID"`
-	Day                time.Weekday        `firestore:"day"`
+	Day                Day                 `firestore:"day"`
 	StartTime          string              `firestore:"startTime"`
 	EndTime            string              `firestore:"endTime"`
 	Location           string              `firestore:"location"`
@@ -28,8 +39,7 @@ type GetSectionRequest struct {
 
 type CreateSectionRequest struct {
 	CourseID string `json:"courseid,omitempty"`
-	// (Sunday = 0, ...)
-	Day int `json:"day"`
+	Day      string `json:"day"`
 	// must be ISO8601 compliant
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
@@ -43,5 +53,5 @@ type DeleteSectionRequest struct {
 }
 
 func (section *Section) TimeAsString() string {
-	return fmt.Sprintf("%d", int(section.Day)) + " " + section.StartTime + "-" + section.EndTime
+	return strings.Join([]string{string(section.Day), section.StartTime, section.EndTime}, ",")
 }
