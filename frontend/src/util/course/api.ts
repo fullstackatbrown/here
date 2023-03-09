@@ -1,117 +1,50 @@
 import APIClient from "@util/APIClient";
+import { Course } from "model/course";
 
 export const enum CoursePermission {
-    CourseAdmin = "ADMIN",
-    CourseStaff = "STAFF"
+  CourseAdmin = "ADMIN",
+  CourseStaff = "STAFF",
 }
 
-export interface Course {
-    id: string;
-    title: string;
-    code: string;
-    term: string;
-    coursePermissions: { [key: string]: CoursePermission };
+async function getCourse(courseID: string): Promise<Course> {
+  return await APIClient.get(`/courses/${courseID}`, {});
 }
 
-/**
- * Gets a course with the given id.
- */
- async function getCourse(courseID: string): Promise<Course> {
-    try {
-        return await APIClient.get(`/courses/${courseID}`, {});
-    } catch (e) {
-        throw e;
-    }
+async function deleteCourse(courseID: string): Promise<boolean> {
+  return APIClient.delete(`/courses/${courseID}`, {});
 }
 
-/**
- * Creates a course with the given title, code, and term.
- */
-async function createCourse(title: string, code: string, term: string): Promise<void> {
-    try {
-        await APIClient.post(`/courses/create`, {
-            title, code, term
-        });
-        return;
-    } catch (e) {
-        throw e;
-    }
+async function assignSections(
+  courseID: string,
+  studentID?: string,
+  sectionID?: string
+): Promise<void> {
+  return APIClient.post(`/courses/${courseID}/assignSections`, {
+    studentID,
+    sectionID,
+  });
 }
 
-/**
- * Deletes a course with the given id.
- */
- async function deleteCourse(courseID: string): Promise<Course> {
-    try {
-        return await APIClient.delete(`/courses/${courseID}`, {});
-    } catch (e) {
-        throw e;
-    }
+async function createCourse(
+  title: string,
+  code: string,
+  term: string
+): Promise<string> {
+  return APIClient.post(`/courses/`, { title, code, term });
 }
 
-/**
- * Creates a course with the given title, code, and term.
- */
-async function editCourse(courseID: string, title: string, code: string, term: string): Promise<void> {
-    try {
-        await APIClient.post(`/courses/${courseID}/edit`, {
-            title, code, term
-        });
-        return;
-    } catch (e) {
-        throw e;
-    }
-}
-
-/**
- * Creates a course with the given title, code, and term.
- */
-async function addCoursePermission(courseID: string, email: string, permission: string): Promise<void> {
-    try {
-        await APIClient.post(`/courses/${courseID}/addPermission`, {
-            email, permission
-        });
-        return;
-    } catch (e) {
-        throw e;
-    }
-}
-
-/**
- * Creates a course with the given title, code, and term.
- */
-async function removeCoursePermission(courseID: string, userID: string): Promise<void> {
-    try {
-        await APIClient.post(`/courses/${courseID}/removePermission`, {
-            userID
-        });
-        return;
-    } catch (e) {
-        throw e;
-    }
-}
-
-/**
- * 
- */
-async function bulkUpload(term: string, data: string): Promise<void> {
-    try {
-        await APIClient.post(`/courses/bulkUpload`, {term, data});
-        return;
-    } catch (e) {
-        throw e;
-    }
+async function updateCourse(
+  courseID: string,
+  gradeOptions?: string,
+  surveyID?: string
+): Promise<string> {
+  return APIClient.patch(`/courses/${courseID}`, { gradeOptions, surveyID });
 }
 
 const CourseAPI = {
-    getCourse,
-    createCourse,
-    deleteCourse,
-    editCourse,
-    addCoursePermission,
-    removeCoursePermission,
-    bulkUpload,
+  getCourse,
+  createCourse,
+  deleteCourse,
 };
-
 
 export default CourseAPI;
