@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"math"
+
 	"golang.org/x/exp/maps"
 )
 
@@ -69,25 +71,33 @@ func GetAssignedSections(results map[string][]string, capacity map[string]map[st
 	finalResults := make(map[string][]string)
 	for time, sections := range capacity {
 		if len(sections) == 1 {
-			for sectionID, _ := range sections {
+			for sectionID := range sections {
 				finalResults[sectionID] = results[time]
 			}
 		} else {
+			allocatedStudentAmount := len(results[time])
+
 			totalCapacity := 0
 			for _, sectionCapacity := range sections {
 				totalCapacity += sectionCapacity
 			}
 
-			// TODO: implement this
-			// get the ratio of capacity for each section
-			// divide the students into sections based on the ratio
+			sectionToEnrollment := make(map[string]int)
+			for sectionID, sectionCapacity := range sections {
+				sectionToEnrollment[sectionID] = int(math.Floor(float64(allocatedStudentAmount) * float64(sectionCapacity) / float64(totalCapacity)))
+			}
 
+			runningSum := 0
+			for sectionID, enrollmentAmt := range sectionToEnrollment {
+				finalResults[sectionID] = results[time][runningSum : runningSum+enrollmentAmt]
+				runningSum += enrollmentAmt
+			}
 		}
-
 	}
 	return finalResults
 }
 
+// -- Helpers --
 func makeFlowNetwork(capacity map[string]int, availability map[string][]string) map[string]map[string]int {
 	flow_network := make(map[string]map[string]int)
 	flow_network["source"] = make(map[string]int)
@@ -113,8 +123,6 @@ func makeFlowNetwork(capacity map[string]int, availability map[string][]string) 
 
 	return flow_network
 }
-
-// Helpers
 
 // Breadth-first search to find an augmenting path
 // Returns the path and whether or not a path was found
