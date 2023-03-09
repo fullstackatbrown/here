@@ -49,7 +49,6 @@ func getCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createCourseHandler(w http.ResponseWriter, r *http.Request) {
-
 	var req *models.CreateCourseRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)

@@ -30,9 +30,8 @@ type DeleteCourseRequest struct {
 }
 
 type UpdateCourseRequest struct {
-	CourseID     *string   `json:"courseid,omitempty"`
-	Title        *string   `json:"title,omitempty"`
-	Code         *string   `json:"code,omitempty"`
-	Term         *string   `json:"term,omitempty"`
-	GradeOptions *[]string `json:"gradeOptions,omitempty"`
+	CourseID *string `json:"courseid,omitempty"`
+	Title    *string `json:"title,omitempty"`
+	Code     *string `json:"code,omitempty"`
+	Term     *string `json:"term,omitempty"`
 }
