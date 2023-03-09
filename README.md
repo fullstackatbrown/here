@@ -74,12 +74,12 @@ Make sure you have Go and npm installed on your device
 
 ### Methods - Users
 
-| Description      | Route                           | Body                                            | Auth |
-|------------------|---------------------------------|-------------------------------------------------|------|
-| Get current user | `GET /users`                    |                                                 | All  |
-| Get user by ID   | `GET /users/{userId}`           |                                                 | All  |
-| Update user      | `PATCH /users/{userId}`         |                                                 | All  |
-| Join a course    | `PATCH /users/{userId}/courses` | Mandatory: `courseID`, Action: `join` or `quit` | All  |
+| Description        | Route                           | Body                                            | Auth |
+|--------------------|---------------------------------|-------------------------------------------------|------|
+| Get current user   | `GET /users`                    |                                                 | All  |
+| Get user by ID     | `GET /users/{userId}`           |                                                 | All  |
+| Update user        | `PATCH /users/{userId}`         |                                                 | All  |
+| Join/Quit a course | `PATCH /users/{userId}/courses` | Mandatory: `courseID`, Action: `join` or `quit` | All  |
 
 ## Data Schema
 
@@ -139,11 +139,10 @@ Make sure you have Go and npm installed on your device
 <b>profiles (collection)</b>
     displayName: string
     email: string
-    auth: map[string]string                          # map from courseID to "admin", or "staff", or "student"
+    access: map[string]string                         # map from courseID to "admin", or "staff"
+    courses: []string                                 # list of courseIDs enrolled in as student
     defaultSections: map[string]string                # map from courseID to sectionID
     actualSections: map[string]map[string]string      # map from courseID to map from assignmentID to sectionID
-
-<b>users (collection)</b>
 
 <b>surveys (collection)</b>
     id: string

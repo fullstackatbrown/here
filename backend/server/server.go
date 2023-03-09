@@ -21,6 +21,7 @@ func Routes() *chi.Mux {
 	router.Route("/", func(r chi.Router) {
 		r.Mount("/", rtr.HealthRoutes())
 		r.Mount("/courses", rtr.CourseRoutes())
+		r.Mount("/users", rtr.AuthRoutes())
 	})
 
 	return router
@@ -40,10 +41,10 @@ func Start() {
 		AllowCredentials: true,
 	})
 
-	chi.Walk(router, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		fmt.Printf("[%s]: '%s' has %d middlewares\n", method, route, len(middlewares))
-		return nil
-	})
+	// chi.Walk(router, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+	// 	fmt.Printf("[%s]: '%s' has %d middlewares\n", method, route, len(middlewares))
+	// 	return nil
+	// })
 
 	handler := c.Handler(router)
 	log.Printf("Server is listening on port %v\n", config.Config.Port)
