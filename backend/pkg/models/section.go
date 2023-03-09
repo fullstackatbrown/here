@@ -39,7 +39,7 @@ type GetSectionRequest struct {
 
 type CreateSectionRequest struct {
 	CourseID string `json:"courseid,omitempty"`
-	Day      string `json:"day"`
+	Day      Day    `json:"day"`
 	// must be ISO8601 compliant
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`

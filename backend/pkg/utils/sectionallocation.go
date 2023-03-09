@@ -5,12 +5,25 @@ import (
 )
 
 // Algorithm for assigning sections
-// Capacity: map from sections to their capacity
+// Capacity: map from unique times to a map from section id to capacity
 // Availability: map from student id to a list of sections they are available for
 // results: map from sections to list of studentIDs
 // exceptions: list of studentIDs unassigned
-func RunAllocationAlgorithm(capacity map[string]int, availability map[string][]string) (results map[string][]string, exceptions []string) {
-	section_network := makeFlowNetwork(capacity, availability)
+func RunAllocationAlgorithm(capacity map[string]map[string]int, availability map[string][]string) (results map[string][]string, exceptions []string) {
+
+	uniqueTimeCapacity := make(map[string]int)
+	for time, sectionCapacity := range capacity {
+		for _, capacity := range sectionCapacity {
+			uniqueTimeCapacity[time] += capacity
+		}
+	}
+
+	return runAllocationAlgorithm(uniqueTimeCapacity, availability)
+}
+
+func runAllocationAlgorithm(uniqueTimeCapacity map[string]int, availability map[string][]string) (results map[string][]string, exceptions []string) {
+
+	section_network := makeFlowNetwork(uniqueTimeCapacity, availability)
 
 	path, ok := findAugmentingPath(section_network, "source", "sink")
 	for ok {
@@ -24,7 +37,7 @@ func RunAllocationAlgorithm(capacity map[string]int, availability map[string][]s
 	results = make(map[string][]string)
 
 	exceptions = maps.Keys(availability)
-	for section := range capacity {
+	for section := range uniqueTimeCapacity {
 		assigned_students := make([]string, 0)
 		for student, capacity := range section_network[section] {
 			if capacity == 1 && student != "sink" {
@@ -47,21 +60,30 @@ func RunAllocationAlgorithm(capacity map[string]int, availability map[string][]s
 	return results, exceptions
 }
 
-// TODO: take into consideration capacity
 // Given the results returned by algorithm, returns a map from sectionID to list of studentIDs
-func GetAssignedSections(results map[string][]string, sectionTimes map[string][]string) map[string][]string {
+// If there is only one section for that time, all the students are in the section
+// Otherwise, the students are assigned into sections based on the proportions of section capacity
+// Results: map from time to a list of studentIDs
+// Capacity: map from unique times to a map from section id to their capacity
+func GetAssignedSections(results map[string][]string, capacity map[string]map[string]int) map[string][]string {
 	finalResults := make(map[string][]string)
-	for time, sections := range sectionTimes {
+	for time, sections := range capacity {
 		if len(sections) == 1 {
-			// If there is only one section for that time, all the students are in the section
-			finalResults[sections[0]] = results[time]
-		} else {
-			// Otherwise, divide the students who are assigned to this time into slices of equal aprts
-			studentsDivided := ChunkSlice(results[time], len(sections))
-			for i, s := range sections {
-				finalResults[s] = studentsDivided[i]
+			for sectionID, _ := range sections {
+				finalResults[sectionID] = results[time]
 			}
+		} else {
+			totalCapacity := 0
+			for _, sectionCapacity := range sections {
+				totalCapacity += sectionCapacity
+			}
+
+			// TODO: implement this
+			// get the ratio of capacity for each section
+			// divide the students into sections based on the ratio
+
 		}
+
 	}
 	return finalResults
 }

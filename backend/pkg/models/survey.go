@@ -5,15 +5,14 @@ var (
 )
 
 type Survey struct {
-	ID           string              `firestore:"id,omitempty"`
-	CourseID     string              `firestore:"courseID"`
-	Name         string              `firestore:"name"`
-	Description  string              `firestore:"description"`
-	SectionTimes map[string][]string `firestore:"sectionTimes"`
-	Capacity     map[string]int      `firestore:"capacity"`
-	Responses    map[string][]string `firestore:"responses"`
-	Results      map[string][]string `firestore:"results"`
-	Exceptions   []string            `firestore:"exceptions"`
+	ID          string                    `firestore:"id,omitempty"`
+	CourseID    string                    `firestore:"courseID"`
+	Name        string                    `firestore:"name"`
+	Description string                    `firestore:"description"`
+	Capacity    map[string]map[string]int `firestore:"capacity"`
+	Responses   map[string][]string       `firestore:"responses"`
+	Results     map[string][]string       `firestore:"results"`
+	Exceptions  []string                  `firestore:"exceptions"`
 }
 
 type Times struct {
@@ -45,38 +44,36 @@ type GenerateResultsResponseItem struct {
 }
 
 func InitSurvey(req *CreateSurveyRequest, sections []*Section) *Survey {
-	// Get all the unique times
-	capacity := make(map[string]int)
-	sectionTimes := make(map[string][]string)
+	// Capacity is a map from the unique times, to a map from section id to capacity
+	capacity := make(map[string]map[string]int)
 	for _, s := range sections {
-		capacity[s.TimeAsString()] = 0
-		sectionTimes[s.TimeAsString()] = make([]string, 0)
+		capacity[s.TimeAsString()] = make(map[string]int)
+		capacity[s.TimeAsString()][s.ID] = 0
 	}
 	for _, s := range sections {
-		capacity[s.TimeAsString()] += s.Capacity
-		sectionTimes[s.TimeAsString()] = append(sectionTimes[s.TimeAsString()], s.ID)
+		capacity[s.TimeAsString()][s.ID] += s.Capacity
 	}
 
 	return &Survey{
-		Name:         req.Name,
-		Description:  req.Description,
-		CourseID:     req.CourseID,
-		SectionTimes: sectionTimes,
-		Capacity:     capacity,
-		Responses:    make(map[string][]string),
-		Results:      make(map[string][]string),
-		Exceptions:   make([]string, 0),
+		Name:        req.Name,
+		Description: req.Description,
+		CourseID:    req.CourseID,
+		Capacity:    capacity,
+		Responses:   make(map[string][]string),
+		Results:     make(map[string][]string),
+		Exceptions:  make([]string, 0),
 	}
 }
 
 func (s *Survey) Update(req *UpdateSurveyRequest, sections []*Section) {
 	// Get all the unique times
-	capacity := make(map[string]int)
+	capacity := make(map[string]map[string]int)
 	for _, s := range sections {
-		capacity[s.TimeAsString()] = 0
+		capacity[s.TimeAsString()] = make(map[string]int)
+		capacity[s.TimeAsString()][s.ID] = 0
 	}
 	for _, s := range sections {
-		capacity[s.TimeAsString()] += s.Capacity
+		capacity[s.TimeAsString()][s.ID] += s.Capacity
 	}
 
 	s.Capacity = capacity

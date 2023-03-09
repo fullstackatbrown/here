@@ -142,7 +142,7 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(survey)
 	res, exceptions := utils.RunAllocationAlgorithm(survey.Capacity, survey.Responses)
 	// res is a map from section id to list of studentIDs
-	res = utils.GetAssignedSections(res, survey.SectionTimes)
+	res = utils.GetAssignedSections(res, survey.Capacity)
 	repo.Repository.UpdateSurveyResults(surveyID, res, exceptions)
 
 	var readableResults []models.GenerateResultsResponseItem

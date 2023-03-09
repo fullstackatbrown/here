@@ -149,11 +149,10 @@ Make sure you have Go and npm installed on your device
     id: string
     courseID: string
     name: string
-    published: bool                            # whether if the survey is published
+    published: bool                                  # whether if the survey is published
     description: string
-    sectionTimes: map[string][]string              # map from time to a list of sectionIDs (sections at that time)
-    capacity: map[string]int                   # map from time to section capacity
-    responses: map[string][]string             # map from studentID to available times
-    results: map[string][]string               # final results: map from sectionID to list of studentIDs
-    exceptions: []string                       # list of studentIDs who cannot get a section assigned after running algorithm
+    capacity: map[string]map[string]int              # map from time to a map from sectionID to capacity
+    responses: map[string][]string                   # map from studentID to available times
+    results: map[string][]string                     # final results: map from sectionID to list of studentIDs
+    exceptions: []string                             # list of studentIDs who cannot get a section assigned after running algorithm
 </pre>
