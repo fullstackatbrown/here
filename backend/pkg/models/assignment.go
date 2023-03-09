@@ -8,7 +8,7 @@ type Assignment struct {
 	ID              string            `firestore:"id,omitempty"`
 	CourseID        string            `firestore:"courseID"`
 	Name            string            `firestore:"name"`
-	Mandatory       bool              `firestore:"mandatory"`
+	Optional        bool              `firestore:"optional"`
 	MaxScore        int               `firestore:"maxScore"`
 	StartDate       string            `firestore:"startDate"`
 	EndDate         string            `firestore:"endDate"`
@@ -22,7 +22,7 @@ type GetAssignmentRequest struct {
 type CreateAssignmentRequest struct {
 	CourseID  string `json:"courseid,omitempty"`
 	Name      string `json:"name"`
-	Mandatory bool   `json:"mandatory"`
+	Optional  bool   `json:"optional"`
 	MaxScore  int    `json:"maxScore"`
 	StartDate string `json:"startDate"`
 	EndDate   string `json:"endDate"`

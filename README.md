@@ -104,7 +104,6 @@ Make sure you have Go and npm installed on your device
     endTime: string                           # the time the section ends
     location: string                          # where the section takes place
     capacity: int                             # max section capacity
-    ---numStudentsEnrolled: int                  # how full the current section is
     swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
     swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
 
@@ -112,7 +111,7 @@ Make sure you have Go and npm installed on your device
     id: string                          # unique assignment id
     courseID: string
     name: string                        # name of the assignment
-    mandatory: bool                     # whether or not this assignment is mandatory to complete
+    optional: bool                      # whether or not this assignment is optional
     maxScore: int                       # maximum points possible
     startDate: string                   # when the assignment is released
     endDate: string                     # when the assignment is due

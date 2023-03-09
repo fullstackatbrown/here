@@ -4,7 +4,7 @@ export interface Assignment {
   ID: string;
   courseID: string;
   name: string;
-  mandatory: boolean;
+  optional: boolean;
   startDate: Date;
   endDate: Date;
   gradesByStudent: Record<string, string>;

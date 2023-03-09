@@ -6,7 +6,6 @@ export interface Course {
   code: string;
   term: string;
   sectionIDs: string[];
-  gradeOptions: string[];
   students: Record<string, string>;
   surveyID: string;
 }

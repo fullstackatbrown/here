@@ -105,7 +105,7 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 	assignment = &models.Assignment{
 		CourseID:        req.CourseID,
 		Name:            req.Name,
-		Mandatory:       req.Mandatory,
+		Optional:        req.Optional,
 		MaxScore:        req.MaxScore,
 		StartDate:       startDate.Format(time.DateOnly),
 		EndDate:         endDate.Format(time.DateOnly),
