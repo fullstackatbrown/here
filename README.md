@@ -50,6 +50,7 @@ Make sure you have Go and npm installed on your device
 | Get survey by id | `GET /courses/{courseId}/surveys/{surveyID}/`                         |                              | Staff |
 | Create survey    | `POST /courses/{courseId}/surveys`                                    | Mandatory: `name`            | Admin |
 | Publish          | `POST /courses/{courseId}/surveys/{surveyID}/publish`                 |                              | Admin |
+| Generate Result  | `POST /courses/{courseId}/surveys/{surveyID}/results`                 |                              | Admin |
 | Create response  | `POST /courses/{courseId}/surveys/{surveyID}/responses`               | Mandatory: `times: []string` | All   |
 | Edit response    | `PATCH /courses/{courseId}/surveys/{surveyID}/responses/{responseId}` | Mandatory: `times: []string` | All   |
 
@@ -74,12 +75,12 @@ Make sure you have Go and npm installed on your device
 
 ### Methods - Users
 
-| Description      | Route                           | Body                                            | Auth |
-|------------------|---------------------------------|-------------------------------------------------|------|
-| Get current user | `GET /users`                    |                                                 | All  |
-| Get user by ID   | `GET /users/{userId}`           |                                                 | All  |
-| Update user      | `PATCH /users/{userId}`         |                                                 | All  |
-| Join a course    | `PATCH /users/{userId}/courses` | Mandatory: `courseID`, Action: `join` or `quit` | All  |
+| Description        | Route                           | Body                                            | Auth |
+|--------------------|---------------------------------|-------------------------------------------------|------|
+| Get current user   | `GET /users`                    |                                                 | All  |
+| Get user by ID     | `GET /users/{userId}`           |                                                 | All  |
+| Update user        | `PATCH /users/{userId}`         |                                                 | All  |
+| Join/Quit a course | `PATCH /users/{userId}/courses` | Mandatory: `courseID`, Action: `join` or `quit` | All  |
 
 ## Data Schema
 
@@ -89,7 +90,6 @@ Make sure you have Go and npm installed on your device
     title: string                  # name of the course
     courseCode: string             # course's course code
     term: string                   # semester this course is offered
-    gradeOptions: []string         # list of grade options for the course default: [completed, incomplete, ungraded]
     students: map[string]string    # map from studentIDs to sectionIDs
     surveyID: string               # id of the survey attached to this course
     sectionIDs: []string           
@@ -113,6 +113,7 @@ Make sure you have Go and npm installed on your device
     courseID: string
     name: string                        # name of the assignment
     mandatory: bool                     # whether or not this assignment is mandatory to complete
+    maxScore: int                       # maximum points possible
     startDate: string                   # when the assignment is released
     endDate: string                     # when the assignment is due
     gradesByStudent: map[string]string  # map from studentID to their gradeID
@@ -121,7 +122,7 @@ Make sure you have Go and npm installed on your device
     id: string                         # unique grade id
     studentID: string                  # the id of the student the grade is for
     assignmentID: string
-    grade: string                      # the grade in gradeOptions
+    grade: int                         # grade
     gradedBy: string                   # id of the TA that graded the assignment
     timeUpdated: Timestamp             # when the time was updated
 
@@ -133,25 +134,25 @@ Make sure you have Go and npm installed on your device
     isTemporary: bool                      # if this is a temporary swap or not
     requestTime: timestamp                 # when the request was submitted
     reason: string                         # reason for the swap
-    status: string                         # submitted, cancelled, approved, denied
+    status: string                         # pending, cancelled, approved, denied, archived
     handledBy: string                      # automatic or taID
 
 <b>profiles (collection)</b>
     displayName: string
     email: string
-    auth: map[string]string                          # map from courseID to "admin", or "staff", or "student"
+    access: map[string]string                         # map from courseID to "admin", or "staff"
+    courses: []string                                 # list of courseIDs enrolled in as student
     defaultSections: map[string]string                # map from courseID to sectionID
     actualSections: map[string]map[string]string      # map from courseID to map from assignmentID to sectionID
-
-<b>users (collection)</b>
 
 <b>surveys (collection)</b>
     id: string
     courseID: string
     name: string
-    published: bool                            # whether if the survey is published
+    published: bool                                  # whether if the survey is published
     description: string
-    capacity: map[string]int                   # map from time to section capacity
-    responses: map[string][]string             # map from studentID to available times
-    numResponses: int
+    capacity: map[string]map[string]int              # map from time to a map from sectionID to capacity
+    responses: map[string][]string                   # map from studentID to available times
+    results: map[string][]string                     # final results: map from sectionID to list of studentIDs
+    exceptions: []string                             # list of studentIDs who cannot get a section assigned after running algorithm
 </pre>

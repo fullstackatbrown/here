@@ -39,7 +39,7 @@ func TestSimpleAllocation(t *testing.T) {
 
 	missing_want := []string{}
 
-	allocated_got, missing_got := AssignSections(capacity, availability)
+	allocated_got, missing_got := runAllocationAlgorithm(capacity, availability)
 
 	assertEquals(allocated_got, allocated_want, t)
 	assertEquals(missing_got, missing_want, t)

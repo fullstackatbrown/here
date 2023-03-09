@@ -2,11 +2,13 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
+	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -21,6 +23,7 @@ func SurveyRoutes() *chi.Mux {
 		router.Get("/", getSurveyHandler)
 		router.Post("/", updateSurveyHandler)
 		router.Post("/publish", publishSurveyHandler)
+		router.Post("/results", generateResultsHandler)
 		router.Mount("/responses", ResponsesRoutes())
 
 	})
@@ -127,6 +130,46 @@ func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Successfully published survey " + surveyID))
 }
 
+func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
+	surveyID := r.Context().Value("surveyID").(string)
+
+	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println(survey)
+	res, exceptions := utils.RunAllocationAlgorithm(survey.Capacity, survey.Responses)
+	// res is a map from section id to list of studentIDs
+	res = utils.GetAssignedSections(res, survey.Capacity)
+	repo.Repository.UpdateSurveyResults(surveyID, res, exceptions)
+
+	var readableResults []models.GenerateResultsResponseItem
+
+	for sectionID, studentIDs := range res {
+		section, err := repo.Repository.GetSectionByID(sectionID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var students []string
+		for _, studentID := range studentIDs {
+			student, err := repo.Repository.GetUserByID(studentID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			students = append(students, student.DisplayName)
+		}
+
+		readableResults = append(readableResults, models.GenerateResultsResponseItem{Section: *section, Students: students})
+	}
+
+	render.JSON(w, r, readableResults)
+}
+
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	surveyID := r.Context().Value("surveyID").(string)
 
@@ -137,10 +180,6 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.SurveyID = surveyID
-
-	// TODO: get user from auth middleware
-	req.UserID = "USERID(Placeholder)"
 	req.SurveyID = surveyID
 
 	s, err := repo.Repository.CreateSurveyResponse(req)
