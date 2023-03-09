@@ -21,9 +21,9 @@ func CourseCtx() func(handler http.Handler) http.Handler {
 func SectionCtx() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			courseID := chi.URLParam(r, "sectionID")
+			sectionID := chi.URLParam(r, "sectionID")
 
-			ctx := context.WithValue(r.Context(), "sectionID", courseID)
+			ctx := context.WithValue(r.Context(), "sectionID", sectionID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -32,9 +32,9 @@ func SectionCtx() func(handler http.Handler) http.Handler {
 func AssignmentCtx() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			courseID := chi.URLParam(r, "assignmentID")
+			assignmentID := chi.URLParam(r, "assignmentID")
 
-			ctx := context.WithValue(r.Context(), "assignmentID", courseID)
+			ctx := context.WithValue(r.Context(), "assignmentID", assignmentID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -43,9 +43,9 @@ func AssignmentCtx() func(handler http.Handler) http.Handler {
 func SwapCtx() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			courseID := chi.URLParam(r, "swapID")
+			swapID := chi.URLParam(r, "swapID")
 
-			ctx := context.WithValue(r.Context(), "swapID", courseID)
+			ctx := context.WithValue(r.Context(), "swapID", swapID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -54,9 +54,9 @@ func SwapCtx() func(handler http.Handler) http.Handler {
 func SurveyCtx() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			courseID := chi.URLParam(r, "surveyID")
+			surveyID := chi.URLParam(r, "surveyID")
 
-			ctx := context.WithValue(r.Context(), "surveyID", courseID)
+			ctx := context.WithValue(r.Context(), "surveyID", surveyID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
