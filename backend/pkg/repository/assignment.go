@@ -94,14 +94,14 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		return nil, fmt.Errorf("error parsing end time: %v\n", err)
 	}
 
-	// TODO: make this a transaction
-
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
 	}
 
-	// Create a new assignment document
+	// In a transaction, create a new assignment document and add the assignment to the corresponding course
+	batch := fr.firestoreClient.Batch()
+
 	assignment = &models.Assignment{
 		CourseID:        req.CourseID,
 		Name:            req.Name,
@@ -112,23 +112,22 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		GradesByStudent: make(map[string]string),
 	}
 
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreAssignmentsCollection).Add(firebase.Context, assignment)
-	if err != nil {
-		return nil, fmt.Errorf("error creating course: %v\n", err)
-	}
-	assignment.ID = ref.ID
+	assignmentRef := fr.firestoreClient.Collection(models.FirestoreAssignmentsCollection).NewDoc()
+	batch.Create(assignmentRef, assignment)
 
 	// Add the assignment to the corresponding course
 	newAssignments := append(course.AssignmentIDs, assignment.ID)
 
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
-		{Path: "assignmentIDs", Value: newAssignments},
-	})
+	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
+	batch.Update(coursesRef, []firestore.Update{{Path: "assignmentIDs", Value: newAssignments}})
 
+	// Commit the batch.
+	_, err = batch.Commit(firebase.Context)
 	if err != nil {
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
 	}
 
+	assignment.ID = assignmentRef.ID
 	return assignment, nil
 }
 
@@ -144,18 +143,14 @@ func (fr *FirebaseRepository) DeleteAssignment(req *models.DeleteAssignmentReque
 		return err
 	}
 
-	// TODO: make this a transaction
-	// Delete the assignment.
-	_, err = fr.firestoreClient.Collection(models.FirestoreAssignmentsCollection).Doc(req.AssignmentID).Delete(firebase.Context)
-	if err != nil {
-		return err
-	}
+	// In a transaction, delete the assignment document and delete the assignment from course
+	batch := fr.firestoreClient.Batch()
+	assignmentRef := fr.firestoreClient.Collection(models.FirestoreAssignmentsCollection).Doc(req.AssignmentID)
+	batch.Delete(assignmentRef)
 
-	// Delete the assignment from course
 	newAssignments := utils.Filter(course.AssignmentIDs, func(s string) bool { return s != req.AssignmentID })
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
-		{Path: "assignmentIDs", Value: newAssignments},
-	})
+	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
+	batch.Update(coursesRef, []firestore.Update{{Path: "assignmentIDs", Value: newAssignments}})
 
 	return err
 }

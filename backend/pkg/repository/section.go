@@ -92,14 +92,13 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 	}
 
 	// TODO: check if c.Day is a valid weekday constant
-	// TODO: make this a transaction
 
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, fmt.Errorf("error creating section: %v\n", err)
 	}
 
-	// Create a new section document
+	// In a transaction, create a new section document and add the section to the corresponding course
 	section = &models.Section{
 		Day:                models.Day(req.Day),
 		CourseID:           req.CourseID,
@@ -112,22 +111,21 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 		SwappedOutStudents: make(map[string][]string),
 	}
 
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Add(firebase.Context, section)
-	if err != nil {
-		return nil, fmt.Errorf("error creating section: %v\n", err)
-	}
-	section.ID = ref.ID
+	batch := fr.firestoreClient.Batch()
+	sectionRef := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).NewDoc()
+	batch.Create(sectionRef, section)
 
-	// Add the section to the corresponding course
-	newSections := append(course.SectionIDs, section.ID)
-
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
-		{Path: "sectionIDs", Value: newSections},
+	courseRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
+	batch.Update(courseRef, []firestore.Update{
+		{Path: "sectionIDs", Value: append(course.SectionIDs, sectionRef.ID)},
 	})
 
+	_, err = batch.Commit(firebase.Context)
 	if err != nil {
 		return nil, fmt.Errorf("error creating section: %v\n", err)
 	}
+
+	section.ID = sectionRef.ID
 
 	return section, nil
 }
@@ -144,18 +142,21 @@ func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) er
 		return err
 	}
 
-	// TODO: make this a transaction
-	// Delete the section.
-	_, err = fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Doc(req.SectionID).Delete(firebase.Context)
-	if err != nil {
-		return err
-	}
+	// In a transaction, delete the section document and remove the section from the corresponding course
 
-	// Delete the section from course
-	newSections := utils.Filter(course.SectionIDs, func(s string) bool { return s != req.SectionID })
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
-		{Path: "sectionIDs", Value: newSections},
+	batch := fr.firestoreClient.Batch()
+	sectionsRef := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Doc(req.SectionID)
+	batch.Delete(sectionsRef)
+
+	courseRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
+	batch.Update(courseRef, []firestore.Update{
+		{Path: "sectionIDs", Value: utils.Filter(course.SectionIDs, func(s string) bool { return s != req.SectionID })},
 	})
+
+	_, err = batch.Commit(firebase.Context)
+	if err != nil {
+		return fmt.Errorf("error deleting course: %v\n", err)
+	}
 
 	return err
 }
