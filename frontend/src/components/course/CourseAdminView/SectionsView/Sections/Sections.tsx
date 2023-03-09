@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import { useSections } from "@util/section/hooks";
-import { Course } from "model/general";
+import { Course } from "model/course";
 import { useState } from "react";
 import CreateSectionDialog from "./CreateSectionDialog";
 import SectionCard from "./SectionCard";

@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { Course } from "model/general";
+import { Course } from "model/course";
 
 export interface AssignmentsProps {
   course: Course;
