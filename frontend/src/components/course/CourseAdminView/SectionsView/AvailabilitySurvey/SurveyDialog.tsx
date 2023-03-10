@@ -19,7 +19,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { Controller, useForm } from "react-hook-form";
-import QueueAPI from "@util/queue/api";
 import { toast } from "react-hot-toast";
 import errors from "@util/errors";
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
@@ -61,7 +60,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
         <DialogContent>
             <Typography variant="body2" mb={2.5}> {survey.description} </Typography>
             <Stack >
-                {Array.from(survey.capacity.keys()).map(time =>
+                {Array.from(Object.keys(survey.capacity)).map(time =>
                     <FormControlLabel control={<Checkbox onChange={onChangeCheckbox(time)} />} label={time} />
                 )}
             </Stack>

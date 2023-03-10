@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 var (
 	FirestoreSurveysCollection = "surveys"
 )
@@ -9,6 +11,7 @@ type Survey struct {
 	CourseID    string                    `firestore:"courseID"`
 	Name        string                    `firestore:"name"`
 	Description string                    `firestore:"description"`
+	EndTime     time.Time                 `firestore:"endTime"`
 	Capacity    map[string]map[string]int `firestore:"capacity"`
 	Responses   map[string][]string       `firestore:"responses"`
 	Results     map[string][]string       `firestore:"results"`

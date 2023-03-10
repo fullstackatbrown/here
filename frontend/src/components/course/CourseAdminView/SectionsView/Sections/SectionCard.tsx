@@ -1,15 +1,9 @@
 import React, { FC } from "react";
-import { Box, ButtonBase, Paper, Stack, Typography } from "@mui/material";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { useRouter } from "next/router";
-import { Section } from "@util/section/api";
-import formatEndTime from "@util/shared/formatEndTime";
-import getSectionColor from "@util/shared/getSectionColor";
-import SectionStatusChip from "@components/course/CourseStatusChip";
+import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import formatSectionTime from "@util/shared/formatSectionTime";
 import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from "@mui/icons-material/Clear";
+import { Section } from "model/section";
 
 export interface SectionCardProps {
   section: Section;
@@ -45,23 +39,17 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
               Capacity: {section.capacity}
             </Typography>
             <Typography variant="body1" fontWeight={400}>
-              Registered: {section.enrollment}
+              {/* Registered: {section.enrollment} */}
             </Typography>
           </Stack>
         </Stack>
         <Stack display={"flex"} direction="row" spacing={1}>
-          <ButtonBase
-            onClick={() => console.log("handle editing section...")}
-            focusRipple
-          >
+          <IconButton aria-label="edit" size="small">
             <CreateIcon />
-          </ButtonBase>
-          <ButtonBase
-            onClick={() => console.log("handle deleting section...")}
-            focusRipple
-          >
+          </IconButton>
+          <IconButton aria-label="delete" size="small">
             <ClearIcon />
-          </ButtonBase>
+          </IconButton>
         </Stack>
       </Box>
     </Paper>

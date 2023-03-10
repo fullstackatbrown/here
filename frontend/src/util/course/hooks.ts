@@ -1,15 +1,16 @@
-import {useEffect, useState} from "react";
-import {Course} from "model/general"
-import {collection, doc, getFirestore, onSnapshot} from "@firebase/firestore";
-import AuthAPI, {User} from "@util/auth/api";
+import { useEffect, useState } from "react";
+import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
+import AuthAPI, { User } from "@util/auth/api";
+import { Course } from "model/course";
 
 const dummyCourse: Course = {
-    code: "CSCI 1470",
+    ID: "",
     title: "Deep Learning",
-    sections: [],
-    assignments: [],
-    gradeOptions: [],
-    students: [],
+    code: "CSCI 1470",
+    term: "spring 2023",
+    sectionIDs: [],
+    students: { "student1": "", "student2": "", "student3": "", "student4": "" },
+    surveyID: "survey1",
 };
 
 const dummyCourses: Course[] = [dummyCourse]
@@ -76,20 +77,20 @@ export function useInvitations(courseID: string): [string[], boolean] {
     const [invites, setInvites] = useState<string[]>([]);
 
     useEffect(() => {
-            const db = getFirestore();
-            const unsubscribe = onSnapshot(collection(db, "invites"), (querySnapshot) => {
-                const res: string[] = [];
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.courseID === courseID) res.push(data.email);
-                });
-    
-                setInvites(res);
-                setLoading(false);
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(collection(db, "invites"), (querySnapshot) => {
+            const res: string[] = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.courseID === courseID) res.push(data.email);
             });
 
-            return () => unsubscribe();
-        }, [courseID]);
+            setInvites(res);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [courseID]);
 
     return [invites, loading];
 }
