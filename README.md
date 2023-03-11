@@ -149,6 +149,7 @@ Make sure you have Go and npm installed on your device
     courseID: string
     name: string
     published: bool                                  # whether if the survey is published
+    endTime: timestamp                               # when this survey will be made unavailable
     description: string
     capacity: map[string]map[string]int              # map from time to a map from sectionID to capacity
     responses: map[string][]string                   # map from studentID to available times

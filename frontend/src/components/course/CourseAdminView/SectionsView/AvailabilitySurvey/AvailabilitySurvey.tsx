@@ -1,5 +1,5 @@
 import { Box, Button, Card, Paper, Stack, Typography } from "@mui/material";
-import { Course } from "model/general";
+import { Course } from "model/course";
 import { Survey } from "model/survey";
 import { useEffect, useState } from "react";
 import CreateSurveyDialog from "./CreateSurveyDialog";
@@ -11,19 +11,15 @@ export interface AvailabilitySurveyProps {
 }
 
 const exampleSurvey: Survey = {
-  id: "tempid",
-  courseID: "tempcourseid",
+  ID: "",
+  courseID: "CSCI 1470",
   name: "Time Availability Survey",
-  description: "Please select all the times that you are available for",
-  capacity: new Map(),
-  responses: new Map(),
-  numResponses: 0,
+  description: "Please choose all the times that you are available for.",
+  endTime: new Date('March 30, 2023 03:00:00'),
+  capacity: { "Tuesday 2-3pm": { "section1": 30 }, "Wednesday 2-3pm": { "section2": 50 } },
+  responses: { "student1": ["Tuesday 2-3pm"], "student2": ["Tuesday 2-3pm, Wednesday 2-3pm"] },
   published: true,
-};
-
-exampleSurvey.capacity.set("Tuesday 3-5PM", 20);
-exampleSurvey.capacity.set("Wednesday 6-8PM", 40);
-exampleSurvey.capacity.set("Friday 6-8PM", 40);
+}
 
 export default function AvailabilitySurvey({
   course,
@@ -33,17 +29,20 @@ export default function AvailabilitySurvey({
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
 
   useEffect(() => {
-    // TODO: get survey id from backend
-
     // Uncomment this for testing UI
-    setSurvey(exampleSurvey);
-  }, []);
+    if (course.surveyID != "") {
+      // TODO: get survey from backend
+      setSurvey(exampleSurvey);
+    }
+
+  }, [course]);
 
   return (
     <>
       <CreateSurveyDialog
         open={createSurveyDialog}
         onClose={() => setCreateSurveyDialog(false)}
+        update={false}
       />
       {survey && (
         <SurveyDialog
@@ -57,18 +56,11 @@ export default function AvailabilitySurvey({
         <Typography variant="h6" fontWeight={600}>
           Availability Survey
         </Typography>
-        {survey ? (
-          // TODO:
-          <Button onClick={() => {}}>Update Survey</Button>
-        ) : (
-          <Button onClick={() => setCreateSurveyDialog(true)}>
-            + Create Survey
-          </Button>
-        )}
+        {!survey && <Button onClick={() => setCreateSurveyDialog(true)}>+ Create Survey</Button>}
       </Stack>
-      <Box height={100}>
+      <Box height={100} my={2}>
         {survey && (
-          <SurveyCard survey={survey} numStudents={course.students.length} />
+          <SurveyCard survey={survey} numStudents={Object.keys(course.students).length} />
         )}
       </Box>
     </>

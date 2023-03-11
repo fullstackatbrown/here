@@ -1,30 +1,12 @@
-import { FC, useEffect } from "react";
+import Button from "@components/shared/Button";
 import {
-    Dialog,
+    Checkbox, Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
-    Stack,
-    TextField,
-    FormControlLabel,
-    Checkbox,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
-    Typography
+    DialogTitle, FormControlLabel, Stack, Typography
 } from "@mui/material";
-import Button from "@components/shared/Button";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, { Dayjs } from 'dayjs';
-import { Controller, useForm } from "react-hook-form";
-import QueueAPI from "@util/queue/api";
-import { toast } from "react-hot-toast";
-import errors from "@util/errors";
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { useState } from 'react';
 import { Survey } from "model/survey";
+import { FC, useState } from "react";
 
 export interface SurveyDialogProps {
     open: boolean;
@@ -57,11 +39,11 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
     }
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
-        <DialogTitle>{survey.name}</DialogTitle>
+        <DialogTitle>{survey.name}{preview && " (Preview)"}</DialogTitle>
         <DialogContent>
             <Typography variant="body2" mb={2.5}> {survey.description} </Typography>
             <Stack >
-                {Array.from(survey.capacity.keys()).map(time =>
+                {Array.from(Object.keys(survey.capacity)).map(time =>
                     <FormControlLabel control={<Checkbox onChange={onChangeCheckbox(time)} />} label={time} />
                 )}
             </Stack>
