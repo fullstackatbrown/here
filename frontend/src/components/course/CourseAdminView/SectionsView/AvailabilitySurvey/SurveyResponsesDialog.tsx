@@ -1,9 +1,11 @@
 import {
-    Checkbox, Dialog, DialogContent,
-    DialogTitle, FormControlLabel, Stack, Typography
+    Button, Dialog, DialogActions, DialogContent,
+    DialogTitle,
+    Typography
 } from "@mui/material";
+import formatSectionResponses from "@util/shared/formatSectionResponses";
 import { Survey } from "model/survey";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -13,25 +15,32 @@ export interface SurveyResponsesDialogProps {
 
 
 const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey }) => {
-    const [times, setTimes] = useState<string[]>([]);
+    const numResponses = Object.keys(survey.responses).length
+    const formattedResponses = formatSectionResponses(survey.responses)
 
-    function onChangeCheckbox(time: string) {
-        return (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (e.target.checked) {
-                setTimes([...times, time])
-            } else {
-                let newTimes = times.filter(t => t !== time)
-                setTimes([...newTimes])
-            }
-        }
-    }
+    useEffect(() => {
+        console.log(formatSectionResponses(survey.responses))
+    }, []);
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>{survey.name} (Responses)</DialogTitle>
         <DialogContent>
+            <Typography>
+                {numResponses} have responded to this survey.
+            </Typography>
 
+            {Object.keys(formattedResponses).map((time) => {
+                const percentage = (formattedResponses[time] / numResponses) * 100
+                return <Typography>
+                    {time}: {formattedResponses[time]} students, {percentage}%
+                </Typography>
+            }
+            )}
 
         </DialogContent>
+        <DialogActions>
+            <Button type="submit" variant="contained">Allocate Sections</Button>
+        </DialogActions>
     </Dialog>;
 };
 

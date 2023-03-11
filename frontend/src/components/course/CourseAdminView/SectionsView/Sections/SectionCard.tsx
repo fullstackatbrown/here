@@ -16,8 +16,6 @@ export interface SectionCardProps {
  */
 const SectionCard: FC<SectionCardProps> = ({ section }) => {
   const [editSectionDialog, setEditSectionDialog] = React.useState(false);
-  const startTime = new Date(section.startTime);
-  const endTime = new Date(section.endTime);
 
   const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
@@ -40,7 +38,7 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2} alignItems={"center"}>
           <Stack>
             <Typography variant="body1" noWrap>
-              {formatSectionTime(startTime, endTime)}
+              {formatSectionTime(section.day, section.startTime, section.endTime)}
             </Typography>
             <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
               <Typography variant="body1" fontWeight={400}>

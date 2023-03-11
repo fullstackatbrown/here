@@ -1,1 +1,0 @@
-export const TICKET_COOLDOWN_MINUTES = 15;

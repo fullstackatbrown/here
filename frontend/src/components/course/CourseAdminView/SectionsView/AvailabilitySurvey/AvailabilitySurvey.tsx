@@ -17,7 +17,7 @@ const exampleSurvey: Survey = {
   description: "Please choose all the times that you are available for.",
   endTime: new Date('March 30, 2023 03:00:00'),
   capacity: { "Tuesday 2-3pm": { "section1": 30 }, "Wednesday 2-3pm": { "section2": 50 } },
-  responses: { "student1": ["Tuesday 2-3pm"], "student2": ["Tuesday 2-3pm, Wednesday 2-3pm"] },
+  responses: { "student1": ["Tuesday 2-3pm"], "student2": ["Tuesday 2-3pm", "Wednesday 2-3pm"] },
   published: true,
 }
 
