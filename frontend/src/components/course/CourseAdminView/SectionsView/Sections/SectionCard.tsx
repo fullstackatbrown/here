@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Box, Card, IconButton, Paper, Stack, Typography } from "@mui/material";
 import formatSectionTime from "@util/shared/formatSectionTime";
 import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -17,21 +17,13 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
   const startTime = new Date(section.startTime);
   const endTime = new Date(section.endTime);
   return (
-    <Paper
-      variant="elevation"
-      elevation={1}
-      style={{
-        padding: 16,
-      }}
-      square
-    >
-      <Box display="flex" flexDirection="row" justifyContent="space-between">
+    <Card sx={{ ':hover': { boxShadow: 2 } }} variant={"outlined"}>
+      <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2}>
         <Stack>
           <Typography variant="body1" noWrap>
             {formatSectionTime(startTime, endTime)}
           </Typography>
-          {/* TODO: change color to an RGB or HSL value */}
-          <Stack direction="row" spacing={2} color="lightgray">
+          <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
             <Typography variant="body1" fontWeight={400}>
               Location: {section.location}
             </Typography>
@@ -52,7 +44,7 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
           </IconButton>
         </Stack>
       </Box>
-    </Paper>
+    </Card>
   );
 };
 

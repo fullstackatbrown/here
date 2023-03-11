@@ -27,7 +27,7 @@ export interface CreateSectionDialogProps {
 }
 
 type FormData = {
-    day: number;
+    day: string;
     starttime: Dayjs;
     endtime: Dayjs;
     location: string | null;
@@ -61,13 +61,13 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) =>
                             label="Day"
                             required
                         >
-                            <MenuItem value={0}>Sunday</MenuItem>
-                            <MenuItem value={1}>Monday</MenuItem>
-                            <MenuItem value={2}>Tuesday</MenuItem>
-                            <MenuItem value={3}>Wednesday</MenuItem>
-                            <MenuItem value={4}>Thursday</MenuItem>
-                            <MenuItem value={5}>Friday</MenuItem>
-                            <MenuItem value={6}>Saturday</MenuItem>
+                            <MenuItem value={"Sunday"}>Sunday</MenuItem>
+                            <MenuItem value={"Monday"}>Monday</MenuItem>
+                            <MenuItem value={"Tuesday"}>Tuesday</MenuItem>
+                            <MenuItem value={"Wednesday"}>Wednesday</MenuItem>
+                            <MenuItem value={"Thursday"}>Thursday</MenuItem>
+                            <MenuItem value={"Friday"}>Friday</MenuItem>
+                            <MenuItem value={"Saturday"}>Saturday</MenuItem>
                         </Select>
                     </FormControl>
                     <Controller

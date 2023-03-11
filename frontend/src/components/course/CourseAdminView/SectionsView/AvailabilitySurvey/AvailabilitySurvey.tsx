@@ -58,7 +58,7 @@ export default function AvailabilitySurvey({
         </Typography>
         {!survey && <Button onClick={() => setCreateSurveyDialog(true)}>+ Create Survey</Button>}
       </Stack>
-      <Box height={100}>
+      <Box height={100} my={2}>
         {survey && (
           <SurveyCard survey={survey} numStudents={Object.keys(course.students).length} />
         )}
