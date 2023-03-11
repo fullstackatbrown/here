@@ -18,7 +18,7 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
   const endTime = new Date(section.endTime);
   return (
     <Card sx={{ ':hover': { boxShadow: 2 } }} variant={"outlined"}>
-      <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2}>
+      <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2} alignItems={"center"}>
         <Stack>
           <Typography variant="body1" noWrap>
             {formatSectionTime(startTime, endTime)}
@@ -35,13 +35,15 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
             </Typography>
           </Stack>
         </Stack>
-        <Stack display={"flex"} direction="row" spacing={1}>
-          <IconButton aria-label="edit" size="small">
-            <CreateIcon />
-          </IconButton>
-          <IconButton aria-label="delete" size="small">
-            <ClearIcon />
-          </IconButton>
+        <Stack display={"flex"} direction="row" spacing={4}>
+          <div>
+            <IconButton aria-label="edit">
+              <CreateIcon />
+            </IconButton>
+            <IconButton aria-label="delete">
+              <ClearIcon />
+            </IconButton>
+          </div>
         </Stack>
       </Box>
     </Card>

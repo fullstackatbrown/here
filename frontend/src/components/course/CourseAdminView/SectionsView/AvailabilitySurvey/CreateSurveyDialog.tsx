@@ -1,21 +1,14 @@
-import { FC } from "react";
+import Button from "@components/shared/Button";
 import {
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Stack,
-    TextField,
-    FormControlLabel,
-    Checkbox,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
-    Typography
+    TextField, Typography
 } from "@mui/material";
-import Button from "@components/shared/Button";
-import { Controller, useForm } from "react-hook-form";
+import { FC } from "react";
+import { useForm } from "react-hook-form";
 
 export interface CreateSectionDialogProps {
     open: boolean;
@@ -40,7 +33,7 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose, upda
         console.log(data)
     });
 
-    return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} onClose={onClose} onClick={(e) => e.stopPropagation()} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>
                 {update ? "Update" : "Create"} Survey

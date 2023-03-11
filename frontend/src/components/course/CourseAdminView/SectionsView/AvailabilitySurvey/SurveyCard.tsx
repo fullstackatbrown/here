@@ -1,8 +1,9 @@
-import React, { FC, useState } from "react";
-import { Box, ButtonBase, Card, IconButton, ListItem, ListItemButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Card, Stack, Typography } from "@mui/material";
 import { Survey } from "model/survey";
-import SurveyListItemMenu from "./SurveyListItemMenu";
+import { FC, useState } from "react";
 import SurveyDialog from "./SurveyDialog";
+import SurveyListItemMenu from "./SurveyListItemMenu";
+import SurveyResponsesDialog from "./SurveyResponsesDialog";
 
 export interface SurveyCardProps {
   survey: Survey;
@@ -15,9 +16,14 @@ export interface SurveyCardProps {
  */
 const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents }) => {
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false)
+  const [surveyResponsesDialog, setSUrveyResponsesDialog] = useState(false)
 
-  const handleShowSurveyPreview = () => {
-    setSurveyPreviewDialog(true)
+  const handleClick = () => {
+    if (survey.published) {
+      setSUrveyResponsesDialog(true)
+    } else {
+      setSurveyPreviewDialog(true)
+    }
   }
 
   const handleCloseSurveyPreview = () => {
@@ -27,16 +33,17 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents }) => {
   return (
     <>
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
-      <Card sx={{ ':hover': { boxShadow: 2 } }} onClick={handleShowSurveyPreview} variant={"outlined"}>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2}>
+      <SurveyResponsesDialog open={surveyResponsesDialog} onClose={() => setSUrveyResponsesDialog(false)} survey={survey} />
+      <Card sx={{ ':hover': { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2} alignItems={"center"}>
           <Stack>
             <Typography variant="body1" noWrap>
               {survey.name}
             </Typography>
             <Typography variant="body1" fontWeight={400} sx={{ color: 'text.disabled' }}>
               {survey.published
-                ? `${survey.responses.length}/${numStudents} responded`
-                : "Unpublished"}
+                ? `${Object.keys(survey.responses).length}/${numStudents} responded`
+                : "Click to preview"}
             </Typography>
           </Stack>
           <SurveyListItemMenu survey={survey} />

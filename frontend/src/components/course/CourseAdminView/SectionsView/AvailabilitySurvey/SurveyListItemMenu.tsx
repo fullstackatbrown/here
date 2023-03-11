@@ -20,7 +20,12 @@ const SurveyListItemMenu: FC<SurveyListItemMenu> = ({ survey }) => {
     const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event: MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget);
+    const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+        // stop the outer click handler from firing
+        event.stopPropagation()
+        setAnchorEl(event.currentTarget)
+    }
+
     const handleClose = () => setAnchorEl(null);
 
     const handlePublish = () => {
@@ -60,6 +65,7 @@ const SurveyListItemMenu: FC<SurveyListItemMenu> = ({ survey }) => {
             anchorEl={anchorEl}
             open={open}
             onClose={handleClose}
+            onClick={(event) => { event.stopPropagation() }}
         >
 
             {survey.published &&
