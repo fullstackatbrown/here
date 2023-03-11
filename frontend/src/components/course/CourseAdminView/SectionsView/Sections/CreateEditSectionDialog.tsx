@@ -1,29 +1,24 @@
-import { FC } from "react";
+import Button from "@components/shared/Button";
 import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
-    Stack,
-    TextField,
-    FormControlLabel,
-    Checkbox,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel
+    DialogTitle, FormControl,
+    InputLabel, MenuItem, Select, Stack,
+    TextField
 } from "@mui/material";
-import Button from "@components/shared/Button";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, { Dayjs } from 'dayjs';
-import { Controller, useForm } from "react-hook-form";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+import { Section } from "model/section";
+import { FC } from "react";
+import { Controller, useForm } from "react-hook-form";
 
-export interface CreateSectionDialogProps {
+export interface CreateEditSectionDialogProps {
     open: boolean;
     onClose: () => void;
+    section?: Section;
 }
 
 type FormData = {
@@ -31,14 +26,17 @@ type FormData = {
     starttime: Dayjs;
     endtime: Dayjs;
     location: string | null;
-    capacity: string | null;
+    capacity: number | null;
 };
 
-const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) => {
+const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section }) => {
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
-            starttime: dayjs('2014-08-18T00:00:00'),
-            endtime: dayjs('2014-08-18T00:00:00'),
+            day: section ? section.day : undefined,
+            starttime: section ? section.startTime : dayjs('2014-08-18T00:00:00'),
+            endtime: section ? section.endTime : dayjs('2014-08-18T00:00:00'),
+            location: section ? section.location : undefined,
+            capacity: section ? section.capacity : undefined,
         }
     });
 
@@ -50,7 +48,7 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) =>
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
 
-            <DialogTitle>Create Section</DialogTitle>
+            <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} my={1}>
                     <FormControl fullWidth>
@@ -60,6 +58,7 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) =>
                             {...register("day")}
                             label="Day"
                             required
+                            value={section ? section.day : undefined}
                         >
                             <MenuItem value={"Sunday"}>Sunday</MenuItem>
                             <MenuItem value={"Monday"}>Monday</MenuItem>
@@ -121,6 +120,6 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) =>
     </Dialog>;
 };
 
-export default CreateSectionDialog;
+export default CreateEditSectionDialog;
 
 

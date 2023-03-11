@@ -2,7 +2,7 @@ import { Box, Button, Card, Paper, Stack, Typography } from "@mui/material";
 import { Course } from "model/course";
 import { Survey } from "model/survey";
 import { useEffect, useState } from "react";
-import CreateSurveyDialog from "./CreateSurveyDialog";
+import CreateSurveyDialog from "./CreateEditSurveyDialog";
 import SurveyCard from "./SurveyCard";
 import SurveyDialog from "./SurveyDialog";
 

@@ -1,15 +1,13 @@
-import React, { FC, useState, MouseEvent } from "react";
-import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
 import IconButton from "@components/shared/IconButton";
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import UndoIcon from "@mui/icons-material/Undo";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SendIcon from "@mui/icons-material/Send";
+import CancelScheduleSendIcon from '@mui/icons-material/CancelScheduleSend';
+import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
 import { Survey } from "model/survey";
-import CreateSurveyDialog from "./CreateSurveyDialog";
+import { FC, MouseEvent, useState } from "react";
+import CreateSurveyDialog from "./CreateEditSurveyDialog";
 
 export interface SurveyListItemMenu {
     survey: Survey;
@@ -71,7 +69,7 @@ const SurveyListItemMenu: FC<SurveyListItemMenu> = ({ survey }) => {
             {survey.published &&
                 <MenuItem onClick={() => { }}>
                     <ListItemIcon>
-                        <EditIcon fontSize="small" />
+                        <CancelScheduleSendIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Unpublish</ListItemText>
                 </MenuItem>
