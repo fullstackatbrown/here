@@ -62,6 +62,16 @@ func runAllocationAlgorithm(uniqueTimeCapacity map[string]int, availability map[
 	return results, exceptions
 }
 
+// Handle the exception cases by adding students to the sections they are available for
+func HandleExceptions(
+	capacity map[string]map[string]int,
+	availability map[string][]string,
+	results map[string][]string,
+	exceptions []string) (finalResults map[string][]string) {
+
+	return
+}
+
 // Given the results returned by algorithm, returns a map from sectionID to list of studentIDs
 // If there is only one section for that time, all the students are in the section
 // Otherwise, the students are assigned into sections based on the proportions of section capacity
