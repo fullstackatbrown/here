@@ -7,4 +7,5 @@ export interface Survey {
   capacity: Record<string, Record<string, number>>;
   responses: Record<string, string[]>;
   published: boolean;
+  results: Record<string, string[]>;
 }

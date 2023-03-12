@@ -53,6 +53,7 @@ const exampleSurvey: Survey = {
     "student33": ["Wednesday 2-3pm"],
     "student34": ["Wednesday 2-3pm"],
   },
+  results: {},
   published: true,
 }
 
