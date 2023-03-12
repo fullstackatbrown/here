@@ -10,7 +10,6 @@ export default function CoursePage() {
   const router = useRouter();
   const { courseID } = router.query;
   const [course, courseLoading] = useCourse(courseID as string);
-  const [showCompletedTickets, setShowCompletedTickets] = useState(true);
 
   // Redirect user back to home page if no queue with given ID is found
   useEffect(() => {

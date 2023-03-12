@@ -3,7 +3,7 @@ import { Survey } from "model/survey";
 import { FC, useState } from "react";
 import SurveyDialog from "./SurveyDialog";
 import SurveyListItemMenu from "./SurveyListItemMenu";
-import SurveyResponsesDialog from "./SurveyResponsesDialog";
+import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 
 export interface SurveyCardProps {
   survey: Survey;

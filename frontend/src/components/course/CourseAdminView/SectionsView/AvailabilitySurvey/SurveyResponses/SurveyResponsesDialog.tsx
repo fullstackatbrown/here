@@ -1,5 +1,4 @@
-import { blue } from '@mui/material/colors';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import TabPanel from '@components/shared/TabPanel';
 import {
     Box,
     Button, Dialog, DialogActions, DialogContent,
@@ -14,14 +13,9 @@ import {
     Typography
 } from "@mui/material";
 import { formatSectionResponses, mapToList, TimeCount } from "@util/shared/formatSectionResponses";
-import {
-    BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title,
-    Tooltip
-} from 'chart.js';
 import { Survey } from "model/survey";
 import { FC, useEffect, useState } from "react";
-import { Bar } from 'react-chartjs-2';
-import TabPanel from '@components/shared/TabPanel';
+import SurveyResponsesBarChart from './SurveyResponsesBarChart';
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -34,76 +28,27 @@ enum Mode {
     TABLE = 1
 }
 
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    ChartDataLabels,
-);
-
-ChartJS.defaults.font.size = 16;
-
-
 const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey }) => {
     const [formattedResponses, setFormattedResponses] = useState<TimeCount[]>([])
     const [numResponses, setNumResponses] = useState(0)
     const [mode, setMode] = useState<Mode>(Mode.CHART);
-    const [chartData, setChartData] = useState({
-        labels: [],
-        datasets: []
-    });
 
     const handleChangeMode = (event: React.SyntheticEvent, newValue: number) => {
         setMode(newValue);
-    };
-
-    const barChartOptions = {
-        indexAxis: 'y' as const,
-        elements: {
-            bar: {
-                borderWidth: 2,
-            },
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false,
-            },
-            title: {
-                display: false,
-            },
-            datalabels: {
-                display: true,
-                anchor: "end" as const,
-                align: "right" as const,
-                formatter: function (value) {
-                    return `${value} (${getPercentage(value)}%)`
-                },
-            }
-        },
-        events: [],
-
     };
 
     useEffect(() => {
         setNumResponses(Object.keys(survey.responses).length)
         const formattedRes = mapToList(formatSectionResponses(survey.responses))
         setFormattedResponses(formattedRes)
-        setChartData({
-            labels: formattedRes.map((data) => data.time),
-            datasets: [
-                {
-                    data: formattedRes.map((data) => data.count),
-                    backgroundColor: blue[500],
-                    borderWidth: 0,
-                    maxBarThickness: 25,
-                }
-            ]
-        })
     }, [survey.responses])
 
     const getPercentage = (count) => Math.round((count / numResponses) * 100)
+
+    const handleAllocateSections = () => {
+        // Submit API request to run algorithm
+        // will receive the results and a list of sections from backend
+    }
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg" keepMounted={false}>
         <DialogTitle>{survey.name} (Responses)</DialogTitle>
@@ -129,20 +74,11 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                         minHeight: 300,
                     }}
                     >
-                        <Box sx={{
-                            minWidth: "50%",
-                            minHeight: 300,
-                        }}
-                        >
-                            <Bar
-                                data={chartData}
-                                options={barChartOptions}
-                            />
-                        </Box>
+                        <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} />
                     </Box>
                 </TabPanel>
                 <TabPanel value={mode} index={1}>
-                    <Table aria-label="simple table">
+                    <Table>
                         <TableHead>
                             <TableRow>
                                 <TableCell>Time</TableCell>
@@ -170,8 +106,9 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
             </>
         </DialogContent>
         <DialogActions>
-            <Button type="submit" variant="contained">Allocate Sections</Button>
+            <Button type="submit" variant="contained" onClick={handleAllocateSections}>Allocate Sections</Button>
         </DialogActions>
+
     </Dialog >
 };
 

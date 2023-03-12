@@ -16,7 +16,7 @@ const exampleSurvey: Survey = {
   name: "Time Availability Survey",
   description: "Please choose all the times that you are available for.",
   endTime: new Date('March 30, 2023 03:00:00'),
-  capacity: { "Tuesday 2-3pm": { "section1": 30 }, "Wednesday 2-3pm": { "section2": 50 }, "Friday 5-7pm": { "section3": 50 } },
+  capacity: { "Tuesday 2-3pm": { "section1": 10 }, "Wednesday 2-3pm": { "section2": 50 }, "Friday 5-7pm": { "section3": 50 } },
   responses: {
     "student1": ["Tuesday 2-3pm"],
     "student2": ["Tuesday 2-3pm", "Wednesday 2-3pm"],
@@ -53,7 +53,11 @@ const exampleSurvey: Survey = {
     "student33": ["Wednesday 2-3pm"],
     "student34": ["Wednesday 2-3pm"],
   },
-  results: {},
+  results: {
+    "section1": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
+    "section2": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
+    "section3": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
+  },
   published: true,
 }
 

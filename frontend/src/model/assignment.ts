@@ -1,4 +1,3 @@
-import { Grade } from "./grades";
 
 export interface Assignment {
   ID: string;
