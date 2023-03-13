@@ -19,7 +19,7 @@ export default function Sections(props: SectionsProps) {
     <>
       <CreateEditSectionDialog open={createSectionDialog} onClose={() => setcreateSectionDialog(false)}
       />
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" justifyContent="space-between" mb={1}>
         <Typography variant="h6" fontWeight={600}>
           Sections
         </Typography>
@@ -28,7 +28,9 @@ export default function Sections(props: SectionsProps) {
         </Button>
       </Stack>
       <Box height={300}>
-        <SectionCard section={sections[0]} />
+        <Stack direction="column" spacing={2}>
+          {sections.map((s) => <SectionCard section={s} />)}
+        </Stack>
       </Box>
     </>
   );
