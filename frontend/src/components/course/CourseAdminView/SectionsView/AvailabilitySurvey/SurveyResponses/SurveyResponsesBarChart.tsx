@@ -4,10 +4,10 @@ import {
 import { blue } from '@mui/material/colors';
 import { TimeCount } from "@util/shared/formatSectionResponses";
 import {
-    BarElement, CategoryScale, Chart as ChartJS, LinearScale
+    BarElement, CategoryScale, Chart as ChartJS, LinearScale, Scale
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Bar } from 'react-chartjs-2';
 
 export interface SurveyResponsesBarChartProps {
@@ -30,7 +30,6 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
         labels: [],
         datasets: []
     });
-
     const barChartOptions = {
         indexAxis: 'y' as const,
         elements: {
@@ -39,6 +38,14 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
             },
         },
         responsive: true,
+        layout: {
+            padding: {
+                left: 60,
+                right: 80,
+                top: 20,
+                bottom: 20
+            }
+        },
         maintainAspectRatio: false,
         plugins: {
             legend: {
@@ -57,7 +64,6 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
             }
         },
         events: [],
-
     };
 
     useEffect(() => {
@@ -76,16 +82,10 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
 
     const getPercentage = (count) => Math.round((count / numResponses) * 100)
 
-    return <Box sx={{
-        minWidth: "50%",
-        minHeight: 300,
-    }}
-    >
-        <Bar
-            data={chartData}
-            options={barChartOptions}
-        />
-    </Box>
+    return <Bar
+        data={chartData}
+        options={barChartOptions}
+    />
 };
 
 export default SurveyResponsesBarChart;

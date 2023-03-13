@@ -1,20 +1,15 @@
-import TabPanel from '@components/shared/TabPanel';
 import {
     Box,
-    Button, Dialog, DialogActions, DialogContent,
+    Button, createTheme, Dialog, DialogActions, DialogContent,
     DialogTitle,
-    Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Tabs,
-    Typography
+    Link,
+    Stack, ThemeProvider, Typography
 } from "@mui/material";
+import { dummySectionsMap } from '@util/section/hooks';
 import { formatSectionResponses, mapToList, TimeCount } from "@util/shared/formatSectionResponses";
 import { Survey } from "model/survey";
 import { FC, useEffect, useState } from "react";
+import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
 
 export interface SurveyResponsesDialogProps {
@@ -23,19 +18,9 @@ export interface SurveyResponsesDialogProps {
     survey: Survey;
 }
 
-enum Mode {
-    CHART = 0,
-    TABLE = 1
-}
-
 const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey }) => {
     const [formattedResponses, setFormattedResponses] = useState<TimeCount[]>([])
     const [numResponses, setNumResponses] = useState(0)
-    const [mode, setMode] = useState<Mode>(Mode.CHART);
-
-    const handleChangeMode = (event: React.SyntheticEvent, newValue: number) => {
-        setMode(newValue);
-    };
 
     useEffect(() => {
         setNumResponses(Object.keys(survey.responses).length)
@@ -43,71 +28,71 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         setFormattedResponses(formattedRes)
     }, [survey.responses])
 
-    const getPercentage = (count) => Math.round((count / numResponses) * 100)
 
     const handleAllocateSections = () => {
         // Submit API request to run algorithm
         // will receive the results and a list of sections from backend
     }
 
-    return <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg" keepMounted={false}>
-        <DialogTitle>{survey.name} (Responses)</DialogTitle>
+    const hasResults = () => {
+        return Object.keys(survey.results).length > 0
+    }
+
+    return <Dialog open={open} onClose={onClose} fullWidth maxWidth="md" keepMounted={false}>
+        <DialogTitle>{survey.name}</DialogTitle>
+
         <DialogContent >
             <>
-                <Typography mb={3}>
-                    Total responses: {numResponses}
+                <Typography fontSize={17} fontWeight={500}>
+                    {survey.description}
                 </Typography>
-
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <Tabs value={mode} onChange={handleChangeMode}>
-                        <Tab label="Chart" />
-                        <Tab label="Table" />
-                    </Tabs>
+                <Typography mb={3}>
+                    {numResponses} responses
+                </Typography>
+                <Box mb={4} sx={{
+                    // width: '80%',
+                    minHeight: 300,
+                }}
+                >
+                    <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} />
                 </Box>
-                <TabPanel value={mode} index={0} >
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: '100%',
-                        minWidth: "50%",
-                        minHeight: 300,
-                    }}
+
+                <Typography fontSize={17} fontWeight={500}>
+                    Allocate Sections
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                    <Link
+                        component="button"
+                        variant="body1"
+                        onClick={() => {
+                            console.info("I'm a button.");
+                        }}
                     >
-                        <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} />
+                        Run Algorithm
+                    </Link>
+                    <Typography mb={3}>
+                        to automatically allocate sections based on student responses.
+                    </Typography>
+                </Stack>
+
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    <Box sx={{ width: '70%', }}>
+                        {hasResults() && <AllocatedSectionsTable results={survey.results} sections={dummySectionsMap} />}
                     </Box>
-                </TabPanel>
-                <TabPanel value={mode} index={1}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Time</TableCell>
-                                <TableCell align="right"># Students Available</TableCell>
-                                <TableCell align="right">% Students Available</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {formattedResponses.map((response) => (
-                                <TableRow
-                                    key={response.time}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
-                                    <TableCell component="th" scope="row">
-                                        {response.time}
-                                    </TableCell>
-                                    <TableCell align="right">{response.count}</TableCell>
-                                    <TableCell align="right">{getPercentage(response.count)}%</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TabPanel>
+                </Box>
 
             </>
         </DialogContent>
         <DialogActions>
-            <Button type="submit" variant="contained" onClick={handleAllocateSections}>Allocate Sections</Button>
+            {hasResults() && <Button variant="contained">Confirm</Button>}
         </DialogActions>
+
+
+
 
     </Dialog >
 };

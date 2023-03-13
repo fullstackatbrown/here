@@ -10,6 +10,12 @@ export interface AvailabilitySurveyProps {
   course: Course;
 }
 
+const results = {
+  "section1": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
+  "section2": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
+  "section3": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
+}
+
 const exampleSurvey: Survey = {
   ID: "",
   courseID: "CSCI 1470",
@@ -53,11 +59,7 @@ const exampleSurvey: Survey = {
     "student33": ["Wednesday 2-3pm"],
     "student34": ["Wednesday 2-3pm"],
   },
-  results: {
-    "section1": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
-    "section2": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
-    "section3": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
-  },
+  results: results,
   published: true,
 }
 
