@@ -10,7 +10,7 @@ import {
 import { FC } from "react";
 import { useForm } from "react-hook-form";
 
-export interface CreateSectionDialogProps {
+export interface CreateEditSurveyDialogProps {
     open: boolean;
     onClose: () => void;
     update: boolean;
@@ -21,7 +21,7 @@ type FormData = {
     description: string,
 };
 
-const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose, update }) => {
+const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, update }) => {
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
             name: "Time Availability Survey",
@@ -77,6 +77,6 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose, upda
     </Dialog>;
 };
 
-export default CreateSectionDialog;
+export default CreateEditSurveyDialog;
 
 

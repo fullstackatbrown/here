@@ -1,13 +1,3 @@
-const daysOfTheWeek = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
 const timeFormatter = new Intl.DateTimeFormat('en-US', {
   hour: "numeric",
   hour12: true,
@@ -15,10 +5,12 @@ const timeFormatter = new Intl.DateTimeFormat('en-US', {
 })
 
 export default function formatSectionTime(
-  startTime: Date,
-  endTime: Date
+  day: string,
+  startTimeStr: string,
+  endTimeStr: string
 ): string {
-  return `${
-    daysOfTheWeek[startTime.getDay()]
-  } ${timeFormatter.format(startTime)}-${timeFormatter.format(endTime)}`;
+  const startTime = new Date(startTimeStr);
+  const endTime = new Date(endTimeStr);
+  return `${day
+    } ${timeFormatter.format(startTime)}-${timeFormatter.format(endTime)}`;
 }

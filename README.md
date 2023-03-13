@@ -154,5 +154,4 @@ Make sure you have Go and npm installed on your device
     capacity: map[string]map[string]int              # map from time to a map from sectionID to capacity
     responses: map[string][]string                   # map from studentID to available times
     results: map[string][]string                     # final results: map from sectionID to list of studentIDs
-    exceptions: []string                             # list of studentIDs who cannot get a section assigned after running algorithm
 </pre>
