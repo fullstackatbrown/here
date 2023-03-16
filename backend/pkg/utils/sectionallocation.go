@@ -66,7 +66,6 @@ func runAllocationAlgorithm(uniqueTimeCapacity map[string]int, availability map[
 
 // Handle the exception cases by adding students to the sections they are available for
 func HandleExceptions(
-	capacity map[string]map[string]int,
 	availability map[string][]string,
 	results map[string][]string,
 	exceptions []string) (finalResults map[string][]string) {
