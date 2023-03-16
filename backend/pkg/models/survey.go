@@ -14,7 +14,6 @@ type Survey struct {
 	EndTime     time.Time                 `firestore:"endTime"`
 	Capacity    map[string]map[string]int `firestore:"capacity"`
 	Responses   map[string][]string       `firestore:"responses"`
-	Results     map[string][]string       `firestore:"results"`
 	Exceptions  []string                  `firestore:"exceptions"`
 }
 
@@ -63,7 +62,6 @@ func InitSurvey(req *CreateSurveyRequest, sections []*Section) *Survey {
 		CourseID:    req.CourseID,
 		Capacity:    capacity,
 		Responses:   make(map[string][]string),
-		Results:     make(map[string][]string),
 		Exceptions:  make([]string, 0),
 	}
 }
