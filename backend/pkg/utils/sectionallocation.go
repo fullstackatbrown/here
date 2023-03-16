@@ -69,7 +69,7 @@ func HandleExceptions(
 	results map[string][]string,
 	exceptions []string) (finalResults map[string][]string) {
 
-	return
+	return results
 }
 
 // Given the results returned by algorithm, returns a map from sectionID to list of studentIDs
