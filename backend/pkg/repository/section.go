@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"log"
+	"reflect"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -145,5 +146,26 @@ func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) er
 		return fmt.Errorf("error deleting course: %v\n", err)
 	}
 
+	return err
+}
+
+func (fr *FirebaseRepository) UpdateSection(req *models.UpdateSectionRequest) error {
+
+	v := reflect.ValueOf(*req)
+	typeOfS := v.Type()
+
+	var updates []firestore.Update
+
+	for i := 0; i < v.NumField(); i++ {
+		field := typeOfS.Field(i).Name
+		val := v.Field(i).Interface()
+
+		// Only include the fields that are set
+		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "SectionID") {
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
+		}
+	}
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Doc(*req.SectionID).Update(firebase.Context, updates)
 	return err
 }

@@ -77,16 +77,27 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("courseID").(string)
-	// var req *models.UpdateSectionRequest
+	courseID := r.Context().Value("courseID").(string)
+	sectionID := r.Context().Value("sectionID").(string)
+	var req *models.UpdateSectionRequest
 
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// TODO:
+	req.CourseID = &courseID
+	req.SectionID = &sectionID
+
+	err = repo.Repository.UpdateSection(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated section " + sectionID))
 }
 
 func deleteSectionHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,5 +112,4 @@ func deleteSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully deleted section " + sectionID))
-
 }

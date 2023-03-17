@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"strings"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
+	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -116,7 +116,7 @@ func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) erro
 		val := v.Field(i).Interface()
 		// Only include the fields that are set
 		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") {
-			updates = append(updates, firestore.Update{Path: strings.ToLower(field), Value: val})
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
 		}
 	}
 

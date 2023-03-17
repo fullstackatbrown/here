@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 func Filter[T any](ss []T, test func(T) bool) (ret []T) {
@@ -81,4 +82,11 @@ func ChunkSlice[T any](slice []T, chunkSize int) [][]T {
 	}
 
 	return chunks
+}
+
+func LowercaseFirst(str string) string {
+	for i, v := range str {
+		return string(unicode.ToLower(v)) + str[i+1:]
+	}
+	return ""
 }
