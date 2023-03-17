@@ -79,6 +79,11 @@ export default function AvailabilitySurvey({
 
   }, [course]);
 
+  const numStudents = () => {
+    if (!course.students) return 0;
+    return Object.keys(course.students).length;
+  }
+
   return (
     <>
       <CreateSurveyDialog
@@ -102,7 +107,7 @@ export default function AvailabilitySurvey({
       </Stack>
       <Box height={100}>
         {survey && (
-          <SurveyCard survey={survey} numStudents={Object.keys(course.students).length} />
+          <SurveyCard survey={survey} numStudents={numStudents()} />
         )}
       </Box>
     </>

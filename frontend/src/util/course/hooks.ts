@@ -50,6 +50,7 @@ export function useCourses(): [Course[] | undefined, boolean] {
         const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
             const res: Course[] = [];
             querySnapshot.forEach((doc) => {
+                console.log(doc.id)
                 res.push({ ID: doc.id, ...doc.data() } as Course);
             });
 
@@ -66,7 +67,26 @@ export function useCourses(): [Course[] | undefined, boolean] {
 }
 
 export function useCourse(courseID: string): [Course | undefined, boolean] {
-    return [dummyCourse1, false];
+    console.log(courseID)
+    const [loading, setLoading] = useState(true);
+    const [course, setCourse] = useState<Course | undefined>(undefined);
+
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(doc(db, "courses", courseID), (doc) => {
+            if (doc.exists()) {
+                setCourse({ ID: doc.id, ...doc.data() } as Course);
+
+            }
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, [courseID]);
+
+    return [course, loading];
+
+    // Uncomment this for testing
+    // return [dummyCourse1, false];
 }
 
 export function useCourseStaff(courseID: string): [User[], boolean] {

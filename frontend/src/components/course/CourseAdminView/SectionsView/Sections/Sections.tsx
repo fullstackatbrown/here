@@ -1,3 +1,4 @@
+import AppLayout from "@components/shared/AppLayout";
 import { Box, Button, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import { useSections } from "@util/section/hooks";
@@ -12,12 +13,11 @@ export interface SectionsProps {
 
 const Sections: FC<SectionsProps> = ({ course }) => {
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
-
-  const [maybeSections, _] = useSections();
-  const sections = maybeSections ?? [];
+  const [sections, loading] = useSections(course.ID);
 
   const getEnrollment = (sectionId: string) => {
     // loop through courses.students and count the number of students whose value is section id
+    if (!course.students) return 0;
     let count = 0;
     Object.keys(course.students).forEach((studentId) => {
       if (course.students[studentId] === sectionId) {
@@ -41,7 +41,7 @@ const Sections: FC<SectionsProps> = ({ course }) => {
       </Stack>
       <Box height={300}>
         <Stack direction="column" spacing={2}>
-          {sections.map((s) => <SectionCard section={s} enrollment={getEnrollment(s.ID)} />)}
+          {sections && sections.map((s) => <SectionCard section={s} enrollment={getEnrollment(s.ID)} />)}
         </Stack>
       </Box>
     </>

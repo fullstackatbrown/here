@@ -11,13 +11,13 @@ export default function CoursePage() {
   const { courseID } = router.query;
   const [course, courseLoading] = useCourse(courseID as string);
 
-  // Redirect user back to home page if no queue with given ID is found
+  // Redirect user back to home page if no course with given ID is found
   useEffect(() => {
     if (router.isReady && !courseLoading && !course) {
       router
         .push("/")
         .then(() =>
-          toast.error("We couldn't find the queue you were looking for.")
+          toast.error("We couldn't find the course you were looking for.")
         );
     }
   }, [router, course, courseLoading]);

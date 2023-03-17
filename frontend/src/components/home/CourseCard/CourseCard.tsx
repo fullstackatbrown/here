@@ -22,7 +22,7 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
     // <Paper variant="outlined" sx={{ overflow: "hidden" }}>
     <Card variant="outlined" sx={{ ':hover': { boxShadow: 2 } }}>
       <ButtonBase
-        onClick={() => router.push("/course/" + course.code)}
+        onClick={() => router.push("/course/" + course.ID)}
         sx={{ width: "100%", textAlign: "left" }}
         focusRipple
       >

@@ -62,7 +62,7 @@ export default function Home() {
                 )
                 }
                 {
-                    courses && Object.keys(courses).length === 0 && (
+                    (!courses || Object.keys(courses).length === 0) && (
                         <Stack
                             mt={4}
                             spacing={2}
