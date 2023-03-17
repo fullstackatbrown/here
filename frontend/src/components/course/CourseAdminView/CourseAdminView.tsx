@@ -18,7 +18,7 @@ export function CourseAdminView({ course }: CourseAdminViewProps) {
   const [view, setView] = useState<Views>("sections");
 
   return (
-    <Stack paddingTop={12} gap={4}>
+    <Stack paddingTop={8} gap={4}>
       <Grid container spacing={2}>
         <Grid xs={2}></Grid>
         <Grid xs={10}>

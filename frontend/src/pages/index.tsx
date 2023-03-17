@@ -21,6 +21,7 @@ export default function Home() {
         <AppLayout maxWidth={false} loading={loading}>
             {coursesByTerm && Object.keys(coursesByTerm).length > 0 && (
                 <Box>
+                    {/* TODO: Sort by Course Term */}
                     {Object.keys(coursesByTerm).map((term) => (
                         <Box my={4}>
                             <Typography variant="body1" my={1} ml={0.5} sx={{ fontWeight: 500 }}>
