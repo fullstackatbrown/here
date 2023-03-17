@@ -7,6 +7,7 @@ import { Section } from "model/section";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
 
 export interface SectionCardProps {
+  enrollment: number;
   section: Section;
 }
 
@@ -14,7 +15,7 @@ export interface SectionCardProps {
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SectionCard: FC<SectionCardProps> = ({ section }) => {
+const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
   const [editSectionDialog, setEditSectionDialog] = React.useState(false);
 
   const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,7 +49,7 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
                 Capacity: {section.capacity}
               </Typography>
               <Typography variant="body1" fontWeight={400}>
-                {/* Registered: {section.enrollment} */}
+                Registered: {enrollment}
               </Typography>
             </Stack>
           </Stack>
