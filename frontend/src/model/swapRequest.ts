@@ -1,3 +1,10 @@
+export type SwapRequestStatus =
+  | "pending"
+  | "cancelled"
+  | "approved"
+  | "denied"
+  | "archived";
+
 export interface SwapRequest {
   ID: string;
   studentID: string;
@@ -6,6 +13,6 @@ export interface SwapRequest {
   isTemporary: boolean;
   requestTime: Date;
   reason: string;
-  status: string;
+  status: SwapRequestStatus;
   handledBy: string;
 }
