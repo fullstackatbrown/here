@@ -139,7 +139,7 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, exceptions := utils.RunAllocationAlgorithm(survey.Capacity, survey.Responses)
-	res = utils.HandleExceptions(survey.Capacity, survey.Responses, res, exceptions)
+	res = utils.HandleExceptions(survey.Responses, res, exceptions)
 
 	// res is a map from section id to list of studentIDs
 	res = utils.GetAssignedSections(res, survey.Capacity)
