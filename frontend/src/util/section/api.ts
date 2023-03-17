@@ -16,7 +16,7 @@ async function deleteSection(
   courseID: string,
   sectionID: string
 ): Promise<boolean> {
-  return APIClient.get(`/courses/${courseID}/sections/${sectionID}`);
+  return APIClient.delete(`/courses/${courseID}/sections/${sectionID}`);
 }
 
 async function createSection(
