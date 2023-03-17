@@ -23,7 +23,7 @@ export default function Home() {
                 <Box>
                     {/* TODO: Sort by Course Term */}
                     {Object.keys(coursesByTerm).map((term) => (
-                        <Box my={4}>
+                        <Box key={term} my={4}>
                             <Typography variant="body1" my={1} ml={0.5} sx={{ fontWeight: 500 }}>
                                 {term}
                             </Typography>
