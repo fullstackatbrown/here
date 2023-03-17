@@ -24,8 +24,8 @@ export default function CoursePage() {
 
   return (
     <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
-      {course && !courseLoading && <CourseAdminView course={course} />}
-      {/* {course && !courseLoading && <CourseStudentView course={course} />} */}
+      {/* {course && !courseLoading && <CourseAdminView course={course} />} */}
+      {course && !courseLoading && <CourseStudentView course={course} />}
     </AppLayout>
   );
 }
