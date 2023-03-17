@@ -2,7 +2,7 @@ import { Stack } from "@mui/material";
 import { Course } from "model/course";
 import Assignments from "../AssignmentsView/Assignments/Assignments";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
-import GradeOptions from "./GradeOptions/GradeOptions";
+import GradeOptions from "../RequestsView/GradeOptions/GradeOptions";
 import Sections from "./Sections/Sections";
 
 export interface SectionsViewProps {
