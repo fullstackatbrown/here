@@ -67,20 +67,21 @@ export function useCourses(): [Course[] | undefined, boolean] {
 }
 
 export function useCourse(courseID: string): [Course | undefined, boolean] {
-    console.log(courseID)
     const [loading, setLoading] = useState(true);
     const [course, setCourse] = useState<Course | undefined>(undefined);
 
     useEffect(() => {
-        const db = getFirestore();
-        const unsubscribe = onSnapshot(doc(db, "courses", courseID), (doc) => {
-            if (doc.exists()) {
-                setCourse({ ID: doc.id, ...doc.data() } as Course);
+        if (courseID) {
+            const db = getFirestore();
+            const unsubscribe = onSnapshot(doc(db, "courses", courseID), (doc) => {
+                if (doc.exists()) {
+                    setCourse({ ID: doc.id, ...doc.data() } as Course);
 
-            }
-            setLoading(false);
-        });
-        return () => unsubscribe();
+                }
+                setLoading(false);
+            });
+            return () => unsubscribe();
+        }
     }, [courseID]);
 
     return [course, loading];
