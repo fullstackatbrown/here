@@ -1,11 +1,7 @@
 import { Accordion, AccordionDetails, AccordionSummary, Stack, Typography } from "@mui/material";
 import { useSwapRequests } from "@util/swaps/hooks";
 import { Course } from "model/course";
-<<<<<<< HEAD
 import PendingRequestsView from "./PendingRequests/PendingRequestsView";
-=======
-import RequestStatusChip from "./RequestStatusChip";
->>>>>>> 61be9814ab2adf73e390765cfecd982a38e3be0a
 
 export interface RequestsViewProps {
   course: Course;
