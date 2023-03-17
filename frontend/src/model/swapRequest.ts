@@ -10,9 +10,9 @@ export interface SwapRequest {
   studentID: string;
   oldSectionID: string;
   newSectionID: string;
-  isTemporary: boolean;
   requestTime: Date;
   reason: string;
   status: SwapRequestStatus;
   handledBy: string;
+  assignmentID?: string
 }
