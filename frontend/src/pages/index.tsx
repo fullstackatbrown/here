@@ -24,51 +24,53 @@ export default function Home() {
         Object.keys(currentUser.coursePermissions).length > 0;
 
     return (
-        <AppLayout maxWidth={false} loading={loading}>
-            {coursesByTerm && Object.keys(coursesByTerm).length > 0 && (
-                <Box>
-                    {/* TODO: add a global value for current term instead of using index */}
-                    {getTerms().map((term, index) => (
-                        <Box key={term} my={4}>
-                            <Typography variant="body1" my={1} ml={0.5} sx={{ fontWeight: 500 }}>
-                                {term}
-                            </Typography>
-                            <Grid
-                                spacing={3}
-                                container
-                                direction="row"
-                                alignItems="stretch"
-                            >
-                                {
-                                    coursesByTerm[term].map((course) => (
-                                        <Grid key={course.code} item xs={12} md={6} lg={4} xl={3}>
-                                            <CourseCard course={course} />
-                                        </Grid>
-                                    ))
-                                }
-                                {index === 0 && <Grid key={"add_course"} item xs={12} md={6} lg={4} xl={3}>
-                                    <AddCourseCard />
-                                </Grid>}
-                            </Grid>
-                        </Box>
-                    ))}
-                </Box>
-            )
-            }
-            {
-                coursesByTerm && Object.keys(coursesByTerm).length === 0 && (
-                    <Stack
-                        mt={4}
-                        spacing={2}
-                        justifyContent="center"
-                        alignItems="center"
-                    >
-                        <Typography variant="h6">
-                            You are not enrolled in any course yet.
-                        </Typography>
-                    </Stack>
+        <>
+            <AppLayout maxWidth={false} loading={loading}>
+                {coursesByTerm && Object.keys(coursesByTerm).length > 0 && (
+                    <Box>
+                        {/* TODO: add a global value for current term instead of using index */}
+                        {getTerms().map((term, index) => (
+                            <Box key={term} my={4}>
+                                <Typography variant="body1" my={1} ml={0.5} sx={{ fontWeight: 500 }}>
+                                    {term}
+                                </Typography>
+                                <Grid
+                                    spacing={3}
+                                    container
+                                    direction="row"
+                                    alignItems="stretch"
+                                >
+                                    {
+                                        coursesByTerm[term].map((course) => (
+                                            <Grid key={course.code} item xs={12} md={6} lg={4} xl={3}>
+                                                <CourseCard course={course} />
+                                            </Grid>
+                                        ))
+                                    }
+                                    {index === 0 && <Grid key={"add_course"} item xs={12} md={6} lg={4} xl={3}>
+                                        <AddCourseCard />
+                                    </Grid>}
+                                </Grid>
+                            </Box>
+                        ))}
+                    </Box>
                 )
-            }
-        </AppLayout >
+                }
+                {
+                    coursesByTerm && Object.keys(coursesByTerm).length === 0 && (
+                        <Stack
+                            mt={4}
+                            spacing={2}
+                            justifyContent="center"
+                            alignItems="center"
+                        >
+                            <Typography variant="h6">
+                                You are not enrolled in any course yet.
+                            </Typography>
+                        </Stack>
+                    )
+                }
+            </AppLayout >
+        </>
     );
 }
