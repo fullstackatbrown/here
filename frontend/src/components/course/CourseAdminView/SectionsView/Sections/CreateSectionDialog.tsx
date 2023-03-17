@@ -18,7 +18,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { Controller, useForm } from "react-hook-form";
-import QueueAPI from "@util/queue/api";
+//import QueueAPI from "@util/queue/api";
 import { toast } from "react-hot-toast";
 import errors from "@util/errors";
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
@@ -82,7 +82,8 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) =>
                                     label="Start Time"
                                     value={value}
                                     onChange={onChange}
-                                    renderInput={(params) => <TextField {...params} />} />
+                                    //renderInput={(params) => <TextField {...params} />} 
+                                    />
                             </LocalizationProvider>
                         )}
                     />
@@ -95,7 +96,8 @@ const CreateSectionDialog: FC<CreateSectionDialogProps> = ({ open, onClose }) =>
                                     label="End Time"
                                     value={value}
                                     onChange={onChange}
-                                    renderInput={(params) => <TextField {...params} />} />
+                                    //renderInput={(params) => <TextField {...params} />} 
+                                    />
                             </LocalizationProvider>
                         )}
                     />
