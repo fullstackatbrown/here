@@ -2,6 +2,8 @@ package utils
 
 import (
 	"math"
+	"math/rand"
+	"time"
 
 	"golang.org/x/exp/maps"
 )
@@ -60,6 +62,25 @@ func runAllocationAlgorithm(uniqueTimeCapacity map[string]int, availability map[
 	}
 
 	return results, exceptions
+}
+
+// Handle the exception cases by adding students to the sections they are available for
+func HandleExceptions(
+	availability map[string][]string,
+	results map[string][]string,
+	exceptions []string) (finalResults map[string][]string) {
+	// The algorithm tries to maximally assign students, therefore, if a student wasn't assigned this means all the sections they were assigned to are full
+	// To remedy this, we randomly choose a section that the student can attend and assign the student to that section
+	rand.Seed(time.Now().Unix())
+
+	for _, student := range exceptions {
+		availableSections := availability[student]
+		randIdx := rand.Intn(len(availableSections))
+
+		results[availableSections[randIdx]] = append(results[availableSections[randIdx]], student)
+	}
+
+	return results
 }
 
 // Given the results returned by algorithm, returns a map from sectionID to list of studentIDs

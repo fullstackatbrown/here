@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
@@ -139,32 +138,17 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(survey)
 	res, exceptions := utils.RunAllocationAlgorithm(survey.Capacity, survey.Responses)
+	res = utils.HandleExceptions(survey.Responses, res, exceptions)
+
 	// res is a map from section id to list of studentIDs
 	res = utils.GetAssignedSections(res, survey.Capacity)
-	repo.Repository.UpdateSurveyResults(surveyID, res, exceptions)
+	repo.Repository.UpdateSurveyResults(surveyID, res)
 
-	var readableResults []models.GenerateResultsResponseItem
-
-	for sectionID, studentIDs := range res {
-		section, err := repo.Repository.GetSectionByID(sectionID)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		var students []string
-		for _, studentID := range studentIDs {
-			student, err := repo.Repository.GetUserByID(studentID)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			students = append(students, student.DisplayName)
-		}
-
-		readableResults = append(readableResults, models.GenerateResultsResponseItem{Section: *section, Students: students})
+	readableResults, err := generateReadableResults(res)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	render.JSON(w, r, readableResults)
@@ -195,4 +179,29 @@ func updateSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	// surveyID := r.Context().Value("surveyID").(string)
 
 	// TODO:
+}
+
+// Helpers
+func generateReadableResults(results map[string][]string) (readableResults []models.GenerateResultsResponseItem, err error) {
+	readableResults = make([]models.GenerateResultsResponseItem, 0)
+
+	for sectionID, studentIDs := range results {
+		section, err := repo.Repository.GetSectionByID(sectionID)
+		if err != nil {
+			return nil, err
+		}
+
+		var students []string
+		for _, studentID := range studentIDs {
+			student, err := repo.Repository.GetUserByID(studentID)
+			if err != nil {
+				return nil, err
+			}
+			students = append(students, student.DisplayName)
+		}
+
+		readableResults = append(readableResults, models.GenerateResultsResponseItem{Section: *section, Students: students})
+	}
+
+	return
 }

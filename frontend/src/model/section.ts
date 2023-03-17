@@ -8,7 +8,6 @@ export interface Section {
   endTime: string;
   location: string;
   capacity: number;
-  enrolledStudents: string[];
   swappedInStudents: Record<string, string[]>;
   swappedOutStudents: Record<string, string[]>;
 }

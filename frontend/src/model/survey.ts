@@ -2,8 +2,10 @@ export interface Survey {
   ID: string;
   courseID: string;
   name: string;
-  capacity: Record<string, number>;
   description: string;
+  endTime: Date;
+  capacity: Record<string, Record<string, number>>;
   responses: Record<string, string[]>;
-    published: boolean;
+  published: boolean;
+  results: Record<string, string[]>;
 }

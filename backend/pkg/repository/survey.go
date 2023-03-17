@@ -103,12 +103,11 @@ func (fr *FirebaseRepository) UpdateSurvey(surveyID string, newSurvey *models.Su
 	return err
 }
 
-func (fr *FirebaseRepository) UpdateSurveyResults(surveyID string, results map[string][]string, exceptions []string) error {
+func (fr *FirebaseRepository) UpdateSurveyResults(surveyID string, results map[string][]string) error {
 
 	// override existing survey
 	_, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
 		{Path: "results", Value: results},
-		{Path: "exceptions", Value: exceptions},
 	})
 
 	return err

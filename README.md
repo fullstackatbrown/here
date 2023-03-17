@@ -88,7 +88,7 @@ Make sure you have Go and npm installed on your device
 <b>courses</b>
     id: string                     # unique id of the course
     title: string                  # name of the course
-    courseCode: string             # course's course code
+    code: string             # course's course code
     term: string                   # semester this course is offered
     students: map[string]string    # map from studentIDs to sectionIDs
     surveyID: string               # id of the survey attached to this course
@@ -104,7 +104,6 @@ Make sure you have Go and npm installed on your device
     endTime: string                           # the time the section ends
     location: string                          # where the section takes place
     capacity: int                             # max section capacity
-    ---numStudentsEnrolled: int                  # how full the current section is
     swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
     swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
 
@@ -112,7 +111,7 @@ Make sure you have Go and npm installed on your device
     id: string                          # unique assignment id
     courseID: string
     name: string                        # name of the assignment
-    mandatory: bool                     # whether or not this assignment is mandatory to complete
+    optional: bool                      # whether or not this assignment is optional
     maxScore: int                       # maximum points possible
     startDate: string                   # when the assignment is released
     endDate: string                     # when the assignment is due
@@ -150,9 +149,9 @@ Make sure you have Go and npm installed on your device
     courseID: string
     name: string
     published: bool                                  # whether if the survey is published
+    endTime: timestamp                               # when this survey will be made unavailable
     description: string
     capacity: map[string]map[string]int              # map from time to a map from sectionID to capacity
     responses: map[string][]string                   # map from studentID to available times
     results: map[string][]string                     # final results: map from sectionID to list of studentIDs
-    exceptions: []string                             # list of studentIDs who cannot get a section assigned after running algorithm
 </pre>

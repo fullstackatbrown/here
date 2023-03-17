@@ -1,12 +1,13 @@
-import {FC} from "react";
-import {DialogContent} from "@mui/material";
+import { FC } from "react";
+import { DialogContent } from "@mui/material";
 
 interface TabPanelProps {
+    children: any;
     index: number;
     value: number;
 }
 
-const TabPanel: FC<TabPanelProps> = ({index, value, children, ...props}) => {
+const TabPanel: FC<TabPanelProps> = ({ index, value, children, ...props }) => {
     return <div
         role="tabpanel"
         hidden={value !== index}
@@ -23,5 +24,6 @@ const TabPanel: FC<TabPanelProps> = ({index, value, children, ...props}) => {
 };
 
 export default TabPanel;
+
 
 

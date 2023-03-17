@@ -1,17 +1,13 @@
 import React, { FC } from "react";
-import { Box, ButtonBase, Paper, Stack, Typography } from "@mui/material";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { useRouter } from "next/router";
-import { Section } from "@util/section/api";
-import formatEndTime from "@util/shared/formatEndTime";
-import getSectionColor from "@util/shared/getSectionColor";
-import SectionStatusChip from "@components/course/CourseStatusChip";
+import { Box, Card, IconButton, Paper, Stack, Typography } from "@mui/material";
 import formatSectionTime from "@util/shared/formatSectionTime";
 import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from "@mui/icons-material/Clear";
+import { Section } from "model/section";
+import CreateEditSectionDialog from "./CreateEditSectionDialog";
 
 export interface SectionCardProps {
+  enrollment: number;
   section: Section;
 }
 
@@ -19,52 +15,57 @@ export interface SectionCardProps {
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SectionCard: FC<SectionCardProps> = ({ section }) => {
-  const startTime = new Date(section.startTime);
-  const endTime = new Date(section.endTime);
+const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
+  const [editSectionDialog, setEditSectionDialog] = React.useState(false);
+
+  const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    const confirmed = confirm("Are you sure you want to delete this section?");
+  }
+
+  const handleEditSection = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    setEditSectionDialog(true);
+  }
+
+  const handleCloseEditSectionDialog = () => {
+    setEditSectionDialog(false)
+  }
+
   return (
-    <Paper
-      variant="elevation"
-      elevation={1}
-      style={{
-        padding: 16,
-      }}
-      square
-    >
-      <Box display="flex" flexDirection="row" justifyContent="space-between">
-        <Stack>
-          <Typography variant="body1" noWrap>
-            {formatSectionTime(startTime, endTime)}
-          </Typography>
-          {/* TODO: change color to an RGB or HSL value */}
-          <Stack direction="row" spacing={2} color="lightgray">
-            <Typography variant="body1" fontWeight={400}>
-              Location: {section.location}
+    <>
+      <CreateEditSectionDialog open={editSectionDialog} onClose={handleCloseEditSectionDialog} section={section} />
+      <Card sx={{ ':hover': { boxShadow: 2 } }} variant={"outlined"}>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems={"center"}>
+          <Stack>
+            <Typography variant="body2" noWrap>
+              {formatSectionTime(section.day, section.startTime, section.endTime)}
             </Typography>
-            <Typography variant="body1" fontWeight={400}>
-              Capacity: {section.capacity}
-            </Typography>
-            <Typography variant="body1" fontWeight={400}>
-              Registered: {section.enrollment}
-            </Typography>
+            <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
+              <Typography variant="body2" fontWeight={400}>
+                Location: {section.location}
+              </Typography>
+              <Typography variant="body2" fontWeight={400}>
+                Capacity: {section.capacity}
+              </Typography>
+              <Typography variant="body2" fontWeight={400}>
+                Registered: {enrollment}
+              </Typography>
+            </Stack>
           </Stack>
-        </Stack>
-        <Stack display={"flex"} direction="row" spacing={1}>
-          <ButtonBase
-            onClick={() => console.log("handle editing section...")}
-            focusRipple
-          >
-            <CreateIcon />
-          </ButtonBase>
-          <ButtonBase
-            onClick={() => console.log("handle deleting section...")}
-            focusRipple
-          >
-            <ClearIcon />
-          </ButtonBase>
-        </Stack>
-      </Box>
-    </Paper>
+          <Stack display={"flex"} direction="row" spacing={4}>
+            <div>
+              <IconButton onClick={handleEditSection} size={"small"}>
+                <CreateIcon fontSize="small" />
+              </IconButton >
+              <IconButton onClick={handleDeleteSection} size={"small"}>
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </div>
+          </Stack>
+        </Box>
+      </Card>
+    </>
   );
 };
 
