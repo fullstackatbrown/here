@@ -48,7 +48,7 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
               <Typography variant="body2" fontWeight={400}>
                 Capacity: {section.capacity}
               </Typography>
-              <Typography variant="body1" fontWeight={400}>
+              <Typography variant="body2" fontWeight={400}>
                 Registered: {enrollment}
               </Typography>
             </Stack>
