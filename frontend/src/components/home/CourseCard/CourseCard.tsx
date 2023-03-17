@@ -1,4 +1,4 @@
-import { Box, ButtonBase, Paper, Stack, Typography } from "@mui/material";
+import { Box, ButtonBase, Card, Paper, Stack, Typography } from "@mui/material";
 import getCourseColor from "@util/shared/getCourseColor";
 import { Course } from "model/course";
 import { useRouter } from "next/router";
@@ -17,7 +17,8 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
   const router = useRouter();
 
   return (
-    <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+    // <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+    <Card variant="outlined" sx={{ ':hover': { boxShadow: 2 } }}>
       <ButtonBase
         onClick={() => router.push("/course/" + course.code)}
         sx={{ width: "100%", textAlign: "left" }}
@@ -38,7 +39,7 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
           </Typography>
         </Box>
       </ButtonBase>
-      <Box width="100%" p={2} color={"#777777"}
+      <Box width="100%" p={2} color={"#777777"} height={55}
       // sx={{ bgcolor: "#78909c" }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -48,7 +49,8 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
           <UserAccessChip access="student" size="small" />
         </Stack>
       </Box>
-    </Paper>
+      {/* </Paper> */}
+    </Card>
   );
 };
 

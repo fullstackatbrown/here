@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import CourseCard from "@components/home/CourseCard";
+import AddCourseCard from "@components/home/CourseCard/AddCourseCard";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
+import { useCourses } from "@util/course/hooks";
 import AppLayout from "components/shared/AppLayout";
 import { useAuth } from "util/auth/hooks";
-import Button from "components/shared/Button";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CourseCard from "@components/home/CourseCard";
-import { useCourses } from "@util/course/hooks";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
@@ -40,6 +38,10 @@ export default function Home() {
                                         </Grid>
                                     ))
                                 }
+                                <Grid key={"add_course"} item xs={12} md={6} lg={4} xl={3}>
+
+                                    <AddCourseCard />
+                                </Grid>
                             </Grid>
                         </Box>
                     ))}
