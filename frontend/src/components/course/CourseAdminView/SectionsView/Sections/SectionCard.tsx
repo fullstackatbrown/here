@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { Box, Card, IconButton, Paper, Stack, Typography } from "@mui/material";
 import formatSectionTime from "@util/shared/formatSectionTime";
 import CreateIcon from "@mui/icons-material/Create";
@@ -16,7 +16,7 @@ export interface SectionCardProps {
  * number of tickets, location, and the ending time.
  */
 const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
-  const [editSectionDialog, setEditSectionDialog] = React.useState(false);
+  const [editSectionDialog, setEditSectionDialog] = useState(false);
 
   const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
@@ -43,7 +43,7 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
             </Typography>
             <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
               <Typography variant="body2" fontWeight={400}>
-                Location: {section.location}
+                Location: {section.location || "TBD"}
               </Typography>
               <Typography variant="body2" fontWeight={400}>
                 Capacity: {section.capacity}

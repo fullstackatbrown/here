@@ -43,7 +43,7 @@ type CreateSectionRequest struct {
 	// must be ISO8601 compliant
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
-	Location  string `json:"location"`
+	Location  string `json:"location,omitempty"`
 	Capacity  int    `json:"capacity"`
 }
 

@@ -3,7 +3,6 @@ package repository
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -11,7 +10,6 @@ import (
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
-	"github.com/relvacode/iso8601"
 )
 
 func (fr *FirebaseRepository) initializeSectionsListener() {
@@ -82,17 +80,6 @@ func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Sec
 }
 
 func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
-	startTime, err := iso8601.ParseString(req.StartTime)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing start time: %v\n", err)
-	}
-	endTime, err := iso8601.ParseString(req.EndTime)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing end time: %v\n", err)
-	}
-
-	// TODO: check if c.Day is a valid weekday constant
-
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, fmt.Errorf("error creating section: %v\n", err)
@@ -102,8 +89,8 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 	section = &models.Section{
 		Day:                models.Day(req.Day),
 		CourseID:           req.CourseID,
-		StartTime:          startTime.Format(time.Kitchen),
-		EndTime:            endTime.Format(time.Kitchen),
+		StartTime:          req.StartTime,
+		EndTime:            req.EndTime,
 		Location:           req.Location,
 		Capacity:           req.Capacity,
 		EnrolledStudents:   make([]string, 0),

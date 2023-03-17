@@ -29,7 +29,7 @@ const Sections: FC<SectionsProps> = ({ course }) => {
 
   return (
     <>
-      <CreateEditSectionDialog open={createSectionDialog} onClose={() => setcreateSectionDialog(false)}
+      <CreateEditSectionDialog open={createSectionDialog} onClose={() => setcreateSectionDialog(false)} courseID={course.ID}
       />
       <Stack direction="row" justifyContent="space-between" mb={1}>
         <Typography variant="h6" fontWeight={600}>

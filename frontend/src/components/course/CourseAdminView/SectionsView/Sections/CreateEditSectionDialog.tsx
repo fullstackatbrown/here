@@ -10,26 +10,30 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import errors from "@util/errors";
+import SectionAPI from "@util/section/api";
 import dayjs, { Dayjs } from 'dayjs';
-import { Section } from "model/section";
 import { FC } from "react";
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { Day, Section } from "model/section";
 
 export interface CreateEditSectionDialogProps {
     open: boolean;
     onClose: () => void;
     section?: Section;
+    courseID?: string;
 }
 
 type FormData = {
-    day: string;
+    day: Day;
     starttime: Dayjs;
     endtime: Dayjs;
     location: string | null;
     capacity: number | null;
 };
 
-const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section }) => {
+const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section, courseID }) => {
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
             day: section ? section.day : undefined,
@@ -41,13 +45,56 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
     });
 
     const onSubmit = handleSubmit(async data => {
-        // TODO: submit form 
         console.log(data)
+        if (section) {
+            toast.promise(SectionAPI.updateSection(
+                section.courseID, section.ID, data.day,
+                data.starttime.toISOString(),
+                data.endtime.toISOString(),
+                data.location, data.capacity),
+                {
+                    loading: "Updating section...",
+                    success: "Section updated!",
+                    error: errors.UNKNOWN
+                })
+                .then(() => {
+                    onClose();
+                    reset();
+                })
+                .catch(() => {
+                    onClose();
+                    reset();
+                });
+        } else {
+            console.log(courseID, data.day,
+                data.starttime.toISOString(),
+                data.endtime.toISOString(),
+                data.location, data.capacity)
+            toast.promise(SectionAPI.createSection(
+                courseID, data.day,
+                data.starttime.toISOString(),
+                data.endtime.toISOString(),
+                data.location, data.capacity),
+                {
+                    loading: "Creating section...",
+                    success: "section created!",
+                    error: (err) => `This just happened: ${err.toString()}`,
+                    // TODO: change to errors.UNKNOWN
+                })
+                .then(() => {
+                    onClose();
+                    reset();
+                })
+                .catch(() => {
+                    onClose();
+                    reset();
+                });
+
+        }
     });
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
-
             <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} my={1}>
@@ -103,9 +150,10 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                         fullWidth
                     />
                     <TextField
-                        {...register("capacity")}
+                        {...register("capacity", { valueAsNumber: true })}
                         label="Capacity"
                         type="number"
+                        required
                         InputLabelProps={{
                             shrink: true,
                         }}
