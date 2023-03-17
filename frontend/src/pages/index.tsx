@@ -9,7 +9,7 @@ import { useCourses } from "@util/course/hooks";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
-    const [courses, loading] = useCourses();
+    const [coursesByTerm, loading] = useCourses();
 
     const isTA =
         isAuthenticated &&
@@ -19,32 +19,46 @@ export default function Home() {
 
     return (
         <AppLayout maxWidth={false} loading={loading}>
-            {courses && courses.length > 0 && (
-                <Grid
-                    spacing={3}
-                    container
-                    direction="row"
-                    alignItems="stretch"
-                >
-                    {courses.map((course) => (
-                        <Grid key={course.code} item xs={12} md={6} lg={4} xl={3}>
-                            <CourseCard course={course} />
-                        </Grid>
+            {coursesByTerm && Object.keys(coursesByTerm).length > 0 && (
+                <Box>
+                    {Object.keys(coursesByTerm).map((term) => (
+                        <Box my={4}>
+                            <Typography variant="body1" my={1} ml={0.5} sx={{ fontWeight: 500 }}>
+                                {term}
+                            </Typography>
+                            <Grid
+                                spacing={3}
+                                container
+                                direction="row"
+                                alignItems="stretch"
+                            >
+                                {
+                                    coursesByTerm[term].map((course) => (
+                                        <Grid key={course.code} item xs={12} md={6} lg={4} xl={3}>
+                                            <CourseCard course={course} />
+                                        </Grid>
+                                    ))
+                                }
+                            </Grid>
+                        </Box>
                     ))}
-                </Grid>
-            )}
-            {courses && courses.length === 0 && (
-                <Stack
-                    mt={4}
-                    spacing={2}
-                    justifyContent="center"
-                    alignItems="center"
-                >
-                    <Typography variant="h6">
-                        No courses are currently holding hours.
-                    </Typography>
-                </Stack>
-            )}
-        </AppLayout>
+                </Box>
+            )
+            }
+            {
+                coursesByTerm && Object.keys(coursesByTerm).length === 0 && (
+                    <Stack
+                        mt={4}
+                        spacing={2}
+                        justifyContent="center"
+                        alignItems="center"
+                    >
+                        <Typography variant="h6">
+                            You are not enrolled in any course yet.
+                        </Typography>
+                    </Stack>
+                )
+            }
+        </AppLayout >
     );
 }

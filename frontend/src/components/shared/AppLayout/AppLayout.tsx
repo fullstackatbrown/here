@@ -106,7 +106,7 @@ const AppLayout: FC<AppLayoutProps> = ({
     return (
         <div>
             <Head>
-                <title>{title ? `${title} | Hours` : "Hours"}</title>
+                <title>{title ? `${title} | Here` : "Here"}</title>
             </Head>
             <Navbar
                 fixed
