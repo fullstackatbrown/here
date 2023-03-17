@@ -16,6 +16,8 @@ export interface CourseCardProps {
 const CourseCard: FC<CourseCardProps> = ({ course }) => {
   const router = useRouter();
 
+  const numAssignments = course.assignmentIDs ? course.assignmentIDs.length : 0;
+
   return (
     // <Paper variant="outlined" sx={{ overflow: "hidden" }}>
     <Card variant="outlined" sx={{ ':hover': { boxShadow: 2 } }}>
@@ -44,7 +46,7 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" noWrap>
-            {course.assignmentIDs.length > 0 ? course.assignmentIDs.length : "No Assignments"}
+            {numAssignments > 0 ? numAssignments : "No Assignments"}
           </Typography>
           <UserAccessChip access="student" size="small" />
         </Stack>
