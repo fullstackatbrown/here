@@ -1,11 +1,9 @@
-import React, { FC } from "react";
-import { Box, ButtonBase, Paper, Stack, Typography } from "@mui/material";
-import { useRouter } from "next/router";
-import { Course } from "model/general";
+import { Box, ButtonBase, Card, Paper, Stack, Typography } from "@mui/material";
 import getCourseColor from "@util/shared/getCourseColor";
-import BackpackIcon from "@mui/icons-material/Backpack";
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import { AccessTime } from "@mui/icons-material";
+import { Course } from "model/course";
+import { useRouter } from "next/router";
+import { FC } from "react";
+import UserAccessChip from "./UserAccessChip";
 
 export interface CourseCardProps {
   course: Course;
@@ -19,7 +17,8 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
   const router = useRouter();
 
   return (
-    <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+    // <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+    <Card variant="outlined" sx={{ ':hover': { boxShadow: 2 } }}>
       <ButtonBase
         onClick={() => router.push("/course/" + course.code)}
         sx={{ width: "100%", textAlign: "left" }}
@@ -35,36 +34,23 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
           <Typography variant="body1" noWrap>
             {course.code}
           </Typography>
-          <Typography variant="h5" fontWeight={600}>
+          <Typography variant="h6" fontWeight={600}>
             {course.title}
           </Typography>
         </Box>
       </ButtonBase>
-      <Box width="100%" p={2} color={"#777777"}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-            <Stack direction="row" spacing={0.5} alignItems="center">
-              <BackpackIcon />
-              {/* TODO: use user's role */}
-              { false && <VerifiedUserIcon /> }
-              <Typography variant="body2" noWrap>
-                {/* TODO: use user's role */}
-                Student
-              </Typography>
-            </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <AccessTime />
-            <Typography variant="body2" noWrap>
-              {/* TODO: format date and time */}
-              Thursday 4:00PM - 5:00PM
-            </Typography>
-          </Stack>
+      <Box width="100%" p={2} color={"#777777"} height={55}
+      // sx={{ bgcolor: "#78909c" }}
+      >
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Typography variant="body2" noWrap>
+            {course.assignmentIDs.length > 0 ? course.assignmentIDs.length : "No Assignments"}
+          </Typography>
+          <UserAccessChip access="student" size="small" />
         </Stack>
       </Box>
-    </Paper>
+      {/* </Paper> */}
+    </Card>
   );
 };
 

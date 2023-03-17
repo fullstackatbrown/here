@@ -21,6 +21,7 @@ export default function getSectionColor(course: Course): string {
         "#b71c1c",
         "#004d40",
     ];
+
     const hash = hashCodeFromString(course.code);
     const colorIndex = Math.abs(hash % (colors.length - 1));
     return colors[colorIndex];

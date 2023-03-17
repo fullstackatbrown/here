@@ -35,12 +35,12 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents }) => {
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
       <SurveyResponsesDialog open={surveyResponsesDialog} onClose={() => setSUrveyResponsesDialog(false)} survey={survey} />
       <Card sx={{ ':hover': { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2} alignItems={"center"}>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems={"center"}>
           <Stack>
-            <Typography variant="body1" noWrap>
+            <Typography variant="body2" noWrap>
               {survey.name}
             </Typography>
-            <Typography variant="body1" fontWeight={400} sx={{ color: 'text.disabled' }}>
+            <Typography variant="body2" fontWeight={400} sx={{ color: 'text.disabled' }}>
               {survey.published
                 ? `${Object.keys(survey.responses).length}/${numStudents} responded`
                 : "Click to preview"}

@@ -88,7 +88,7 @@ Make sure you have Go and npm installed on your device
 <b>courses</b>
     id: string                     # unique id of the course
     title: string                  # name of the course
-    courseCode: string             # course's course code
+    code: string             # course's course code
     term: string                   # semester this course is offered
     students: map[string]string    # map from studentIDs to sectionIDs
     surveyID: string               # id of the survey attached to this course

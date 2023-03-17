@@ -35,30 +35,30 @@ const SectionCard: FC<SectionCardProps> = ({ section }) => {
     <>
       <CreateEditSectionDialog open={editSectionDialog} onClose={handleCloseEditSectionDialog} section={section} />
       <Card sx={{ ':hover': { boxShadow: 2 } }} variant={"outlined"}>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={2} alignItems={"center"}>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems={"center"}>
           <Stack>
-            <Typography variant="body1" noWrap>
+            <Typography variant="body2" noWrap>
               {formatSectionTime(section.day, section.startTime, section.endTime)}
             </Typography>
             <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
-              <Typography variant="body1" fontWeight={400}>
+              <Typography variant="body2" fontWeight={400}>
                 Location: {section.location}
               </Typography>
-              <Typography variant="body1" fontWeight={400}>
+              <Typography variant="body2" fontWeight={400}>
                 Capacity: {section.capacity}
               </Typography>
-              <Typography variant="body1" fontWeight={400}>
+              <Typography variant="body2" fontWeight={400}>
                 {/* Registered: {section.enrollment} */}
               </Typography>
             </Stack>
           </Stack>
           <Stack display={"flex"} direction="row" spacing={4}>
             <div>
-              <IconButton onClick={handleEditSection}>
-                <CreateIcon />
+              <IconButton onClick={handleEditSection} size={"small"}>
+                <CreateIcon fontSize="small" />
               </IconButton >
-              <IconButton onClick={handleDeleteSection}>
-                <ClearIcon />
+              <IconButton onClick={handleDeleteSection} size={"small"}>
+                <ClearIcon fontSize="small" />
               </IconButton>
             </div>
           </Stack>

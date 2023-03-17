@@ -77,7 +77,7 @@ function MyApp(props: MyAppProps) {
                     value={[themeMode!, setThemeMode, prefersDarkMode]}
                 >
                     <Head>
-                        <title>Hours</title>
+                        <title>Heres</title>
                         <meta
                             name="viewport"
                             content="minimum-scale=1, initial-scale=1, width=device-width"
