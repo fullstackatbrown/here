@@ -80,6 +80,8 @@ export function useSections(courseID: string): [Section[] | undefined, boolean] 
   // if (doc.data().courseID === courseID) {
 
   // }
+
+  console.log(sections)
   let filteredSections: Section[] | undefined = loading ? undefined : sections.filter((section) => section.courseID === courseID);
   return [filteredSections, loading];
 }

@@ -19,6 +19,7 @@ export interface SectionCardProps {
  * number of tickets, location, and the ending time.
  */
 const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
+  console.log(section)
   const [editSectionDialog, setEditSectionDialog] = useState(false);
 
   const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {

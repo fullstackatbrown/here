@@ -27,8 +27,8 @@ export interface CreateEditSectionDialogProps {
 
 type FormData = {
     day: Day;
-    starttime: Dayjs;
-    endtime: Dayjs;
+    starttime: string;
+    endtime: string;
     location: string | null;
     capacity: number | null;
 };
@@ -37,20 +37,19 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
             day: section ? section.day : undefined,
-            starttime: section ? section.startTime : dayjs('2014-08-18T00:00:00'),
-            endtime: section ? section.endTime : dayjs('2014-08-18T00:00:00'),
+            starttime: section ? section.startTime : '2014-08-18T04:00:00',
+            endtime: section ? section.endTime : '2014-08-18T04:00:00',
             location: section ? section.location : undefined,
             capacity: section ? section.capacity : undefined,
         }
     });
 
     const onSubmit = handleSubmit(async data => {
-        console.log(data)
         if (section) {
             toast.promise(SectionAPI.updateSection(
                 section.courseID, section.ID, data.day,
-                data.starttime.toISOString(),
-                data.endtime.toISOString(),
+                data.starttime,
+                data.endtime,
                 data.location, data.capacity),
                 {
                     loading: "Updating section...",
@@ -66,14 +65,10 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                     reset();
                 });
         } else {
-            console.log(courseID, data.day,
-                data.starttime.toISOString(),
-                data.endtime.toISOString(),
-                data.location, data.capacity)
             toast.promise(SectionAPI.createSection(
                 courseID, data.day,
-                data.starttime.toISOString(),
-                data.endtime.toISOString(),
+                data.starttime,
+                data.endtime,
                 data.location, data.capacity),
                 {
                     loading: "Creating section...",
@@ -162,7 +157,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button type="submit" variant="contained">Add</Button>
+                <Button type="submit" variant="contained">{section ? "Submit" : "Add"}</Button>
             </DialogActions>
         </form>
     </Dialog>;

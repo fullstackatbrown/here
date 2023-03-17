@@ -1,10 +1,8 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { useSections } from "@util/section/hooks";
 import { Course } from "model/course";
-import { FC, useState } from "react";
-import Assignments from "../AssignmentsView/Assignments/Assignments";
+import { FC, useEffect, useState } from "react";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
-import GradeOptions from "./GradeOptions/GradeOptions";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
 
@@ -15,6 +13,13 @@ export interface SectionsViewProps {
 const SectionsView: FC<SectionsViewProps> = ({ course }) => {
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
   const [sections, loading] = useSections(course.ID);
+
+  // useEffect(() => {
+  //   // if (router.isReady && !queueLoading && !queue) {
+  //   //     router.push("/")
+  //   //         .then(() => toast.error("We couldn't find the queue you were looking for."));
+  //   // }
+  // }, [course, sections, loading]);
 
   const getEnrollment = (sectionId: string) => {
     // loop through courses.students and count the number of students whose value is section id
