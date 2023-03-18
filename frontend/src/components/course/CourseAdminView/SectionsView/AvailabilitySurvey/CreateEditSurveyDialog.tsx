@@ -87,16 +87,31 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         }
     });
 
+    const handleCancel = () => {
+        onClose()
+        reset()
+    }
+
+    const getInstructionText = () => {
+        if (survey) {
+            if (!survey.published) {
+                return "This will update the survey with the new section times. You will be able to see the preview before publishing it."
+            } else {
+                return "This will update the existing survey and sync it with the section times. Keep in mind that the survey is already published."
+            }
+        } else {
+            return "This will autogenerate a survey from the section times. You will be able to see the preview before publishing it."
+        }
+    }
+
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>
                 {survey ? "Update" : "Create"} Survey
             </DialogTitle>
             <DialogContent>
-                <Typography variant="body2" mb={2.5}>
-                    {survey ? "This will update the survey with the new section times. " :
-                        "This will autogenerate a survey from the section times. "}
-                    You will be able to see the preview before publishing it.
+                <Typography variant="body1" mb={2}>
+                    {getInstructionText()}
                 </Typography>
                 <Stack spacing={2} my={1}>
                     <TextField
@@ -155,7 +170,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={handleCancel}>Cancel</Button>
                 <Button type="submit" variant="contained">{survey ? "Update" : "Create"}</Button>
             </DialogActions>
         </form>

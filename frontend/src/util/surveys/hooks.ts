@@ -14,7 +14,7 @@ const exampleSurvey: Survey = {
     courseID: "CSCI 1470",
     name: "Time Availability Survey",
     description: "Please choose all the times that you are available for.",
-    endTime: new Date('March 30, 2023 03:00:00'),
+    endTime: new Date('March 30, 2023 03:00:00').toISOString(),
     capacity: { "Tuesday 2-3pm": { "section1": 10 }, "Wednesday 2-3pm": { "section2": 50 }, "Friday 5-7pm": { "section3": 50 } },
     responses: {
         "student1": ["Tuesday 2-3pm"],
@@ -75,5 +75,6 @@ export function useSurvey(surveyID: string | undefined): [Survey | undefined, bo
         }
     }, [surveyID]);
 
+    // return [exampleSurvey, false]
     return [survey, loading];
 }

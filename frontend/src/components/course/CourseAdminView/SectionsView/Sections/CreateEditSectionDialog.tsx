@@ -88,6 +88,11 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         }
     });
 
+    const handleCancel = () => {
+        onClose()
+        reset()
+    }
+
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
@@ -156,7 +161,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={handleCancel}>Cancel</Button>
                 <Button type="submit" variant="contained">{section ? "Submit" : "Add"}</Button>
             </DialogActions>
         </form>
