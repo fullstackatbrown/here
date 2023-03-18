@@ -37,19 +37,20 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
             day: section ? section.day : undefined,
-            starttime: section ? section.startTime : '2014-08-18T00:00:00',
-            endtime: section ? section.endTime : '2014-08-18T00:00:00',
+            starttime: section ? section.startTime : '2001-01-01T04:00:00.000Z',
+            endtime: section ? section.endTime : '2001-01-1T04:00:00.000Z',
             location: section ? section.location : undefined,
             capacity: section ? section.capacity : undefined,
         }
     });
 
     const onSubmit = handleSubmit(async data => {
+        const startTime = new Date(data.starttime).toISOString()
+        const endTime = new Date(data.endtime).toISOString()
         if (section) {
             toast.promise(SectionAPI.updateSection(
                 section.courseID, section.ID, data.day,
-                data.starttime,
-                data.endtime,
+                startTime, endTime,
                 data.location, data.capacity),
                 {
                     loading: "Updating section...",
@@ -67,8 +68,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         } else {
             toast.promise(SectionAPI.createSection(
                 courseID, data.day,
-                data.starttime,
-                data.endtime,
+                startTime, endTime,
                 data.location, data.capacity),
                 {
                     loading: "Creating section...",
