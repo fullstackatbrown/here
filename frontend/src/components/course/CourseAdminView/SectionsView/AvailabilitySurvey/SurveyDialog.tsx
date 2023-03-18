@@ -8,8 +8,10 @@ import {
 } from "@mui/material";
 import { formatDateTime } from "@util/shared/formatTime";
 import { sortSurveyTimes } from "@util/shared/sortSectionTime";
+import SurveyAPI from "@util/surveys/api";
 import { Survey } from "model/survey";
 import { FC, useState } from "react";
+import toast from "react-hot-toast";
 
 export interface SurveyDialogProps {
     open: boolean;
@@ -24,11 +26,26 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
 
     function onSubmit() {
         if (preview) {
+            if (new Date(survey.endTime) < new Date()) {
+                alert("This survey's end time is in the past. Please edit before publishing.");
+                onClose();
+                return;
+            }
             const confirmed = confirm("Are you sure you want to publish this survey?");
+            if (confirmed) {
+                toast.promise(SurveyAPI.publishSurvey(survey.courseID, survey.ID), {
+                    loading: "Publishing survey...",
+                    success: "Survey published!",
+                    error: "Failed to publish survey"
+                });
+            }
             onClose();
             return;
-            // TODO: publish survey
         } else {
+            if (new Date(survey.endTime) < new Date()) {
+                alert("This survey has already ended")
+                return;
+            }
             if (times.length === 0) {
                 alert("Please select at least one time slot");
                 return;

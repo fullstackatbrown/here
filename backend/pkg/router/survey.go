@@ -2,7 +2,9 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
@@ -152,8 +154,26 @@ func deleteSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	surveyID := r.Context().Value("surveyID").(string)
-	err := repo.Repository.PublishSurvey(surveyID)
+
+	survey, err := repo.Repository.GetSurveyByID(surveyID)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if surveyEndTime.Before(time.Now()) {
+		http.Error(w, "Survey's end time is in the past\n", http.StatusBadRequest)
+		return
+	}
+
+	err = repo.Repository.PublishSurvey(surveyID)
+	if err != nil {
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -190,14 +210,39 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	surveyID := r.Context().Value("surveyID").(string)
 
+	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// check if survey is published
+	if survey.Published == false {
+		http.Error(w, "Survey is not published", http.StatusBadRequest)
+		return
+	}
+
+	// check if survey ended
+	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if surveyEndTime.Before(time.Now()) {
+		http.Error(w, "Survey already ended\n", http.StatusBadRequest)
+		return
+	}
+
 	var req *models.CreateSurveyResponseRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	req.SurveyID = surveyID
+
+	// TODO: check if student is in the course
 
 	s, err := repo.Repository.CreateSurveyResponse(req)
 	if err != nil {

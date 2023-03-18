@@ -157,7 +157,9 @@ func (fr *FirebaseRepository) UpdateSurveyResults(surveyID string, results map[s
 
 func (fr *FirebaseRepository) PublishSurvey(surveyID string) error {
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+	fmt.Println(surveyID)
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
 		{Path: "published", Value: true},
 	})
 
