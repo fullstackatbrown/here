@@ -15,6 +15,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import CourseHeader from "../CourseHeader";
 import { Autorenew, CalendarMonth } from "@mui/icons-material";
 import { Assignment } from "model/assignment";
+import { GradeChip } from "@components/shared/GradeChip/GradeChip";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -23,7 +24,7 @@ export interface CourseStudentViewProps {
 export function CourseStudentView({ course }: CourseStudentViewProps) {
   const sectionID: string = "1";
   const studentID = "";
-  const assignments: Assignment[] = [
+  const assignments = [
     {
       ID: "1",
       courseID: "string",
@@ -32,6 +33,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
+      grade: 1,
     },
     {
       ID: "2",
@@ -41,6 +43,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
+      grade: undefined,
     },
     {
       ID: "3",
@@ -50,6 +53,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
+      grade: 1,
     },
     {
       ID: "4",
@@ -59,8 +63,9 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
+      grade: undefined,
     },
-  ];
+  ] as const;
 
   return (
     <Stack paddingTop={12} gap={4}>
@@ -124,7 +129,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
                           Section name
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          {`1/1`}
+                          <GradeChip score={assignment.grade} maxScore={1} />
                         </TableCell>
                       </TableRow>
                     ))}
