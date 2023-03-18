@@ -22,10 +22,17 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
 
     function onSubmit() {
         if (preview) {
+            const confirmed = confirm("Are you sure you want to publish this survey?");
             onClose();
             return;
+            // TODO: publish survey
+        } else {
+            if (times.length === 0) {
+                alert("Please select at least one time slot");
+                return;
+            }
+            // TODO: submit form
         }
-        // TODO: submit form
     }
 
     function onChangeCheckbox(time: string) {
@@ -54,7 +61,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
         </DialogContent>
         <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onSubmit} variant="contained">Submit</Button>
+            <Button onClick={onSubmit} variant="contained">{preview ? "Publish" : "Submit"}</Button>
         </DialogActions>
     </Dialog>;
 };
