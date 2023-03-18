@@ -62,7 +62,6 @@ export function useSurvey(surveyID: string | undefined): [Survey | undefined, bo
 
     useEffect(() => {
         if (surveyID && surveyID !== "") {
-            console.log("here")
             const db = getFirestore();
             const unsubscribe = onSnapshot(doc(db, "surveys", surveyID), (doc) => {
                 if (doc.exists()) {

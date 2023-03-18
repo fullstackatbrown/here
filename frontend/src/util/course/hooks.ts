@@ -50,7 +50,6 @@ export function useCourses(): [Course[] | undefined, boolean] {
         const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
             const res: Course[] = [];
             querySnapshot.forEach((doc) => {
-                console.log(doc.id)
                 res.push({ ID: doc.id, ...doc.data() } as Course);
             });
 
@@ -84,7 +83,6 @@ export function useCourse(courseID: string): [Course | undefined, boolean] {
         }
     }, [courseID]);
 
-    console.log(course)
     return [course, loading];
 
     // Uncomment this for testing
