@@ -51,7 +51,8 @@ const SurveyListItemMenu: FC<SurveyListItemMenu> = ({ survey }) => {
         <CreateSurveyDialog
             open={updateSurveyDialog}
             onClose={() => setUpdateSurveyDialog(false)}
-            update={true}
+            courseID={survey.courseID}
+            survey={survey}
         />
         <IconButton
             label="More options"

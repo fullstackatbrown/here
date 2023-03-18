@@ -1,6 +1,6 @@
 import { Section } from "model/section";
 import { useEffect, useState } from "react";
-import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
+import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
 
 const dummySection1: Section = {
   ID: "section1",
@@ -50,12 +50,12 @@ export function useSections(courseID: string): [Section[] | undefined, boolean] 
 
   useEffect(() => {
     const db = getFirestore();
-    const unsubscribe = onSnapshot(collection(db, "sections"), (querySnapshot) => {
+    const q = query(collection(db, "sections"), where("courseID", "==", courseID));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const res: Section[] = [];
       querySnapshot.forEach((doc) => {
         res.push({ ID: doc.id, ...doc.data() } as Section);
       });
-
       setSections(res);
       setLoading(false);
     });

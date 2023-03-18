@@ -11,12 +11,9 @@ export interface AvailabilitySurveyProps {
   course: Course;
 }
 
-export default function AvailabilitySurvey({
-  course,
-}: AvailabilitySurveyProps) {
+export default function AvailabilitySurvey({ course }: AvailabilitySurveyProps) {
   const [createSurveyDialog, setCreateSurveyDialog] = useState(false);
   const [survey, loading] = useSurvey(course.surveyID || undefined);
-  // const [survey, setSurvey] = useState<Survey | null>(null);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
 
   const numStudents = () => {
@@ -30,7 +27,6 @@ export default function AvailabilitySurvey({
         open={createSurveyDialog}
         onClose={() => setCreateSurveyDialog(false)}
         courseID={course.ID}
-        update={false}
       />
       {survey && (
         <SurveyDialog

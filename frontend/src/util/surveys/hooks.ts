@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
 import { Survey } from "model/survey";
+import { Course } from "model/course";
 
 const results = {
     "section1": ["student1", "student2", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3", "student3"],
@@ -55,21 +56,23 @@ const exampleSurvey: Survey = {
     published: true,
 }
 
-export function useSurvey(surveyID: string): [Survey | undefined, boolean] {
+export function useSurvey(surveyID: string | undefined): [Survey | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [survey, setSurvey] = useState<Survey | undefined>(undefined);
 
     useEffect(() => {
-        if (surveyID) {
+        if (surveyID && surveyID !== "") {
+            console.log("here")
             const db = getFirestore();
             const unsubscribe = onSnapshot(doc(db, "surveys", surveyID), (doc) => {
                 if (doc.exists()) {
                     setSurvey({ ID: doc.id, ...doc.data() } as Survey);
-
                 }
                 setLoading(false);
             });
             return () => unsubscribe();
+        } else {
+            setSurvey(undefined)
         }
     }, [surveyID]);
 

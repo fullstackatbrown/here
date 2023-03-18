@@ -20,7 +20,8 @@ func SurveyRoutes() *chi.Mux {
 	router.Route("/{surveyID}", func(router chi.Router) {
 		router.Use(middleware.SurveyCtx())
 		router.Get("/", getSurveyHandler)
-		router.Post("/", updateSurveyHandler)
+		router.Patch("/", updateSurveyHandler)
+		router.Delete("/", deleteSurveyHandler)
 		router.Post("/publish", publishSurveyHandler)
 		router.Post("/results", generateResultsHandler)
 		router.Mount("/responses", ResponsesRoutes())
@@ -133,6 +134,19 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 	render.JSON(w, r, survey)
 
+}
+
+func deleteSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+	surveyID := r.Context().Value("surveyID").(string)
+	err := repo.Repository.DeleteSurvey(courseID, surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully deleted survey " + surveyID))
 }
 
 func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {

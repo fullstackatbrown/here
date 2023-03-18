@@ -84,6 +84,7 @@ export function useCourse(courseID: string): [Course | undefined, boolean] {
         }
     }, [courseID]);
 
+    console.log(course)
     return [course, loading];
 
     // Uncomment this for testing

@@ -96,11 +96,25 @@ func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Surve
 }
 
 func (fr *FirebaseRepository) UpdateSurvey(surveyID string, newSurvey *models.Survey) error {
-
 	// override existing survey
 	_, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(surveyID).Set(firebase.Context, newSurvey)
-
 	return err
+}
+
+func (fr *FirebaseRepository) DeleteSurvey(courseID string, surveyID string) error {
+	// In a batch, delete survey from surveys collection and remove surveyID from course
+	batch := fr.firestoreClient.Batch()
+	batch.Delete(fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(surveyID))
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID), []firestore.Update{
+		{Path: "surveyID", Value: firestore.Delete},
+	})
+
+	_, err := batch.Commit(firebase.Context)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (fr *FirebaseRepository) UpdateSurveyResults(surveyID string, results map[string][]string) error {
