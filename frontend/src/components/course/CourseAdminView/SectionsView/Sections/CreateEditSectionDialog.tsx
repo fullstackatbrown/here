@@ -13,7 +13,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import errors from "@util/errors";
 import SectionAPI from "@util/section/api";
 import dayjs, { Dayjs } from 'dayjs';
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Day, Section } from "model/section";
@@ -43,6 +43,16 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
             capacity: section ? section.capacity : undefined,
         }
     });
+
+    useEffect(() => {
+        reset({
+            day: section ? section.day : undefined,
+            starttime: section ? section.startTime : '2001-01-01T04:00:00.000Z',
+            endtime: section ? section.endTime : '2001-01-1T04:00:00.000Z',
+            location: section ? section.location : undefined,
+            capacity: section ? section.capacity : undefined,
+        });
+    }, [section]);
 
     const onSubmit = handleSubmit(async data => {
         const startTime = new Date(data.starttime).toISOString()

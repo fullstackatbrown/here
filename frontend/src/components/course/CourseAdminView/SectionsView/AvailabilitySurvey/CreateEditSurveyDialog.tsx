@@ -13,7 +13,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import errors from "@util/errors";
 import SurveyAPI from "@util/surveys/api";
 import { Survey } from "model/survey";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -47,6 +47,15 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
             endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
         }
     });
+
+    useEffect(() => {
+        reset({
+            name: survey ? survey.name : "Time Availability Survey",
+            description: survey ? survey.description : "Please select all the times that you will be available.",
+            enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
+            endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
+        });
+    }, [survey]);
 
     const onSubmit = handleSubmit(async data => {
         const endDate = new Date(data.enddate)
