@@ -35,7 +35,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     }
 
     const hasResults = () => {
-        return Object.keys(survey.results).length > 0
+        return survey.results ? Object.keys(survey.results).length > 0 : false
     }
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="md" keepMounted={false}>

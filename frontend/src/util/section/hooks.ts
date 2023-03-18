@@ -44,12 +44,6 @@ export const dummySectionsMap = {
   "section3": dummySection3,
 }
 
-export function useSection(id: string): [Section | undefined, boolean] {
-  return [
-    dummySection1, false
-  ]
-}
-
 export function useSections(courseID: string): [Section[] | undefined, boolean] {
   const [loading, setLoading] = useState(true);
   const [sections, setSections] = useState<Section[] | undefined>(undefined);
@@ -81,7 +75,6 @@ export function useSections(courseID: string): [Section[] | undefined, boolean] 
 
   // }
 
-  console.log(sections)
   let filteredSections: Section[] | undefined = loading ? undefined : sections.filter((section) => section.courseID === courseID);
   return [filteredSections, loading];
 }

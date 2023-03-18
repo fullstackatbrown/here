@@ -7,12 +7,16 @@ import {
     Stack,
     TextField, Typography
 } from "@mui/material";
+import errors from "@util/errors";
+import SurveyAPI from "@util/surveys/api";
 import { FC } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;
     onClose: () => void;
+    courseID: string;
     update: boolean;
 }
 
@@ -21,16 +25,29 @@ type FormData = {
     description: string,
 };
 
-const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, update }) => {
-    const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
+const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, update }) => {
+    const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
             name: "Time Availability Survey",
             description: "Please select all the times that you will be available.",
         }
     });
+
     const onSubmit = handleSubmit(async data => {
-        // TODO: submit form 
-        console.log(data)
+        toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description), {
+            loading: "Creating survey...",
+            success: "Survey created!",
+            error: errors.UNKNOWN,
+        })
+            .then(() => {
+                onClose()
+                reset()
+            })
+            .catch((err) => {
+                onClose()
+                reset()
+            });
+
     });
 
     return <Dialog open={open} onClose={onClose} onClick={(e) => e.stopPropagation()} fullWidth maxWidth="sm" keepMounted={false}>

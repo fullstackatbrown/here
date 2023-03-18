@@ -45,15 +45,10 @@ type GenerateResultsResponseItem struct {
 	Students []string `json:"students"`
 }
 
-func InitSurvey(req *CreateSurveyRequest, sections []*Section) *Survey {
-	// Capacity is a map from the unique times, to a map from section id to capacity
-	capacity := make(map[string]map[string]int)
-	for _, s := range sections {
-		capacity[s.TimeAsString()] = make(map[string]int)
-		capacity[s.TimeAsString()][s.ID] = 0
-	}
-	for _, s := range sections {
-		capacity[s.TimeAsString()][s.ID] += s.Capacity
+func InitSurvey(req *CreateSurveyRequest, sections []*Section) (*Survey, error) {
+	capacity, err := getUniqueSectionTimes(sections)
+	if err != nil {
+		return nil, err
 	}
 
 	return &Survey{
@@ -63,18 +58,13 @@ func InitSurvey(req *CreateSurveyRequest, sections []*Section) *Survey {
 		Capacity:    capacity,
 		Responses:   make(map[string][]string),
 		Exceptions:  make([]string, 0),
-	}
+	}, nil
 }
 
-func (s *Survey) Update(req *UpdateSurveyRequest, sections []*Section) {
-	// Get all the unique times
-	capacity := make(map[string]map[string]int)
-	for _, s := range sections {
-		capacity[s.TimeAsString()] = make(map[string]int)
-		capacity[s.TimeAsString()][s.ID] = 0
-	}
-	for _, s := range sections {
-		capacity[s.TimeAsString()][s.ID] += s.Capacity
+func (s *Survey) Update(req *UpdateSurveyRequest, sections []*Section) error {
+	capacity, err := getUniqueSectionTimes(sections)
+	if err != nil {
+		return err
 	}
 
 	s.Capacity = capacity
@@ -86,4 +76,29 @@ func (s *Survey) Update(req *UpdateSurveyRequest, sections []*Section) {
 	if req.Name != "" {
 		s.Description = req.Name
 	}
+
+	return nil
+}
+
+// Returns a map from a unique time, to a map from section id (that has the time) to capacity
+func getUniqueSectionTimes(sections []*Section) (map[string]map[string]int, error) {
+	capacity := make(map[string]map[string]int)
+	for _, s := range sections {
+		t, err := s.TimeAsString()
+		if err != nil {
+			return nil, err
+		}
+
+		_, ok := capacity[t]
+		if !ok {
+			capacity[t] = make(map[string]int)
+		}
+		_, ok = capacity[t][s.ID]
+		if !ok {
+			capacity[t][s.ID] = 0
+		}
+		capacity[t][s.ID] += s.Capacity
+	}
+
+	return capacity, nil
 }

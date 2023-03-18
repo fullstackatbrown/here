@@ -60,7 +60,17 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 
-	// TODO: deny the request if a survey already exists under the course
+	course, err := repo.Repository.GetCourseByID(courseID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// deny the request if a survey already exists under the course
+	if course.SurveyID != "" {
+		http.Error(w, "Survey already exists for this course", http.StatusBadRequest)
+		return
+	}
 
 	// Get all the section times
 	sections, err := repo.Repository.GetSectionByCourse(req.CourseID)
@@ -69,7 +79,11 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	survey := models.InitSurvey(req, sections)
+	survey, err := models.InitSurvey(req, sections)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	s, err := repo.Repository.CreateSurvey(survey)
 	if err != nil {
@@ -105,7 +119,11 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	survey.Update(req, sections)
+	err = survey.Update(req, sections)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	err = repo.Repository.UpdateSurvey(surveyID, survey)
 	if err != nil {

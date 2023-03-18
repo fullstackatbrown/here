@@ -44,7 +44,10 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
             <Typography variant="body2" mb={2.5}> {survey.description} </Typography>
             <Stack >
                 {Array.from(Object.keys(survey.capacity)).map(time =>
-                    <FormControlLabel control={<Checkbox onChange={onChangeCheckbox(time)} />} label={time} />
+                    <FormControlLabel
+                        control={<Checkbox onChange={onChangeCheckbox(time)} />}
+                        label={time}
+                    />
                 )}
             </Stack>
         </DialogContent>

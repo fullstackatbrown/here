@@ -1,7 +1,9 @@
 package models
 
 import (
-	"strings"
+	"fmt"
+
+	"github.com/fullstackatbrown/here/pkg/utils"
 )
 
 var (
@@ -63,6 +65,14 @@ type DeleteSectionRequest struct {
 	SectionID string
 }
 
-func (section *Section) TimeAsString() string {
-	return strings.Join([]string{string(section.Day), section.StartTime, section.EndTime}, ",")
+func (section *Section) TimeAsString() (string, error) {
+	startTime, err := utils.ParseIsoTimeToReadableUTC(section.StartTime)
+	if err != nil {
+		return "", err
+	}
+	endTime, err := utils.ParseIsoTimeToReadableUTC(section.EndTime)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s %s - %s", section.Day, startTime, endTime), nil
 }

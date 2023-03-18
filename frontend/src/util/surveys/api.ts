@@ -8,9 +8,9 @@ async function getSurveyByID(
   return APIClient.get(`/courses/${courseID}/surveys/${surveyID}`);
 }
 
-async function createSurvey(courseID: string, name: string): Promise<string> {
+async function createSurvey(courseID: string, name: string, description: string): Promise<string> {
   return APIClient.post(`/courses/${courseID}/surveys`, {
-    name,
+    name, description
   });
 }
 

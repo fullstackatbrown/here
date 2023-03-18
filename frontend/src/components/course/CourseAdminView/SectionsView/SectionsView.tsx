@@ -15,13 +15,6 @@ const SectionsView: FC<SectionsViewProps> = ({ course }) => {
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
   const [sections, loading] = useSections(course.ID);
 
-  // useEffect(() => {
-  //   // if (router.isReady && !queueLoading && !queue) {
-  //   //     router.push("/")
-  //   //         .then(() => toast.error("We couldn't find the queue you were looking for."));
-  //   // }
-  // }, [course, sections, loading]);
-
   const getEnrollment = (sectionId: string) => {
     // loop through courses.students and count the number of students whose value is section id
     if (!course.students) return 0;
