@@ -5,6 +5,7 @@ import {
     DialogContent,
     DialogTitle, FormControlLabel, Stack, Typography
 } from "@mui/material";
+import { sortSurveyTimes } from "@util/shared/sortSectionTime";
 import { Survey } from "model/survey";
 import { FC, useState } from "react";
 
@@ -43,7 +44,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
         <DialogContent>
             <Typography variant="body2" mb={2.5}> {survey.description} </Typography>
             <Stack >
-                {Array.from(Object.keys(survey.capacity)).map(time =>
+                {sortSurveyTimes(Object.keys(survey.capacity)).map(time =>
                     <FormControlLabel
                         control={<Checkbox onChange={onChangeCheckbox(time)} />}
                         label={time}

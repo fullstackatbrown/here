@@ -8,8 +8,8 @@ export default function formatSectionTime(
   const startTime = new Date(startTimeStr)
   const endTime = new Date(endTimeStr)
   const timeZone = "America/New_York"
-  const formattedStartTime = format(startTime, "h:mm a", { timeZone })
-  const formattedEndTime = format(endTime, "h:mm a", { timeZone })
+  const formattedStartTime = format(startTime, "h:mma", { timeZone })
+  const formattedEndTime = format(endTime, "h:mma", { timeZone })
 
   return `${day} ${formattedStartTime} - ${formattedEndTime}`
 }
