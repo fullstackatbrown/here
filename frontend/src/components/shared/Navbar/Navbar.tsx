@@ -1,6 +1,6 @@
-import {FC, useEffect, useState} from "react";
+import { FC, useEffect, useState } from "react";
 import NextLink from "next/link";
-import {AppBar, Box, Divider, LinearProgress, Link, Stack, Toolbar} from "@mui/material";
+import { AppBar, Box, Divider, LinearProgress, Link, Stack, Toolbar } from "@mui/material";
 import IconButton from "../IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "@components/shared/Logo";
@@ -26,14 +26,14 @@ export interface NavbarProps {
  * A header that displays information and actions relating to the current page.
  */
 const Navbar: FC<NavbarProps> = ({
-                                     compact,
-                                     endItems,
-                                     loading = false,
-                                     onOpenMenu,
-                                     showMenuButton,
-                                     startItems,
-                                     fixed
-                                 }) => {
+    compact,
+    endItems,
+    loading = false,
+    onOpenMenu,
+    showMenuButton,
+    startItems,
+    fixed
+}) => {
     const [scrollPosition, setScrollPosition] = useState(0);
     const handleScroll = () => {
         const position = window.scrollY;
@@ -41,17 +41,17 @@ const Navbar: FC<NavbarProps> = ({
     };
 
     useEffect(() => {
-        window.addEventListener('scroll', handleScroll, {passive: true});
+        window.addEventListener('scroll', handleScroll, { passive: true });
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
 
-    return <Box sx={{flexGrow: 1, position: "relative"}}>
+    return <Box sx={{ flexGrow: 1, position: "relative" }}>
         <AppBar position={fixed ? "fixed" : "static"} color="transparent" elevation={scrollPosition > 20 ? 2 : 0}>
-            {loading && <LinearProgress sx={{position: "absolute", bottom: 0, width: "100%", height: 2}}/>}
-            <Box sx={(theme) => ({backgroundColor: theme.palette.background.default})}>
+            {loading && <LinearProgress sx={{ position: "absolute", bottom: 0, width: "100%", height: 2 }} />}
+            <Box sx={(theme) => ({ backgroundColor: theme.palette.background.default })}>
                 <Toolbar variant={compact ? "dense" : "regular"}>
                     {showMenuButton && <IconButton
                         onClick={onOpenMenu}
@@ -60,15 +60,15 @@ const Navbar: FC<NavbarProps> = ({
                         edge="start"
                         color="inherit"
                         aria-label="menu"
-                        sx={{mr: 2}}>
-                        <MenuIcon/>
+                        sx={{ mr: 2 }}>
+                        <MenuIcon />
                     </IconButton>}
-                    <Stack sx={{flexGrow: 1}} direction="row" alignItems="center" spacing={1}>
+                    <Stack sx={{ flexGrow: 1 }} direction="row" alignItems="center" spacing={1}>
                         <NextLink href="/">
                             <Link variant="h6" component="button" color="inherit" underline="hover"
-                                  sx={{display: "inline-flex", alignItems: "center"}}>
-                                <Box mr={1} width={32} height={32}>
-                                    <Logo/>
+                                sx={{ display: "inline-flex", alignItems: "center" }}>
+                                <Box mr={1} width={30} height={30}>
+                                    <Logo />
                                 </Box>
                                 Here
                             </Link>
@@ -79,7 +79,7 @@ const Navbar: FC<NavbarProps> = ({
                         {endItems}
                     </Stack>
                 </Toolbar>
-                <Divider/>
+                <Divider />
             </Box>
         </AppBar>
     </Box>;
