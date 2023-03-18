@@ -1,4 +1,4 @@
-import { zonedTimeToUtc, utcToZonedTime, format } from 'date-fns-tz'
+import { format } from 'date-fns-tz'
 
 export default function formatSectionTime(
   day: string,
@@ -12,4 +12,11 @@ export default function formatSectionTime(
   const formattedEndTime = format(endTime, "h:mma", { timeZone })
 
   return `${day} ${formattedStartTime} - ${formattedEndTime}`
+}
+
+export function formatDateTime(timeISO: string): string {
+  const time = new Date(timeISO)
+  const timeZone = "America/New_York"
+  const formattedTime = format(time, "MM/dd/yyyy h:mma", { timeZone })
+  return formattedTime
 }

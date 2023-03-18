@@ -1,10 +1,12 @@
 import Button from "@components/shared/Button";
 import {
+    Box,
     Checkbox, Dialog,
     DialogActions,
     DialogContent,
     DialogTitle, FormControlLabel, Stack, Typography
 } from "@mui/material";
+import { formatDateTime } from "@util/shared/formatTime";
 import { sortSurveyTimes } from "@util/shared/sortSectionTime";
 import { Survey } from "model/survey";
 import { FC, useState } from "react";
@@ -49,7 +51,10 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>{survey.name}{preview && " (Preview)"}</DialogTitle>
         <DialogContent>
-            <Typography variant="body2" mb={2.5}> {survey.description} </Typography>
+            <Typography variant="body1" mb={1}> {survey.description} </Typography>
+            <Typography variant="body1" mb={2}> This survey will end on&nbsp;
+                <Box component="span" fontWeight='fontWeightMedium'>{formatDateTime(survey.endTime)} </Box>
+            </Typography>
             <Stack >
                 {sortSurveyTimes(Object.keys(survey.capacity)).map(time =>
                     <FormControlLabel

@@ -4,10 +4,10 @@ import {
     TableCell, TableHead,
     TableRow
 } from "@mui/material";
-import formatSectionTime from '@util/shared/formatSectionTime';
 import { Section } from 'model/section';
 import { FC } from "react";
 import { red } from '@mui/material/colors';
+import formatSectionTime from "@util/shared/formatTime";
 
 export interface AllocatedSectionsTableProps {
     results: Record<string, string[]>;

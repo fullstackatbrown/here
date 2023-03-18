@@ -43,8 +43,8 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         defaultValues: {
             name: survey ? survey.name : "Time Availability Survey",
             description: survey ? survey.description : "Please select all the times that you will be available.",
-            enddate: survey ? survey.endTime : getNextWeekDate(),
-            endtime: survey ? survey.endTime : getNextWeekDate(),
+            enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
+            endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
         }
     });
 
@@ -52,6 +52,10 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         const endDate = new Date(data.enddate)
         const endTime = new Date(data.endtime)
         endDate.setHours(endTime.getHours(), endTime.getMinutes())
+        if (endDate < new Date()) {
+            toast.error("The time you selected is in the past.")
+            return
+        }
         if (survey) {
             toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, endDate.toISOString()), {
                 loading: "Updating survey...",
@@ -117,8 +121,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                         size="small"
                         variant="standard"
                     />
-                    <Box my={2} />
-                    <Stack direction="row" spacing={3} pb={4}>
+                    <Stack direction="row" spacing={3} pt={1} pb={4}>
                         <Controller
                             control={control}
                             name="enddate"
@@ -129,7 +132,8 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                                         value={value}
                                         onChange={onChange}
                                         PopperProps={{ style: { height: '100px' } }}
-                                        renderInput={(params) => <TextField {...params} />}
+                                        renderInput={(params) => <TextField variant="standard" {...params} />}
+                                        minDate={new Date()}
                                     />
                                 </LocalizationProvider>
                             )}
@@ -143,7 +147,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                                         label="End Time"
                                         value={value}
                                         onChange={onChange}
-                                        renderInput={(params) => <TextField {...params} />} />
+                                        renderInput={(params) => <TextField variant="standard" {...params} />} />
                                 </LocalizationProvider>
                             )}
                         />
