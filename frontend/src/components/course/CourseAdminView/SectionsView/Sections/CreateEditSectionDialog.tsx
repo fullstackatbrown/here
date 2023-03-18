@@ -37,8 +37,8 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
             day: section ? section.day : undefined,
-            starttime: section ? section.startTime : '2014-08-18T04:00:00',
-            endtime: section ? section.endTime : '2014-08-18T04:00:00',
+            starttime: section ? section.startTime : '2014-08-18T00:00:00',
+            endtime: section ? section.endTime : '2014-08-18T00:00:00',
             location: section ? section.location : undefined,
             capacity: section ? section.capacity : undefined,
         }

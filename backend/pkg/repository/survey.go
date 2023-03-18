@@ -3,11 +3,13 @@ package repository
 import (
 	"fmt"
 	"log"
+	"reflect"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
+	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -75,7 +77,18 @@ func (fr *FirebaseRepository) GetSurveyByCourse(courseID string) (survey *models
 	return survey, nil
 }
 
-func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Survey, error) {
+func (fr *FirebaseRepository) CreateSurvey(req *models.CreateSurveyRequest, capacity map[string]map[string]int) (*models.Survey, error) {
+
+	survey := &models.Survey{
+		Name:        req.Name,
+		Description: req.Description,
+		EndTime:     req.EndTime,
+		CourseID:    req.CourseID,
+		Capacity:    capacity,
+		Published:   false,
+		Responses:   make(map[string][]string),
+		Exceptions:  make([]string, 0),
+	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Add(firebase.Context, survey)
 	if err != nil {
@@ -95,9 +108,24 @@ func (fr *FirebaseRepository) CreateSurvey(survey *models.Survey) (*models.Surve
 	return survey, nil
 }
 
-func (fr *FirebaseRepository) UpdateSurvey(surveyID string, newSurvey *models.Survey) error {
-	// override existing survey
-	_, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(surveyID).Set(firebase.Context, newSurvey)
+func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest, capacity map[string]map[string]int) error {
+	v := reflect.ValueOf(*req)
+	typeOfS := v.Type()
+
+	var updates []firestore.Update
+
+	for i := 0; i < v.NumField(); i++ {
+		field := typeOfS.Field(i).Name
+		val := v.Field(i).Interface()
+
+		// Only include the fields that are set
+		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "SurveyID") {
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
+		}
+	}
+
+	updates = append(updates, firestore.Update{Path: "capacity", Value: capacity})
+	_, err := fr.firestoreClient.Collection(models.FirestoreSurveysCollection).Doc(*req.SurveyID).Update(firebase.Context, updates)
 	return err
 }
 

@@ -8,12 +8,17 @@ async function getSurveyByID(
   return APIClient.get(`/courses/${courseID}/surveys/${surveyID}`);
 }
 
-async function createSurvey(courseID: string, name: string, description: string): Promise<string> {
+async function createSurvey(courseID: string, name: string, description: string, endTime: string): Promise<string> {
   return APIClient.post(`/courses/${courseID}/surveys`, {
-    name, description
+    name, description, endTime
   });
 }
 
+async function updateSurvey(courseID: string, surveyID: string, name: string, description: string, endTime: string): Promise<string> {
+  return APIClient.patch(`/courses/${courseID}/surveys/${surveyID}`, {
+    name, description, endTime
+  });
+}
 async function publishSurvey(
   courseID: string,
   surveyID: string
@@ -50,6 +55,7 @@ async function editSurveyResponse(
 const SurveyAPI = {
   getSurveyByID,
   createSurvey,
+  updateSurvey,
   publishSurvey,
   deleteSurvey,
   createSurveyResponse,

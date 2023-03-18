@@ -49,16 +49,25 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
     });
 
     const onSubmit = handleSubmit(async data => {
-        const endDateTime = new Date(
-            data.enddate.getFullYear(),
-            data.enddate.getMonth(),
-            data.enddate.getDate(),
-            data.endtime.getHours(),
-            data.endtime.getMinutes());
+        const endDate = new Date(data.enddate)
+        const endTime = new Date(data.endtime)
+        endDate.setHours(endTime.getHours(), endTime.getMinutes())
         if (survey) {
-
+            toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, endDate.toISOString()), {
+                loading: "Updating survey...",
+                success: "Survey updated!",
+                error: errors.UNKNOWN,
+            })
+                .then(() => {
+                    onClose()
+                    reset()
+                })
+                .catch((err) => {
+                    onClose()
+                    reset()
+                });
         } else {
-            toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description), {
+            toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description, endDate.toISOString()), {
                 loading: "Creating survey...",
                 success: "Survey created!",
                 error: errors.UNKNOWN,
@@ -143,7 +152,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button type="submit" variant="contained">Submit</Button>
+                <Button type="submit" variant="contained">{survey ? "Update" : "Create"}</Button>
             </DialogActions>
         </form>
     </Dialog>;

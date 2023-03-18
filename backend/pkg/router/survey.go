@@ -80,24 +80,24 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	survey, err := models.InitSurvey(req, sections)
+	capacity, err := models.GetUniqueSectionTimes(sections)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	s, err := repo.Repository.CreateSurvey(survey)
+	s, err := repo.Repository.CreateSurvey(req, capacity)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	render.JSON(w, r, s)
-
 }
 
 func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: what if the survey is already published
+	courseID := r.Context().Value("courseID").(string)
 	surveyID := r.Context().Value("surveyID").(string)
 	var req *models.UpdateSurveyRequest
 
@@ -106,27 +106,28 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	req.SurveyID = &surveyID
+	req.CourseID = &courseID
 
 	survey, err := repo.Repository.GetSurveyByID(surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	// Get all the section times
-	sections, err := repo.Repository.GetSectionByCourse(req.CourseID)
+	sections, err := repo.Repository.GetSectionByCourse(*req.CourseID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = survey.Update(req, sections)
+	capacity, err := models.GetUniqueSectionTimes(sections)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = repo.Repository.UpdateSurvey(surveyID, survey)
+	err = repo.Repository.UpdateSurvey(req, capacity)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
