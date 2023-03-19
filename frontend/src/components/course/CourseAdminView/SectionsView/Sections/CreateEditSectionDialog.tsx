@@ -37,8 +37,8 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: {
             day: section ? section.day : undefined,
-            starttime: section ? section.startTime : '2001-01-01T04:00:00.000Z',
-            endtime: section ? section.endTime : '2001-01-1T04:00:00.000Z',
+            starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
+            endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
             location: section ? section.location : undefined,
             capacity: section ? section.capacity : undefined,
         }
@@ -47,8 +47,8 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
     useEffect(() => {
         reset({
             day: section ? section.day : undefined,
-            starttime: section ? section.startTime : '2001-01-01T04:00:00.000Z',
-            endtime: section ? section.endTime : '2001-01-1T04:00:00.000Z',
+            starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
+            endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
             location: section ? section.location : undefined,
             capacity: section ? section.capacity : undefined,
         });
@@ -129,7 +129,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                     <Controller
                         control={control}
                         name="starttime"
-                        render={({ field: { onChange, onBlur, value, ref } }) => (
+                        render={({ field: { onChange, value } }) => (
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <TimePicker
                                     label="Start Time"
@@ -142,7 +142,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                     <Controller
                         control={control}
                         name="endtime"
-                        render={({ field: { onChange, onBlur, value, ref } }) => (
+                        render={({ field: { onChange, value } }) => (
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <TimePicker
                                     label="End Time"
