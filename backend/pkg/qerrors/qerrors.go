@@ -12,6 +12,7 @@ var (
 	AssignmentNotFoundError  = errors.New("assignment not found")
 	SurveyNotFoundError      = errors.New("survey not found")
 	CourseAlreadyExistsError = errors.New("course already exists")
+	InvalidEntryCodeError    = errors.New("invalid entry code")
 
 	// User errors
 	DeleteUserError    = errors.New("an error occurred while deleting user")

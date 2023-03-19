@@ -89,7 +89,7 @@ func (fr *FirebaseRepository) GetCourseByEntryCode(entryCode string) (*models.Co
 	if val, ok := fr.coursesEntryCodes[entryCode]; ok {
 		return fr.GetCourseByID(val)
 	} else {
-		return nil, qerrors.CourseNotFoundError
+		return nil, qerrors.InvalidEntryCodeError
 	}
 }
 
