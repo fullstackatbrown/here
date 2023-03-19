@@ -1,11 +1,11 @@
 import APIClient from "@util/APIClient";
-import { Student } from "../../model/student";
+import { User } from "../../model/user";
 
-async function getUser(): Promise<Student> {
+async function getUser(): Promise<User> {
   return APIClient.get(`/users`);
 }
 
-async function getUserByID(userID: string): Promise<Student> {
+async function getUserByID(userID: string): Promise<User> {
   return APIClient.get(`/users/${userID}`);
 }
 
