@@ -1,6 +1,7 @@
 import { Box, Button, Card, Paper, Stack, Typography } from "@mui/material";
 import { useSurvey } from "@util/surveys/hooks";
 import { Course } from "model/course";
+import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { useEffect, useState } from "react";
 import CreateSurveyDialog from "./CreateEditSurveyDialog";
@@ -9,9 +10,10 @@ import SurveyDialog from "./SurveyDialog";
 
 export interface AvailabilitySurveyProps {
   course: Course;
+  sections: Section[];
 }
 
-export default function AvailabilitySurvey({ course }: AvailabilitySurveyProps) {
+export default function AvailabilitySurvey({ course, sections }: AvailabilitySurveyProps) {
   const [createSurveyDialog, setCreateSurveyDialog] = useState(false);
   const [survey, loading] = useSurvey(course.surveyID || undefined);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
@@ -44,7 +46,7 @@ export default function AvailabilitySurvey({ course }: AvailabilitySurveyProps) 
       </Stack>
       <Box height={100}>
         {survey && (
-          <SurveyCard survey={survey} numStudents={numStudents()} />
+          <SurveyCard survey={survey} numStudents={numStudents()} sections={sections} />
         )}
       </Box>
     </>

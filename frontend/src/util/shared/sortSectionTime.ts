@@ -61,5 +61,3 @@ export function sortSurveyResponses(times: TimeCount[]): TimeCount[] {
         return { time, count }
     });
 }
-
-

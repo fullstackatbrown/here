@@ -45,7 +45,7 @@ const SectionsView: FC<SectionsViewProps> = ({ course }) => {
           <SectionCard section={s as Section} enrollment={getEnrollment((s as Section).ID)} />)
         }
       </Stack>
-      {sections && sections.length > 0 && <AvailabilitySurvey course={course} />}
+      {sections && sections.length > 0 && <AvailabilitySurvey sections={sections} course={course} />}
     </>
   );
 }

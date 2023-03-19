@@ -1,3 +1,5 @@
+import { Section } from "./section";
+
 export interface Survey {
   ID: string;
   courseID: string;
@@ -8,4 +10,9 @@ export interface Survey {
   responses: Record<string, string[]>;
   published: boolean;
   results: Record<string, string[]>;
+}
+
+export interface GenerateResultsResponse {
+  section: Section;
+  students: string[];
 }

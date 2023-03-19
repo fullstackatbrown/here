@@ -10,17 +10,19 @@ import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 import toast from "react-hot-toast";
 import SurveyAPI from "@util/surveys/api";
 import errors from "@util/errors";
+import { Section } from "model/section";
 
 export interface SurveyCardProps {
   survey: Survey;
   numStudents: number;
+  sections: Section[];
 }
 
 /**
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents }) => {
+const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections }) => {
   const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false)
   const [surveyResponsesDialog, setSUrveyResponsesDialog] = useState(false)
@@ -58,7 +60,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents }) => {
     <>
       <CreateSurveyDialog open={updateSurveyDialog} onClose={() => setUpdateSurveyDialog(false)} courseID={survey.courseID} survey={survey} />
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
-      <SurveyResponsesDialog open={surveyResponsesDialog} onClose={() => setSUrveyResponsesDialog(false)} survey={survey} numStudents={numStudents} />
+      <SurveyResponsesDialog open={surveyResponsesDialog} onClose={() => setSUrveyResponsesDialog(false)} survey={survey} numStudents={numStudents} sections={sections} />
       <Card sx={{ ':hover': { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems={"center"}>
           <Stack>

@@ -8,13 +8,19 @@ import { Section } from 'model/section';
 import { FC } from "react";
 import { red } from '@mui/material/colors';
 import formatSectionTime from "@util/shared/formatTime";
+import { sortSections } from "@util/shared/sortSectionTime";
 
 export interface AllocatedSectionsTableProps {
     results: Record<string, string[]>;
-    sections: Record<string, Section>;
+    sections: Section[];
 }
 
 const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sections }) => {
+
+    // const sectionsMap = sections.reduce((acc, section) => {
+    //     acc[section.ID] = section
+    //     return acc
+    // }, {} as Record<string, Section>)
 
     return <Table>
         <TableHead>
@@ -25,9 +31,8 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
             </TableRow>
         </TableHead>
         <TableBody>
-            {Object.keys(results).map((sectionID) => {
-                const section = sections[sectionID]
-                const numStudents = results[sectionID].length
+            {sortSections(sections).map((section) => {
+                const numStudents = results[section.ID].length
                 return <TableRow
                     key={formatSectionTime(section.day, section.startTime, section.endTime)}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -36,12 +41,13 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
                         {formatSectionTime(section.day, section.startTime, section.endTime)}
                     </TableCell>
                     <TableCell align="right">
-                        {section.location}
+                        {section.location ? section.location : "TBD"}
                     </TableCell>
-                    <TableCell align="right" sx={{ color: numStudents > section.capacity ? red[500] : "default" }}>{numStudents} / {section.capacity}</TableCell>
+                    <TableCell align="right" sx={{ color: numStudents > section.capacity ? red[500] : "default" }}>
+                        {numStudents} / {section.capacity}
+                    </TableCell>
                 </TableRow>
-            }
-            )}
+            })}
         </TableBody>
     </Table>
 

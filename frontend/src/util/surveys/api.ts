@@ -36,8 +36,8 @@ async function deleteSurvey(
 async function generateResults(
   courseID: string,
   surveyID: string
-): Promise<boolean> {
-  return APIClient.post(`/courses/${courseID}/surveys/${surveyID}`);
+): Promise<any> {
+  return APIClient.post(`/courses/${courseID}/surveys/${surveyID}/results`);
 }
 
 async function createSurveyResponse(
