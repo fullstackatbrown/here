@@ -9,6 +9,7 @@ type Course struct {
 	Title         string            `firestore:"title"`
 	Code          string            `firestore:"code"`
 	Term          string            `firestore:"term"`
+	EntryCode     string            `firestore:"entryCode"`
 	SectionIDs    []string          `firestore:"sectionIDs,omitempty"`
 	AssignmentIDs []string          `firestore:"assignmentIDs,omitempty"`
 	Students      map[string]string `firestore:"students,omitempty"`

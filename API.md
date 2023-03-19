@@ -75,7 +75,8 @@
 <b>courses</b>
     id: string                     # unique id of the course
     title: string                  # name of the course
-    code: string             # course's course code
+    code: string                   # course's course code
+    entryCode: string              # course's entry code, 6 randomly generated characters
     term: string                   # semester this course is offered
     students: map[string]string    # map from studentIDs to sectionIDs
     surveyID: string               # id of the survey attached to this course
