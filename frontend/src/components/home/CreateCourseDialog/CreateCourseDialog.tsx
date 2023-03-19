@@ -26,6 +26,11 @@ const JoinCourseDialog: FC<JoinCourseDialogProps> = ({ open, onClose }) => {
         console.log(data)
     });
 
+    const handleCancel = () => {
+        onClose()
+        reset()
+    };
+
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
 
@@ -42,7 +47,7 @@ const JoinCourseDialog: FC<JoinCourseDialogProps> = ({ open, onClose }) => {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={handleCancel}>Cancel</Button>
                 <Button type="submit" variant="contained">Join Course</Button>
             </DialogActions>
         </form>
