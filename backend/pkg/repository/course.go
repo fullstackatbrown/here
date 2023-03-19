@@ -75,6 +75,10 @@ func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models
 }
 
 func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (course *models.Course, err error) {
+	course, err = fr.GetCourseByInfo(req.Code, req.Term)
+	if err == nil {
+		return nil, qerrors.CourseAlreadyExistsError
+	}
 	// TODO: check if course already exists
 	course = &models.Course{
 		Title:         req.Title,
