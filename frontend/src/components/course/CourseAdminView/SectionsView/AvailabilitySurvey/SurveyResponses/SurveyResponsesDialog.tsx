@@ -1,22 +1,13 @@
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import {
     Box,
-    Button, createTheme, Dialog, DialogActions, DialogContent,
-    DialogTitle,
-    IconButton,
-    Link,
-    Stack, ThemeProvider, Typography
+    Button, Dialog, DialogActions, DialogContent,
+    DialogTitle, Stack, Typography
 } from "@mui/material";
-import { dummySectionsMap } from '@util/section/hooks';
-import { formatSectionResponses, mapToList, TimeCount } from "@util/shared/formatSectionResponses";
+import formatSectionResponses, { TimeCount } from "@util/shared/formatSectionResponses";
 import { Survey } from "model/survey";
 import { FC, useEffect, useState } from "react";
-import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
-import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
-import toast from "react-hot-toast";
-import SurveyAPI from "@util/surveys/api";
-import Errors from "@util/errors";
-import errors from "@util/errors";
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -31,8 +22,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
 
     useEffect(() => {
         setNumResponses(Object.keys(survey.responses).length)
-        const formattedRes = mapToList(formatSectionResponses(survey.capacity, survey.responses))
-        setFormattedResponses(formattedRes)
+        setFormattedResponses(formatSectionResponses(survey.capacity, survey.responses))
     }, [survey.responses])
 
 

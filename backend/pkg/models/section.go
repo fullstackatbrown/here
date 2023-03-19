@@ -2,8 +2,6 @@ package models
 
 import (
 	"fmt"
-
-	"github.com/fullstackatbrown/here/pkg/utils"
 )
 
 var (
@@ -66,15 +64,15 @@ type DeleteSectionRequest struct {
 }
 
 func (section *Section) TimeAsString() (string, error) {
-	startTime, err := utils.ParseIsoTimeToReadableUTC(section.StartTime)
-	if err != nil {
-		return "", err
-	}
-	endTime, err := utils.ParseIsoTimeToReadableUTC(section.EndTime)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%s %s - %s", section.Day, startTime, endTime), nil
+	// startTime, err := utils.ParseIsoTimeToReadableUTC(section.StartTime)
+	// if err != nil {
+	// 	return "", err
+	// }
+	// endTime, err := utils.ParseIsoTimeToReadableUTC(section.EndTime)
+	// if err != nil {
+	// 	return "", err
+	// }
+	return fmt.Sprintf("%s,%s,%s", section.Day, section.StartTime, section.EndTime), nil
 }
 
 // Returns a map from a unique time, to a map from section id (that has the time) to capacity

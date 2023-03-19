@@ -13,6 +13,8 @@ Make sure you have Go and npm installed on your device
 
 ## Backend APIs
 
+## A note on time
+when time is stored in the database, it is alway stored in the ISO format for consistency, e.g. "2014-08-18T07:00:00.000Z"
 ### Methods - Courses
 
 | Description         | Route                                     | Body                                 | Auth  |

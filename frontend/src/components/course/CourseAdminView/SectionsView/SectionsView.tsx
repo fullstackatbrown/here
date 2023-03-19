@@ -1,6 +1,6 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { useSections } from "@util/section/hooks";
-import { sortByTime } from "@util/shared/sortSectionTime";
+import { sortSections } from "@util/shared/sortSectionTime";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { FC, useEffect, useState } from "react";
@@ -41,7 +41,7 @@ const SectionsView: FC<SectionsViewProps> = ({ course }) => {
         </Button>
       </Stack>
       <Stack direction="column" spacing={2} mb={5}>
-        {sections && sortByTime(sections).map((s) =>
+        {sections && sortSections(sections).map((s) =>
           <SectionCard section={s as Section} enrollment={getEnrollment((s as Section).ID)} />)
         }
       </Stack>

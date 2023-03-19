@@ -14,9 +14,20 @@ export default function formatSectionTime(
   return `${day} ${formattedStartTime} - ${formattedEndTime}`
 }
 
-export function formatDateTime(timeISO: string): string {
+export function formatDateTime(timeISO: string, f: string = "MM/dd/yyyy h:mma"): string {
   const time = new Date(timeISO)
   const timeZone = "America/New_York"
-  const formattedTime = format(time, "MM/dd/yyyy h:mma", { timeZone })
+  const formattedTime = format(time, f, { timeZone })
   return formattedTime
+}
+
+// input: Tuesday,2014-08-18T04:00:00.000Z,2014-08-18T04:00:00.000Z
+// output: Tuesday 12:00AM - 12:00AM
+export function formatSurveyTime(time: string): string {
+  const [day, startTimeStr, endTimeStr] = time.split(",")
+  const formattedStartTime = formatDateTime(startTimeStr, "h:mma")
+  const formattedEndTime = formatDateTime(endTimeStr, "h:mma")
+
+  return `${day} ${formattedStartTime} - ${formattedEndTime}`
+
 }
