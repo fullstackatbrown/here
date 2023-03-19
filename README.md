@@ -1,159 +1,41 @@
 # Here
 
-## Developer Guide
+## Codebase
 
-Make sure you have Go and npm installed on your device
+The frontend is a React (Next.js) app written in Typescript, while the backend is a REST API written in Go. We also use Firebase Authentication and Firestore.
 
-- Start backend: `cd backend`, `go run main.go`
-- Start frontend: `cd frontend`, `yarn dev`
+## Set up
+1. Make sure you have Go and npm/yarn installed on your device
+2. Install backend dependencies
+    ```
+    cd backend
+    go mod tidy
+    go get .
+    ```
+3. Install frontend dependencies
+    ```
+    cd frontend
+    npm install // or yarn install
+    ```
 
-## Firestore
 
-- Go to firebase project and follow the steps [here](https://firebase.google.com/docs/admin/setup#initialize-sdk) to generate a private key file. Put it in the root of backend folder and rename it as `dev-firebase-config.json`
+4. In the Firebase console, go to **Project Settings > Service Accounts** and generate a new private key file. Detailed steps can be found [here](https://firebase.google.com/docs/admin/setup#initialize-sdk). Take the downloaded JSON file, put it in the root of backend folder and rename it as `dev-firebase-config.json`
+
+5. Create a `.env.local` file under the root of frontend folder. Copy the contents in `example.env` and copy over the corresponding Firebase credentials from earlier. For the last environment variable, set it to `http://localhost:8080`.
+
+    - Make sure to not push `.env.local` to remote (it should be already git-ignored) 
+
+6. Run backend
+    ```
+    cd backend
+    go run main.go
+    ```
+7. Run frontend
+    ```
+    cd frontend
+    npm run dev // or yarn dev
+    ```
 
 ## Backend APIs
+For a full list of the backend APIs, visit [API documentation](./API.md).
 
-## A note on time
-when time is stored in the database, it is alway stored in the ISO format for consistency, e.g. "2014-08-18T07:00:00.000Z"
-### Methods - Courses
-
-| Description         | Route                                     | Body                                 | Auth  |
-|---------------------|-------------------------------------------|--------------------------------------|-------|
-| Get course by id    | `GET /courses/{courseId}`                 |                                      | All   |
-| Delete course by id | `DELETE /courses/{courseId}`              |                                      | Admin |
-| Assign sections     | `POST /courses/{courseId}/assignSections` | Optional: `studentId`, `sectionId`   | Admin |
-| Create course       | `POST /courses`                           | Mandatory: `title`, `code`, `term`   | Admin |
-| Update course       | `PATCH /courses/{courseId}`               | Optional: `gradeOptions`, `surveyID` | Admin |
-
-### Methods - Sections
-
-| Description       | Route                                             | Body                                                                       | Auth  |
-|-------------------|---------------------------------------------------|----------------------------------------------------------------------------|-------|
-| Get all sections  | `GET /courses/{courseId}/sections`                |                                                                            | Staff |
-| Get section by id | `GET /courses/{courseId}/sections/{sectionId}`    |                                                                            | All   |
-| Delete section    | `DELETE /courses/{courseId}/sections/{sectionId}` |                                                                            | Admin |
-| Create section    | `POST /courses/{courseId}/sections/`              | Mandatory: `day`, `startTime`, `endTime`; Optional: `location`, `capacity` | Admin |
-| Update section    | `PATCH /courses/{courseId}/sections/{sectionId}`  | Optional: `day`, `startTime`, `endTime`, `location`, `capacity`            | Admin |
-
-### Methods - Assignments
-
-| Description          | Route                                                   | Body                                                   | Auth  |
-|----------------------|---------------------------------------------------------|--------------------------------------------------------|-------|
-| Get all assignments  | `GET /courses/{courseId}/assignments`                   |                                                        | All   |
-| Get assignment by id | `GET /courses/{courseId}/assignments/{assignmentId}`    |                                                        | All   |
-| Delete assignment    | `DELETE /courses/{courseId}/assignments/{assignmentId}` |                                                        | Admin |
-| Create assignment    | `POST /courses/{courseId}/assignments/`                 | Mandatory: `name`, `mandatory`, `startDate`, `endDate` | Admin |
-| Update assignment    | `PATCH /courses/{courseId}/assignments/{assignmentId}`  | Optional: `name`, `mandatory`, `startDate`, `endDate`  | Admin |
-
-### Methods - Surveys
-
-| Description      | Route                                                                 | Body                         | Auth  |
-|------------------|-----------------------------------------------------------------------|------------------------------|-------|
-| Get survey by id | `GET /courses/{courseId}/surveys/{surveyID}/`                         |                              | Staff |
-| Create survey    | `POST /courses/{courseId}/surveys`                                    | Mandatory: `name`            | Admin |
-| Publish          | `POST /courses/{courseId}/surveys/{surveyID}/publish`                 |                              | Admin |
-| Generate Result  | `POST /courses/{courseId}/surveys/{surveyID}/results`                 |                              | Admin |
-| Create response  | `POST /courses/{courseId}/surveys/{surveyID}/responses`               | Mandatory: `times: []string` | All   |
-| Edit response    | `PATCH /courses/{courseId}/surveys/{surveyID}/responses/{responseId}` | Mandatory: `times: []string` | All   |
-
-### Methods - Swaps
-
-| Description           | Route                                       | Body                                                                           | Response                        | Auth         |
-|-----------------------|---------------------------------------------|--------------------------------------------------------------------------------|---------------------------------|--------------|
-| Create a Swap Request | `POST /courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All          |
-| Update Swap Request   | `PATCH /courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                            |                                 | Staff & Self |
-| Get all Swaps         | `GET /courses/{courseId}/swaps/`            |                                                                                | JSON of swaps                   | Staff        |
-| Get swap by student   | `GET /courses/{courseId}/swaps/me`          |                                                                                |                                 | All          |
-
-### Methods - Grades
-
-| Description              | Route                                                                   | Body                                    | Auth  |
-|--------------------------|-------------------------------------------------------------------------|-----------------------------------------|-------|
-| Get grades by assignment | `GET /courses/{courseId}/assignments/{assignmentID}grades`              |                                         | Staff |
-| Get grades by student    | `GET /courses/{courseId}/grades`                                        | Mandatory: `studentID`                  | All   |
-| Create a grade           | `POST /courses/{courseId}/assignments/{assignmentID}/grades`            | Mandatory: `studentID`, `grade`, `taID` | Staff |
-| Update a grade           | `PATCH /courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}` | Mandatory: `studentID`, `grade`, `taID` | Staff |
-| Export grades            | `POST /courses/{courseId}/exportGrades`                                 |                                         | Admin |
-
-### Methods - Users
-
-| Description        | Route                           | Body                                            | Auth |
-|--------------------|---------------------------------|-------------------------------------------------|------|
-| Get current user   | `GET /users`                    |                                                 | All  |
-| Get user by ID     | `GET /users/{userId}`           |                                                 | All  |
-| Update user        | `PATCH /users/{userId}`         |                                                 | All  |
-| Join/Quit a course | `PATCH /users/{userId}/courses` | Mandatory: `courseID`, Action: `join` or `quit` | All  |
-
-## Data Schema
-
-<pre>
-<b>courses</b>
-    id: string                     # unique id of the course
-    title: string                  # name of the course
-    code: string             # course's course code
-    term: string                   # semester this course is offered
-    students: map[string]string    # map from studentIDs to sectionIDs
-    surveyID: string               # id of the survey attached to this course
-    sectionIDs: []string
-    assignmentIDs: []string
-    swapRequests: []string
-
-<b>sections</b>
-    id: string                                # unique id of the section
-    courseID: string
-    day: string                               # the day this section runs
-    startTime: string                         # the time the section starts
-    endTime: string                           # the time the section ends
-    location: string                          # where the section takes place
-    capacity: int                             # max section capacity
-    swappedInStudents: map[string][]string    # maps assignmentIDs to studentIDs that swap into this section
-    swappedOutStudents: map[string][]string   # maps assignmentIDs to studentIDs that swapped out of this section
-
-<b>assignments</b>
-    id: string                          # unique assignment id
-    courseID: string
-    name: string                        # name of the assignment
-    optional: bool                      # whether or not this assignment is optional
-    maxScore: int                       # maximum points possible
-    startDate: string                   # when the assignment is released
-    endDate: string                     # when the assignment is due
-    gradesByStudent: map[string]string  # map from studentID to their gradeID
-
-<b>grades</b>
-    id: string                         # unique grade id
-    studentID: string                  # the id of the student the grade is for
-    assignmentID: string
-    grade: int                         # grade
-    gradedBy: string                   # id of the TA that graded the assignment
-    timeUpdated: Timestamp             # when the time was updated
-
-<b>swapRequest</b>
-    id: string
-    studentID: string                      # ID of student
-    oldSectionID: string                   # ID of the section the student is swapping out of
-    newSectionID: string                   # ID of the section the student is swapping into
-    isTemporary: bool                      # if this is a temporary swap or not
-    requestTime: timestamp                 # when the request was submitted
-    reason: string                         # reason for the swap
-    status: string                         # pending, cancelled, approved, denied, archived
-    handledBy: string                      # automatic or taID
-
-<b>profiles</b>
-    displayName: string
-    email: string
-    access: map[string]string                         # map from courseID to "admin", or "staff"
-    courses: []string                                 # list of courseIDs enrolled in as student
-    defaultSections: map[string]string                # map from courseID to sectionID
-    actualSections: map[string]map[string]string      # map from courseID to map from assignmentID to sectionID
-
-<b>surveys</b>
-    id: string
-    courseID: string
-    name: string
-    published: bool                                  # whether if the survey is published
-    endTime: timestamp                               # when this survey will be made unavailable
-    description: string
-    capacity: map[string]map[string]int              # map from time to a map from sectionID to capacity
-    responses: map[string][]string                   # map from studentID to available times
-    results: map[string][]string                     # final results: map from sectionID to list of studentIDs
-</pre>
