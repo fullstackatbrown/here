@@ -56,6 +56,8 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections }) => {
     setUpdateSurveyDialog(true)
   }
 
+  const getNumResponses = () => survey.responses ? Object.keys(survey.responses).length : 0
+
   return (
     <>
       <CreateSurveyDialog open={updateSurveyDialog} onClose={() => setUpdateSurveyDialog(false)} courseID={survey.courseID} survey={survey} />
@@ -69,7 +71,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections }) => {
             </Typography>
             <Typography variant="body2" fontWeight={400} sx={{ color: 'text.disabled' }}>
               {survey.published
-                ? `${Object.keys(survey.responses).length}/${numStudents} responded`
+                ? `${getNumResponses()}/${numStudents} responded`
                 : "Click to preview"}
             </Typography>
           </Stack>

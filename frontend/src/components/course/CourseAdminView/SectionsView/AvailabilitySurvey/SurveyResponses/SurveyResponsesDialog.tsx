@@ -27,7 +27,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     const [numResponses, setNumResponses] = useState(0)
 
     useEffect(() => {
-        setNumResponses(Object.keys(survey.responses).length)
+        setNumResponses(getNumResponses())
         setFormattedResponses(formatSectionResponses(survey.capacity, survey.responses))
     }, [survey.responses])
 
@@ -40,13 +40,9 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         })
     }
 
-    const hasResponses = () => {
-        return survey.responses ? Object.keys(survey.responses).length > 0 : false
-    }
+    const getNumResponses = () => survey.responses ? Object.keys(survey.responses).length : 0
 
-    const hasResults = () => {
-        return survey.results ? Object.keys(survey.results).length > 0 : false
-    }
+    const hasResults = () => survey.results ? Object.keys(survey.results).length > 0 : false
 
     const handleConfirmResults = () => {
         // TODO:
@@ -80,7 +76,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                         Capacity may be overridden if there is no solution.
                     </Typography>
                 </Stack>
-                <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={!hasResponses()} onClick={handleRunAlgorithm}>
+                <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={getNumResponses() === 0} onClick={handleRunAlgorithm}>
                     Run Algorithm
                 </Button>
             </Stack>
