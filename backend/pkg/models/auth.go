@@ -4,8 +4,8 @@ type ActionType string
 
 const (
 	FirestoreProfilesCollection            = "user_profiles"
-	ACTION_JOIN                 ActionType = "join"
-	ACTION_QUIT                 ActionType = "quit"
+	ACTION_JOIN                 ActionType = "JOIN"
+	ACTION_QUIT                 ActionType = "QUIT"
 )
 
 // Profile is a collection of standard profile information for a user.

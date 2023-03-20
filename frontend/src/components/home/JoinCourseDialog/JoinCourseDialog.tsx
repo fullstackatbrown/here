@@ -6,8 +6,10 @@ import {
     DialogTitle, Stack,
     TextField
 } from "@mui/material";
+import AuthAPI, { ChangeCourseAction } from "@util/auth/api";
 import { FC } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export interface JoinCourseDialogProps {
     open: boolean;
@@ -15,30 +17,42 @@ export interface JoinCourseDialogProps {
 }
 
 type FormData = {
-    accessCode: string;
+    entryCode: string;
 };
 
 const JoinCourseDialog: FC<JoinCourseDialogProps> = ({ open, onClose }) => {
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>();
 
     const onSubmit = handleSubmit(async data => {
-        // TODO: submit form 
-        console.log(data)
+        toast.promise(AuthAPI.joinOrQuitCourse("test student id", data.entryCode, ChangeCourseAction.Join), {
+            loading: "Joining Course...",
+            success: "Joined Course!",
+            error: (err) => `Failed to join course: ${err.response.data}`,
+        })
+            .then(() => {
+                onClose();
+                reset();
+            })
+            .catch(() => {
+                onClose();
+                reset();
+            })
     });
 
-    const handleCancel = () => {
-        onClose()
-        reset()
+    const handleOnClose = () => {
+        // Reset the form before closing the dialog
+        reset();
+        onClose();
     };
 
-    return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
 
             <DialogTitle>Join Course with Entry Code</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} my={1}>
                     <TextField
-                        {...register("accessCode")}
+                        {...register("entryCode")}
                         autoFocus
                         label="Course Entry Code"
                         type="text"
@@ -47,7 +61,7 @@ const JoinCourseDialog: FC<JoinCourseDialogProps> = ({ open, onClose }) => {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleCancel}>Cancel</Button>
+                <Button onClick={handleOnClose}>Cancel</Button>
                 <Button type="submit" variant="contained">Join Course</Button>
             </DialogActions>
         </form>

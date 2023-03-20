@@ -96,7 +96,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         }
     });
 
-    const handleCancel = () => {
+    const handleOnClose = () => {
         onClose()
         reset()
     }
@@ -113,7 +113,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         }
     }
 
-    return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>
                 {survey ? "Update" : "Create"} Survey
@@ -179,7 +179,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleCancel}>Cancel</Button>
+                <Button onClick={handleOnClose}>Cancel</Button>
                 <Button type="submit" variant="contained">{survey ? "Update" : "Create"}</Button>
             </DialogActions>
         </form>
