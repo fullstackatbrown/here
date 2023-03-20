@@ -176,26 +176,6 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 </Select>
                             </FormControl>
                         )} />
-                    {/* <FormControl fullWidth variant="standard">
-                        <InputLabel id="new-section-select-label">Section to Switch To</InputLabel>
-                        <Select
-                            labelId="new-section-select-label"
-                            {...register("newSectionID")}
-                            label="Section to Switch To"
-                            required
-                        >
-                            {sections && sortSections(sections).map((s) => {
-                                return <MenuItem
-                                    key={`select-section-${s.ID}`}
-                                    value={s.ID}
-                                    disabled={s.ID === watchOldSectionID}
-                                >
-                                    {formatSectionInfo(s)}
-                                </MenuItem>
-                            }
-                            )}
-                        </Select>
-                    </FormControl> */}
                     <TextField
                         {...register("reason")}
                         multiline
