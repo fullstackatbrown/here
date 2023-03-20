@@ -2,7 +2,9 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
@@ -20,7 +22,8 @@ func SurveyRoutes() *chi.Mux {
 	router.Route("/{surveyID}", func(router chi.Router) {
 		router.Use(middleware.SurveyCtx())
 		router.Get("/", getSurveyHandler)
-		router.Post("/", updateSurveyHandler)
+		router.Patch("/", updateSurveyHandler)
+		router.Delete("/", deleteSurveyHandler)
 		router.Post("/publish", publishSurveyHandler)
 		router.Post("/results", generateResultsHandler)
 		router.Mount("/responses", ResponsesRoutes())
@@ -60,7 +63,17 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 
-	// TODO: deny the request if a survey already exists under the course
+	course, err := repo.Repository.GetCourseByID(courseID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// deny the request if a survey already exists under the course
+	if course.SurveyID != "" {
+		http.Error(w, "Survey already exists for this course", http.StatusBadRequest)
+		return
+	}
 
 	// Get all the section times
 	sections, err := repo.Repository.GetSectionByCourse(req.CourseID)
@@ -69,20 +82,24 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	survey := models.InitSurvey(req, sections)
+	capacity, err := models.GetUniqueSectionTimes(sections)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	s, err := repo.Repository.CreateSurvey(survey)
+	s, err := repo.Repository.CreateSurvey(req, capacity)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	render.JSON(w, r, s)
-
 }
 
 func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: what if the survey is already published
+	courseID := r.Context().Value("courseID").(string)
 	surveyID := r.Context().Value("surveyID").(string)
 	var req *models.UpdateSurveyRequest
 
@@ -91,23 +108,28 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	req.SurveyID = &surveyID
+	req.CourseID = &courseID
 
 	survey, err := repo.Repository.GetSurveyByID(surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	// Get all the section times
-	sections, err := repo.Repository.GetSectionByCourse(req.CourseID)
+	sections, err := repo.Repository.GetSectionByCourse(*req.CourseID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	survey.Update(req, sections)
+	capacity, err := models.GetUniqueSectionTimes(sections)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	err = repo.Repository.UpdateSurvey(surveyID, survey)
+	err = repo.Repository.UpdateSurvey(req, capacity)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -117,10 +139,41 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func deleteSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+	surveyID := r.Context().Value("surveyID").(string)
+	err := repo.Repository.DeleteSurvey(courseID, surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully deleted survey " + surveyID))
+}
+
 func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	surveyID := r.Context().Value("surveyID").(string)
-	err := repo.Repository.PublishSurvey(surveyID)
+
+	survey, err := repo.Repository.GetSurveyByID(surveyID)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if surveyEndTime.Before(time.Now()) {
+		http.Error(w, "Survey's end time is in the past\n", http.StatusBadRequest)
+		return
+	}
+
+	err = repo.Repository.PublishSurvey(surveyID)
+	if err != nil {
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -157,14 +210,39 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	surveyID := r.Context().Value("surveyID").(string)
 
+	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// check if survey is published
+	if survey.Published == false {
+		http.Error(w, "Survey is not published", http.StatusBadRequest)
+		return
+	}
+
+	// check if survey ended
+	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if surveyEndTime.Before(time.Now()) {
+		http.Error(w, "Survey already ended\n", http.StatusBadRequest)
+		return
+	}
+
 	var req *models.CreateSurveyResponseRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	req.SurveyID = surveyID
+
+	// TODO: check if student is in the course
 
 	s, err := repo.Repository.CreateSurveyResponse(req)
 	if err != nil {

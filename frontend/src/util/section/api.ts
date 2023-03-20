@@ -16,16 +16,16 @@ async function deleteSection(
   courseID: string,
   sectionID: string
 ): Promise<boolean> {
-  return APIClient.get(`/courses/${courseID}/sections/${sectionID}`);
+  return APIClient.delete(`/courses/${courseID}/sections/${sectionID}`);
 }
 
 async function createSection(
   courseID: string,
   day: Day,
-  startTime: Date,
-  endTime: Date,
+  startTime: string,
+  endTime: string,
   location?: string,
-  capacity?: string
+  capacity?: number
 ): Promise<string> {
   return APIClient.post(`/courses/${courseID}/sections`, {
     day,
@@ -40,10 +40,10 @@ async function updateSection(
   courseID: string,
   sectionID: string,
   day?: Day,
-  startTime?: Date,
-  endTime?: Date,
+  startTime?: string,
+  endTime?: string,
   location?: string,
-  capacity?: string
+  capacity?: number
 ): Promise<string> {
   return APIClient.patch(`/courses/${courseID}/sections/${sectionID}`, {
     day,

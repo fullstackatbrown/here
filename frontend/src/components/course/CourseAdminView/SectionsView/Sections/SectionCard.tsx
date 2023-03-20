@@ -1,10 +1,13 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { Box, Card, IconButton, Paper, Stack, Typography } from "@mui/material";
-import formatSectionTime from "@util/shared/formatSectionTime";
+import formatSectionTime from "@util/shared/formatTime";
 import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Section } from "model/section";
+import SectionAPI from "@util/section/api";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
+import toast from "react-hot-toast";
+import errors from "@util/errors";
 
 export interface SectionCardProps {
   enrollment: number;
@@ -16,11 +19,18 @@ export interface SectionCardProps {
  * number of tickets, location, and the ending time.
  */
 const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
-  const [editSectionDialog, setEditSectionDialog] = React.useState(false);
+  const [editSectionDialog, setEditSectionDialog] = useState(false);
 
   const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     const confirmed = confirm("Are you sure you want to delete this section?");
+    if (confirmed) {
+      toast.promise(SectionAPI.deleteSection(section.courseID, section.ID), {
+        loading: "Deleting section...",
+        success: "Section deleted!",
+        error: errors.UNKNOWN
+      })
+    }
   }
 
   const handleEditSection = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -39,11 +49,11 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems={"center"}>
           <Stack>
             <Typography variant="body2" noWrap>
-              {formatSectionTime(section.day, section.startTime, section.endTime)}
+              {formatSectionTime(section)}
             </Typography>
             <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
               <Typography variant="body2" fontWeight={400}>
-                Location: {section.location}
+                Location: {section.location || "TBD"}
               </Typography>
               <Typography variant="body2" fontWeight={400}>
                 Capacity: {section.capacity}

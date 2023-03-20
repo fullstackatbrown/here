@@ -3,9 +3,9 @@ export interface Course {
   title: string;
   code: string;
   term: string;
-  students: Record<string, string>;
-  surveyID: string;
-  sectionIDs: string[];
-  assignmentIDs: string[];
-  swapRequests: string[];
+  students?: Record<string, string>;
+  surveyID?: string;
+  sectionIDs?: string[];
+  assignmentIDs?: string[];
+  swapRequests?: string[];
 }

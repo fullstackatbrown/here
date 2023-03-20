@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"strings"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
+	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 )
 
 func (fr *FirebaseRepository) initializeCoursesListener() {
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newCourses := make(map[string]*models.Course)
+		newCoursesEntryCodes := make(map[string]string)
 		for _, doc := range docs {
 			if !doc.Exists() {
 				continue
@@ -30,11 +31,18 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 
 			c.ID = doc.Ref.ID
 			newCourses[doc.Ref.ID] = &c
+			// TODO: do not add to map if term is over
+			newCoursesEntryCodes[c.EntryCode] = doc.Ref.ID
 		}
 
 		fr.coursesLock.Lock()
 		defer fr.coursesLock.Unlock()
+
+		fr.coursesEntryCodesLock.Lock()
+		defer fr.coursesEntryCodesLock.Unlock()
+
 		fr.courses = newCourses
+		fr.coursesEntryCodes = newCoursesEntryCodes
 
 		return nil
 	}
@@ -74,12 +82,44 @@ func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models
 	return nil, qerrors.CourseNotFoundError
 }
 
+func (fr *FirebaseRepository) GetCourseByEntryCode(entryCode string) (*models.Course, error) {
+	fr.coursesEntryCodesLock.RLock()
+	defer fr.coursesEntryCodesLock.RUnlock()
+
+	if val, ok := fr.coursesEntryCodes[entryCode]; ok {
+		return fr.GetCourseByID(val)
+	} else {
+		return nil, qerrors.InvalidEntryCodeError
+	}
+}
+
+func (fr *FirebaseRepository) checkUniqueEntryCode(entryCode string) bool {
+	fr.coursesEntryCodesLock.RLock()
+	defer fr.coursesEntryCodesLock.RUnlock()
+
+	_, ok := fr.coursesEntryCodes[entryCode]
+	return !ok
+}
+
 func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (course *models.Course, err error) {
-	// TODO: check if course already exists
+	course, err = fr.GetCourseByInfo(req.Code, req.Term)
+	if err == nil {
+		return nil, qerrors.CourseAlreadyExistsError
+	}
+
+	var entryCode string
+	for {
+		entryCode = utils.GenerateCourseEntryCode()
+		if fr.checkUniqueEntryCode(entryCode) {
+			break
+		}
+	}
+
 	course = &models.Course{
 		Title:         req.Title,
 		Code:          req.Code,
 		Term:          req.Term,
+		EntryCode:     entryCode,
 		SectionIDs:    make([]string, 0),
 		AssignmentIDs: make([]string, 0),
 		Students:      make(map[string]string),
@@ -105,7 +145,6 @@ func (fr *FirebaseRepository) DeleteCourse(req *models.DeleteCourseRequest) erro
 }
 
 func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) error {
-
 	v := reflect.ValueOf(*req)
 	typeOfS := v.Type()
 
@@ -116,7 +155,7 @@ func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) erro
 		val := v.Field(i).Interface()
 		// Only include the fields that are set
 		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") {
-			updates = append(updates, firestore.Update{Path: strings.ToLower(field), Value: val})
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
 		}
 	}
 

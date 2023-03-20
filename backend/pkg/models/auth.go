@@ -4,8 +4,8 @@ type ActionType string
 
 const (
 	FirestoreProfilesCollection            = "user_profiles"
-	ACTION_JOIN                 ActionType = "join"
-	ACTION_QUIT                 ActionType = "quit"
+	ACTION_JOIN                 ActionType = "JOIN"
+	ACTION_QUIT                 ActionType = "QUIT"
 )
 
 // Profile is a collection of standard profile information for a user.
@@ -35,7 +35,7 @@ type CreateUserProfileRequest struct {
 
 // request for joining or quitting a course
 type JoinOrQuitCourseRequest struct {
-	UserID   string     `json:"join,omitempty"`
-	Action   ActionType `json:"action"`
-	CourseID string     `json:"courseID"`
+	UserID    string     `json:"join,omitempty"`
+	Action    ActionType `json:"action"`
+	EntryCode string     `json:"entryCode"`
 }

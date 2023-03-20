@@ -1,7 +1,7 @@
 package models
 
 import (
-	"strings"
+	"fmt"
 )
 
 var (
@@ -40,11 +40,22 @@ type GetSectionRequest struct {
 type CreateSectionRequest struct {
 	CourseID string `json:"courseid,omitempty"`
 	Day      Day    `json:"day"`
-	// must be ISO8601 compliant
+	// must be ISO8601 compliant, UTC Time
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
-	Location  string `json:"location"`
+	Location  string `json:"location,omitempty"`
 	Capacity  int    `json:"capacity"`
+}
+
+type UpdateSectionRequest struct {
+	CourseID  *string `json:"courseid,omitempty"`
+	SectionID *string `json:"sectionid,omitempty"`
+	Day       *Day    `json:"day,omitempty"`
+	// must be ISO8601 compliant, UTC Time
+	StartTime *string `json:"startTime,omitempty"`
+	EndTime   *string `json:"endTime,omitempty"`
+	Location  *string `json:"location,omitempty"`
+	Capacity  *int    `json:"capacity,omitempty"`
 }
 
 type DeleteSectionRequest struct {
@@ -52,6 +63,37 @@ type DeleteSectionRequest struct {
 	SectionID string
 }
 
-func (section *Section) TimeAsString() string {
-	return strings.Join([]string{string(section.Day), section.StartTime, section.EndTime}, ",")
+func (section *Section) TimeAsString() (string, error) {
+	// startTime, err := utils.ParseIsoTimeToReadableUTC(section.StartTime)
+	// if err != nil {
+	// 	return "", err
+	// }
+	// endTime, err := utils.ParseIsoTimeToReadableUTC(section.EndTime)
+	// if err != nil {
+	// 	return "", err
+	// }
+	return fmt.Sprintf("%s,%s,%s", section.Day, section.StartTime, section.EndTime), nil
+}
+
+// Returns a map from a unique time, to a map from section id (that has the time) to capacity
+func GetUniqueSectionTimes(sections []*Section) (map[string]map[string]int, error) {
+	capacity := make(map[string]map[string]int)
+	for _, s := range sections {
+		t, err := s.TimeAsString()
+		if err != nil {
+			return nil, err
+		}
+
+		_, ok := capacity[t]
+		if !ok {
+			capacity[t] = make(map[string]int)
+		}
+		_, ok = capacity[t][s.ID]
+		if !ok {
+			capacity[t][s.ID] = 0
+		}
+		capacity[t][s.ID] += s.Capacity
+	}
+
+	return capacity, nil
 }

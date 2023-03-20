@@ -138,7 +138,7 @@ func (fr *FirebaseRepository) getProfileById(id string) (*models.Profile, error)
 
 func (fr *FirebaseRepository) QuitCourse(req *models.JoinOrQuitCourseRequest) error {
 	// Check if course exists
-	course, err := fr.GetCourseByID(req.CourseID)
+	course, err := fr.GetCourseByEntryCode(req.EntryCode)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (fr *FirebaseRepository) QuitCourse(req *models.JoinOrQuitCourseRequest) er
 	batch.Update(userProfileRef, []firestore.Update{
 		{
 			Path:  "courses",
-			Value: firestore.ArrayRemove(req.CourseID),
+			Value: firestore.ArrayRemove(course.ID),
 		},
 	})
 
@@ -157,7 +157,7 @@ func (fr *FirebaseRepository) QuitCourse(req *models.JoinOrQuitCourseRequest) er
 	newStudentMap := utils.CopyStringMap(course.Students)
 	delete(newStudentMap, req.UserID)
 
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
+	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
 	batch.Update(coursesRef, []firestore.Update{
 		{
 			Path:  "students",
@@ -177,7 +177,7 @@ func (fr *FirebaseRepository) QuitCourse(req *models.JoinOrQuitCourseRequest) er
 func (fr *FirebaseRepository) JoinCourse(req *models.JoinOrQuitCourseRequest) error {
 
 	// Check if course exists
-	course, err := fr.GetCourseByID(req.CourseID)
+	course, err := fr.GetCourseByEntryCode(req.EntryCode)
 	if err != nil {
 		return err
 	}
@@ -188,8 +188,8 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinOrQuitCourseRequest) er
 		return err
 	}
 
-	if utils.Contains(profile.Courses, req.CourseID) {
-		return fmt.Errorf("User %v is already enrolled in course\n", req.UserID)
+	if utils.Contains(profile.Courses, course.ID) {
+		return fmt.Errorf("Student is already enrolled in course")
 	}
 
 	batch := fr.firestoreClient.Batch()
@@ -198,7 +198,7 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinOrQuitCourseRequest) er
 	batch.Update(userProfileRef, []firestore.Update{
 		{
 			Path:  "courses",
-			Value: firestore.ArrayUnion(req.CourseID),
+			Value: firestore.ArrayUnion(course.ID),
 		},
 	})
 
@@ -206,7 +206,7 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinOrQuitCourseRequest) er
 	newStudentMap := utils.CopyStringMap(course.Students)
 	newStudentMap[req.UserID] = ""
 
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
+	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
 	batch.Update(coursesRef, []firestore.Update{
 		{
 			Path:  "students",

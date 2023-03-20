@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
 import AuthAPI, { User } from "@util/auth/api";
 import { Course } from "model/course";
-import organizeCourseByTerm from "@util/shared/organizeCourseByTerm";
 
 const dummyCourse1: Course = {
     ID: "",
@@ -42,35 +41,52 @@ const dummyCourse3: Course = {
 
 const dummyCourses: Course[] = [dummyCourse1, dummyCourse2, dummyCourse3];
 
-
-export function useCourses(): [Record<string, Course[]> | undefined, boolean] {
+export function useCourses(): [Course[] | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [courses, setCourses] = useState<Course[] | undefined>(undefined);
 
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
+            const res: Course[] = [];
+            querySnapshot.forEach((doc) => {
+                res.push({ ID: doc.id, ...doc.data() } as Course);
+            });
 
-    // TODO: make call to backend to get courses
-    // useEffect(() => {
-    //     const db = getFirestore();
-    //     const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
-    //         const res: Course[] = [];
-    //         querySnapshot.forEach((doc) => {
-    //             res.push({id: doc.id, ...doc.data()} as Course);
-    //         });
+            setCourses(res);
+            setLoading(false);
+        });
 
-    //         setCourses(res);
-    //         setLoading(false);
-    //     });
+        return () => unsubscribe();
+    }, []);
 
-    //     return () => unsubscribe();
-    // }, []);
-
-    // return [courses, loading];
-
-    return [organizeCourseByTerm(dummyCourses), false];
+    // Uncomment this for testing
+    // return [dummyCourses, false];
+    return [courses, loading];
 }
 
 export function useCourse(courseID: string): [Course | undefined, boolean] {
-    return [dummyCourse1, false];
+    const [loading, setLoading] = useState(true);
+    const [course, setCourse] = useState<Course | undefined>(undefined);
+
+    useEffect(() => {
+        if (courseID) {
+            const db = getFirestore();
+            const unsubscribe = onSnapshot(doc(db, "courses", courseID), (doc) => {
+                if (doc.exists()) {
+                    setCourse({ ID: doc.id, ...doc.data() } as Course);
+
+                }
+                setLoading(false);
+            });
+            return () => unsubscribe();
+        }
+    }, [courseID]);
+
+    return [course, loading];
+
+    // Uncomment this for testing
+    // return [dummyCourse1, false];
 }
 
 export function useCourseStaff(courseID: string): [User[], boolean] {
@@ -97,27 +113,4 @@ export function useCourseStaff(courseID: string): [User[], boolean] {
     }, [courseID]);
 
     return [staff, loading];
-}
-
-export function useInvitations(courseID: string): [string[], boolean] {
-    const [loading, setLoading] = useState(true);
-    const [invites, setInvites] = useState<string[]>([]);
-
-    useEffect(() => {
-        const db = getFirestore();
-        const unsubscribe = onSnapshot(collection(db, "invites"), (querySnapshot) => {
-            const res: string[] = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.courseID === courseID) res.push(data.email);
-            });
-
-            setInvites(res);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [courseID]);
-
-    return [invites, loading];
 }
