@@ -39,23 +39,18 @@ const getNextWeekDate = () => {
 }
 
 const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, survey }) => {
+    const defaultValues = {
+        name: survey ? survey.name : "Time Availability Survey",
+        description: survey ? survey.description : "Please select all the times that you will be available.",
+        enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
+        endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
+    }
+
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
-        defaultValues: {
-            name: survey ? survey.name : "Time Availability Survey",
-            description: survey ? survey.description : "Please select all the times that you will be available.",
-            enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
-            endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
-        }
+        defaultValues: defaultValues
     });
 
-    useEffect(() => {
-        reset({
-            name: survey ? survey.name : "Time Availability Survey",
-            description: survey ? survey.description : "Please select all the times that you will be available.",
-            enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
-            endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
-        });
-    }, [survey]);
+    useEffect(() => { reset(defaultValues) }, [survey]);
 
     const onSubmit = handleSubmit(async data => {
         const endDate = new Date(data.enddate)

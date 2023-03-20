@@ -34,25 +34,19 @@ type FormData = {
 };
 
 const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section, courseID }) => {
+    const defaultValues = {
+        day: section ? section.day : undefined,
+        starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
+        endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
+        location: section ? section.location : undefined,
+        capacity: section ? section.capacity : undefined,
+    }
+
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
-        defaultValues: {
-            day: section ? section.day : undefined,
-            starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
-            endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
-            location: section ? section.location : undefined,
-            capacity: section ? section.capacity : undefined,
-        }
+        defaultValues: defaultValues
     });
 
-    useEffect(() => {
-        reset({
-            day: section ? section.day : undefined,
-            starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
-            endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
-            location: section ? section.location : undefined,
-            capacity: section ? section.capacity : undefined,
-        });
-    }, [section]);
+    useEffect(() => { reset(defaultValues) }, [section]);
 
     const onSubmit = handleSubmit(async data => {
         const startTime = new Date(data.starttime).toISOString()
