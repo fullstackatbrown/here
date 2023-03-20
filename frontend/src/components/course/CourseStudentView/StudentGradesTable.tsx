@@ -25,7 +25,6 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments }) => {
         <TableHead>
             <TableRow>
                 <TableCell>
-                    {/* <Typography variant="body2">Assignment</Typography> */}
                     Assignment
                 </TableCell>
                 <TableCell>Due</TableCell>

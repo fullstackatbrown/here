@@ -81,7 +81,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
         </Grid>
         <Grid xs>
           <Box mb={2}>
-            <Typography color="text.disabled" variant="body2">
+            <Typography color="text.secondary" variant="body2">
               Regular Section:
             </Typography>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
