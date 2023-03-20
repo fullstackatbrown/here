@@ -69,41 +69,33 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
   ]
 
   return (
-    <Stack pt={8} gap={4}>
-      <Grid container spacing={2}>
-        <Grid xs={2} />
-        <Grid xs={10}>
-          <CourseHeader course={course} />
-        </Grid>
+    <Grid container>
+      <Grid xs={2}>
       </Grid>
-      <Grid container spacing={2}>
-        <Grid xs={2}>
-        </Grid>
-        <Grid xs>
-          <Box mb={2}>
-            <Typography color="text.secondary" variant="body2">
-              Regular Section:
+      <Grid xs>
+        <Box mb={2}>
+          <Typography color="text.secondary" variant="body2">
+            Regular Section:
+          </Typography>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography>
+              {sectionID === "" ? "Unassigned" : "Section Name"}
             </Typography>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>
-                {sectionID === "" ? "Unassigned" : "Section Name"}
-              </Typography>
-              {sectionID === "" ? (
-                <Button variant="text" startIcon={<CalendarMonth />}>
-                  Update Your Availability
-                </Button>
-              ) : (
-                <Button startIcon={<Autorenew />}>
-                  Request Swap
-                </Button>
-              )}
-            </Stack>
-          </Box>
-          {sectionID !== "" ? <StudentGradesTable assignments={assignments} /> : null}
+            {sectionID === "" ? (
+              <Button variant="text" startIcon={<CalendarMonth />}>
+                Update Your Availability
+              </Button>
+            ) : (
+              <Button startIcon={<Autorenew />}>
+                Request Swap
+              </Button>
+            )}
+          </Stack>
+        </Box>
+        {sectionID !== "" ? <StudentGradesTable assignments={assignments} /> : null}
 
-        </Grid>
-        <Grid xs={2} />
       </Grid>
-    </Stack>
+      <Grid xs={2} />
+    </Grid>
   );
 }

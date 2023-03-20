@@ -18,25 +18,17 @@ export function CourseAdminView({ course }: CourseAdminViewProps) {
   const [view, setView] = useState<Views>("sections");
 
   return (
-    <Stack pt={8} gap={4}>
-      <Grid container spacing={2}>
-        <Grid xs={2} />
-        <Grid xs={10}>
-          <CourseHeader course={course} />
-        </Grid>
+    <Grid container>
+      <Grid xs={2}>
+        <CourseAdminViewNavigation setView={setView} />
       </Grid>
-      <Grid container spacing={2}>
-        <Grid xs={2}>
-          <CourseAdminViewNavigation setView={setView} />
-        </Grid>
-        <Grid xs>
-          {view === "sections" && <SectionsView course={course} />}
-          {view === "assignments" && <AssignmentsView course={course} />}
-          {view === "people" && <PeopleView course={course} />}
-          {view === "requests" && <RequestsView course={course} />}
-        </Grid>
-        <Grid xs={2} />
+      <Grid xs>
+        {view === "sections" && <SectionsView course={course} />}
+        {view === "assignments" && <AssignmentsView course={course} />}
+        {view === "people" && <PeopleView course={course} />}
+        {view === "requests" && <RequestsView course={course} />}
       </Grid>
-    </Stack>
+      <Grid xs={2} />
+    </Grid>
   );
 }
