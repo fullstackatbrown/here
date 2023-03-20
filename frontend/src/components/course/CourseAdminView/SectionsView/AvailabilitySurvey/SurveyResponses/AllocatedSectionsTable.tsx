@@ -34,11 +34,11 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
             {sortSections(sections).map((section) => {
                 const numStudents = results[section.ID].length
                 return <TableRow
-                    key={formatSectionTime(section.day, section.startTime, section.endTime)}
+                    key={formatSectionTime(section)}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                     <TableCell>
-                        {formatSectionTime(section.day, section.startTime, section.endTime)}
+                        {formatSectionTime(section)}
                     </TableCell>
                     <TableCell align="right">
                         {section.location ? section.location : "TBD"}

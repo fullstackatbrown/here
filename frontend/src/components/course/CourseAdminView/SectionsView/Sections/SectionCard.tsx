@@ -49,7 +49,7 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems={"center"}>
           <Stack>
             <Typography variant="body2" noWrap>
-              {formatSectionTime(section.day, section.startTime, section.endTime)}
+              {formatSectionTime(section)}
             </Typography>
             <Stack direction="row" spacing={2} sx={{ color: 'text.disabled' }}>
               <Typography variant="body2" fontWeight={400}>

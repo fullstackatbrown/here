@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useAssignments } from "@util/assignment/hooks";
+import { useSections } from "@util/section/hooks";
 import { useSurvey } from "@util/surveys/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -22,6 +23,7 @@ import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/Sur
 import SectionsView from "../CourseAdminView/SectionsView/SectionsView";
 import CourseHeader from "../CourseHeader";
 import StudentGradesTable from "./StudentGradesTable";
+import SwapRequestDialog from "./SwapRequestDialog";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -33,16 +35,24 @@ const student: User = {
   email: "",
   access: {},
   courses: ["r5fOh8uw28B0uM2GAPNf"],
-  defaultSection: { "r5fOh8uw28B0uM2GAPNf": "" },
+  defaultSection: { "r5fOh8uw28B0uM2GAPNf": "35s1joLA4EBawZqKpyeX" },
   actualSection: { "r5fOh8uw28B0uM2GAPNf": {} },
 }
 
 export function CourseStudentView({ course }: CourseStudentViewProps) {
   const [assignments, assignmentsLoading] = useAssignments()
+  const [sections, sectionsLoading] = useSections(course.ID)
   const [survey, surveyLoading] = useSurvey(course.surveyID || undefined);
   const [surveyDialog, setSurveyDialog] = useState(false)
+  const [swapRequestDialog, setSwapRequestDialog] = useState(false)
 
-  const hasAssignedSection = () => (student.defaultSection[course.ID] && student.defaultSection[course.ID] !== "")
+  const getAssignedSection = () => {
+    if (student.defaultSection[course.ID] && student.defaultSection[course.ID] !== "") {
+      return student.defaultSection[course.ID]
+    }
+    return undefined
+  }
+
   const hasFilledOutSurvey = () => {
     if (survey && survey.responses) {
       return survey.responses[student.ID] !== undefined
@@ -50,6 +60,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
   }
 
   const handleRequestSwap = () => {
+    setSwapRequestDialog(true)
   }
 
   const handleFillSurvey = () => {
@@ -70,6 +81,14 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
           survey={survey}
           studentID={student.ID}
         />}
+      <SwapRequestDialog
+        open={swapRequestDialog}
+        onClose={() => { setSwapRequestDialog(false) }}
+        course={course}
+        assignments={assignments}
+        student={student}
+        sections={sections}
+      />
       <Grid container>
         <Grid xs={2}>
         </Grid>
@@ -80,9 +99,9 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
             </Typography>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography>
-                {hasAssignedSection() ? "Unassigned" : "Section Name"}
+                {getAssignedSection() || "Unassigned"}
               </Typography>
-              {hasAssignedSection() ?
+              {getAssignedSection() !== undefined ?
                 <Button startIcon={<Autorenew />} onClick={handleRequestSwap}>Request Swap</Button> :
                 // TODO: check if course has survey
                 (hasFilledOutSurvey() ?
@@ -91,7 +110,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
             </Stack>
           </Box>
           {(assignments && assignments.length > 0) ?
-            <StudentGradesTable assignments={assignments} student={student} /> :
+            <StudentGradesTable assignments={assignments} student={student} sections={sections} /> :
             <Typography>Your instructor has not published any assignments yet</Typography>}
 
         </Grid>

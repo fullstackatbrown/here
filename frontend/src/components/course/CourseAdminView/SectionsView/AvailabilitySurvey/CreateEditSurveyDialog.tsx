@@ -125,7 +125,6 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 <Stack spacing={2} my={1}>
                     <TextField
                         {...register("name")}
-                        multiline
                         required
                         autoFocus
                         label="Survey Name"

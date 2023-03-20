@@ -1,17 +1,14 @@
 import { format } from 'date-fns-tz'
+import { Section } from 'model/section'
 
-export default function formatSectionTime(
-  day: string,
-  startTimeStr: string,
-  endTimeStr: string
-): string {
-  const startTime = new Date(startTimeStr)
-  const endTime = new Date(endTimeStr)
+export default function formatSectionTime(section: Section): string {
+  const startTime = new Date(section.startTime)
+  const endTime = new Date(section.endTime)
   const timeZone = "America/New_York"
   const formattedStartTime = format(startTime, "h:mma", { timeZone })
   const formattedEndTime = format(endTime, "h:mma", { timeZone })
 
-  return `${day} ${formattedStartTime} - ${formattedEndTime}`
+  return `${section.day} ${formattedStartTime} - ${formattedEndTime}`
 }
 
 export function formatDateTime(timeISO: string, f: string = "MM/dd/yyyy h:mma"): string {

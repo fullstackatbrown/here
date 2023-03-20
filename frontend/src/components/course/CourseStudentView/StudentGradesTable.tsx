@@ -5,10 +5,12 @@ import MuiTableCell from "@mui/material/TableCell";
 import { Table, TableHead, TableRow, TableBody, Stack, Box, Chip } from "@mui/material";
 import { FC } from "react";
 import { User } from "model/user";
+import { Section } from "model/section";
 
 interface StudentGradesTableProps {
     assignments: Assignment[];
     student: User;
+    sections: Section[];
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
