@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Chip,
   Paper,
   Stack,
   Table,
@@ -24,7 +26,7 @@ export interface CourseStudentViewProps {
 export function CourseStudentView({ course }: CourseStudentViewProps) {
   const sectionID: string = "1";
   const studentID = "";
-  const assignments = [
+  const assignments: Assignment[] = [
     {
       ID: "1",
       courseID: "string",
@@ -33,7 +35,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
-      grade: 1,
+      maxScore: 1,
     },
     {
       ID: "2",
@@ -43,7 +45,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
-      grade: undefined,
+      maxScore: 1,
     },
     {
       ID: "3",
@@ -53,7 +55,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
-      grade: 1,
+      maxScore: 1,
     },
     {
       ID: "4",
@@ -63,80 +65,73 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
       startDate: new Date(),
       endDate: new Date(),
       gradesByStudent: {},
-      grade: undefined,
+      maxScore: 2,
     },
-  ] as const;
+  ]
 
   return (
-    <Stack paddingTop={12} gap={4}>
+    <Stack pt={12} gap={4}>
       <Grid container spacing={2}>
-        <Grid xs={2}></Grid>
+        <Grid xs={2} />
         <Grid xs={10}>
           <CourseHeader course={course} />
           <Grid xs={2} />
-          <Typography sx={{ color: "text.disabled" }}>
+
+
+          <Typography color="text.disabled" variant="body2">
             Regular Section:
           </Typography>
-          <Grid
-            container
-            spacing={2}
-            justifyContent="space-between"
-            alignItems="center"
-          >
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography>
               {sectionID === "" ? "Unassigned" : "Section Name"}
             </Typography>
             {sectionID === "" ? (
-              <Button
-                variant="text"
-                sx={{ color: "text.disabled" }}
-                startIcon={<CalendarMonth />}
-              >
+              <Button variant="text" startIcon={<CalendarMonth />}>
                 Update Your Availability
               </Button>
             ) : (
-              <Button
-                variant="text"
-                sx={{ color: "text.disabled" }}
-                startIcon={<Autorenew />}
-              >
+              <Button startIcon={<Autorenew />}>
                 Request Swap
               </Button>
             )}
-          </Grid>
+          </Stack>
           <Grid xs={2} />
           {sectionID !== "" ? (
-            <>
-              <Typography sx={{ color: "text.disabled" }}>Grades:</Typography>
-              <TableContainer component={Paper} variant="outlined">
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Assignment</TableCell>
-                      <TableCell>Section</TableCell>
-                      <TableCell>Grade</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {assignments.map((assignment) => (
-                      <TableRow key={assignment.ID}>
-                        <TableCell component="th" scope="row">
-                          {`${assignment.name}${
-                            assignment.optional ? "" : "*"
-                          }`}
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          Section name
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          <GradeChip score={assignment.grade} maxScore={1} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
+
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ paddingLeft: 0 }}>
+                    {/* <Typography variant="body2">Assignment</Typography> */}
+                    Assignment
+                  </TableCell>
+                  <TableCell>Due</TableCell>
+                  <TableCell>Section</TableCell>
+                  <TableCell>Grade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {assignments.map((assignment) => (
+                  <TableRow key={assignment.ID}>
+                    <TableCell component="th" scope="row" sx={{ paddingLeft: 0 }}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Box>{assignment.name}</Box>
+                        {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
+                      </Stack>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {assignment.endDate.toLocaleDateString()}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      Section name
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      <GradeChip score={1} maxScore={assignment.maxScore} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : null}
         </Grid>
       </Grid>
