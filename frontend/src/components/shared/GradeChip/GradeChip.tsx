@@ -10,7 +10,7 @@ export const GradeChip = ({
 }) => {
   return (
     <Stack direction="row" spacing={2}>
-      <Box sx={{ width: "18px" }}>
+      <Box sx={{ width: "15px" }}>
         <Typography
           variant="body2"
           sx={{
@@ -21,7 +21,7 @@ export const GradeChip = ({
           {score === undefined ? <HelpOutlineIcon fontSize="small" /> : score}
         </Typography>
       </Box>
-      <Box sx={{ width: "15px" }}>
+      <Box sx={{ width: "12px" }}>
         <Typography
           variant="body2"
           sx={{
@@ -32,7 +32,7 @@ export const GradeChip = ({
           /
         </Typography>
       </Box>
-      <Box sx={{ width: "15px" }}>
+      <Box sx={{ width: "12px" }}>
         <Typography
           variant="body2"
           sx={{
