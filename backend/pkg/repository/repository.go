@@ -31,6 +31,10 @@ type FirebaseRepository struct {
 	coursesLock *sync.RWMutex
 	courses     map[string]*models.Course
 
+	// map from valid course entry codes to courseID
+	coursesEntryCodesLock *sync.RWMutex
+	coursesEntryCodes     map[string]string
+
 	sectionsLock *sync.RWMutex
 	sections     map[string]*models.Section
 
@@ -46,16 +50,18 @@ type FirebaseRepository struct {
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {
 	fr := &FirebaseRepository{
-		coursesLock:     &sync.RWMutex{},
-		courses:         make(map[string]*models.Course),
-		sectionsLock:    &sync.RWMutex{},
-		sections:        make(map[string]*models.Section),
-		assignmentsLock: &sync.RWMutex{},
-		assignments:     make(map[string]*models.Assignment),
-		surveysLock:     &sync.RWMutex{},
-		surveys:         make(map[string]*models.Survey),
-		profilesLock:    &sync.RWMutex{},
-		profiles:        make(map[string]*models.Profile),
+		coursesLock:           &sync.RWMutex{},
+		courses:               make(map[string]*models.Course),
+		coursesEntryCodesLock: &sync.RWMutex{},
+		coursesEntryCodes:     make(map[string]string),
+		sectionsLock:          &sync.RWMutex{},
+		sections:              make(map[string]*models.Section),
+		assignmentsLock:       &sync.RWMutex{},
+		assignments:           make(map[string]*models.Assignment),
+		surveysLock:           &sync.RWMutex{},
+		surveys:               make(map[string]*models.Survey),
+		profilesLock:          &sync.RWMutex{},
+		profiles:              make(map[string]*models.Profile),
 	}
 
 	authClient, err := firebase.App.Auth(firebase.Context)

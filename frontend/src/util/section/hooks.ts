@@ -1,4 +1,6 @@
 import { Section } from "model/section";
+import { useEffect, useState } from "react";
+import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
 
 const dummySection1: Section = {
   ID: "section1",
@@ -42,21 +44,37 @@ export const dummySectionsMap = {
   "section3": dummySection3,
 }
 
-export function useSection(id: string): [Section | undefined, boolean] {
-  return [
-    dummySection1, false
-  ]
-}
+export function useSections(courseID: string): [Section[] | undefined, boolean] {
+  const [loading, setLoading] = useState(true);
+  const [sections, setSections] = useState<Section[] | undefined>(undefined);
 
-export function useSections(): [Section[] | undefined, boolean] {
-  // TODO: make call to backend to get sections
-  // TODO: implement with util/queue/hooks.ts as reference
-  return [
-    [
-      dummySection1,
-      dummySection2,
-      dummySection3,
-    ],
-    false,
-  ];
+  useEffect(() => {
+    const db = getFirestore();
+    const q = query(collection(db, "sections"), where("courseID", "==", courseID));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const res: Section[] = [];
+      querySnapshot.forEach((doc) => {
+        res.push({ ID: doc.id, ...doc.data() } as Section);
+      });
+      setSections(res);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Uncomment this for testing
+  // return [
+  //       [
+  //         dummySection1,
+  //         dummySection2,
+  //         dummySection3,
+  //       ],
+  //       false,
+  //     ];
+  // if (doc.data().courseID === courseID) {
+
+  // }
+
+  let filteredSections: Section[] | undefined = loading ? undefined : sections.filter((section) => section.courseID === courseID);
+  return [filteredSections, loading];
 }
