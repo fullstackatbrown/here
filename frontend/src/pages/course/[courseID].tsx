@@ -5,6 +5,8 @@ import AppLayout from "@components/shared/AppLayout";
 import CourseAdminView from "@components/course/CourseAdminView";
 import { useCourse } from "@util/course/hooks";
 import { CourseStudentView } from "@components/course/CourseStudentView/CourseStudentView";
+import CourseHeader from "@components/course/CourseHeader";
+import { Stack, Grid } from "@mui/material";
 
 export default function CoursePage() {
   const router = useRouter();
@@ -24,8 +26,19 @@ export default function CoursePage() {
 
   return (
     <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
-      {course && !courseLoading && <CourseAdminView course={course} />}
-      {/* {course && !courseLoading && <CourseStudentView course={course} />} */}
+      {course && !courseLoading &&
+        <Stack pt={8} gap={4}>
+          <Grid container>
+            <Grid xs={2} />
+            <Grid xs={10}>
+              <CourseHeader course={course} />
+            </Grid>
+          </Grid>
+          <CourseAdminView course={course} />
+          {/* <CourseStudentView course={course} /> */}
+        </Stack>
+      }
     </AppLayout>
+
   );
 }

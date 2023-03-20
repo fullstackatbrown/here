@@ -1,15 +1,16 @@
 import { Box, Paper, Typography } from "@mui/material";
 import { Course } from "model/course";
+import { FC } from "react";
 
 export interface CourseHeaderProps {
   course: Course;
 }
 
-export function CourseHeader(props: CourseHeaderProps) {
+export const CourseHeader: FC<CourseHeaderProps> = ({ course }) => {
   return (
     <Box width="100%" position="relative">
       <Typography variant="h5" fontWeight={600}>
-        {props.course.code}: {props.course.title}
+        {course.code}: {course.title}
       </Typography>
     </Box>
   );

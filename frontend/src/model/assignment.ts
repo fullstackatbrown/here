@@ -7,4 +7,5 @@ export interface Assignment {
   startDate: Date;
   endDate: Date;
   gradesByStudent: Record<string, string>;
+  maxScore: number;
 }
