@@ -4,9 +4,11 @@ import { styled } from "@mui/material/styles";
 import MuiTableCell from "@mui/material/TableCell";
 import { Table, TableHead, TableRow, TableBody, Stack, Box, Chip } from "@mui/material";
 import { FC } from "react";
+import { User } from "model/user";
 
 interface StudentGradesTableProps {
     assignments: Assignment[];
+    student: User;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -20,13 +22,19 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments }) => {
+const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments, student }) => {
+
+    const getScores = (assignment: Assignment) => {
+        const gradeID = assignment.gradesByStudent[student.ID];
+        // TODO: get grade from gradeID
+    }
+
+    // TODO: firestore listener function to get all grades for this student, for a class
+
     return <Table>
         <TableHead>
             <TableRow>
-                <TableCell>
-                    Assignment
-                </TableCell>
+                <TableCell>Assignment</TableCell>
                 <TableCell>Due</TableCell>
                 <TableCell>Section</TableCell>
                 <TableCell>Grade</TableCell>
@@ -45,6 +53,8 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments }) => {
                         {assignment.endDate.toLocaleDateString()}
                     </TableCell>
                     <TableCell component="th" scope="row">
+
+                        {/* {student.actualSection[assignment.courseID][assignment.ID]} */}
                         Section name
                     </TableCell>
                     <TableCell component="th" scope="row" >
