@@ -1,12 +1,12 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Stack, TextField, Switch, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Box } from "@mui/material";
-import formatSectionTime from "@util/shared/formatTime";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import formatSectionInfo from "@util/shared/formatSectionInfo";
 import sectionListToMap from "@util/shared/sectionListToMap";
 import { sortSections } from "@util/shared/sortSectionTime";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { User } from "model/user";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 export interface SwapRequestDialogProps {
@@ -28,36 +28,45 @@ type FormData = {
 };
 
 const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sections }) => {
-    const [isPermanent, setIsPermanent] = useState(false);
-    const { register, handleSubmit, getValues, setValue, control, reset, watch, formState: { } } = useForm<FormData>({
-        defaultValues: {
-            courseID: course.ID,
-            isPermanent: false,
-            reason: "",
-            assignmentID: "",
-            oldSectionID: "",
-            newSectionID: "",
-        }
+    const defaultValues: FormData = {
+        courseID: course.ID,
+        isPermanent: true,
+        reason: "",
+        assignmentID: "",
+        oldSectionID: student.defaultSection[course.ID],
+        newSectionID: "",
+    }
+
+    const { register, handleSubmit, getValues, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
+        defaultValues: defaultValues
     })
 
+    const watchIsPermanent = watch("isPermanent")
+    const watchAssignmentID = watch("assignmentID")
+
     useEffect(() => {
-        const subscription = watch((value, { name, type }) => {
-            if (name === "assignmentID") {
-                if (getValues["assignmentID"] === "") {
-                    setValue("oldSectionID", "")
-                    return
-                }
-                const currentSectionID = getCurrentSectionID(value.assignmentID)
-                setValue("oldSectionID", currentSectionID)
-            }
-        });
-        return () => subscription.unsubscribe();
-    }, [watch]);
+        if (watchIsPermanent) {
+            unregister("assignmentID")
+            const currentSectionID = getCurrentSectionID(watchAssignmentID)
+            setValue("oldSectionID", currentSectionID)
+        } else {
+            register("assignmentID")
+            setValue("oldSectionID", "")
+        }
+    }, [watchIsPermanent]);
 
+    useEffect(() => {
+        if (watchAssignmentID === "") {
+            setValue("oldSectionID", "")
+        } else {
+            const currentSectionID = getCurrentSectionID(watchAssignmentID)
+            setValue("oldSectionID", currentSectionID)
+        }
+    }, [watchAssignmentID]);
 
-    const handleTogglePermanent = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setIsPermanent(event.target.checked);
-    };
+    useEffect(() => {
+        reset(defaultValues);
+    }, [student])
 
     const handleOnClose = () => {
         onClose()
@@ -101,8 +110,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                     />
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="body1">Permanent</Typography>
-                        <Switch checked={getValues["isPermanent"]} onChange={handleTogglePermanent} />
-                        {/* <Controller
+                        <Controller
                             name="isPermanent"
                             control={control}
                             render={({ field: { value, onChange } }) => (
@@ -110,9 +118,9 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                     checked={value}
                                     onChange={(e) => onChange(e.target.checked)}
                                 />
-                            )} /> */}
+                            )} />
                     </Stack>
-                    {!isPermanent &&
+                    {!watchIsPermanent &&
                         <FormControl fullWidth variant="standard">
                             <InputLabel id="assignment-select-label">Assignment</InputLabel>
                             <Select
@@ -134,7 +142,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 type="text"
                                 fullWidth
                                 size="small"
-                                value={value && value !== "" && formatSectionTime(sectionListToMap(sections)[value])}
+                                value={value === "" ? "" : formatSectionInfo(sectionListToMap(sections)[value])}
                                 variant="standard"
                                 InputProps={{ readOnly: true, }}
                             />
@@ -153,7 +161,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                     value={s.ID}
                                     disabled={s.ID === getValues("oldSectionID")}
                                 >
-                                    {formatSectionTime(s)}
+                                    {formatSectionInfo(s)}
                                 </MenuItem>
                             }
                             )}

@@ -1,29 +1,18 @@
-import { GradeChip } from "@components/shared/GradeChip/GradeChip";
 import { Autorenew, CalendarMonth } from "@mui/icons-material";
 import {
   Box,
-  Button,
-  Chip, Stack,
-  Table,
-  TableBody,
-  TableCell, TableHead,
-  TableRow,
-  Typography
+  Button, Stack, Typography
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useAssignments } from "@util/assignment/hooks";
 import { useSections } from "@util/section/hooks";
-import formatSectionTime from "@util/shared/formatTime";
+import formatSectionInfo from "@util/shared/formatSectionInfo";
 import sectionListToMap from "@util/shared/sectionListToMap";
 import { useSurvey } from "@util/surveys/hooks";
-import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { User } from "model/user";
 import { useState } from "react";
-import CourseAdminViewNavigation from "../CourseAdminView/CourseAdminViewNavigation";
 import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
-import SectionsView from "../CourseAdminView/SectionsView/SectionsView";
-import CourseHeader from "../CourseHeader";
 import StudentGradesTable from "./StudentGradesTable";
 import SwapRequestDialog from "./SwapRequestDialog";
 
@@ -52,7 +41,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
     const defaultSection = student.defaultSection[course.ID]
     if (defaultSection && defaultSection !== "" && sections) {
       const section = sectionListToMap(sections)[defaultSection]
-      return formatSectionTime(section)
+      return formatSectionInfo(section)
     }
     return undefined
   }
