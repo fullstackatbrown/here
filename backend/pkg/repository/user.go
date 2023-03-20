@@ -189,7 +189,7 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinOrQuitCourseRequest) er
 	}
 
 	if utils.Contains(profile.Courses, course.ID) {
-		return fmt.Errorf("User %v is already enrolled in course\n", req.UserID)
+		return fmt.Errorf("Student is already enrolled in course")
 	}
 
 	batch := fr.firestoreClient.Batch()

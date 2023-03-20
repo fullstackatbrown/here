@@ -24,10 +24,10 @@ const JoinCourseDialog: FC<JoinCourseDialogProps> = ({ open, onClose }) => {
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>();
 
     const onSubmit = handleSubmit(async data => {
-        toast.promise(AuthAPI.joinOrQuitCourse("test student id", data.entryCode, ChangeCourseAction.Join), {
+        toast.promise(AuthAPI.joinOrQuitCourse("p3d5eSnr3H621G3SwzEL", data.entryCode, ChangeCourseAction.Join), {
             loading: "Joining Course...",
             success: "Joined Course!",
-            error: (err) => `Failed to join course: ${err.response.data}`,
+            error: (err) => `${err.response.data}`,
         })
             .then(() => {
                 onClose();
