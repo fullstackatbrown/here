@@ -50,14 +50,12 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
             unregister("assignmentID")
             const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
-            setValue("newSectionID", "")
-            setValue("reason", "")
         } else {
             register("assignmentID")
             setValue("oldSectionID", "")
-            setValue("newSectionID", "")
-            setValue("reason", "")
         }
+        setValue("newSectionID", "")
+        setValue("reason", "")
     }, [watchIsPermanent]);
 
     useEffect(() => {
@@ -152,7 +150,33 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 InputProps={{ readOnly: true, }}
                             />
                         )} />
-                    <FormControl fullWidth variant="standard">
+                    <Controller
+                        name="newSectionID"
+                        control={control}
+                        render={({ field: { value, onChange } }) => (
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="new-section-select-label">Section to Switch To</InputLabel>
+                                <Select
+                                    labelId="new-section-select-label"
+                                    label="Section to Switch To"
+                                    required
+                                    onChange={onChange}
+                                    value={value}
+                                >
+                                    {sections && sortSections(sections).map((s) => {
+                                        return <MenuItem
+                                            key={`select-section-${s.ID}`}
+                                            value={s.ID}
+                                            disabled={s.ID === watchOldSectionID}
+                                        >
+                                            {formatSectionInfo(s)}
+                                        </MenuItem>
+                                    }
+                                    )}
+                                </Select>
+                            </FormControl>
+                        )} />
+                    {/* <FormControl fullWidth variant="standard">
                         <InputLabel id="new-section-select-label">Section to Switch To</InputLabel>
                         <Select
                             labelId="new-section-select-label"
@@ -171,7 +195,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                             }
                             )}
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
                     <TextField
                         {...register("reason")}
                         multiline
