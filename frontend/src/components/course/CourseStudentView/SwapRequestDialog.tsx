@@ -37,21 +37,26 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         newSectionID: "",
     }
 
-    const { register, handleSubmit, getValues, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
+    const { register, handleSubmit, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     })
 
     const watchIsPermanent = watch("isPermanent")
     const watchAssignmentID = watch("assignmentID")
+    const watchOldSectionID = watch("oldSectionID")
 
     useEffect(() => {
         if (watchIsPermanent) {
             unregister("assignmentID")
             const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
+            setValue("newSectionID", "")
+            setValue("reason", "")
         } else {
             register("assignmentID")
             setValue("oldSectionID", "")
+            setValue("newSectionID", "")
+            setValue("reason", "")
         }
     }, [watchIsPermanent]);
 
@@ -159,7 +164,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 return <MenuItem
                                     key={`select-section-${s.ID}`}
                                     value={s.ID}
-                                    disabled={s.ID === getValues("oldSectionID")}
+                                    disabled={s.ID === watchOldSectionID}
                                 >
                                     {formatSectionInfo(s)}
                                 </MenuItem>
