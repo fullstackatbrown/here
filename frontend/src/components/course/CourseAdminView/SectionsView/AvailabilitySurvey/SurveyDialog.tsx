@@ -10,20 +10,32 @@ import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
 import { sortSurveyTimes } from "@util/shared/sortSectionTime";
 import SurveyAPI from "@util/surveys/api";
 import { Survey } from "model/survey";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export interface SurveyDialogProps {
     open: boolean;
     onClose: () => void;
-    preview: boolean;
+    preview?: boolean;
     survey: Survey;
+    studentID?: string;
 }
 
 
-const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey }) => {
-    const [times, setTimes] = useState<string[]>([]);
+const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID }) => {
+    // If student has already responded, show their response
+    const [times, setTimes] = useState<string[]>((survey.responses && studentID && survey.responses[studentID]) || []);
 
+    const getExistingResponse = (studentID: string) => {
+        if (survey.responses && survey.responses[studentID]) {
+            return survey.responses[studentID];
+        }
+        return [];
+    }
+
+    useEffect(() => {
+        console.log(survey)
+    }, [])
     function onSubmit() {
         if (preview) {
             if (new Date(survey.endTime) < new Date()) {
@@ -77,6 +89,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview, survey })
                     <FormControlLabel
                         control={<Checkbox onChange={onChangeCheckbox(time)} />}
                         label={formatSurveyTime(time)}
+                        checked={times.includes(time)}
                     />
                 )}
             </Stack>
