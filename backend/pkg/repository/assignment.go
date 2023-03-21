@@ -155,6 +155,11 @@ func (fr *FirebaseRepository) DeleteAssignment(req *models.DeleteAssignmentReque
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
 	batch.Update(coursesRef, []firestore.Update{{Path: "assignmentIDs", Value: newAssignments}})
 
+	_, err = batch.Commit(firebase.Context)
+	if err != nil {
+		return fmt.Errorf("error deleting course: %v\n", err)
+	}
+
 	return err
 }
 
