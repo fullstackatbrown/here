@@ -9,8 +9,12 @@ import { Assignment } from 'model/assignment';
 import dayjs from 'dayjs';
 import CreateEditAssignmentDialog from './CreateEditAssignmentDialog';
 import { sortAssignments } from '@util/shared/assignments';
+import toast from 'react-hot-toast';
+import AssignmentAPI from 'api/assignment/api';
+import { Course } from 'model/course';
 
 export interface AssignmentsTableProps {
+  course: Course;
   assignments: Assignment[];
 }
 
@@ -25,17 +29,28 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
   },
 }))
 
-const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
+const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
 
-  const handleDeleteAssignment = () => {
-    const confirmed = confirm("Are you sure you want to delete this assignment?");
+  const handleDeleteAssignment = (assignment: Assignment) => {
+    return () => {
+      const confirmed = confirm("Are you sure you want to delete this assignment?");
+      if (confirmed) {
+        toast.promise(AssignmentAPI.deleteAssignment(course.ID, assignment.ID), {
+          loading: "Deleting assignment...",
+          success: "Deleted assignment!",
+          error: "Failed to delete assignment",
+        })
+      }
+    }
   }
+
   return (
     <>
       <CreateEditAssignmentDialog
         open={editAssignmentDialog !== null}
         onClose={() => { setEditAssignmentDialog(null) }}
+        course={course}
         assignment={editAssignmentDialog} />
       <Table>
         <TableHead>
@@ -71,7 +86,7 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
                     <IconButton onClick={() => { setEditAssignmentDialog(assignment) }} size={"small"}>
                       <CreateIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={handleDeleteAssignment} size={"small"}>
+                    <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"}>
                       <ClearIcon fontSize="small" />
                     </IconButton>
                   </Stack>

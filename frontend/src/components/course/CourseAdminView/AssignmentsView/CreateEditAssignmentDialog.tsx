@@ -1,14 +1,19 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import errors from "@util/errors";
 import { getNextWeekDate } from '@util/shared/time';
+import AssignmentAPI from "api/assignment/api";
 import { Assignment } from 'model/assignment';
+import { Course } from "model/course";
 import { FC, useEffect } from "react";
 import { Controller, useForm } from 'react-hook-form';
+import toast from "react-hot-toast";
 
 export interface CreateEditAssignmentDialogProps {
     open: boolean;
     onClose: () => void;
+    course: Course,
     assignment?: Assignment;
 }
 
@@ -20,7 +25,7 @@ type FormData = {
     maxScore: number;
 };
 
-const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open, onClose, assignment }) => {
+const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open, onClose, course, assignment }) => {
     const defaultValues = {
         name: assignment ? assignment.name : undefined,
         optional: assignment ? assignment.optional : false,
@@ -35,9 +40,48 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
 
     useEffect(() => { reset(defaultValues) }, [assignment]);
 
+    const clearTime = (isoTime: string) => {
+        const date = new Date(isoTime)
+        date.setHours(0, 0, 0, 0)
+        return date.toISOString()
+    }
+
     const onSubmit = handleSubmit(async data => {
-        console.log(data)
-        // TODO: submit form
+        const releaseDate = clearTime(data.releaseDate)
+        const dueDate = clearTime(data.dueDate)
+        if (assignment) {
+            toast.promise(AssignmentAPI.updateAssignment(
+                assignment.courseID, assignment.ID, data.name, data.optional, releaseDate, dueDate, data.maxScore),
+                {
+                    loading: "Updating assignment...",
+                    success: "Assignment updated!",
+                    error: errors.UNKNOWN
+                })
+                .then(() => {
+                    onClose()
+                    reset()
+                })
+                .catch(() => {
+                    onClose()
+                    reset()
+                });
+        } else {
+            toast.promise(AssignmentAPI.createAssignment(
+                course.ID, data.name, data.optional, releaseDate, dueDate, data.maxScore),
+                {
+                    loading: "Creating assignment...",
+                    success: "Assignment created!",
+                    error: (err) => `${err.response.data}`,
+                })
+                .then(() => {
+                    onClose()
+                    reset()
+                })
+                .catch(() => {
+                    onClose()
+                    reset()
+                })
+        }
     })
 
     const handleOnClose = () => {

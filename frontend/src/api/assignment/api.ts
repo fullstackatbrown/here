@@ -22,33 +22,35 @@ async function deleteAssignment(
 async function createAssignment(
   courseID: string,
   name: string,
-  mandatory: boolean,
-  releaseDate: Date,
-  dueDate: Date
+  optional: boolean,
+  releaseDate: string,
+  dueDate: string,
+  maxScore: number
 ): Promise<string> {
   return APIClient.post(`/courses/${courseID}/assignments`, {
     name,
-    mandatory,
+    optional,
     releaseDate,
     dueDate,
+    maxScore
   });
 }
 
 async function updateAssignment(
   courseID: string,
-  sectionID: string,
-  day?: Day,
-  startTime?: Date,
-  endTime?: Date,
-  location?: string,
-  capacity?: string
+  assignmentID: string,
+  name: string,
+  optional: boolean,
+  releaseDate: string,
+  dueDate: string,
+  maxScore: number
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}/assignments/${sectionID}`, {
-    day,
-    startTime,
-    endTime,
-    location,
-    capacity,
+  return APIClient.patch(`/courses/${courseID}/assignments/${assignmentID}`, {
+    name,
+    optional,
+    releaseDate,
+    dueDate,
+    maxScore
   });
 }
 

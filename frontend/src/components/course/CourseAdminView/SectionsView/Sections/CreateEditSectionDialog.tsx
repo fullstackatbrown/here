@@ -78,8 +78,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                 {
                     loading: "Creating section...",
                     success: "section created!",
-                    error: (err) => `This just happened: ${err.toString()}`,
-                    // TODO: change to errors.UNKNOWN
+                    error: (err) => `${err.response.data}`,
                 })
                 .then(() => {
                     onClose();

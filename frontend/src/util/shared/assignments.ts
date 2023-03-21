@@ -1,11 +1,16 @@
 import { Assignment } from "model/assignment";
 
-// sort assignments by due date
+// sort assignments by due date first, and then release date
 export function sortAssignments(assignments: Assignment[]): Assignment[] {
     assignments.sort((a, b) => {
-        const aDate = new Date(a.dueDate);
-        const bDate = new Date(b.dueDate);
-        return aDate.getTime() - bDate.getTime();
+        const aDueDate = new Date(a.dueDate);
+        const bDueDate = new Date(b.dueDate);
+        if (aDueDate.getTime() !== bDueDate.getTime()) {
+            return aDueDate.getTime() - bDueDate.getTime();
+        }
+        const aReleaseDate = new Date(a.releaseDate);
+        const bReleaseDate = new Date(b.releaseDate);
+        return aReleaseDate.getTime() - bReleaseDate.getTime();
     });
     return assignments;
 }
