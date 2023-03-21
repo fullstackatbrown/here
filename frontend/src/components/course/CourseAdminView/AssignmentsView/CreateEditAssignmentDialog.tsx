@@ -121,7 +121,7 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
 
             <DialogActions>
                 <Button onClick={handleOnClose}>Cancel</Button>
-                <Button type="submit" variant="contained">{assignment ? "Submit" : "Add"}</Button>
+                <Button type="submit" variant="contained">{assignment ? "Update" : "Add"}</Button>
             </DialogActions>
         </form>
     </Dialog>

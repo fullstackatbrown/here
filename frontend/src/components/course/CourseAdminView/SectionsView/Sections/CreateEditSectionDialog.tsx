@@ -170,7 +170,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleOnClose}>Cancel</Button>
-                <Button type="submit" variant="contained">{section ? "Submit" : "Add"}</Button>
+                <Button type="submit" variant="contained">{section ? "Update" : "Add"}</Button>
             </DialogActions>
         </form>
     </Dialog>;
