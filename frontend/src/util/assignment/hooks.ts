@@ -8,8 +8,8 @@ const dummyAssignments: Assignment[] = [
         courseID: "string",
         name: "Design Thinking & Low-Fi",
         optional: false,
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
         gradesByStudent: {},
         maxScore: 1,
     },
@@ -18,8 +18,8 @@ const dummyAssignments: Assignment[] = [
         courseID: "string",
         name: "Hi-fi Prototype",
         optional: false,
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
         gradesByStudent: {},
         maxScore: 1,
     },
@@ -28,8 +28,8 @@ const dummyAssignments: Assignment[] = [
         courseID: "string",
         name: "Web Dev",
         optional: false,
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
         gradesByStudent: {},
         maxScore: 1,
     },
@@ -38,14 +38,14 @@ const dummyAssignments: Assignment[] = [
         courseID: "string",
         name: "Flutter",
         optional: true,
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
         gradesByStudent: {},
         maxScore: 2,
     },
 ]
 
-export function useAssignments(): [Assignment[] | undefined, boolean] {
+export function useAssignments(courseID: string): [Assignment[] | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [assignments, setAssignments] = useState<Assignment[] | undefined>(undefined);
 

@@ -1,59 +1,74 @@
 import * as React from 'react';
 import { FC } from "react";
-import { Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-
-import EditIcon from '@mui/icons-material/Edit';
+import { Box, Chip, IconButton, Stack, Table, TableBody, TableContainer, TableHead, TableRow } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import MuiTableCell from "@mui/material/TableCell";
+import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from '@mui/icons-material/Clear';
+import { Assignment } from 'model/assignment';
 
 export interface AssignmentsTableProps {
-  rows: { 
-    assignment: string,
-    dueDate: string,
-    points: number,
-    required: boolean,
-  }[];
+  assignments: Assignment[];
 }
 
-const AssignmentsTable: FC<AssignmentsTableProps> = ({ rows }) => {
+const TableCell = styled(MuiTableCell)(({ theme }) => ({
+  ":first-of-type": {
+    paddingLeft: 0,
+  },
+  ":last-of-type": {
+    width: 100,
+    maxWidth: 100,
+    overflow: "hidden",
+  },
+}))
+
+const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
+  const handleEditAssignment = () => {
+  }
+
+  const handleDeleteAssignment = () => {
+  }
   return (
-    <TableContainer>
-      <Table sx={{ minWidth: 600 }} aria-label="assignment table">
-        <TableHead>
-          <TableRow>
-            <TableCell align="left" variant="footer" padding="none"> Assignment</TableCell>
-            <TableCell align="left" variant="footer">Due</TableCell>
-            <TableCell align="left" variant="footer">Points</TableCell>
-            <TableCell align="right" variant="footer"></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.assignment}                    >
-              <TableCell component="th" scope="row" align="left" padding="none">
-                {row.assignment}
-                {row.required ? "" : "*"}
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Assignment</TableCell>
+          <TableCell>Due</TableCell>
+          <TableCell>Point</TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {assignments && assignments.map((assignment) => {
+          return (
+            <TableRow key={assignment.ID}>
+              <TableCell component="th" scope="row">
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Box>{assignment.name}</Box>
+                  {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
+                </Stack>
               </TableCell>
-              <TableCell>{row.dueDate}</TableCell>
-              <TableCell>{row.points}</TableCell>
-              <TableCell align="right" padding="none">
-
-                <Box sx={{ display: 'flex', flexDirection: 'row-reverse', alignItems: 'right' }}>
-                  <IconButton>
-                    <ClearIcon color="secondary" />
+              <TableCell component="th" scope="row">
+                {assignment.endDate}
+              </TableCell>
+              <TableCell component="th" scope="row">
+                {assignment.maxScore}
+              </TableCell>
+              <TableCell component="th" scope="row">
+                <Stack direction="row">
+                  <IconButton onClick={handleEditAssignment} size={"small"}>
+                    <CreateIcon fontSize="small" />
                   </IconButton>
-
-                  <IconButton>
-                    <EditIcon color="secondary" />
+                  <IconButton onClick={handleDeleteAssignment} size={"small"}>
+                    <ClearIcon fontSize="small" />
                   </IconButton>
-                </Box>
-
+                </Stack>
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          );
+        })}
+      </TableBody>
+    </Table>
   )
 }
 
