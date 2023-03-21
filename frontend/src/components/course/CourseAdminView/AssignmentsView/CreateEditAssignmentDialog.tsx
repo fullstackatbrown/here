@@ -1,11 +1,9 @@
-import * as React from 'react';
-import { FC } from "react";
-
-import { Box, Button, Stack, Switch, Typography } from "@mui/material";
-import { TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { LocalizationProvider, DateField, TimePicker } from '@mui/x-date-pickers';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { getNextWeekDate } from '@util/shared/time';
 import { Assignment } from 'model/assignment';
+import { FC, useEffect } from "react";
 import { Controller, useForm } from 'react-hook-form';
 
 export interface CreateEditAssignmentDialogProps {
@@ -26,8 +24,8 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
     const defaultValues = {
         name: assignment ? assignment.name : undefined,
         optional: assignment ? assignment.optional : false,
-        startDate: assignment ? assignment.startDate : '2001-01-01T05:00:00.000Z',
-        endDate: assignment ? assignment.endDate : '2001-01-01T05:00:00.000Z',
+        startDate: assignment ? assignment.startDate : new Date().toISOString(),
+        endDate: assignment ? assignment.endDate : getNextWeekDate().toISOString(),
         maxScore: assignment ? assignment.maxScore : 1,
     }
 
@@ -35,9 +33,10 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
         defaultValues: defaultValues
     });
 
-    React.useEffect(() => { reset(defaultValues) }, [assignment]);
+    useEffect(() => { reset(defaultValues) }, [assignment]);
 
     const onSubmit = handleSubmit(async data => {
+        console.log(data)
         // TODO: submit form
     })
 
@@ -59,44 +58,64 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
                         fullWidth
                         variant="standard"
                         placeholder="New Assignment"
-                    />
-                    <Controller
-                        control={control}
-                        name="startDate"
-                        render={({ field: { onChange, value } }) => (
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <TimePicker
-                                    label="End Time"
-                                    value={value}
-                                    onChange={onChange}
-                                    renderInput={(params) => <TextField variant="standard" {...params} />}
-                                />
-                            </LocalizationProvider>
-                        )}
-                    />
-                    <TextField
-                        {...register("maxScore", { valueAsNumber: true })}
-                        label="Max Score"
-                        type="number"
                         required
-                        variant="standard"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
                     />
-                    <Stack direction="row" justifyContent="space-between">
-                        <Typography variant="body1">Permanent</Typography>
+                    <Stack direction="row" spacing={4}>
+                        <Controller
+                            control={control}
+                            name="startDate"
+                            render={({ field: { onChange, value } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="End Date"
+                                        value={value}
+                                        onChange={onChange}
+                                        renderInput={(params) => <TextField fullWidth required variant="standard" {...params} />}
+                                    />
+                                </LocalizationProvider>
+                            )}
+                        />
+                        <Controller
+                            control={control}
+                            name="endDate"
+                            render={({ field: { onChange, value } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="End Time"
+                                        value={value}
+                                        onChange={onChange}
+                                        renderInput={(params) => <TextField fullWidth required variant="standard" {...params} />}
+                                    />
+                                </LocalizationProvider>
+                            )}
+                        />
+                    </Stack>
+                    <Stack direction="row" spacing={4} alignItems="flex-end">
+                        <TextField
+                            {...register("maxScore", { valueAsNumber: true })}
+                            label="Max Score"
+                            type="number"
+                            required
+                            fullWidth
+                            variant="standard"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
                         <Controller
                             name="optional"
                             control={control}
                             render={({ field: { value, onChange } }) => (
-                                <Switch
+                                <FormControlLabel
+                                    control={<Switch />}
+                                    label="Optional"
+                                    labelPlacement="start"
                                     checked={value}
-                                    onChange={(e) => onChange(e.target.checked)}
+                                    onChange={onChange}
                                 />
-                            )} />
+                            )}
+                        />
                     </Stack>
-
                 </Stack>
             </DialogContent>
 
