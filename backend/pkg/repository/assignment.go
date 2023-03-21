@@ -75,7 +75,9 @@ func (fr *FirebaseRepository) GetAssignmentByCourse(courseID string) ([]*models.
 
 	assignments := make([]*models.Assignment, 0)
 	for _, id := range course.AssignmentIDs {
-		if assignment, ok := fr.assignments[id]; !ok {
+		fmt.Println(id)
+		fmt.Println(fr.assignments)
+		if assignment, ok := fr.assignments[id]; ok {
 			assignments = append(assignments, assignment)
 		} else {
 			return nil, qerrors.AssignmentNotFoundError
