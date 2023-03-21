@@ -73,16 +73,27 @@ func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("courseID").(string)
-	// var req *models.UpdateSectionRequest
+	courseID := r.Context().Value("courseID").(string)
+	assignmentID := r.Context().Value("assignmentID").(string)
+	var req *models.UpdateAssignmentRequest
 
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// TODO:
+	req.CourseID = &courseID
+	req.AssignmentID = &assignmentID
+
+	err = repo.Repository.UpdateAssignment(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated assignment " + assignmentID))
 }
 
 func deleteAssignmentHandler(w http.ResponseWriter, r *http.Request) {

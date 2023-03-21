@@ -68,13 +68,16 @@ func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Sec
 		return nil, err
 	}
 
+	fr.sectionsLock.RLock()
+	defer fr.sectionsLock.RUnlock()
+
 	sections := make([]*models.Section, 0)
 	for _, sectionID := range course.SectionIDs {
-		section, err := fr.GetSectionByID(sectionID)
-		if err != nil {
-			return nil, err
+		if section, ok := fr.sections[sectionID]; ok {
+			sections = append(sections, section)
+		} else {
+			return nil, qerrors.SectionNotFoundError
 		}
-		sections = append(sections, section)
 	}
 
 	return sections, nil

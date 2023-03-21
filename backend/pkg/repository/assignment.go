@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -69,17 +70,19 @@ func (fr *FirebaseRepository) GetAssignmentByCourse(courseID string) ([]*models.
 		return nil, err
 	}
 
+	fr.assignmentsLock.RLock()
+	defer fr.assignmentsLock.RUnlock()
+
 	assignments := make([]*models.Assignment, 0)
 	for _, id := range course.AssignmentIDs {
-		assignment, err := fr.GetAssignmentByID(id)
-		if err != nil {
-			return nil, err
+		if assignment, ok := fr.assignments[id]; !ok {
+			assignments = append(assignments, assignment)
+		} else {
+			return nil, qerrors.AssignmentNotFoundError
 		}
-		assignments = append(assignments, assignment)
 	}
 
 	return assignments, nil
-
 }
 
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
@@ -127,7 +130,7 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 	batch.Create(assignmentRef, assignment)
 
 	// Add the assignment to the corresponding course
-	newAssignments := append(course.AssignmentIDs, assignment.ID)
+	newAssignments := append(course.AssignmentIDs, assignmentRef.ID)
 
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
 	batch.Update(coursesRef, []firestore.Update{{Path: "assignmentIDs", Value: newAssignments}})
@@ -163,5 +166,26 @@ func (fr *FirebaseRepository) DeleteAssignment(req *models.DeleteAssignmentReque
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
 	batch.Update(coursesRef, []firestore.Update{{Path: "assignmentIDs", Value: newAssignments}})
 
+	return err
+}
+
+func (fr *FirebaseRepository) UpdateAssignment(req *models.UpdateAssignmentRequest) error {
+
+	v := reflect.ValueOf(*req)
+	typeOfS := v.Type()
+
+	var updates []firestore.Update
+
+	for i := 0; i < v.NumField(); i++ {
+		field := typeOfS.Field(i).Name
+		val := v.Field(i).Interface()
+
+		// Only include the fields that are set
+		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "AssignmentID") {
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
+		}
+	}
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreAssignmentsCollection).Doc(*req.AssignmentID).Update(firebase.Context, updates)
 	return err
 }
