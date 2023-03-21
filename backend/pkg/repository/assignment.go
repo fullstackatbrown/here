@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -12,7 +11,6 @@ import (
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
-	"github.com/relvacode/iso8601"
 )
 
 func (fr *FirebaseRepository) initializeAssignmentsListener() {
@@ -88,17 +86,6 @@ func (fr *FirebaseRepository) GetAssignmentByCourse(courseID string) ([]*models.
 }
 
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
-	// TODO: check assignment exists
-
-	releaseDate, err := iso8601.ParseString(req.ReleaseDate)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing start time: %v\n", err)
-	}
-	dueDate, err := iso8601.ParseString(req.DueDate)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing end time: %v\n", err)
-	}
-
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
@@ -123,8 +110,8 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		Name:            req.Name,
 		Optional:        req.Optional,
 		MaxScore:        req.MaxScore,
-		ReleaseDate:     releaseDate.Format(time.DateOnly),
-		DueDate:         dueDate.Format(time.DateOnly),
+		ReleaseDate:     req.ReleaseDate,
+		DueDate:         req.DueDate,
 		GradesByStudent: make(map[string]string),
 	}
 
