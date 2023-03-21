@@ -10,8 +10,8 @@ type Assignment struct {
 	Name            string            `firestore:"name"`
 	Optional        bool              `firestore:"optional"`
 	MaxScore        int               `firestore:"maxScore"`
-	StartDate       string            `firestore:"startDate"`
-	EndDate         string            `firestore:"endDate"`
+	ReleaseDate     string            `firestore:"releaseDate"`
+	DueDate         string            `firestore:"dueDate"`
 	GradesByStudent map[string]string `firestore:"gradesByStudent"`
 }
 
@@ -20,12 +20,12 @@ type GetAssignmentRequest struct {
 }
 
 type CreateAssignmentRequest struct {
-	CourseID  string `json:"courseid,omitempty"`
-	Name      string `json:"name"`
-	Optional  bool   `json:"optional"`
-	MaxScore  int    `json:"maxScore"`
-	StartDate string `json:"startDate"`
-	EndDate   string `json:"endDate"`
+	CourseID    string `json:"courseid,omitempty"`
+	Name        string `json:"name"`
+	Optional    bool   `json:"optional"`
+	MaxScore    int    `json:"maxScore"`
+	ReleaseDate string `json:"releaseDate"`
+	DueDate     string `json:"dueDate"`
 }
 
 type DeleteAssignmentRequest struct {

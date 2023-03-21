@@ -22,13 +22,13 @@
 
 ### Methods - Assignments
 
-| Description          | Route                                                   | Body                                                   | Auth  |
-|----------------------|---------------------------------------------------------|--------------------------------------------------------|-------|
-| Get all assignments  | `GET /courses/{courseId}/assignments`                   |                                                        | All   |
-| Get assignment by id | `GET /courses/{courseId}/assignments/{assignmentId}`    |                                                        | All   |
-| Delete assignment    | `DELETE /courses/{courseId}/assignments/{assignmentId}` |                                                        | Admin |
-| Create assignment    | `POST /courses/{courseId}/assignments/`                 | Mandatory: `name`, `mandatory`, `startDate`, `endDate` | Admin |
-| Update assignment    | `PATCH /courses/{courseId}/assignments/{assignmentId}`  | Optional: `name`, `mandatory`, `startDate`, `endDate`  | Admin |
+| Description          | Route                                                   | Body                                                     | Auth  |
+|----------------------|---------------------------------------------------------|----------------------------------------------------------|-------|
+| Get all assignments  | `GET /courses/{courseId}/assignments`                   |                                                          | All   |
+| Get assignment by id | `GET /courses/{courseId}/assignments/{assignmentId}`    |                                                          | All   |
+| Delete assignment    | `DELETE /courses/{courseId}/assignments/{assignmentId}` |                                                          | Admin |
+| Create assignment    | `POST /courses/{courseId}/assignments/`                 | Mandatory: `name`, `mandatory`, `releaseDate`, `dueDate` | Admin |
+| Update assignment    | `PATCH /courses/{courseId}/assignments/{assignmentId}`  | Optional: `name`, `mandatory`, `releaseDate`, `dueDate`  | Admin |
 
 ### Methods - Surveys
 
@@ -101,8 +101,8 @@
     name: string                        # name of the assignment
     optional: bool                      # whether or not this assignment is optional
     maxScore: int                       # maximum points possible
-    startDate: string                   # when the assignment is released
-    endDate: string                     # when the assignment is due
+    releaseDate: string                 # when the assignment is released
+    dueDate: string                     # when the assignment is due
     gradesByStudent: map[string]string  # map from studentID to their gradeID
 
 <b>grades</b>

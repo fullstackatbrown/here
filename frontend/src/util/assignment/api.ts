@@ -23,14 +23,14 @@ async function createAssignment(
   courseID: string,
   name: string,
   mandatory: boolean,
-  startDate: Date,
-  endDate: Date
+  releaseDate: Date,
+  dueDate: Date
 ): Promise<string> {
   return APIClient.post(`/courses/${courseID}/assignments`, {
     name,
     mandatory,
-    startDate,
-    endDate,
+    releaseDate,
+    dueDate,
   });
 }
 

@@ -85,11 +85,11 @@ func (fr *FirebaseRepository) GetAssignmentByCourse(courseID string) ([]*models.
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
 	// TODO: check assignment exists
 
-	startDate, err := iso8601.ParseString(req.StartDate)
+	releaseDate, err := iso8601.ParseString(req.ReleaseDate)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing start time: %v\n", err)
 	}
-	endDate, err := iso8601.ParseString(req.EndDate)
+	dueDate, err := iso8601.ParseString(req.DueDate)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing end time: %v\n", err)
 	}
@@ -107,8 +107,8 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		Name:            req.Name,
 		Optional:        req.Optional,
 		MaxScore:        req.MaxScore,
-		StartDate:       startDate.Format(time.DateOnly),
-		EndDate:         endDate.Format(time.DateOnly),
+		ReleaseDate:     releaseDate.Format(time.DateOnly),
+		DueDate:         dueDate.Format(time.DateOnly),
 		GradesByStudent: make(map[string]string),
 	}
 

@@ -15,8 +15,8 @@ export interface CreateEditAssignmentDialogProps {
 type FormData = {
     name: string | null;
     optional: boolean;
-    startDate: string;
-    endDate: string;
+    releaseDate: string;
+    dueDate: string;
     maxScore: number;
 };
 
@@ -24,8 +24,8 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
     const defaultValues = {
         name: assignment ? assignment.name : undefined,
         optional: assignment ? assignment.optional : false,
-        startDate: assignment ? assignment.startDate : new Date().toISOString(),
-        endDate: assignment ? assignment.endDate : getNextWeekDate().toISOString(),
+        releaseDate: assignment ? assignment.releaseDate : new Date().toISOString(),
+        dueDate: assignment ? assignment.dueDate : getNextWeekDate().toISOString(),
         maxScore: assignment ? assignment.maxScore : 1,
     }
 
@@ -63,11 +63,11 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
                     <Stack direction="row" spacing={4}>
                         <Controller
                             control={control}
-                            name="startDate"
+                            name="releaseDate"
                             render={({ field: { onChange, value } }) => (
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
-                                        label="End Date"
+                                        label="Release Date"
                                         value={value}
                                         onChange={onChange}
                                         renderInput={(params) => <TextField fullWidth required variant="standard" {...params} />}
@@ -77,11 +77,11 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
                         />
                         <Controller
                             control={control}
-                            name="endDate"
+                            name="dueDate"
                             render={({ field: { onChange, value } }) => (
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
-                                        label="End Time"
+                                        label="Due Date"
                                         value={value}
                                         onChange={onChange}
                                         renderInput={(params) => <TextField fullWidth required variant="standard" {...params} />}
