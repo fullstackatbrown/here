@@ -1,5 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { useSections } from "@util/section/hooks";
+import { useSections } from "api/section/hooks";
 import { sortSections } from "@util/shared/sortSectionTime";
 import { Course } from "model/course";
 import { Section } from "model/section";

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
     Avatar,
     Box,
@@ -14,14 +14,14 @@ import {
 import IconButton from "@components/shared/IconButton";
 import ConfirmButton from "@components/shared/ConfirmButton";
 import CloseIcon from '@mui/icons-material/Close';
-import AuthAPI, {User} from "@util/auth/api";
-import {useAuth, useAdmins} from "@util/auth/hooks";
-import {useForm} from "react-hook-form";
-import {toast} from "react-hot-toast";
+import AuthAPI, { User } from "api/auth/api";
+import { useAuth, useAdmins } from "api/auth/hooks";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import SettingsSection from "@components/settings/SettingsSection";
 import getInitials from "@util/shared/getInitials";
 import Button from "@components/shared/Button";
-import {Add} from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import errors from "@util/errors";
 
 type FormData = {
@@ -34,9 +34,9 @@ type FormData = {
 export default function AdminList() {
     const [currentConfirmDialog, setCurrentConfirmDialog] = useState("");
     const [admins, loading] = useAdmins();
-    const {currentUser} = useAuth();
+    const { currentUser } = useAuth();
 
-    const {register, handleSubmit, reset, formState: {}} = useForm<FormData>();
+    const { register, handleSubmit, reset, formState: { } } = useForm<FormData>();
     const onSubmit = handleSubmit(data => {
         if (admins && admins.some(admin => admin.email === data.email)) {
             toast.error("Cannot add a duplicate admin.");
@@ -71,8 +71,8 @@ export default function AdminList() {
                             onClose={() => setCurrentConfirmDialog("")}
                             onConfirm={() => handleDeleteAdmin(admin)}>
                             <IconButton label="Revoke admin access" edge="end" aria-label="delete"
-                                        onClick={() => setCurrentConfirmDialog(admin.id)}>
-                                <CloseIcon/>
+                                onClick={() => setCurrentConfirmDialog(admin.id)}>
+                                <CloseIcon />
                             </IconButton>
                         </ConfirmButton>
                     }>
@@ -88,7 +88,7 @@ export default function AdminList() {
                 </ListItem>))}
         </List>
         <Box my={2}>
-            <Divider/>
+            <Divider />
         </Box>
         <Stack spacing={2}>
             <Typography fontWeight={500}>
@@ -105,7 +105,7 @@ export default function AdminList() {
                         size="small"
                         variant="outlined"
                     />
-                    <Button type="submit" startIcon={<Add/>}>
+                    <Button type="submit" startIcon={<Add />}>
                         Add
                     </Button>
                 </Stack>

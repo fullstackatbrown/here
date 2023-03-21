@@ -2,12 +2,12 @@ import CourseCard from "@components/home/CourseCard";
 import AddCourseCard from "@components/home/CourseCard/AddCourseCard";
 import JoinCourseDialog from "@components/home/JoinCourseDialog/JoinCourseDialog";
 import { Box, Button, Grid, Stack, Typography } from "@mui/material";
-import { useCourses } from "@util/course/hooks";
+import { useCourses } from "api/course/hooks";
 import organizeCourseByTerm from "@util/shared/organizeCourseByTerm";
 import sortTerms from "@util/shared/sortTerms";
 import AppLayout from "components/shared/AppLayout";
 import { useEffect, useState } from "react";
-import { useAuth } from "util/auth/hooks";
+import { useAuth } from "api/auth/hooks";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();

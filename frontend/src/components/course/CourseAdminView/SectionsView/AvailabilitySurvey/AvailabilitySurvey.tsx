@@ -1,5 +1,5 @@
 import { Box, Button, Card, Paper, Stack, Typography } from "@mui/material";
-import { useSurvey } from "@util/surveys/hooks";
+import { useSurvey } from "api/surveys/hooks";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";

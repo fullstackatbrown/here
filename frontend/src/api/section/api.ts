@@ -1,4 +1,4 @@
-import APIClient from "@util/APIClient";
+import APIClient from "api/APIClient";
 import { Day, Section } from "model/section";
 
 async function getSections(courseID: string): Promise<Section[]> {

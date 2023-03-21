@@ -1,8 +1,8 @@
-import {FC} from "react";
-import {Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
+import { FC } from "react";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material";
 import Button from "@components/shared/Button";
-import {useForm} from "react-hook-form";
-import CourseAPI from "@util/course/api";
+import { useForm } from "react-hook-form";
+import CourseAPI from "api/course/api";
 
 export interface CreateCourseDialogProps {
     open: boolean;
@@ -15,8 +15,8 @@ type FormData = {
     term: string;
 };
 
-const CreateCourseDialog: FC<CreateCourseDialogProps> = ({open, onClose}) => {
-    const {register, handleSubmit, reset, formState: {errors}} = useForm<FormData>();
+const CreateCourseDialog: FC<CreateCourseDialogProps> = ({ open, onClose }) => {
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
     const onSubmit = handleSubmit(data => {
         CourseAPI.createCourse(data.courseTitle, data.courseCode, data.term);
         reset();

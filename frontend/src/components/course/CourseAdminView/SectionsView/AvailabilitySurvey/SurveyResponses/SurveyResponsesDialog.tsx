@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import errors from '@util/errors';
 import formatSectionResponses, { TimeCount } from "@util/shared/formatSectionResponses";
-import SurveyAPI from '@util/surveys/api';
+import SurveyAPI from 'api/surveys/api';
 import { Section } from 'model/section';
 import { GenerateResultsResponse, Survey } from "model/survey";
 import { FC, useEffect, useState } from "react";

@@ -1,4 +1,4 @@
-import APIClient from "@util/APIClient";
+import APIClient from "api/APIClient";
 import { Assignment } from "model/assignment";
 
 async function getAssignments(courseID: string): Promise<Assignment[]> {

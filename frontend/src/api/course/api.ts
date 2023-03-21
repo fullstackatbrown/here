@@ -1,4 +1,4 @@
-import APIClient from "@util/APIClient";
+import APIClient from "api/APIClient";
 import { Course } from "model/course";
 
 export const enum CoursePermission {

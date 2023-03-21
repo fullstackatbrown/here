@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useRef, useState} from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import {
     Avatar,
     ButtonBase,
@@ -8,12 +8,12 @@ import {
     Stack, Tooltip,
     Typography
 } from "@mui/material";
-import AuthAPI, {User} from "@util/auth/api";
+import AuthAPI, { User } from "api/auth/api";
 import FocusTrap from "focus-trap-react";
-import {Feedback, Logout, Settings, WbSunny, Info} from "@mui/icons-material";
+import { Feedback, Logout, Settings, WbSunny, Info } from "@mui/icons-material";
 import useThemeMode from "@util/mui/useThemeMode";
 import getInitials from "@util/shared/getInitials";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import AboutDialog from "../AboutDialog";
 import Callout from "@components/shared/Callout";
 
@@ -29,7 +29,7 @@ function capitalizeFirstLetter(str: string) {
 /**
  * Displays a button with the current user's picture and presents an account menu when clicked
  */
-const AccountMenu: FC<AccountMenuProps> = ({user}) => {
+const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
     const [open, setOpen] = useState(false);
     const [openAbout, setOpenAbout] = useState(false);
     const [themeMode, setThemeMode, prefersDarkMode] = useThemeMode();
@@ -79,40 +79,40 @@ const AccountMenu: FC<AccountMenuProps> = ({user}) => {
 
     return (<>
         {/* About dialog */}
-        <AboutDialog open={openAbout} onClose={() => setOpenAbout(false)}/>
+        <AboutDialog open={openAbout} onClose={() => setOpenAbout(false)} />
         <Callout isOpen={zoomLinkCallout} title="Add a Zoom link to your profile"
-                 body="By adding your Zoom link to your profile, we can automatically provide it to students when you claim them. No more putting Zoom links in the queue title!"
-                 anchorComponent={buttonRef.current}
-                 onContinue={() => router.push("/settings")} onClose={handleCloseZoomLinkCallout}
-                 continueButtonLabel="Add Zoom link"/>
+            body="By adding your Zoom link to your profile, we can automatically provide it to students when you claim them. No more putting Zoom links in the queue title!"
+            anchorComponent={buttonRef.current}
+            onContinue={() => router.push("/settings")} onClose={handleCloseZoomLinkCallout}
+            continueButtonLabel="Add Zoom link" />
         {/*Avatar button*/}
         <Tooltip title={`Signed in as ${user.displayName}`}>
-            <ButtonBase aria-label="account menu" sx={{borderRadius: '100%'}} ref={buttonRef}
-                        onClick={() => setOpen(!open)} focusRipple>
+            <ButtonBase aria-label="account menu" sx={{ borderRadius: '100%' }} ref={buttonRef}
+                onClick={() => setOpen(!open)} focusRipple>
                 <Avatar src={user.photoUrl}
-                        imgProps={{referrerPolicy: "no-referrer"}}
-                        sx={{
-                            width: 40,
-                            height: 40,
-                            fontSize: 16
-                        }}>{getInitials(user.displayName)}</Avatar>
+                    imgProps={{ referrerPolicy: "no-referrer" }}
+                    sx={{
+                        width: 40,
+                        height: 40,
+                        fontSize: 16
+                    }}>{getInitials(user.displayName)}</Avatar>
             </ButtonBase>
         </Tooltip>
 
         {/*Account menu popover*/}
         <Popper id={id} open={open} anchorEl={buttonRef.current} transition keepMounted={true}>
-            {({TransitionProps}) => (
+            {({ TransitionProps }) => (
                 <Fade {...TransitionProps}>
-                    <Paper elevation={5} sx={{width: 320, m: 1, textAlign: "center"}}>
+                    <Paper elevation={5} sx={{ width: 320, m: 1, textAlign: "center" }}>
                         <FocusTrap active={open} focusTrapOptions={{
                             clickOutsideDeactivates: true,
                             onDeactivate: () => setTimeout(() => setOpen(false), 100),
                         }}>
                             <div>
-                                <Stack sx={{p: 4}} alignItems="center">
+                                <Stack sx={{ p: 4 }} alignItems="center">
                                     <Avatar
                                         src={user.photoUrl}
-                                        imgProps={{referrerPolicy: "no-referrer"}}
+                                        imgProps={{ referrerPolicy: "no-referrer" }}
                                         sx={{
                                             width: 96,
                                             height: 96,
@@ -126,31 +126,31 @@ const AccountMenu: FC<AccountMenuProps> = ({user}) => {
                                         {user.email}
                                     </Typography>
                                 </Stack>
-                                <Divider/>
+                                <Divider />
                                 <List>
                                     <ListItem disablePadding>
                                         <ListItemButton onClick={handleSwitchTheme}>
                                             <ListItemIcon>
-                                                <WbSunny/>
+                                                <WbSunny />
                                             </ListItemIcon>
-                                            <ListItemText primary={`Theme: ${capitalizeFirstLetter(themeMode)}`}/>
+                                            <ListItemText primary={`Theme: ${capitalizeFirstLetter(themeMode)}`} />
                                         </ListItemButton>
                                     </ListItem>
                                     <ListItem disablePadding>
                                         <ListItemButton
                                             onClick={() => handleClick("https://forms.gle/Ue9wQDXDuczLk7b56")}>
                                             <ListItemIcon>
-                                                <Feedback/>
+                                                <Feedback />
                                             </ListItemIcon>
-                                            <ListItemText primary="Send feedback"/>
+                                            <ListItemText primary="Send feedback" />
                                         </ListItemButton>
                                     </ListItem>
                                     <ListItem disablePadding>
                                         <ListItemButton onClick={() => handleClick("/settings")}>
                                             <ListItemIcon>
-                                                <Settings/>
+                                                <Settings />
                                             </ListItemIcon>
-                                            <ListItemText primary="Settings"/>
+                                            <ListItemText primary="Settings" />
                                         </ListItemButton>
                                     </ListItem>
                                     <ListItem disablePadding>
@@ -159,17 +159,17 @@ const AccountMenu: FC<AccountMenuProps> = ({user}) => {
                                             setOpen(false);
                                         }}>
                                             <ListItemIcon>
-                                                <Info/>
+                                                <Info />
                                             </ListItemIcon>
-                                            <ListItemText primary="About"/>
+                                            <ListItemText primary="About" />
                                         </ListItemButton>
                                     </ListItem>
                                     <ListItem disablePadding>
                                         <ListItemButton onClick={handleSignOut}>
                                             <ListItemIcon>
-                                                <Logout/>
+                                                <Logout />
                                             </ListItemIcon>
-                                            <ListItemText primary="Sign out"/>
+                                            <ListItemText primary="Sign out" />
                                         </ListItemButton>
                                     </ListItem>
                                 </List>

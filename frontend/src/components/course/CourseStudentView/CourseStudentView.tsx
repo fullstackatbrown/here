@@ -4,11 +4,11 @@ import {
   Button, Stack, Typography
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useAssignments } from "@util/assignment/hooks";
-import { useSections } from "@util/section/hooks";
+import { useAssignments } from "api/assignment/hooks";
+import { useSections } from "api/section/hooks";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import sectionListToMap from "@util/shared/sectionListToMap";
-import { useSurvey } from "@util/surveys/hooks";
+import { useSurvey } from "api/surveys/hooks";
 import { Course } from "model/course";
 import { User } from "model/user";
 import { useState } from "react";

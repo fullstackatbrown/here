@@ -1,8 +1,8 @@
-import {FC} from "react";
-import {Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography} from "@mui/material";
+import { FC } from "react";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from "@mui/material";
 import Button from "@components/shared/Button";
-import {useForm} from "react-hook-form";
-import CourseAPI from "@util/course/api";
+import { useForm } from "react-hook-form";
+import CourseAPI from "api/course/api";
 
 export interface BulkUploadDialogProps {
     open: boolean;
@@ -14,8 +14,8 @@ type FormData = {
     data: string;
 };
 
-const BulkUploadDialog: FC<BulkUploadDialogProps> = ({open, onClose}) => {
-    const {register, handleSubmit, reset} = useForm<FormData>();
+const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
+    const { register, handleSubmit, reset } = useForm<FormData>();
     const onSubmit = handleSubmit(data => {
         CourseAPI.bulkUpload(data.term, data.data);
         reset();
@@ -34,8 +34,8 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({open, onClose}) => {
         <form onSubmit={onSubmit}>
             <DialogTitle>Bulk Upload</DialogTitle>
             <DialogContent>
-                {rows.map((row: string) => <Typography style={{display: "inline-block", marginBottom: "10px"}}
-                                                       key={row}>{row}</Typography>)}
+                {rows.map((row: string) => <Typography style={{ display: "inline-block", marginBottom: "10px" }}
+                    key={row}>{row}</Typography>)}
                 <Stack spacing={2} my={1}>
                     <TextField
                         {...register("term")}

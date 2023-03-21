@@ -4,7 +4,7 @@ import AssignmentsTable from "./AssignmentsTable";
 import AddIcon from '@mui/icons-material/Add';
 import { Course } from "model/course";
 import { FC, useState } from 'react';
-import { useAssignments } from "@util/assignment/hooks";
+import { useAssignments } from "api/assignment/hooks";
 
 
 export interface AssignmentsProps {

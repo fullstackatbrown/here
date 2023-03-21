@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
-import AuthAPI, { Notification, User } from "@util/auth/api";
+import AuthAPI, { Notification, User } from "api/auth/api";
 import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
-import { useAsyncEffect } from "@util/hooks/useAsyncEffect";
+import { useAsyncEffect } from "api/hooks/useAsyncEffect";
 
 type AuthState = {
     loading: boolean;
@@ -40,7 +40,7 @@ export const AuthProvider = authContext.Provider;
 /** useSession is a hook that fetches a user session from the Acropolis API */
 export function useSession(): AuthState {
     const [authState, setAuthState] = useState(initialAuthState);
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     // useAsyncEffect(
     //     async (): Promise<void> => {

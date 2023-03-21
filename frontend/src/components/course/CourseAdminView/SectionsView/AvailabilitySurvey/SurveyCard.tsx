@@ -8,7 +8,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import CreateSurveyDialog from "./CreateEditSurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 import toast from "react-hot-toast";
-import SurveyAPI from "@util/surveys/api";
+import SurveyAPI from "api/surveys/api";
 import errors from "@util/errors";
 import { Section } from "model/section";
 

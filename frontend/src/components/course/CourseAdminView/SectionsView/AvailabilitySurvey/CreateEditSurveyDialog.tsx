@@ -12,7 +12,7 @@ import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from "@m
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import errors from "@util/errors";
 import { getNextWeekDate } from "@util/shared/time";
-import SurveyAPI from "@util/surveys/api";
+import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
