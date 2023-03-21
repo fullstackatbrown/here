@@ -58,7 +58,7 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
                   </Stack>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {dayjs(assignment.endDate).format("MMM D, YYYY")}
+                  {dayjs(assignment.dueDate).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell component="th" scope="row">
                   {assignment.maxScore}

@@ -1,5 +1,5 @@
 import { Assignment } from "model/assignment";
-import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
+import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
 import { useState, useEffect } from "react";
 
 const dummyAssignments: Assignment[] = [
@@ -49,23 +49,21 @@ export function useAssignments(courseID: string): [Assignment[] | undefined, boo
     const [loading, setLoading] = useState(true);
     const [assignments, setAssignments] = useState<Assignment[] | undefined>(undefined);
 
-    // useEffect(() => {
-    //     const db = getFirestore();
-    //     const unsubscribe = onSnapshot(collection(db, "assignments"), (querySnapshot) => {
-    //         const res: Assignment[] = [];
-    //         querySnapshot.forEach((doc) => {
-    //             res.push({ ID: doc.id, ...doc.data() } as Assignment);
-    //         });
-
-    //         setAssignments(res);
-    //         setLoading(false);
-    //     });
-
-    //     return () => unsubscribe();
-    // }, []);
+    useEffect(() => {
+        const db = getFirestore();
+        const q = query(collection(db, "assignments"), where("courseID", "==", courseID));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const res: Assignment[] = [];
+            querySnapshot.forEach((doc) => {
+                res.push({ ID: doc.id, ...doc.data() } as Assignment);
+            });
+            setAssignments(res);
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
 
     // Uncomment this for testing
-    // return [[], false];
-    return [dummyAssignments, false];
-    // return [assignments, loading];
+    // return [dummyAssignments, false];
+    return [assignments, loading];
 }
