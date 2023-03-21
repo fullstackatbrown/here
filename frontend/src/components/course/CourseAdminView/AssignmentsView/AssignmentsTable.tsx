@@ -8,6 +8,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { Assignment } from 'model/assignment';
 import dayjs from 'dayjs';
 import CreateEditAssignmentDialog from './CreateEditAssignmentDialog';
+import { sortAssignments } from '@util/shared/assignments';
 
 export interface AssignmentsTableProps {
   assignments: Assignment[];
@@ -40,15 +41,14 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
         <TableHead>
           <TableRow>
             <TableCell>Assignment</TableCell>
+            <TableCell>Release</TableCell>
             <TableCell>Due</TableCell>
             <TableCell>Point</TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {/* TODO: sort assignments by due date */}
-          {/* only show assignment a week prior to start date? */}
-          {assignments && assignments.map((assignment) => {
+          {assignments && sortAssignments(assignments).map((assignment) => {
             return (
               <TableRow key={assignment.ID}>
                 <TableCell component="th" scope="row">
@@ -56,6 +56,9 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
                     <Box>{assignment.name}</Box>
                     {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
                   </Stack>
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {dayjs(assignment.releaseDate).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell component="th" scope="row">
                   {dayjs(assignment.dueDate).format("MMM D, YYYY")}

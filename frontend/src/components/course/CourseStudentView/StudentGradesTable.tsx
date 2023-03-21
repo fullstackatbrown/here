@@ -6,6 +6,8 @@ import { Table, TableHead, TableRow, TableBody, Stack, Box, Chip } from "@mui/ma
 import { FC } from "react";
 import { User } from "model/user";
 import { Section } from "model/section";
+import dayjs from "dayjs";
+import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
 
 interface StudentGradesTableProps {
     assignments: Assignment[];
@@ -43,7 +45,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments, student 
             </TableRow>
         </TableHead>
         <TableBody>
-            {assignments.map((assignment) => (
+            {filterAssignmentsByReleaseDate(assignments).map((assignment) => (
                 <TableRow key={assignment.ID}>
                     <TableCell component="th" scope="row">
                         <Stack direction="row" spacing={1} alignItems="center">
@@ -52,7 +54,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments, student 
                         </Stack>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                        {assignment.endDate.toLocaleDateString()}
+                        {dayjs(assignment.dueDate).format("MMM D, YYYY")}
                     </TableCell>
                     <TableCell component="th" scope="row">
 

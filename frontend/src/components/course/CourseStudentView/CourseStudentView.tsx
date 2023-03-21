@@ -31,7 +31,7 @@ const student: User = {
 }
 
 export function CourseStudentView({ course }: CourseStudentViewProps) {
-  const [assignments, assignmentsLoading] = useAssignments()
+  const [assignments, assignmentsLoading] = useAssignments(course.ID)
   const [sections, sectionsLoading] = useSections(course.ID)
   const [survey, surveyLoading] = useSurvey(course.surveyID || undefined);
   const [surveyDialog, setSurveyDialog] = useState(false)
@@ -105,7 +105,6 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
           {(assignments && assignments.length > 0) ?
             <StudentGradesTable assignments={assignments} student={student} sections={sections} /> :
             <Typography>Your instructor has not published any assignments yet</Typography>}
-
         </Grid>
         <Grid xs={2} />
       </Grid>
