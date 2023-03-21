@@ -86,6 +86,17 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 		return nil, fmt.Errorf("error creating section: %v\n", err)
 	}
 
+	// Check if a section already exists at the same time and location
+	sections, err := fr.GetSectionByCourse(req.CourseID)
+	if err != nil {
+		return nil, fmt.Errorf("error creating section: %v\n", err)
+	}
+	for _, section := range sections {
+		if section.Day == req.Day && section.StartTime == req.StartTime && section.EndTime == req.EndTime && section.Location == req.Location {
+			return nil, qerrors.SectionAlreadyExistsError
+		}
+	}
+
 	// In a transaction, create a new section document and add the section to the corresponding course
 	section = &models.Section{
 		Day:                models.Day(req.Day),

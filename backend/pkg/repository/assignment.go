@@ -99,6 +99,17 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
 	}
 
+	// Check if an assignment with the same name already exists
+	assignments, err := fr.GetAssignmentByCourse(req.CourseID)
+	if err != nil {
+		return nil, fmt.Errorf("error creating assignment: %v\n", err)
+	}
+	for _, a := range assignments {
+		if a.Name == req.Name {
+			return nil, qerrors.AssignmentAlreadyExistsError
+		}
+	}
+
 	// In a transaction, create a new assignment document and add the assignment to the corresponding course
 	batch := fr.firestoreClient.Batch()
 
