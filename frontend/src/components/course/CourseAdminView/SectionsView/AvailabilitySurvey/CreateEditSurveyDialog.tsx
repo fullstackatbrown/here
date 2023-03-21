@@ -11,6 +11,7 @@ import {
 import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import errors from "@util/errors";
+import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "@util/surveys/api";
 import { Survey } from "model/survey";
 import { FC, useEffect } from "react";
@@ -30,13 +31,6 @@ type FormData = {
     enddate: Date,
     endtime: Date,
 };
-
-const getNextWeekDate = () => {
-    const nextWeek = new Date()
-    nextWeek.setDate(new Date().getDate() + 7)
-    nextWeek.setHours(23, 59)
-    return nextWeek
-}
 
 const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, survey }) => {
     const defaultValues = {

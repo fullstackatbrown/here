@@ -1,5 +1,6 @@
 import Button from "@components/shared/Button";
 import {
+    Box,
     Dialog,
     DialogActions,
     DialogContent,
@@ -120,35 +121,38 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                             <MenuItem value={"Saturday"}>Saturday</MenuItem>
                         </Select>
                     </FormControl>
-                    <Controller
-                        control={control}
-                        name="starttime"
-                        render={({ field: { onChange, value } }) => (
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <TimePicker
-                                    label="Start Time"
-                                    value={value}
-                                    onChange={onChange}
-                                    renderInput={(params) => <TextField {...params} />} />
-                            </LocalizationProvider>
-                        )}
-                    />
-                    <Controller
-                        control={control}
-                        name="endtime"
-                        render={({ field: { onChange, value } }) => (
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <TimePicker
-                                    label="End Time"
-                                    value={value}
-                                    onChange={onChange}
-                                    renderInput={(params) => <TextField {...params} />} />
-                            </LocalizationProvider>
-                        )}
-                    />
+                    <Stack direction="row" spacing={2}>
+                        <Controller
+                            control={control}
+                            name="starttime"
+                            render={({ field: { onChange, value } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                        label="Start Time"
+                                        value={value}
+                                        onChange={onChange}
+                                        renderInput={(params) => <TextField fullWidth {...params} />}
+                                    />
+                                </LocalizationProvider>
+                            )}
+                        />
+                        <Controller
+                            control={control}
+                            name="endtime"
+                            render={({ field: { onChange, value } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                        label="End Time"
+                                        value={value}
+                                        onChange={onChange}
+                                        renderInput={(params) => <TextField fullWidth {...params} />}
+                                    />
+                                </LocalizationProvider>
+                            )}
+                        />
+                    </Stack>
                     <TextField
                         {...register("location")}
-                        autoFocus
                         label="Location"
                         type="text"
                         fullWidth
@@ -166,7 +170,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleOnClose}>Cancel</Button>
-                <Button type="submit" variant="contained">{section ? "Submit" : "Add"}</Button>
+                <Button type="submit" variant="contained">{section ? "Update" : "Add"}</Button>
             </DialogActions>
         </form>
     </Dialog>;
