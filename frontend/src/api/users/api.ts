@@ -1,4 +1,4 @@
-import APIClient from "@util/APIClient";
+import APIClient from "api/APIClient";
 import { User } from "../../model/user";
 
 async function getUser(): Promise<User> {

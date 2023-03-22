@@ -1,8 +1,8 @@
-import React, {FC} from "react";
-import {Box, CircularProgress, Paper, Stack, Tooltip, Typography} from "@mui/material";
+import React, { FC } from "react";
+import { Box, CircularProgress, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import Button from "@components/shared/Button";
-import {useAuth} from "@util/auth/hooks";
-import {CoursePermission} from "@util/auth/api";
+import { useAuth } from "api/auth/hooks";
+import { CoursePermission } from "api/auth/api";
 import GppGoodIcon from '@mui/icons-material/GppGood';
 
 export interface SettingsSectionProps {
@@ -22,16 +22,16 @@ export interface SettingsSectionProps {
 }
 
 const SettingsSection: FC<SettingsSectionProps> = ({
-                                                       title,
-                                                       subtitle,
-                                                       loading,
-                                                       adminOnly,
-                                                       taOnly,
-                                                       primaryActionButton,
-                                                       secondaryActionButton,
-                                                       children
-                                                   }) => {
-    const {currentUser} = useAuth();
+    title,
+    subtitle,
+    loading,
+    adminOnly,
+    taOnly,
+    primaryActionButton,
+    secondaryActionButton,
+    children
+}) => {
+    const { currentUser } = useAuth();
     const isTA = currentUser && Object.values(currentUser.coursePermissions).filter(perm => perm === CoursePermission.CourseAdmin).length > 0;
     const display = ((adminOnly && currentUser?.isAdmin) || !adminOnly) && (!taOnly || (taOnly && isTA));
 
@@ -44,10 +44,10 @@ const SettingsSection: FC<SettingsSectionProps> = ({
                             {title}
                         </Typography>
                         {adminOnly && <Tooltip title="Only visible to admins">
-                            <GppGoodIcon sx={{opacity: 0.36}}/>
+                            <GppGoodIcon sx={{ opacity: 0.36 }} />
                         </Tooltip>}
                     </Stack>
-                    <Typography variant="body2" sx={{opacity: 0.75}}>
+                    <Typography variant="body2" sx={{ opacity: 0.75 }}>
                         {subtitle}
                     </Typography>
                 </Stack>
@@ -62,7 +62,7 @@ const SettingsSection: FC<SettingsSectionProps> = ({
                 </Stack>
             </Stack>
             {loading ? <Box textAlign="center" py={2}>
-                <CircularProgress/>
+                <CircularProgress />
             </Box> : children}
         </Box>
     </Paper> : <></>;

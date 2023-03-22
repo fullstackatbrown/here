@@ -4,7 +4,7 @@ import AssignmentsTable from "./AssignmentsTable";
 import AddIcon from '@mui/icons-material/Add';
 import { Course } from "model/course";
 import { FC, useState } from 'react';
-import { useAssignments } from "@util/assignment/hooks";
+import { useAssignments } from "api/assignment/hooks";
 
 
 export interface AssignmentsProps {
@@ -33,7 +33,11 @@ const Assignments: FC<AssignmentsProps> = ({ course }) => {
 
   return (
     <>
-      <CreateEditAssignmentDialog open={createAssignmentDialog} onClose={() => { setCreateAssignmentDialog(false) }} />
+      <CreateEditAssignmentDialog
+        open={createAssignmentDialog}
+        onClose={() => { setCreateAssignmentDialog(false) }}
+        course={course}
+      />
       <Stack direction="row" justifyContent="space-between" mb={1}>
         <Typography variant="h6" fontWeight={600}>
           Assignments
@@ -42,7 +46,7 @@ const Assignments: FC<AssignmentsProps> = ({ course }) => {
           + New
         </Button>
       </Stack>
-      <AssignmentsTable assignments={assignments} />
+      <AssignmentsTable course={course} assignments={assignments} />
     </>
   );
 }

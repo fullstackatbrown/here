@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 	"log"
-	"time"
+	"reflect"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -11,7 +11,6 @@ import (
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
-	"github.com/relvacode/iso8601"
 )
 
 func (fr *FirebaseRepository) initializeAssignmentsListener() {
@@ -69,34 +68,38 @@ func (fr *FirebaseRepository) GetAssignmentByCourse(courseID string) ([]*models.
 		return nil, err
 	}
 
+	fr.assignmentsLock.RLock()
+	defer fr.assignmentsLock.RUnlock()
+
 	assignments := make([]*models.Assignment, 0)
 	for _, id := range course.AssignmentIDs {
-		assignment, err := fr.GetAssignmentByID(id)
-		if err != nil {
-			return nil, err
+		fmt.Println(id)
+		fmt.Println(fr.assignments)
+		if assignment, ok := fr.assignments[id]; ok {
+			assignments = append(assignments, assignment)
+		} else {
+			return nil, qerrors.AssignmentNotFoundError
 		}
-		assignments = append(assignments, assignment)
 	}
 
 	return assignments, nil
-
 }
 
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
-	// TODO: check assignment exists
-
-	startDate, err := iso8601.ParseString(req.StartDate)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing start time: %v\n", err)
-	}
-	endDate, err := iso8601.ParseString(req.EndDate)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing end time: %v\n", err)
-	}
-
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
+	}
+
+	// Check if an assignment with the same name already exists
+	assignments, err := fr.GetAssignmentByCourse(req.CourseID)
+	if err != nil {
+		return nil, fmt.Errorf("error creating assignment: %v\n", err)
+	}
+	for _, a := range assignments {
+		if a.Name == req.Name {
+			return nil, qerrors.AssignmentAlreadyExistsError
+		}
 	}
 
 	// In a transaction, create a new assignment document and add the assignment to the corresponding course
@@ -107,8 +110,8 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		Name:            req.Name,
 		Optional:        req.Optional,
 		MaxScore:        req.MaxScore,
-		StartDate:       startDate.Format(time.DateOnly),
-		EndDate:         endDate.Format(time.DateOnly),
+		ReleaseDate:     req.ReleaseDate,
+		DueDate:         req.DueDate,
 		GradesByStudent: make(map[string]string),
 	}
 
@@ -116,7 +119,7 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 	batch.Create(assignmentRef, assignment)
 
 	// Add the assignment to the corresponding course
-	newAssignments := append(course.AssignmentIDs, assignment.ID)
+	newAssignments := append(course.AssignmentIDs, assignmentRef.ID)
 
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
 	batch.Update(coursesRef, []firestore.Update{{Path: "assignmentIDs", Value: newAssignments}})
@@ -152,5 +155,31 @@ func (fr *FirebaseRepository) DeleteAssignment(req *models.DeleteAssignmentReque
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
 	batch.Update(coursesRef, []firestore.Update{{Path: "assignmentIDs", Value: newAssignments}})
 
+	_, err = batch.Commit(firebase.Context)
+	if err != nil {
+		return fmt.Errorf("error deleting course: %v\n", err)
+	}
+
+	return err
+}
+
+func (fr *FirebaseRepository) UpdateAssignment(req *models.UpdateAssignmentRequest) error {
+
+	v := reflect.ValueOf(*req)
+	typeOfS := v.Type()
+
+	var updates []firestore.Update
+
+	for i := 0; i < v.NumField(); i++ {
+		field := typeOfS.Field(i).Name
+		val := v.Field(i).Interface()
+
+		// Only include the fields that are set
+		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "AssignmentID") {
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
+		}
+	}
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreAssignmentsCollection).Doc(*req.AssignmentID).Update(firebase.Context, updates)
 	return err
 }

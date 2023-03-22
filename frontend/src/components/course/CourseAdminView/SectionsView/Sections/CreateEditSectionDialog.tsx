@@ -12,7 +12,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import errors from "@util/errors";
-import SectionAPI from "@util/section/api";
+import SectionAPI from "api/section/api";
 import dayjs, { Dayjs } from 'dayjs';
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -78,8 +78,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                 {
                     loading: "Creating section...",
                     success: "section created!",
-                    error: (err) => `This just happened: ${err.toString()}`,
-                    // TODO: change to errors.UNKNOWN
+                    error: (err) => `${err.response.data}`,
                 })
                 .then(() => {
                     onClose();

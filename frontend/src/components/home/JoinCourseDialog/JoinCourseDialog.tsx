@@ -6,7 +6,7 @@ import {
     DialogTitle, Stack,
     TextField
 } from "@mui/material";
-import AuthAPI, { ChangeCourseAction } from "@util/auth/api";
+import AuthAPI, { ChangeCourseAction } from "api/auth/api";
 import { FC } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";

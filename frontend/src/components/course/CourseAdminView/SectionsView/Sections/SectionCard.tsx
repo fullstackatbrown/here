@@ -4,7 +4,7 @@ import formatSectionTime from "@util/shared/formatTime";
 import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Section } from "model/section";
-import SectionAPI from "@util/section/api";
+import SectionAPI from "api/section/api";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
 import toast from "react-hot-toast";
 import errors from "@util/errors";

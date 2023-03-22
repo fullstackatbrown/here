@@ -1,32 +1,32 @@
-import React, {FC, useState} from "react";
+import React, { FC, useState } from "react";
 import EditCourseDialog from "@components/settings/EditCourseDialog";
-import {Box, Divider, ListItem, ListItemText} from "@mui/material";
+import { Box, Divider, ListItem, ListItemText } from "@mui/material";
 import IconButton from "@components/shared/IconButton";
 import ConfirmButton from "@components/shared/ConfirmButton";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import CourseAPI, {Course} from "@util/course/api";
+import CourseAPI, { Course } from "api/course/api";
 
 export interface CourseListItemProps {
     course: Course;
     isLastChild?: boolean;
 }
 
-const CourseListItem: FC<CourseListItemProps> = ({course, isLastChild}) => {
+const CourseListItem: FC<CourseListItemProps> = ({ course, isLastChild }) => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const handleCloseEdit = () => setOpenEdit(false);
 
     return (<>
-        <EditCourseDialog course={course} open={openEdit} onClose={handleCloseEdit}/>
+        <EditCourseDialog course={course} open={openEdit} onClose={handleCloseEdit} />
         <ListItem
             disableGutters
             secondaryAction={
                 <>
                     <Box display="inline" mr={2}>
                         <IconButton label="Edit course" edge="end" aria-label="delete"
-                                    onClick={() => setOpenEdit(true)}>
-                            <EditIcon/>
+                            onClick={() => setOpenEdit(true)}>
+                            <EditIcon />
                         </IconButton>
                     </Box>
                     <ConfirmButton
@@ -36,8 +36,8 @@ const CourseListItem: FC<CourseListItemProps> = ({course, isLastChild}) => {
                         onClose={() => setOpenConfirm(false)}
                         onConfirm={() => CourseAPI.deleteCourse(course.id)}>
                         <IconButton label="Delete course" edge="end" aria-label="delete"
-                                    onClick={() => setOpenConfirm(true)}>
-                            <CloseIcon/>
+                            onClick={() => setOpenConfirm(true)}>
+                            <CloseIcon />
                         </IconButton>
                     </ConfirmButton>
                 </>
@@ -53,7 +53,7 @@ const CourseListItem: FC<CourseListItemProps> = ({course, isLastChild}) => {
                 }}
             />
         </ListItem>
-        {!isLastChild && <Divider/>}
+        {!isLastChild && <Divider />}
     </>);
 };
 

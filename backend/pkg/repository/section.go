@@ -68,13 +68,16 @@ func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Sec
 		return nil, err
 	}
 
+	fr.sectionsLock.RLock()
+	defer fr.sectionsLock.RUnlock()
+
 	sections := make([]*models.Section, 0)
 	for _, sectionID := range course.SectionIDs {
-		section, err := fr.GetSectionByID(sectionID)
-		if err != nil {
-			return nil, err
+		if section, ok := fr.sections[sectionID]; ok {
+			sections = append(sections, section)
+		} else {
+			return nil, qerrors.SectionNotFoundError
 		}
-		sections = append(sections, section)
 	}
 
 	return sections, nil
@@ -84,6 +87,17 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, fmt.Errorf("error creating section: %v\n", err)
+	}
+
+	// Check if a section already exists at the same time and location
+	sections, err := fr.GetSectionByCourse(req.CourseID)
+	if err != nil {
+		return nil, fmt.Errorf("error creating section: %v\n", err)
+	}
+	for _, section := range sections {
+		if section.Day == req.Day && section.StartTime == req.StartTime && section.EndTime == req.EndTime && section.Location == req.Location {
+			return nil, qerrors.SectionAlreadyExistsError
+		}
 	}
 
 	// In a transaction, create a new section document and add the section to the corresponding course

@@ -1,4 +1,4 @@
-import APIClient from "@util/APIClient";
+import APIClient from "api/APIClient";
 import { SwapRequest } from "model/swapRequest";
 
 async function createSwapRequest(

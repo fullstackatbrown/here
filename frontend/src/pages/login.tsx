@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Container, Paper, Typography } from "@mui/material";
 import Button from "@components/shared/Button";
 import GoogleIcon from "@mui/icons-material/Google";
-import AuthAPI from "@util/auth/api";
+import AuthAPI from "api/auth/api";
 import { toast } from "react-hot-toast";
 import errors from "@util/errors";
 

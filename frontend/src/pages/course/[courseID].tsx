@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import AppLayout from "@components/shared/AppLayout";
 import CourseAdminView from "@components/course/CourseAdminView";
-import { useCourse } from "@util/course/hooks";
+import { useCourse } from "api/course/hooks";
 import { CourseStudentView } from "@components/course/CourseStudentView/CourseStudentView";
 import CourseHeader from "@components/course/CourseHeader";
 import { Stack, Grid } from "@mui/material";

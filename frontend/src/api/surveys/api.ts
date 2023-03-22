@@ -1,4 +1,4 @@
-import APIClient from "@util/APIClient";
+import APIClient from "api/APIClient";
 import { Survey } from "model/survey";
 
 async function getSurveyByID(

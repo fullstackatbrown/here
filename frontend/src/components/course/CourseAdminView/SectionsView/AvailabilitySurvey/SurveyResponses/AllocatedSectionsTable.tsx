@@ -16,12 +16,6 @@ export interface AllocatedSectionsTableProps {
 }
 
 const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sections }) => {
-
-    // const sectionsMap = sections.reduce((acc, section) => {
-    //     acc[section.ID] = section
-    //     return acc
-    // }, {} as Record<string, Section>)
-
     return <Table>
         <TableHead>
             <TableRow>

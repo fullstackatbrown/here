@@ -8,8 +8,13 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { Assignment } from 'model/assignment';
 import dayjs from 'dayjs';
 import CreateEditAssignmentDialog from './CreateEditAssignmentDialog';
+import { sortAssignments } from '@util/shared/assignments';
+import toast from 'react-hot-toast';
+import AssignmentAPI from 'api/assignment/api';
+import { Course } from 'model/course';
 
 export interface AssignmentsTableProps {
+  course: Course;
   assignments: Assignment[];
 }
 
@@ -24,31 +29,41 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
   },
 }))
 
-const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
+const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
 
-  const handleDeleteAssignment = () => {
-    const confirmed = confirm("Are you sure you want to delete this assignment?");
+  const handleDeleteAssignment = (assignment: Assignment) => {
+    return () => {
+      const confirmed = confirm("Are you sure you want to delete this assignment?");
+      if (confirmed) {
+        toast.promise(AssignmentAPI.deleteAssignment(course.ID, assignment.ID), {
+          loading: "Deleting assignment...",
+          success: "Deleted assignment!",
+          error: "Failed to delete assignment",
+        })
+      }
+    }
   }
+
   return (
     <>
       <CreateEditAssignmentDialog
         open={editAssignmentDialog !== null}
         onClose={() => { setEditAssignmentDialog(null) }}
+        course={course}
         assignment={editAssignmentDialog} />
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Assignment</TableCell>
+            <TableCell>Release</TableCell>
             <TableCell>Due</TableCell>
             <TableCell>Point</TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {/* TODO: sort assignments by due date */}
-          {/* only show assignment a week prior to start date? */}
-          {assignments && assignments.map((assignment) => {
+          {assignments && sortAssignments(assignments).map((assignment) => {
             return (
               <TableRow key={assignment.ID}>
                 <TableCell component="th" scope="row">
@@ -58,7 +73,10 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
                   </Stack>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {dayjs(assignment.endDate).format("MMM D, YYYY")}
+                  {dayjs(assignment.releaseDate).format("MMM D, YYYY")}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {dayjs(assignment.dueDate).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell component="th" scope="row">
                   {assignment.maxScore}
@@ -68,7 +86,7 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ assignments }) => {
                     <IconButton onClick={() => { setEditAssignmentDialog(assignment) }} size={"small"}>
                       <CreateIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={handleDeleteAssignment} size={"small"}>
+                    <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"}>
                       <ClearIcon fontSize="small" />
                     </IconButton>
                   </Stack>

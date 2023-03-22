@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
 import { sortSurveyTimes } from "@util/shared/sortSectionTime";
-import SurveyAPI from "@util/surveys/api";
+import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
 import { FC, useEffect, useState } from "react";
 import toast from "react-hot-toast";

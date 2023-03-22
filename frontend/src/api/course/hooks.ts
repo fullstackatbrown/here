@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
-import AuthAPI, { User } from "@util/auth/api";
+import AuthAPI, { User } from "api/auth/api";
 import { Course } from "model/course";
 
 const dummyCourse1: Course = {

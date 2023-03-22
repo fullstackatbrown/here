@@ -4,8 +4,8 @@ export interface Assignment {
   courseID: string;
   name: string;
   optional: boolean;
-  startDate: string;
-  endDate: string;
+  releaseDate: string;
+  dueDate: string;
   gradesByStudent: Record<string, string>;
   maxScore: number;
 }
