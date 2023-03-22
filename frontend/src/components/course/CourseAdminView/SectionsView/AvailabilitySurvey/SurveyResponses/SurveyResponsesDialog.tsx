@@ -1,8 +1,9 @@
+import { HelpOutline } from '@mui/icons-material';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import {
     Box,
     Button, Dialog, DialogActions, DialogContent,
-    DialogTitle, Stack, Typography
+    DialogTitle, IconButton, Stack, Typography
 } from "@mui/material";
 import errors from '@util/errors';
 import formatSectionResponses, { TimeCount } from "@util/shared/formatSectionResponses";
@@ -44,7 +45,11 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
 
     const hasResults = () => survey.results ? Object.keys(survey.results).length > 0 : false
 
-    const handleConfirmResults = () => {
+    const handleApplyResults = () => {
+        // TODO:
+    }
+
+    const handleExport = () => {
         // TODO:
     }
 
@@ -90,15 +95,11 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                     {hasResults() && <AllocatedSectionsTable results={survey.results} sections={sections} />}
                 </Box>
             </Box>
-
         </DialogContent>
-        <DialogActions>
-            {hasResults() && <Button variant="contained" onClick={handleConfirmResults}>Confirm Results</Button>}
+        <DialogActions sx={{ paddingTop: 2 }}>
+            {hasResults() && <Button variant="contained" onClick={handleApplyResults}>Apply Results</Button>}
+            {hasResults() && <Button variant="contained" onClick={handleExport}>Export</Button>}
         </DialogActions>
-
-
-
-
     </Dialog >
 };
 
