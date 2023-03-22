@@ -12,10 +12,12 @@ import { sortAssignments } from '@util/shared/assignments';
 import toast from 'react-hot-toast';
 import AssignmentAPI from 'api/assignment/api';
 import { Course } from 'model/course';
+import { useRouter } from 'next/router';
 
 export interface AssignmentsTableProps {
   course: Course;
   assignments: Assignment[];
+  handleNavigate: (assignmentID: string) => void;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -29,7 +31,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
   },
 }))
 
-const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) => {
+const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments, handleNavigate }) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
 
   const handleDeleteAssignment = (assignment: Assignment) => {
@@ -65,7 +67,7 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) =>
         <TableBody>
           {assignments && sortAssignments(assignments).map((assignment) => {
             return (
-              <TableRow key={assignment.ID}>
+              <TableRow key={assignment.ID} hover onClick={() => { handleNavigate(assignment.ID) }}>
                 <TableCell component="th" scope="row">
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Box>{assignment.name}</Box>

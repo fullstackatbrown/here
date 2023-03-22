@@ -46,7 +46,7 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" noWrap>
-            {numAssignments > 0 ? numAssignments : "No Assignments"}
+            {numAssignments > 0 ? `${numAssignments} Assignments` : "No Assignments"}
           </Typography>
           <UserAccessChip access="student" size="small" />
         </Stack>

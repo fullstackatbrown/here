@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
-import sectionListToMap from "@util/shared/sectionListToMap";
+import listToMap from "@util/shared/listToMap";
 import { sortSections } from "@util/shared/sortSectionTime";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -145,7 +145,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 type="text"
                                 fullWidth
                                 size="small"
-                                value={value === "" ? "" : formatSectionInfo(sectionListToMap(sections)[value])}
+                                value={value === "" ? "" : formatSectionInfo(listToMap(sections)[value] as Section)}
                                 variant="standard"
                                 InputProps={{ readOnly: true, }}
                             />

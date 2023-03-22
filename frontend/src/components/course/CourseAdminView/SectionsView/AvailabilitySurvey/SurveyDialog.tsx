@@ -33,9 +33,6 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
         return [];
     }
 
-    useEffect(() => {
-        console.log(survey)
-    }, [])
     function onSubmit() {
         if (preview) {
             if (new Date(survey.endTime) < new Date()) {

@@ -3,33 +3,44 @@ import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import AssignmentsTable from "./AssignmentsTable";
 import AddIcon from '@mui/icons-material/Add';
 import { Course } from "model/course";
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useAssignments } from "api/assignment/hooks";
+import { useRouter } from "next/router";
+import listToMap from "@util/shared/listToMap";
+import { Assignment } from "model/assignment";
+import GradingView from "./Grading/GradingVIew";
 
 
-export interface AssignmentsProps {
+export interface AssignmentsViewProps {
   course: Course;
 }
 
-function createData(
-  assignment: string,
-  dueDate: string,
-  points: number,
-  required: boolean,
-) {
-  return { assignment, dueDate, points, required };
-}
-
-const rows = [
-  createData('Design Thinking', "1 January 2023", 6.0, true),
-  createData('High-Five Prototype', "1 January 2023", 9.0, true),
-  createData('Web Dev', "1 January 2023", 16.0, true),
-  createData('Flutter', "1 January 2023", 3.7, false),
-];
-
-const Assignments: FC<AssignmentsProps> = ({ course }) => {
+const AssignmentsView: FC<AssignmentsViewProps> = ({ course }) => {
+  const router = useRouter();
+  const { query } = router;
   const [assignments, loading] = useAssignments(course.ID)
+  const [assignmentsMap, setAssignmentsMap] = useState<Record<string, Assignment> | null>(null)
   const [createAssignmentDialog, setCreateAssignmentDialog] = useState(false);
+
+  useEffect(() => {
+    if (assignments) {
+      setAssignmentsMap(listToMap(assignments) as Record<string, Assignment>)
+    }
+  }, [assignments])
+
+  const handleNavigate = (assignmentID: string) => {
+    router.push(`/course/${query.courseID}?view=${query.view}&id=${assignmentID}`,
+      undefined, { shallow: true })
+  }
+
+  const handleNavigateBack = () => {
+    router.push(`/course/${query.courseID}?view=${query.view}`, undefined, { shallow: true })
+  }
+
+  if (assignmentsMap && query.id) {
+    // Display specific assignment page
+    return <GradingView course={course} assignment={assignmentsMap[query.id as string]} handleNavigateBack={handleNavigateBack} />
+  }
 
   return (
     <>
@@ -46,9 +57,9 @@ const Assignments: FC<AssignmentsProps> = ({ course }) => {
           + New
         </Button>
       </Stack>
-      <AssignmentsTable course={course} assignments={assignments} />
+      <AssignmentsTable course={course} assignments={assignments} handleNavigate={handleNavigate} />
     </>
   );
 }
 
-export default Assignments;
+export default AssignmentsView;

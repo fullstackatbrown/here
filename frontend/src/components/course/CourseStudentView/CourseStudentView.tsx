@@ -7,7 +7,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { useAssignments } from "api/assignment/hooks";
 import { useSections } from "api/section/hooks";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
-import sectionListToMap from "@util/shared/sectionListToMap";
+import listToMap from "@util/shared/listToMap";
 import { useSurvey } from "api/surveys/hooks";
 import { Course } from "model/course";
 import { User } from "model/user";
@@ -15,6 +15,7 @@ import { useState } from "react";
 import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
 import StudentGradesTable from "./StudentGradesTable";
 import SwapRequestDialog from "./SwapRequestDialog";
+import { Section } from "model/section";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -40,7 +41,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
   const getAssignedSection = () => {
     const defaultSection = student.defaultSection[course.ID]
     if (defaultSection && defaultSection !== "" && sections) {
-      const section = sectionListToMap(sections)[defaultSection]
+      const section = listToMap(sections)[defaultSection] as Section
       return formatSectionInfo(section)
     }
     return undefined
