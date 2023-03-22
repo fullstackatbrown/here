@@ -8,8 +8,7 @@ import { useAssignments } from "api/assignment/hooks";
 import { useRouter } from "next/router";
 import listToMap from "@util/shared/listToMap";
 import { Assignment } from "model/assignment";
-import GradingView from "./Grading/GradingVIew";
-
+import GradingView from "./Grading/GradingView";
 
 export interface AssignmentsViewProps {
   course: Course;
