@@ -1,4 +1,4 @@
-import { GradeChip } from "@components/shared/GradeChip/GradeChip";
+import GradeChip from "@components/shared/GradeChip/GradeChip";
 import { Assignment } from "model/assignment";
 import { styled } from "@mui/material/styles";
 import MuiTableCell from "@mui/material/TableCell";

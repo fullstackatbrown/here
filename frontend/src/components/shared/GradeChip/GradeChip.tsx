@@ -1,13 +1,13 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Stack, Typography } from "@mui/material";
+import { FC } from 'react';
 
-export const GradeChip = ({
-  score,
-  maxScore,
-}: {
+interface GradeChipProps {
   score: number | undefined;
   maxScore: number;
-}) => {
+}
+
+const GradeChip: FC<GradeChipProps> = ({ score, maxScore }) => {
   return (
     <Stack direction="row" spacing={2}>
       <Box sx={{ width: "15px" }}>
@@ -46,3 +46,5 @@ export const GradeChip = ({
     </Stack>
   );
 };
+
+export default GradeChip;

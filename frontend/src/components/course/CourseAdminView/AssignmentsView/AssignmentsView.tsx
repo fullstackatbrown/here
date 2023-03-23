@@ -38,7 +38,12 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course }) => {
 
   if (assignmentsMap && query.id) {
     // Display specific assignment page
-    return <GradingView course={course} assignment={assignmentsMap[query.id as string]} handleNavigateBack={handleNavigateBack} />
+    return (
+      <GradingView
+        course={course}
+        assignment={assignmentsMap[query.id as string]}
+        handleNavigateBack={handleNavigateBack} />
+    )
   }
 
   return (
