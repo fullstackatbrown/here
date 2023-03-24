@@ -29,7 +29,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
 
     const getStudents = () => {
         if (!selectedSection) {
-            return Object.keys(course.students)
+            return []
+            // return Object.keys(course.students)
         } else {
 
         }

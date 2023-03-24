@@ -1,6 +1,9 @@
 package models
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 var (
 	FirestoreAssignmentsCollection = "assignments"
@@ -46,5 +49,6 @@ type UpdateAssignmentRequest struct {
 }
 
 func CreateAssignmentID(req *CreateAssignmentRequest) string {
-	return strings.ToLower(strings.ReplaceAll(req.Name, " ", ""))
+	id := regexp.MustCompile(`[^a-zA-Z0-9]+`).ReplaceAllString(req.Name, "")
+	return strings.ToLower(id)
 }
