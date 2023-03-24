@@ -84,6 +84,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
             <Stack >
                 {sortSurveyTimes(Object.keys(survey.capacity)).map(time =>
                     <FormControlLabel
+                        key={time}
                         control={<Checkbox onChange={onChangeCheckbox(time)} />}
                         label={formatSurveyTime(time)}
                         checked={times.includes(time)}

@@ -88,7 +88,6 @@ export function useSurvey(courseID: string): [Survey | undefined, boolean] {
         const db = getFirestore();
         const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection, courseID, FirestoreSurveysCollection), (querySnapshot) => {
             const res: Survey[] = [];
-            console.log(querySnapshot.size)
             if (querySnapshot.size === 0) {
                 setSurvey(undefined)
             } else {
