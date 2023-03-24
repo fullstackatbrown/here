@@ -35,15 +35,6 @@ type FirebaseRepository struct {
 	coursesEntryCodesLock *sync.RWMutex
 	coursesEntryCodes     map[string]string
 
-	sectionsLock *sync.RWMutex
-	sections     map[string]*models.Section
-
-	assignmentsLock *sync.RWMutex
-	assignments     map[string]*models.Assignment
-
-	surveysLock *sync.RWMutex
-	surveys     map[string]*models.Survey
-
 	profilesLock *sync.RWMutex
 	profiles     map[string]*models.Profile
 }
@@ -54,12 +45,6 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 		courses:               make(map[string]*models.Course),
 		coursesEntryCodesLock: &sync.RWMutex{},
 		coursesEntryCodes:     make(map[string]string),
-		sectionsLock:          &sync.RWMutex{},
-		sections:              make(map[string]*models.Section),
-		assignmentsLock:       &sync.RWMutex{},
-		assignments:           make(map[string]*models.Assignment),
-		surveysLock:           &sync.RWMutex{},
-		surveys:               make(map[string]*models.Survey),
 		profilesLock:          &sync.RWMutex{},
 		profiles:              make(map[string]*models.Profile),
 	}
@@ -78,7 +63,7 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 
 	// Execute the listeners sequentially, in case later listeners need to utilize data fetched
 	// by previous listeners
-	initFns := []func(){fr.initializeCoursesListener, fr.initializeSectionsListener, fr.initializeAssignmentsListener, fr.initializeSurveysListener, fr.initializeProfilesListener}
+	initFns := []func(){fr.initializeCoursesListener, fr.initializeProfilesListener}
 	for _, initFn := range initFns {
 		initFn()
 	}

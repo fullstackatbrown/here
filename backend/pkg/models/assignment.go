@@ -1,5 +1,7 @@
 package models
 
+import "strings"
+
 var (
 	FirestoreAssignmentsCollection = "assignments"
 )
@@ -41,4 +43,8 @@ type UpdateAssignmentRequest struct {
 	MaxScore     *int    `json:"maxScore,omitempty"`
 	ReleaseDate  *string `json:"releaseDate,omitempty"`
 	DueDate      *string `json:"dueDate,omitempty"`
+}
+
+func CreateAssignmentID(req *CreateAssignmentRequest) string {
+	return strings.ToLower(strings.ReplaceAll(req.Name, " ", ""))
 }

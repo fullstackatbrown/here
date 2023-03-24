@@ -11,96 +11,69 @@ import (
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
+	"google.golang.org/api/iterator"
 )
 
-func (fr *FirebaseRepository) initializeSectionsListener() {
-	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
-		newSections := make(map[string]*models.Section)
-		for _, doc := range docs {
-			if !doc.Exists() {
-				continue
-			}
-
-			var c models.Section
-			err := mapstructure.Decode(doc.Data(), &c)
-			if err != nil {
-				log.Panicf("Error destructuring document: %v", err)
-				return err
-			}
-
-			c.ID = doc.Ref.ID
-			newSections[doc.Ref.ID] = &c
-		}
-
-		fr.sectionsLock.Lock()
-		defer fr.sectionsLock.Unlock()
-		fr.sections = newSections
-
-		return nil
-	}
-
-	done := make(chan bool)
-	query := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Query
-	go func() {
-		err := fr.createCollectionInitializer(query, &done, handleDocs)
-		if err != nil {
-			log.Panicf("error creating sections collection listner: %v\n", err)
-		}
-	}()
-	<-done
-}
-
 // GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
-func (fr *FirebaseRepository) GetSectionByID(ID string) (*models.Section, error) {
-	fr.sectionsLock.RLock()
-	defer fr.sectionsLock.RUnlock()
+func (fr *FirebaseRepository) GetSectionByID(courseID string, sectionID string) (*models.Section, error) {
+	doc, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSectionsCollection).Doc(sectionID).Get(firebase.Context)
 
-	if val, ok := fr.sections[ID]; ok {
-		return val, nil
-	} else {
-		return nil, qerrors.SectionNotFoundError
-	}
-}
-
-func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Section, error) {
-	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
 
-	fr.sectionsLock.RLock()
-	defer fr.sectionsLock.RUnlock()
-
-	sections := make([]*models.Section, 0)
-	for _, sectionID := range course.SectionIDs {
-		if section, ok := fr.sections[sectionID]; ok {
-			sections = append(sections, section)
-		} else {
-			return nil, qerrors.SectionNotFoundError
-		}
+	var section models.Section
+	err = mapstructure.Decode(doc.Data(), &section)
+	if err != nil {
+		log.Panicf("Error destructuring document: %v", err)
+		return nil, err
 	}
 
+	section.ID = doc.Ref.ID
+
+	return &section, nil
+}
+
+func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Section, error) {
+	var sections []*models.Section
+	iter := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSectionsCollection).Documents(firebase.Context)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		var section models.Section
+		err = mapstructure.Decode(doc.Data(), &section)
+		if err != nil {
+			log.Panicf("Error destructuring document: %v", err)
+			return nil, err
+		}
+
+		section.ID = doc.Ref.ID
+		sections = append(sections, &section)
+	}
 	return sections, nil
 }
 
 func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
-	course, err := fr.GetCourseByID(req.CourseID)
+
+	sectionID, err := models.CreateSectionID(req)
 	if err != nil {
-		return nil, fmt.Errorf("error creating section: %v\n", err)
+		return nil, err
 	}
 
-	// Check if a section already exists at the same time and location
-	sections, err := fr.GetSectionByCourse(req.CourseID)
-	if err != nil {
-		return nil, fmt.Errorf("error creating section: %v\n", err)
-	}
-	for _, section := range sections {
-		if section.Day == req.Day && section.StartTime == req.StartTime && section.EndTime == req.EndTime && section.Location == req.Location {
-			return nil, qerrors.SectionAlreadyExistsError
-		}
+	// Check if a section with the same name already exists
+	s, err := fr.GetSectionByID(req.CourseID, sectionID)
+	if err == nil && s != nil {
+		return nil, qerrors.SectionAlreadyExistsError
 	}
 
-	// In a transaction, create a new section document and add the section to the corresponding course
 	section = &models.Section{
 		Day:                models.Day(req.Day),
 		CourseID:           req.CourseID,
@@ -113,52 +86,21 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 		SwappedOutStudents: make(map[string][]string),
 	}
 
-	batch := fr.firestoreClient.Batch()
-	sectionRef := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).NewDoc()
-	batch.Create(sectionRef, section)
-
-	courseRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
-	batch.Update(courseRef, []firestore.Update{
-		{Path: "sectionIDs", Value: append(course.SectionIDs, sectionRef.ID)},
-	})
-
-	_, err = batch.Commit(firebase.Context)
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSectionsCollection).Doc(sectionID).Set(firebase.Context, section)
 	if err != nil {
-		return nil, fmt.Errorf("error creating section: %v\n", err)
+		return nil, fmt.Errorf("error creating assignment: %v\n", err)
 	}
 
-	section.ID = sectionRef.ID
+	section.ID = sectionID
 
 	return section, nil
 }
 
 func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) error {
 
-	course, err := fr.GetCourseByID(req.CourseID)
-	if err != nil {
-		return err
-	}
-
-	_, err = fr.GetSectionByID(req.SectionID)
-	if err != nil {
-		return err
-	}
-
-	// In a transaction, delete the section document and remove the section from the corresponding course
-
-	batch := fr.firestoreClient.Batch()
-	sectionsRef := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Doc(req.SectionID)
-	batch.Delete(sectionsRef)
-
-	courseRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID)
-	batch.Update(courseRef, []firestore.Update{
-		{Path: "sectionIDs", Value: utils.Filter(course.SectionIDs, func(s string) bool { return s != req.SectionID })},
-	})
-
-	_, err = batch.Commit(firebase.Context)
-	if err != nil {
-		return fmt.Errorf("error deleting course: %v\n", err)
-	}
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSectionsCollection).Doc(req.SectionID).Delete(firebase.Context)
 
 	return err
 }
@@ -180,6 +122,7 @@ func (fr *FirebaseRepository) UpdateSection(req *models.UpdateSectionRequest) er
 		}
 	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreSectionsCollection).Doc(*req.SectionID).Update(firebase.Context, updates)
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
+		models.FirestoreSectionsCollection).Doc(*req.SectionID).Update(firebase.Context, updates)
 	return err
 }

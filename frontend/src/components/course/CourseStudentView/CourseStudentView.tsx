@@ -34,7 +34,7 @@ const student: User = {
 export function CourseStudentView({ course }: CourseStudentViewProps) {
   const [assignments, assignmentsLoading] = useAssignments(course.ID)
   const [sections, sectionsLoading] = useSections(course.ID)
-  const [survey, surveyLoading] = useSurvey(course.surveyID || undefined);
+  const [survey, surveyLoading] = useSurvey(course.ID || undefined);
   const [surveyDialog, setSurveyDialog] = useState(false)
   const [swapRequestDialog, setSwapRequestDialog] = useState(false)
 

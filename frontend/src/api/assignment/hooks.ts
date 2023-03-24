@@ -1,6 +1,7 @@
 import { Assignment } from "model/assignment";
 import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
 import { useState, useEffect } from "react";
+import { FirestoreAssignmentsCollection, FirestoreCoursesCollection } from "api/firebaseConst";
 
 const dummyAssignments: Assignment[] = [
     {
@@ -51,8 +52,7 @@ export function useAssignments(courseID: string): [Assignment[] | undefined, boo
 
     useEffect(() => {
         const db = getFirestore();
-        const q = query(collection(db, "assignments"), where("courseID", "==", courseID));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection, courseID, FirestoreAssignmentsCollection), (querySnapshot) => {
             const res: Assignment[] = [];
             querySnapshot.forEach((doc) => {
                 res.push({ ID: doc.id, ...doc.data() } as Assignment);

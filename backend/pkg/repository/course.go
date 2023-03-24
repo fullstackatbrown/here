@@ -102,8 +102,12 @@ func (fr *FirebaseRepository) checkUniqueEntryCode(entryCode string) bool {
 }
 
 func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (course *models.Course, err error) {
-	course, err = fr.GetCourseByInfo(req.Code, req.Term)
-	if err == nil {
+
+	courseID := models.CreateCourseID(req)
+
+	// Check if an assignment with the same name already exists
+	c, err := fr.GetCourseByID(courseID)
+	if err == nil && c != nil {
 		return nil, qerrors.CourseAlreadyExistsError
 	}
 
@@ -116,13 +120,11 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 	}
 
 	course = &models.Course{
-		Title:         req.Title,
-		Code:          req.Code,
-		Term:          req.Term,
-		EntryCode:     entryCode,
-		SectionIDs:    make([]string, 0),
-		AssignmentIDs: make([]string, 0),
-		Students:      make(map[string]string),
+		Title:     req.Title,
+		Code:      req.Code,
+		Term:      req.Term,
+		EntryCode: entryCode,
+		Students:  make(map[string]string),
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Add(firebase.Context, course)

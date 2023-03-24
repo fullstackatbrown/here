@@ -41,9 +41,10 @@ func ResponsesRoutes() *chi.Mux {
 }
 
 func getSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	surveyID := r.Context().Value("surveyID").(string)
 
-	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -63,32 +64,7 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 
-	course, err := repo.Repository.GetCourseByID(courseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// deny the request if a survey already exists under the course
-	if course.SurveyID != "" {
-		http.Error(w, "Survey already exists for this course", http.StatusBadRequest)
-		return
-	}
-
-	// Get all the section times
-	sections, err := repo.Repository.GetSectionByCourse(req.CourseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	capacity, err := models.GetUniqueSectionTimes(sections)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	s, err := repo.Repository.CreateSurvey(req, capacity)
+	s, err := repo.Repository.CreateSurvey(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -111,7 +87,7 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	req.SurveyID = &surveyID
 	req.CourseID = &courseID
 
-	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -153,9 +129,10 @@ func deleteSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	surveyID := r.Context().Value("surveyID").(string)
 
-	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -171,7 +148,7 @@ func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = repo.Repository.PublishSurvey(surveyID)
+	err = repo.Repository.PublishSurvey(courseID, surveyID)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -183,9 +160,10 @@ func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	surveyID := r.Context().Value("surveyID").(string)
 
-	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -196,9 +174,9 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// res is a map from section id to list of studentIDs
 	res = utils.GetAssignedSections(res, survey.Capacity)
-	repo.Repository.UpdateSurveyResults(surveyID, res)
+	repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
 
-	readableResults, err := generateReadableResults(res)
+	readableResults, err := generateReadableResults(courseID, res)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -208,9 +186,10 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	surveyID := r.Context().Value("surveyID").(string)
 
-	survey, err := repo.Repository.GetSurveyByID(surveyID)
+	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -260,11 +239,11 @@ func updateSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Helpers
-func generateReadableResults(results map[string][]string) (readableResults []models.GenerateResultsResponseItem, err error) {
+func generateReadableResults(courseID string, results map[string][]string) (readableResults []models.GenerateResultsResponseItem, err error) {
 	readableResults = make([]models.GenerateResultsResponseItem, 0)
 
 	for sectionID, studentIDs := range results {
-		section, err := repo.Repository.GetSectionByID(sectionID)
+		section, err := repo.Repository.GetSectionByID(courseID, sectionID)
 		if err != nil {
 			return nil, err
 		}
