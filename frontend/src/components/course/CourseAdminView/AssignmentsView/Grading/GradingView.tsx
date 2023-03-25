@@ -3,8 +3,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FormControl, IconButton, InputLabel, Select, Stack, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material';
 import { styled } from "@mui/material/styles";
 import MuiTableCell from "@mui/material/TableCell";
+import { arraySubtract, arrayUnion } from '@util/shared/array';
+import getStudentsInSection from '@util/shared/getStudentsInSection';
+import { useStudentsByIDs } from 'api/users/hooks';
 import { Assignment } from 'model/assignment';
 import { Course } from 'model/course';
+import { Section } from 'model/section';
 import { FC, useState } from 'react';
 
 interface GradingViewProps {
@@ -25,16 +29,35 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 }))
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
-    const [selectedSection, setSelectedSection] = useState<string | null>(null)
+    const [selectedSection, setSelectedSection] = useState<Section | null>(null)
+    const [students, studentsLoading] = useStudentsByIDs(Object.keys(course.students || {}))
 
     const getStudents = () => {
         if (!selectedSection) {
-            return []
-            // return Object.keys(course.students)
+            return course.students ? Object.keys(course.students) : []
         } else {
+            if (!course.students) return []
+            let students = getStudentsInSection(course.students, selectedSection.ID)
 
+            // filter out swapped out students
+            if (selectedSection.swappedOutStudents && assignment.ID in selectedSection.swappedOutStudents) {
+                students = arraySubtract(students, selectedSection.swappedOutStudents[assignment.ID])
+            }
+
+            // add in swapped in students
+            if (selectedSection.swappedInStudents && assignment.ID in selectedSection.swappedInStudents) {
+                students = arrayUnion(students, selectedSection.swappedInStudents[assignment.ID])
+            }
+            return students
         }
     }
+
+    // const getGradeByStudent = (studentID: string) => {
+    //     if (!assignment.gradesByStudent || !(studentID in assignment.gradesByStudent)) {
+    //         return null
+    //     }
+    //     return assignment.gradesByStudent[studentID]
+    // }
 
     return (
         <>
@@ -47,16 +70,16 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                         <ArrowBackIcon />
                     </IconButton>
                 </Stack>
-                <FormControl variant="standard">
-                    {/* <InputLabel id="section-select-label">Assignment</InputLabel> */}
+                {/* <FormControl variant="standard">
+                    <InputLabel id="section-select-label">Assignment</InputLabel>
                     <Select
                         // labelId="assignment-select-label"
                         label="Assignment"
                         required
                     >
-                        {/* <MenuItem key={`select-assignment-${a.ID}`} value={a.ID}>{a.name}</MenuItem> */}
+                        <MenuItem key={`select-assignment-${a.ID}`} value={a.ID}>{a.name}</MenuItem>
                     </Select>
-                </FormControl>
+                </FormControl> */}
             </Stack>
             <Table>
                 <TableHead>
@@ -67,10 +90,11 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {getStudents().map((studentID, id) =>
-                        <TableRow key={studentID}>
+                    {students && students.map((user) => {
+                        // const gradeID = getGradeByStudent(user.ID)
+                        return <TableRow key={user.ID}>
                             <TableCell component="th" scope="row">
-                                NAME
+                                {user.displayName}
                             </TableCell>
                             <TableCell component="th" scope="row">
                                 <GradeChip score={1} maxScore={assignment.maxScore} />
@@ -79,8 +103,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                                 Graded by
                             </TableCell>
                         </TableRow>
+                    }
                     )}
-
                 </TableBody>
             </Table>
 

@@ -60,12 +60,13 @@
 
 ### Methods - Users
 
-| Description        | Route                           | Body                                              | Auth |
-|--------------------|---------------------------------|---------------------------------------------------|------|
-| Get current user   | `GET /users`                    |                                                   | All  |
-| Get user by ID     | `GET /users/{userId}`           |                                                   | All  |
-| Update user        | `PATCH /users/{userId}`         |                                                   | All  |
-| Join/Quit a course | `PATCH /users/{userId}/courses` | Mandatory: `accessCode`, Action: `JOIN` or `QUIT` | All  |
+| Description      | Route                              | Body                    | Auth |
+|------------------|------------------------------------|-------------------------|------|
+| Get current user | `GET /users`                       |                         | All  |
+| Get user by ID   | `GET /users/{userId}`              |                         | All  |
+| Update user      | `PATCH /users/{userId}`            |                         | All  |
+| Join a course    | `PATCH /users/{userId}/joinCourse` | Mandatory: `accessCode` | All  |
+| Quit a course    | `PATCH /users/{userId}/quitCourse` | Mandatory: `courseID`   | All  |
 
 ## Data Schema
 

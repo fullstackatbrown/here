@@ -136,9 +136,9 @@ func (fr *FirebaseRepository) getProfileById(id string) (*models.Profile, error)
 	}
 }
 
-func (fr *FirebaseRepository) QuitCourse(req *models.JoinOrQuitCourseRequest) error {
+func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 	// Check if course exists
-	course, err := fr.GetCourseByEntryCode(req.EntryCode)
+	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return err
 	}
@@ -174,22 +174,24 @@ func (fr *FirebaseRepository) QuitCourse(req *models.JoinOrQuitCourseRequest) er
 	return nil
 }
 
-func (fr *FirebaseRepository) JoinCourse(req *models.JoinOrQuitCourseRequest) error {
+func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models.Course, error) {
 
+	fmt.Println(req.EntryCode)
 	// Check if course exists
 	course, err := fr.GetCourseByEntryCode(req.EntryCode)
+	fmt.Println(course, err)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Check if already enrolled
 	profile, err := fr.getProfileById(req.UserID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if utils.Contains(profile.Courses, course.ID) {
-		return fmt.Errorf("Student is already enrolled in course")
+		return nil, fmt.Errorf("Student is already enrolled in course")
 	}
 
 	batch := fr.firestoreClient.Batch()
@@ -217,10 +219,10 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinOrQuitCourseRequest) er
 	// Commit the batch.
 	_, err = batch.Commit(firebase.Context)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return course, nil
 
 }
 

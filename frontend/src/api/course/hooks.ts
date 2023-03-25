@@ -48,7 +48,7 @@ export function useCourses(): [Course[] | undefined, boolean] {
 
     useEffect(() => {
         const db = getFirestore();
-        const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
+        const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection), (querySnapshot) => {
             const res: Course[] = [];
             querySnapshot.forEach((doc) => {
                 res.push({ ID: doc.id, ...doc.data() } as Course);

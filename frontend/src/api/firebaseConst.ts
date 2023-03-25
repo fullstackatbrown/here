@@ -1,6 +1,6 @@
 export const FirestoreCoursesCollection = "courses";
 export const FirestoreAssignmentsCollection = "assignments";
-export const FirestoreUsersCollection = "users";
+export const FirestoreUsersCollection = "user_profiles";
 export const FirestoreSectionsCollection = "sections";
 export const FirestoreSurveysCollection = "surveys";
 

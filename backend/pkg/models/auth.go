@@ -33,9 +33,12 @@ type CreateUserProfileRequest struct {
 	DisplayName string `json:"displayName"`
 }
 
-// request for joining or quitting a course
-type JoinOrQuitCourseRequest struct {
-	UserID    string     `json:"join,omitempty"`
-	Action    ActionType `json:"action"`
-	EntryCode string     `json:"entryCode"`
+type JoinCourseRequest struct {
+	UserID    string `json:"join,omitempty"`
+	EntryCode string `json:"entryCode"`
+}
+
+type QuitCourseRequest struct {
+	UserID   string `json:"join,omitempty"`
+	CourseID string `json:"courseID"`
 }
