@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var (
+const (
 	FirestoreAssignmentsCollection = "assignments"
 )
 

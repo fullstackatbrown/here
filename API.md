@@ -50,13 +50,12 @@
 
 ### Methods - Grades
 
-| Description              | Route                                                                   | Body                                    | Auth  |
-|--------------------------|-------------------------------------------------------------------------|-----------------------------------------|-------|
-| Get grades by assignment | `GET /courses/{courseId}/assignments/{assignmentID}grades`              |                                         | Staff |
-| Get grades by student    | `GET /courses/{courseId}/grades`                                        | Mandatory: `studentID`                  | All   |
-| Create a grade           | `POST /courses/{courseId}/assignments/{assignmentID}/grades`            | Mandatory: `studentID`, `grade`, `taID` | Staff |
-| Update a grade           | `PATCH /courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}` | Mandatory: `studentID`, `grade`, `taID` | Staff |
-| Export grades            | `POST /courses/{courseId}/exportGrades`                                 |                                         | Admin |
+| Description    | Route                                                                    | Body                                    | Auth  |
+|----------------|--------------------------------------------------------------------------|-----------------------------------------|-------|
+| Create a grade | `POST /courses/{courseId}/assignments/{assignmentID}/grades`             | Mandatory: `studentID`, `grade`, `taID` | Staff |
+| Update a grade | `PATCH /courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}`  | Mandatory: `studentID`, `grade`, `taID` | Staff |
+| Update a grade | `DELETE /courses/{courseId}/assignments/{assignmentID}/grades/{gradeId}` | Mandatory: `studentID`, `taID`          | Staff |
+| Export grades  | `POST /courses/{courseId}/export`                                        |                                         | Admin |
 
 ### Methods - Users
 
@@ -107,7 +106,7 @@
             assignmentID: string
             grade: int                             # grade
             gradedBy: string                       # id of the TA that graded the assignment
-            timeUpdated: Timestamp                 # when the time was updated
+            timeUpdated: string                    # when the time was updated
 
     <b>swapRequest (sub-collection)</b>
         id: string

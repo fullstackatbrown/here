@@ -21,6 +21,7 @@ func AssignmentRoutes() *chi.Mux {
 		router.Get("/", getAssignmentHandler)
 		router.Delete("/", deleteAssignmentHandler)
 		router.Patch("/", updateAssignmentHandler)
+		router.Mount("/grades", GradesRoutes())
 	})
 
 	return router

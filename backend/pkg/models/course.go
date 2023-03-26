@@ -2,7 +2,7 @@ package models
 
 import "strings"
 
-var (
+const (
 	FirestoreCoursesCollection = "courses"
 )
 

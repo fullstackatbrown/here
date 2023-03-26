@@ -7,7 +7,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/utils"
 )
 
-var (
+const (
 	FirestoreSectionsCollection = "sections"
 )
 
