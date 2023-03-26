@@ -5,6 +5,7 @@ import { styled } from "@mui/material/styles";
 import MuiTableCell from "@mui/material/TableCell";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import getStudentsInSection from '@util/shared/getStudentsInSection';
+import { useGrades } from 'api/grades/hooks';
 import { useStudentsByIDs } from 'api/users/hooks';
 import { Assignment } from 'model/assignment';
 import { Course } from 'model/course';
@@ -30,6 +31,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
     const [selectedSection, setSelectedSection] = useState<Section | null>(null)
+    const [grades, loading] = useGrades(course.ID, assignment.ID)
     const [students, studentsLoading] = useStudentsByIDs(Object.keys(course.students || {}))
 
     const getStudents = () => {
@@ -51,13 +53,6 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
             return students
         }
     }
-
-    // const getGradeByStudent = (studentID: string) => {
-    //     if (!assignment.gradesByStudent || !(studentID in assignment.gradesByStudent)) {
-    //         return null
-    //     }
-    //     return assignment.gradesByStudent[studentID]
-    // }
 
     return (
         <>
@@ -91,16 +86,17 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                 </TableHead>
                 <TableBody>
                     {students && students.map((user) => {
+                        const grade = grades && user.ID in grades ? grades[user.ID] : undefined
                         // const gradeID = getGradeByStudent(user.ID)
                         return <TableRow key={user.ID}>
                             <TableCell component="th" scope="row">
                                 {user.displayName}
                             </TableCell>
                             <TableCell component="th" scope="row">
-                                <GradeChip score={1} maxScore={assignment.maxScore} />
+                                <GradeChip score={grade ? grade.grade : undefined} maxScore={assignment.maxScore} />
                             </TableCell>
                             <TableCell component="th" scope="row">
-                                Graded by
+                                {grade ? grade.gradedBy : "/"}
                             </TableCell>
                         </TableRow>
                     }

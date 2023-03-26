@@ -46,13 +46,12 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 	}
 
 	assignment = &models.Assignment{
-		CourseID:        req.CourseID,
-		Name:            req.Name,
-		Optional:        req.Optional,
-		MaxScore:        req.MaxScore,
-		ReleaseDate:     req.ReleaseDate,
-		DueDate:         req.DueDate,
-		GradesByStudent: make(map[string]string),
+		CourseID:    req.CourseID,
+		Name:        req.Name,
+		Optional:    req.Optional,
+		MaxScore:    req.MaxScore,
+		ReleaseDate: req.ReleaseDate,
+		DueDate:     req.DueDate,
 	}
 
 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(

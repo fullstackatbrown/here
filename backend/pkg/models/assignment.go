@@ -10,14 +10,13 @@ const (
 )
 
 type Assignment struct {
-	ID              string            `firestore:"id,omitempty"`
-	CourseID        string            `firestore:"courseID"`
-	Name            string            `firestore:"name"`
-	Optional        bool              `firestore:"optional"`
-	MaxScore        int               `firestore:"maxScore"`
-	ReleaseDate     string            `firestore:"releaseDate"`
-	DueDate         string            `firestore:"dueDate"`
-	GradesByStudent map[string]string `firestore:"gradesByStudent"`
+	ID          string `firestore:"id,omitempty"`
+	CourseID    string `firestore:"courseID"`
+	Name        string `firestore:"name"`
+	Optional    bool   `firestore:"optional"`
+	MaxScore    int    `firestore:"maxScore"`
+	ReleaseDate string `firestore:"releaseDate"`
+	DueDate     string `firestore:"dueDate"`
 }
 
 type GetAssignmentRequest struct {

@@ -61,7 +61,7 @@ export function useAssignments(courseID: string): [Assignment[] | undefined, boo
             setLoading(false);
         });
         return () => unsubscribe();
-    }, []);
+    }, [courseID]);
 
     // Uncomment this for testing
     // return [dummyAssignments, false];

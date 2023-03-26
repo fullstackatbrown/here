@@ -98,7 +98,6 @@
         maxScore: int                              # maximum points possible
         releaseDate: string                        # when the assignment is released
         dueDate: string                            # when the assignment is due
-        gradesByStudent: map[string]string         # map from studentID to their gradeID
 
         <b>grades (sub-collection)</b>
             id: string                             # unique grade id
