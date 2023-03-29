@@ -13,7 +13,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
 func (fr *FirebaseRepository) GetAssignmentByID(courseID string, assignmentID string) (*models.Assignment, error) {
 
 	doc, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(

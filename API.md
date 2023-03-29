@@ -41,12 +41,13 @@
 
 ### Methods - Swaps
 
-| Description           | Route                                       | Body                                                                           | Response                        | Auth         |
-|-----------------------|---------------------------------------------|--------------------------------------------------------------------------------|---------------------------------|--------------|
-| Create a Swap Request | `POST /courses/{courseId}/swaps/`           | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All          |
-| Update Swap Request   | `PATCH /courses/{courseId}/swaps/{swapID}/` | Mandatory: `status`                                                            |                                 | Staff & Self |
-| Get all Swaps         | `GET /courses/{courseId}/swaps/`            |                                                                                | JSON of swaps                   | Staff        |
-| Get swap by student   | `GET /courses/{courseId}/swaps/me`          |                                                                                |                                 | All          |
+| Description           | Route                                              | Body                                                                           | Response                        | Auth  |
+|-----------------------|----------------------------------------------------|--------------------------------------------------------------------------------|---------------------------------|-------|
+| Create a Swap Request | `POST /courses/{courseId}/swaps/`                  | Mandatory: `studentID`, `oldSectionID`, `toSectionID`, `isTemporary`, `reason` | `{status: string, msg: string}` | All   |
+| Update Swap Request   | `PATCH /courses/{courseId}/swaps/{swapID}/`        |                                                                                |                                 | Self  |
+| Handle Swap Request   | `PATCH /courses/{courseId}/swaps/{swapID}/handle`  | Mandatory: `status`, `handledBy`                                               |                                 | Staff |
+| Cancel Swap Request   | `DELETE /courses/{courseId}/swaps/{swapID}/handle` |                                                                                |                                 | Self  |
+
 
 ### Methods - Grades
 
@@ -107,12 +108,12 @@
             gradedBy: string                       # id of the TA that graded the assignment
             timeUpdated: string                    # when the time was updated
 
-    <b>swapRequest (sub-collection)</b>
+    <b>swap (sub-collection)</b>
         id: string
         studentID: string                          # ID of student
         oldSectionID: string                       # ID of the section the student is swapping out of
         newSectionID: string                       # ID of the section the student is swapping into
-        isTemporary: bool                          # if this is a temporary swap or not
+        assignmentID: string                       # ID of the assignment for which the request is for, null for permanent swap
         requestTime: timestamp                     # when the request was submitted
         reason: string                             # reason for the swap
         status: string                             # pending, cancelled, approved, denied, archived
