@@ -1,13 +1,12 @@
-import { Box, Button, Grid, Stack, Typography } from "@mui/material";
-import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
-import AssignmentsTable from "./AssignmentsTable";
-import AddIcon from '@mui/icons-material/Add';
-import { Course } from "model/course";
-import { FC, useEffect, useState } from 'react';
-import { useAssignments } from "api/assignment/hooks";
-import { useRouter } from "next/router";
+import { Button, Stack, Typography } from "@mui/material";
 import listToMap from "@util/shared/listToMap";
+import { useAssignments } from "api/assignment/hooks";
 import { Assignment } from "model/assignment";
+import { Course } from "model/course";
+import { useRouter } from "next/router";
+import { FC, useEffect, useState } from 'react';
+import AssignmentsTable from "./AssignmentsTable";
+import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
 
 export interface AssignmentsViewProps {

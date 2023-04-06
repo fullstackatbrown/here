@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 )
@@ -30,6 +31,16 @@ func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*mode
 	}
 
 	return grade, nil
+}
+
+func (fr *FirebaseRepository) UpdateGrade(req *models.UpdateGradeRequest) error {
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreAssignmentsCollection).Doc(req.AssignmentID).Collection(
+		models.FirestoreGradesCollection).Doc(req.GradeID).Update(firebase.Context, []firestore.Update{
+		{Path: "grade", Value: req.Grade},
+		{Path: "gradedBy", Value: req.GradedBy},
+	})
+	return err
 }
 
 func (fr *FirebaseRepository) DeleteGrade(req *models.DeleteGradeRequest) error {

@@ -8,35 +8,48 @@ interface GradeChipProps {
   score: number | undefined;
   maxScore: number;
   editable?: boolean;
-  submitGrade?: (grade: number) => void;
+  handleCreateGrade?: (grade: number) => void;
+  handleUpdateGrade?: (grade: number) => void;
+  handleDeleteGrade?: () => void;
 }
 
 type FormData = {
-  grade: number
+  grade: string
 };
 
-const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, submitGrade }) => {
+const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, handleCreateGrade, handleUpdateGrade, handleDeleteGrade }) => {
 
-  const { register, handleSubmit, getValues, reset, watch, formState: { } } = useForm<FormData>({
-    defaultValues: { grade: score }
+  const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
+    defaultValues: { grade: score ? score.toString() : "" }
   });
 
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => console.log(value, name, type));
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  useEffect(() => { reset({ grade: score }) }, [score])
+  useEffect(() => { reset({ grade: score ? score.toString() : "" }) }, [score])
 
   const onSubmit = handleSubmit(async data => {
-    if (isNaN(Number(data.grade))) {
+    const grade = Number(data.grade)
+    if (isNaN(grade)) {
       alert("Grade must be a number")
       reset()
       return
     }
-    if (submitGrade) {
-      submitGrade(data.grade)
+    // if there existed a grade
+    if (score !== undefined) {
+      // if we are trying to delete it
+      if (data.grade === "") {
+        const confirmed = confirm("Are you sure you want to delete this grade?")
+        confirmed && handleDeleteGrade && handleDeleteGrade()
+      } else {
+        handleUpdateGrade && handleUpdateGrade(grade)
+      }
+    } else {
+      if (data.grade === "") {
+        alert("Please enter a grade")
+        reset()
+        return
+      }
+      handleCreateGrade && handleCreateGrade(grade)
     }
+
   })
 
   return (

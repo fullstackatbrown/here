@@ -1,18 +1,17 @@
+import ClearIcon from '@mui/icons-material/Clear';
+import CreateIcon from "@mui/icons-material/Create";
+import { Box, Chip, IconButton, Stack, Table, TableBody, TableHead, TableRow } from "@mui/material";
+import MuiTableCell from "@mui/material/TableCell";
+import { styled } from "@mui/material/styles";
+import { sortAssignments } from '@util/shared/assignments';
+import AssignmentAPI from 'api/assignment/api';
+import dayjs from 'dayjs';
+import { Assignment } from 'model/assignment';
+import { Course } from 'model/course';
 import * as React from 'react';
 import { FC, useState } from "react";
-import { Box, Chip, IconButton, Stack, Table, TableBody, TableContainer, TableHead, TableRow } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import MuiTableCell from "@mui/material/TableCell";
-import CreateIcon from "@mui/icons-material/Create";
-import ClearIcon from '@mui/icons-material/Clear';
-import { Assignment } from 'model/assignment';
-import dayjs from 'dayjs';
-import CreateEditAssignmentDialog from './CreateEditAssignmentDialog';
-import { sortAssignments } from '@util/shared/assignments';
 import toast from 'react-hot-toast';
-import AssignmentAPI from 'api/assignment/api';
-import { Course } from 'model/course';
-import { useRouter } from 'next/router';
+import CreateEditAssignmentDialog from './CreateEditAssignmentDialog';
 
 export interface AssignmentsTableProps {
   course: Course;
