@@ -8,6 +8,7 @@ import {
 import { useSwapRequests } from "@util/swaps/hooks";
 import { Course } from "model/course";
 import PendingRequestsView from "./PendingRequests/PendingRequestsView";
+import PastRequestsView from "./PastRequests/PastRequestsView";
 
 export interface RequestsViewProps {
   course: Course;
@@ -34,9 +35,15 @@ export default function RequestsView({ course }: RequestsViewProps) {
             <Typography variant="h6">Pending Requests</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Stack>
-              <PendingRequestsView pendingRequests={pendingSwapRequests} />
-            </Stack>
+            <PendingRequestsView pendingRequests={pendingSwapRequests} />
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>
+            <Typography variant="h6">Past Requests</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <PastRequestsView pastRequests={pastSwapRequests} />
           </AccordionDetails>
         </Accordion>
       </Stack>
