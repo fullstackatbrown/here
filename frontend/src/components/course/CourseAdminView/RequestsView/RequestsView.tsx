@@ -9,6 +9,7 @@ import { useSwapRequests } from "@util/swaps/hooks";
 import { Course } from "model/course";
 import PendingRequestsView from "./PendingRequests/PendingRequestsView";
 import PastRequestsView from "./PastRequests/PastRequestsView";
+import { ExpandMore } from "@mui/icons-material";
 
 export interface RequestsViewProps {
   course: Course;
@@ -23,23 +24,17 @@ export default function RequestsView({ course }: RequestsViewProps) {
 
   return (
     <>
-      {/* <Stack direction="row" justifyContent="space-between">
-        <RequestStatusChip status="approved" size="small" />
-        <RequestStatusChip status="denied" size="small" />
-        <RequestStatusChip status="archived" size="small" />
-        <RequestStatusChip status="cancelled" size="small" />
-      </Stack> */}
       <Stack>
-        <Accordion>
-          <AccordionSummary>
+        <Accordion square style={{paddingBottom: "20px", backgroundImage: "none"}}>
+          <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="h6">Pending Requests</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <PendingRequestsView pendingRequests={pendingSwapRequests} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
-          <AccordionSummary>
+        <Accordion square style={{backgroundImage: "none"}}>
+          <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="h6">Past Requests</Typography>
           </AccordionSummary>
           <AccordionDetails>
