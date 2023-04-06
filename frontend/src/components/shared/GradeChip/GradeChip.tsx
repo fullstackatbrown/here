@@ -55,6 +55,8 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, subm
             sx={{
               color: score === undefined ? "text.disabled" : "",
               textAlign: "center",
+              display: "flex",
+              alignItems: "center",
             }}
           >
             {score === undefined ? <HelpOutlineIcon fontSize="small" /> : score}
