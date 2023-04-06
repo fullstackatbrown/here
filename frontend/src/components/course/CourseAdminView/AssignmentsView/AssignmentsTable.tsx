@@ -64,11 +64,11 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments, hand
         assignment={editAssignmentDialog} />
       <Table>
         <colgroup>
-          <col width="40%" />
+          <col width="38%" />
           <col width="20%" />
           <col width="20%" />
-          <col width="15%" />
-          <col width="15%" />
+          <col width="10%" />
+          <col width="22%" />
         </colgroup>
         <TableHead>
           <TableRow>
@@ -96,7 +96,7 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments, hand
                   {dayjs(assignment.dueDate).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {assignment.maxScore}
+                  &nbsp;{assignment.maxScore}
                 </TableCell>
                 <TableCell component="th" scope="row">
                   <Stack direction="row">
