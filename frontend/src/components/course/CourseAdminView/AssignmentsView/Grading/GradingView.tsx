@@ -1,19 +1,18 @@
 import GradeChip from '@components/shared/GradeChip/GradeChip';
+import { ClickAwayListener } from '@mui/base';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { FormControl, IconButton, InputLabel, Select, Stack, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material';
-import { styled } from "@mui/material/styles";
+import { IconButton, Stack, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material';
 import MuiTableCell from "@mui/material/TableCell";
+import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import getStudentsInSection from '@util/shared/getStudentsInSection';
+import GradeAPI from 'api/grades/api';
 import { useGrades } from 'api/grades/hooks';
-import { useStudentsByIDs } from 'api/users/hooks';
 import { Assignment } from 'model/assignment';
 import { Course } from 'model/course';
-import { Grade } from 'model/grades';
 import { Section } from 'model/section';
-import { ClickAwayListener } from '@mui/base';
 import { FC, useState } from 'react';
-import { User } from 'model/user';
+import toast from 'react-hot-toast';
 
 interface GradingViewProps {
     course: Course;
@@ -57,6 +56,45 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
         }
     }
 
+    const handleSubmitGrade = (userID: string) => {
+        return (grade: number) => {
+            toast.promise(GradeAPI.createGrade(course.ID, assignment.ID, userID, grade, "temp_ta_id"),
+                {
+                    loading: "Submitting grade...",
+                    success: "Grade submitted!",
+                    error: "Error submitting grade"
+                })
+                .then(() => setEditGrade(null))
+                .catch(() => setEditGrade(null))
+        }
+    }
+
+    const handleUpdateGrade = (gradeID: string, userID: string) => {
+        return (grade: number) => {
+            toast.promise(GradeAPI.updateGrade(course.ID, assignment.ID, gradeID, userID, grade, "temp_ta_id"),
+                {
+                    loading: "Updating grade...",
+                    success: "Grade updated!",
+                    error: "Error updating grade"
+                })
+                .then(() => setEditGrade(null))
+                .catch(() => setEditGrade(null))
+        }
+    }
+
+    const handleDeleteGrade = (gradeID: string) => {
+        return () => {
+            toast.promise(GradeAPI.deleteGrade(course.ID, assignment.ID, gradeID),
+                {
+                    loading: "Deleting grade...",
+                    success: "Grade deleted",
+                    error: "Error deleting grade"
+                })
+                .then(() => setEditGrade(null))
+                .catch(() => setEditGrade(null))
+        }
+    }
+
     return (
         <>
             <Stack direction="row" justifyContent="space-between" mb={1}>
@@ -68,16 +106,6 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                         <ArrowBackIcon />
                     </IconButton>
                 </Stack>
-                {/* <FormControl variant="standard">
-                    <InputLabel id="section-select-label">Assignment</InputLabel>
-                    <Select
-                        // labelId="assignment-select-label"
-                        label="Assignment"
-                        required
-                    >
-                        <MenuItem key={`select-assignment-${a.ID}`} value={a.ID}>{a.name}</MenuItem>
-                    </Select>
-                </FormControl> */}
             </Stack>
             <Table>
                 <colgroup>
@@ -94,24 +122,6 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                 </TableHead>
                 <ClickAwayListener onClickAway={() => setEditGrade(null)}>
                     <TableBody>
-                        {/* {grades && grades.map((grade) => {
-                            return <TableRow hover key={grade.ID} onClick={() => setEditGrade(grade)}>
-                                <TableCell component="th" scope="row">
-                                    {grade.studentID}
-                                </TableCell>
-                                <TableCell component="th" scope="row">
-                                    <GradeChip
-                                        score={grade ? grade.grade : undefined}
-                                        maxScore={assignment.maxScore}
-                                        editable={editGrade && editGrade.ID === grade.ID}
-                                    />
-                                </TableCell>
-                                <TableCell component="th" scope="row">
-                                    {grade ? grade.gradedBy : "/"}
-                                </TableCell>
-                            </TableRow>
-                        }
-                        )} */}
                         {getStudents().map((userID) => {
                             const grade = grades && userID in grades ? grades[userID] : undefined
                             return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
@@ -123,6 +133,9 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                                         score={grade ? grade.grade : undefined}
                                         maxScore={assignment.maxScore}
                                         editable={editGrade && editGrade === userID}
+                                        handleCreateGrade={handleSubmitGrade(userID)}
+                                        handleUpdateGrade={grade ? handleUpdateGrade(grade.ID, userID) : undefined}
+                                        handleDeleteGrade={grade ? handleDeleteGrade(grade.ID) : undefined}
                                     />
                                 </TableCell>
                                 <TableCell component="th" scope="row">
