@@ -1,3 +1,5 @@
+import { Stack, Typography } from "@mui/material";
+import formatSectionTime from "@util/shared/formatSectionTime";
 import { SwapRequest } from "model/swapRequest";
 import { FC } from "react";
 
@@ -5,11 +7,16 @@ export interface PendingRequestProps {
   pendingRequest: SwapRequest;
 }
 
-const PendingRequest: FC<PendingRequestProps> = ({
-  pendingRequest,
-}) => {
+const PendingRequest: FC<PendingRequestProps> = ({ pendingRequest }) => {
+  const whichSection = pendingRequest.assignmentID
+    ? pendingRequest.newSectionID
+    : "Permanent";
+
   return (
-    <div>hello</div>
+    <Stack direction="row">
+      <Typography>{`${pendingRequest.studentID} - ${whichSection}`}</Typography>
+      <Typography>{}</Typography>
+    </Stack>
   );
 };
 
