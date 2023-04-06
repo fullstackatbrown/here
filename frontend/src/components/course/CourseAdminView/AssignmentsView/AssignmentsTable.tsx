@@ -63,6 +63,13 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments, hand
         course={course}
         assignment={editAssignmentDialog} />
       <Table>
+        <colgroup>
+          <col width="40%" />
+          <col width="20%" />
+          <col width="20%" />
+          <col width="15%" />
+          <col width="15%" />
+        </colgroup>
         <TableHead>
           <TableRow>
             <TableCell>Assignment</TableCell>

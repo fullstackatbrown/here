@@ -1,16 +1,18 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { FC } from 'react';
+import EditIcon from "@mui/icons-material/Edit";
 
 interface GradeChipProps {
   score: number | undefined;
   maxScore: number;
+  editable?: boolean;
 }
 
-const GradeChip: FC<GradeChipProps> = ({ score, maxScore }) => {
+const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = true }) => {
   return (
-    <Stack direction="row" spacing={2}>
-      <Box sx={{ width: "15px" }}>
+    <Stack direction="row" spacing={2} alignItems="center">
+      <Box sx={{ width: editable ? "50px" : "15px" }}>
         <Typography
           variant="body2"
           sx={{
@@ -18,7 +20,15 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore }) => {
             textAlign: "center",
           }}
         >
-          {score === undefined ? <HelpOutlineIcon fontSize="small" /> : score}
+          {editable ?
+            < TextField
+              size="small" variant="outlined"
+              autoFocus inputProps={{ padding: 0 }}
+              defaultValue={score}
+            />
+            :
+            (score === undefined ? <HelpOutlineIcon fontSize="small" /> : score)
+          }
         </Typography>
       </Box>
       <Box sx={{ width: "12px" }}>
@@ -43,6 +53,9 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore }) => {
           {maxScore}
         </Typography>
       </Box>
+      {/* <IconButton size="small">
+        <EditIcon fontSize="small" />
+      </IconButton> */}
     </Stack>
   );
 };

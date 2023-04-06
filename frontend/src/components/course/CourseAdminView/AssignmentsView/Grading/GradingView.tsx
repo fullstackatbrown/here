@@ -9,7 +9,9 @@ import { useGrades } from 'api/grades/hooks';
 import { useStudentsByIDs } from 'api/users/hooks';
 import { Assignment } from 'model/assignment';
 import { Course } from 'model/course';
+import { Grade } from 'model/grades';
 import { Section } from 'model/section';
+import { ClickAwayListener } from '@mui/base';
 import { FC, useState } from 'react';
 
 interface GradingViewProps {
@@ -32,7 +34,8 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
     const [selectedSection, setSelectedSection] = useState<Section | null>(null)
     const [grades, loading] = useGrades(course.ID, assignment.ID)
-    const [students, studentsLoading] = useStudentsByIDs(Object.keys(course.students || {}))
+    const [editGrade, setEditGrade] = useState<Grade | null>(null)
+    // const [students, studentsLoading] = useStudentsByIDs(Object.keys(course.students || {}))
 
     const getStudents = () => {
         if (!selectedSection) {
@@ -77,6 +80,11 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                 </FormControl> */}
             </Stack>
             <Table>
+                <colgroup>
+                    <col width="30%" />
+                    <col width="30%" />
+                    <col width="30%" />
+                </colgroup>
                 <TableHead>
                     <TableRow>
                         <TableCell>Student</TableCell>
@@ -84,11 +92,31 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                         <TableCell>Graded by</TableCell>
                     </TableRow>
                 </TableHead>
-                <TableBody>
-                    {students && students.map((user) => {
+                <ClickAwayListener onClickAway={() => setEditGrade(null)}>
+                    <TableBody>
+                        {grades && grades.map((grade) => {
+                            return <TableRow hover key={grade.ID} onClick={() => setEditGrade(grade)}>
+                                <TableCell component="th" scope="row">
+                                    {grade.studentID}
+                                    {/* {user.displayName} */}
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <GradeChip
+                                        score={grade ? grade.grade : undefined}
+                                        maxScore={assignment.maxScore}
+                                        editable={editGrade && editGrade.ID === grade.ID}
+                                    />
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    {grade ? grade.gradedBy : "/"}
+                                </TableCell>
+                            </TableRow>
+                        }
+                        )}
+                        {/* {students && students.map((user) => {
                         const grade = grades && user.ID in grades ? grades[user.ID] : undefined
                         // const gradeID = getGradeByStudent(user.ID)
-                        return <TableRow key={user.ID}>
+                        return <TableRow key={user.ID} hover>
                             <TableCell component="th" scope="row">
                                 {user.displayName}
                             </TableCell>
@@ -100,8 +128,9 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                             </TableCell>
                         </TableRow>
                     }
-                    )}
-                </TableBody>
+                    )} */}
+                    </TableBody>
+                </ClickAwayListener>
             </Table>
 
         </>
