@@ -42,7 +42,7 @@ const SectionsView: FC<SectionsViewProps> = ({ course }) => {
       </Stack>
       <Stack direction="column" spacing={2} mb={5}>
         {sections && sortSections(sections).map((s) =>
-          <SectionCard section={s as Section} enrollment={getEnrollment((s as Section).ID)} />)
+          <SectionCard key={s.ID} section={s} enrollment={getEnrollment(s.ID)} />)
         }
       </Stack>
       {sections && sections.length > 0 && <AvailabilitySurvey sections={sections} course={course} />}

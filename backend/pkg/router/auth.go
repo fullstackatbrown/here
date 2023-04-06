@@ -19,7 +19,8 @@ func AuthRoutes() *chi.Mux {
 		r.Use(auth.AuthCtx())
 		r.Get("/", getUserHandler)
 		// r.Patch("/", updateUserHandler)
-		r.Patch("/courses", joinOrQuitCourseHandler)
+		r.Patch("/joinCourse", joinCourseHandler)
+		r.Patch("/quitCourse", quitCourseHandler)
 	})
 
 	return router
@@ -68,10 +69,10 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, user)
 }
 
-func joinOrQuitCourseHandler(w http.ResponseWriter, r *http.Request) {
+func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(string)
 
-	var req *models.JoinOrQuitCourseRequest
+	var req *models.JoinCourseRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -80,19 +81,34 @@ func joinOrQuitCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.UserID = userID
 
-	if req.Action == models.ACTION_JOIN {
-		err = repo.Repository.JoinCourse(req)
-
-	} else if req.Action == models.ACTION_QUIT {
-		err = repo.Repository.QuitCourse(req)
-	}
-
+	course, err := repo.Repository.JoinCourse(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(200)
-	w.Write([]byte("Request success"))
+	w.Write([]byte("Successfully joined course " + course.ID))
+}
 
+func quitCourseHandler(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(string)
+
+	var req *models.QuitCourseRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	req.UserID = userID
+
+	err = repo.Repository.QuitCourse(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully quit course " + req.CourseID))
 }

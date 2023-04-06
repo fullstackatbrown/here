@@ -1,18 +1,22 @@
 package models
 
-var (
+import (
+	"regexp"
+	"strings"
+)
+
+const (
 	FirestoreAssignmentsCollection = "assignments"
 )
 
 type Assignment struct {
-	ID              string            `firestore:"id,omitempty"`
-	CourseID        string            `firestore:"courseID"`
-	Name            string            `firestore:"name"`
-	Optional        bool              `firestore:"optional"`
-	MaxScore        int               `firestore:"maxScore"`
-	ReleaseDate     string            `firestore:"releaseDate"`
-	DueDate         string            `firestore:"dueDate"`
-	GradesByStudent map[string]string `firestore:"gradesByStudent"`
+	ID          string `firestore:"id,omitempty"`
+	CourseID    string `firestore:"courseID"`
+	Name        string `firestore:"name"`
+	Optional    bool   `firestore:"optional"`
+	MaxScore    int    `firestore:"maxScore"`
+	ReleaseDate string `firestore:"releaseDate"`
+	DueDate     string `firestore:"dueDate"`
 }
 
 type GetAssignmentRequest struct {
@@ -41,4 +45,9 @@ type UpdateAssignmentRequest struct {
 	MaxScore     *int    `json:"maxScore,omitempty"`
 	ReleaseDate  *string `json:"releaseDate,omitempty"`
 	DueDate      *string `json:"dueDate,omitempty"`
+}
+
+func CreateAssignmentID(req *CreateAssignmentRequest) string {
+	id := regexp.MustCompile(`[^a-zA-Z0-9]+`).ReplaceAllString(req.Name, "")
+	return strings.ToLower(id)
 }

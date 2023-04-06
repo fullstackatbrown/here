@@ -1,6 +1,6 @@
 package models
 
-var (
+const (
 	FirestoreSurveysCollection = "surveys"
 )
 
@@ -37,6 +37,7 @@ type UpdateSurveyRequest struct {
 }
 
 type CreateSurveyResponseRequest struct {
+	CourseID     string   `json:"courseID"`
 	UserID       string   `json:"userID"`
 	SurveyID     string   `json:"surveyid,omitempty"`
 	Availability []string `json:"availability"`

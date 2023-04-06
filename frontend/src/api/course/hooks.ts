@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
-import AuthAPI, { User } from "api/auth/api";
+import AuthAPI from "api/auth/api";
 import { Course } from "model/course";
+import { FirestoreCoursesCollection } from "api/firebaseConst";
 
 const dummyCourse1: Course = {
-    ID: "",
+    ID: "1234",
     title: "Deep Learning",
     code: "CSCI 1470",
     term: "Spring 2023",
@@ -47,7 +48,7 @@ export function useCourses(): [Course[] | undefined, boolean] {
 
     useEffect(() => {
         const db = getFirestore();
-        const unsubscribe = onSnapshot(collection(db, "courses"), (querySnapshot) => {
+        const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection), (querySnapshot) => {
             const res: Course[] = [];
             querySnapshot.forEach((doc) => {
                 res.push({ ID: doc.id, ...doc.data() } as Course);
@@ -72,7 +73,7 @@ export function useCourse(courseID: string): [Course | undefined, boolean] {
     useEffect(() => {
         if (courseID) {
             const db = getFirestore();
-            const unsubscribe = onSnapshot(doc(db, "courses", courseID), (doc) => {
+            const unsubscribe = onSnapshot(doc(db, FirestoreCoursesCollection, courseID), (doc) => {
                 if (doc.exists()) {
                     setCourse({ ID: doc.id, ...doc.data() } as Course);
 
@@ -83,34 +84,10 @@ export function useCourse(courseID: string): [Course | undefined, boolean] {
         }
     }, [courseID]);
 
+    // return [dummyCourse1, false]
+
     return [course, loading];
 
     // Uncomment this for testing
     // return [dummyCourse1, false];
-}
-
-export function useCourseStaff(courseID: string): [User[], boolean] {
-    const [loading, setLoading] = useState(true);
-    const [staff, setStaff] = useState<User[]>([]);
-
-    useEffect(() => {
-        if (courseID) {
-            const db = getFirestore();
-            const unsubscribe = onSnapshot(doc(db, "courses", courseID), (doc) => {
-                const data = doc.data();
-                if (data) {
-                    const staffIDs = Object.keys(data.coursePermissions);
-                    Promise.all(staffIDs.map(staffID => AuthAPI.getUserById(staffID)))
-                        .then(res => {
-                            setStaff(res);
-                            setLoading(false);
-                        });
-                }
-            });
-
-            return () => unsubscribe();
-        }
-    }, [courseID]);
-
-    return [staff, loading];
 }

@@ -12,10 +12,12 @@ import { sortAssignments } from '@util/shared/assignments';
 import toast from 'react-hot-toast';
 import AssignmentAPI from 'api/assignment/api';
 import { Course } from 'model/course';
+import { useRouter } from 'next/router';
 
 export interface AssignmentsTableProps {
   course: Course;
   assignments: Assignment[];
+  handleNavigate: (assignmentID: string) => void;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -29,11 +31,19 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
   },
 }))
 
-const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) => {
+const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments, handleNavigate }) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
 
+  const handleEditAssignment = (assignment: Assignment) => {
+    return (e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
+      setEditAssignmentDialog(assignment);
+    }
+  }
+
   const handleDeleteAssignment = (assignment: Assignment) => {
-    return () => {
+    return (e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
       const confirmed = confirm("Are you sure you want to delete this assignment?");
       if (confirmed) {
         toast.promise(AssignmentAPI.deleteAssignment(course.ID, assignment.ID), {
@@ -53,6 +63,13 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) =>
         course={course}
         assignment={editAssignmentDialog} />
       <Table>
+        <colgroup>
+          <col width="38%" />
+          <col width="20%" />
+          <col width="20%" />
+          <col width="10%" />
+          <col width="22%" />
+        </colgroup>
         <TableHead>
           <TableRow>
             <TableCell>Assignment</TableCell>
@@ -65,7 +82,7 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) =>
         <TableBody>
           {assignments && sortAssignments(assignments).map((assignment) => {
             return (
-              <TableRow key={assignment.ID}>
+              <TableRow key={assignment.ID} hover onClick={() => { handleNavigate(assignment.ID) }}>
                 <TableCell component="th" scope="row">
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Box>{assignment.name}</Box>
@@ -79,11 +96,11 @@ const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments }) =>
                   {dayjs(assignment.dueDate).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {assignment.maxScore}
+                  &nbsp;{assignment.maxScore}
                 </TableCell>
                 <TableCell component="th" scope="row">
                   <Stack direction="row">
-                    <IconButton onClick={() => { setEditAssignmentDialog(assignment) }} size={"small"}>
+                    <IconButton onClick={handleEditAssignment(assignment)} size={"small"}>
                       <CreateIcon fontSize="small" />
                     </IconButton>
                     <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"}>

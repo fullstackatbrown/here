@@ -1,67 +1,113 @@
 package router
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
+	"github.com/fullstackatbrown/here/pkg/models"
+	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 )
 
 func SwapRoutes() *chi.Mux {
 	router := chi.NewRouter()
 	// router.Use(middleware.AuthCtx())
 
-	router.Post("/", createSwapRequestHandler)
-	router.Get("/", getAllSwapRequestsHandler)
+	router.Post("/", createSwapHandler)
 	router.Route("/{swapID}", func(router chi.Router) {
 		router.Use(middleware.SwapCtx())
-		router.Get("/me", getSwapRequestByStudentHandler)
-		router.Patch("/", updateSwapRequestHandler)
-
+		router.Patch("/", updateSwapHandler)
+		router.Patch("/handle", handleSwapHandler)
+		router.Delete("/", cancelSwapHandler)
 	})
 
 	return router
 }
 
-func getAllSwapRequestsHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("sectionID").(string)
+func createSwapHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+	var req *models.CreateSwapRequest
 
-	// TODO:
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// render.JSON(w, r, course)
+	req.CourseID = courseID
+
+	swap, err := repo.Repository.CreateSwap(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// TODO: automatically handle swap based on availability
+
+	render.JSON(w, r, swap)
 }
 
-func getSwapRequestByStudentHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("sectionID").(string)
+func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+	swapID := r.Context().Value("swapID").(string)
+	var req *models.UpdateSwapRequest
 
-	// TODO:
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// render.JSON(w, r, course)
+	req.CourseID = &courseID
+	req.SwapID = &swapID
+
+	err = repo.Repository.UpdateSwap(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated swap request " + swapID))
+
 }
 
-func createSwapRequestHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("courseID").(string)
-	// var req *models.CreateAssignmentRequest
+func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+	swapID := r.Context().Value("swapID").(string)
+	var req *models.HandleSwapRequest
 
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// TODO:
-	// render.JSON(w, r, c)
+	req.CourseID = courseID
+	req.SwapID = swapID
+
+	err = repo.Repository.HandleSwap(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated swap request to status " + req.Status))
 }
 
-func updateSwapRequestHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("courseID").(string)
-	// var req *models.UpdateSectionRequest
+func cancelSwapHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+	swapID := r.Context().Value("swapID").(string)
 
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	err := repo.Repository.CancelSwap(courseID, swapID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	// TODO:
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully cancelled swap request " + swapID))
 }

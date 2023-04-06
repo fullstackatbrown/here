@@ -18,7 +18,6 @@ func SectionRoutes() *chi.Mux {
 	// router.Use(middleware.AuthCtx())
 
 	router.Post("/", createSectionHandler)
-	router.Get("/", getAllSectionsHandler)
 	router.Route("/{sectionID}", func(router chi.Router) {
 		router.Use(middleware.SectionCtx())
 		router.Get("/", getSectionHandler)
@@ -30,22 +29,11 @@ func SectionRoutes() *chi.Mux {
 	return router
 }
 
-func getAllSectionsHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-
-	sections, err := repo.Repository.GetSectionByCourse(courseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, sections)
-}
-
 func getSectionHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	sectionID := r.Context().Value("sectionID").(string)
 
-	section, err := repo.Repository.GetSectionByID(sectionID)
+	section, err := repo.Repository.GetSectionByID(courseID, sectionID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

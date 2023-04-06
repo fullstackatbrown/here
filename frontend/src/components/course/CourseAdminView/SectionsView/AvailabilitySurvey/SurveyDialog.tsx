@@ -33,9 +33,6 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
         return [];
     }
 
-    useEffect(() => {
-        console.log(survey)
-    }, [])
     function onSubmit() {
         if (preview) {
             if (new Date(survey.endTime) < new Date()) {
@@ -87,6 +84,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
             <Stack >
                 {sortSurveyTimes(Object.keys(survey.capacity)).map(time =>
                     <FormControlLabel
+                        key={time}
                         control={<Checkbox onChange={onChangeCheckbox(time)} />}
                         label={formatSurveyTime(time)}
                         checked={times.includes(time)}

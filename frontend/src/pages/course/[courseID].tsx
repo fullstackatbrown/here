@@ -29,8 +29,8 @@ export default function CoursePage() {
       {course && !courseLoading &&
         <Stack pt={8} gap={4}>
           <Grid container>
-            <Grid xs={2} />
-            <Grid xs={10}>
+            <Grid item xs={2} />
+            <Grid item xs={10}>
               <CourseHeader course={course} />
             </Grid>
           </Grid>

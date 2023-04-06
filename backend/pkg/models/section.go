@@ -2,9 +2,12 @@ package models
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/fullstackatbrown/here/pkg/utils"
 )
 
-var (
+const (
 	FirestoreSectionsCollection = "sections"
 )
 
@@ -63,15 +66,20 @@ type DeleteSectionRequest struct {
 	SectionID string
 }
 
+func CreateSectionID(req *CreateSectionRequest) (string, error) {
+	startTime, err := utils.ParseIsoTimeToReadableUTC(req.StartTime)
+	if err != nil {
+		return "", fmt.Errorf("Error parsing time: %s", req.StartTime)
+	}
+	endTime, err := utils.ParseIsoTimeToReadableUTC(req.EndTime)
+	if err != nil {
+		return "", fmt.Errorf("Error parsing time: %s", req.EndTime)
+	}
+	location := strings.ToLower(strings.ReplaceAll(req.Location, " ", ""))
+	return fmt.Sprintf("%s,%s,%s,%s", req.Day, startTime, endTime, location), nil
+}
+
 func (section *Section) TimeAsString() (string, error) {
-	// startTime, err := utils.ParseIsoTimeToReadableUTC(section.StartTime)
-	// if err != nil {
-	// 	return "", err
-	// }
-	// endTime, err := utils.ParseIsoTimeToReadableUTC(section.EndTime)
-	// if err != nil {
-	// 	return "", err
-	// }
 	return fmt.Sprintf("%s,%s,%s", section.Day, section.StartTime, section.EndTime), nil
 }
 
