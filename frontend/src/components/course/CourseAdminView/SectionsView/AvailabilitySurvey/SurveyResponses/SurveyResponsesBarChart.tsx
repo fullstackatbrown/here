@@ -13,6 +13,7 @@ import { Bar } from 'react-chartjs-2';
 export interface SurveyResponsesBarChartProps {
     formattedResponses: TimeCount[];
     numResponses: number;
+    numStudents: number;
 }
 
 ChartJS.register(
@@ -25,11 +26,12 @@ ChartJS.register(
 ChartJS.defaults.font.size = 16;
 
 
-const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedResponses, numResponses }) => {
+const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedResponses, numResponses, numStudents }) => {
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: []
     });
+
     const barChartOptions = {
         indexAxis: 'y' as const,
         elements: {
@@ -59,9 +61,21 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
                 anchor: "end" as const,
                 align: "right" as const,
                 formatter: function (value) {
-                    return `${value} (${getPercentage(value)}%)`
+                    if (numResponses === 0) {
+                        return ""
+                    } else {
+                        const percentage = Math.round((value / numResponses) * 100)
+                        return `${value} (${percentage}%)`
+                    }
+
                 },
             }
+        },
+        scales: {
+            x:
+            {
+                max: numResponses > 10 ? numResponses : (numStudents > 10 ? numStudents : 10),
+            },
         },
         events: [],
     };
@@ -79,8 +93,6 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
             ]
         })
     }, [formattedResponses])
-
-    const getPercentage = (count) => Math.round((count / numResponses) * 100)
 
     return <Bar
         data={chartData}

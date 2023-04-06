@@ -16,34 +16,22 @@ func AssignmentRoutes() *chi.Mux {
 	// router.Use(middleware.AuthCtx())
 
 	router.Post("/", createAssignmentHandler)
-	router.Get("/", getAllAssignmentsHandler)
 	router.Route("/{assignmentID}", func(router chi.Router) {
 		router.Use(middleware.AssignmentCtx())
 		router.Get("/", getAssignmentHandler)
 		router.Delete("/", deleteAssignmentHandler)
 		router.Patch("/", updateAssignmentHandler)
-
+		router.Mount("/grades", GradesRoutes())
 	})
 
 	return router
 }
 
-func getAllAssignmentsHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-
-	assignments, err := repo.Repository.GetAssignmentByCourse(courseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, assignments)
-}
-
 func getAssignmentHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	assignmentID := r.Context().Value("assignmentID").(string)
 
-	assignment, err := repo.Repository.GetAssignmentByID(assignmentID)
+	assignment, err := repo.Repository.GetAssignmentByID(courseID, assignmentID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -74,16 +62,27 @@ func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("courseID").(string)
-	// var req *models.UpdateSectionRequest
+	courseID := r.Context().Value("courseID").(string)
+	assignmentID := r.Context().Value("assignmentID").(string)
+	var req *models.UpdateAssignmentRequest
 
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// TODO:
+	req.CourseID = &courseID
+	req.AssignmentID = &assignmentID
+
+	err = repo.Repository.UpdateAssignment(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated assignment " + assignmentID))
 }
 
 func deleteAssignmentHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,18 +1,18 @@
 package models
 
-var (
+import "strings"
+
+const (
 	FirestoreCoursesCollection = "courses"
 )
 
 type Course struct {
-	ID            string            `firestore:"id,omitempty"`
-	Title         string            `firestore:"title"`
-	Code          string            `firestore:"code"`
-	Term          string            `firestore:"term"`
-	SectionIDs    []string          `firestore:"sectionIDs,omitempty"`
-	AssignmentIDs []string          `firestore:"assignmentIDs,omitempty"`
-	Students      map[string]string `firestore:"students,omitempty"`
-	SurveyID      string            `firestore:"surveyID,omitempty"`
+	ID        string            `firestore:"id,omitempty"`
+	Title     string            `firestore:"title"`
+	Code      string            `firestore:"code"`
+	Term      string            `firestore:"term"`
+	EntryCode string            `firestore:"entryCode"`
+	Students  map[string]string `firestore:"students,omitempty"`
 }
 
 type GetCourseRequest struct {
@@ -34,4 +34,8 @@ type UpdateCourseRequest struct {
 	Title    *string `json:"title,omitempty"`
 	Code     *string `json:"code,omitempty"`
 	Term     *string `json:"term,omitempty"`
+}
+
+func CreateCourseID(req *CreateCourseRequest) string {
+	return strings.ToLower(req.Code + req.Term)
 }

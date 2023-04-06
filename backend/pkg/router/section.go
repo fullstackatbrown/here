@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
@@ -17,7 +18,6 @@ func SectionRoutes() *chi.Mux {
 	// router.Use(middleware.AuthCtx())
 
 	router.Post("/", createSectionHandler)
-	router.Get("/", getAllSectionsHandler)
 	router.Route("/{sectionID}", func(router chi.Router) {
 		router.Use(middleware.SectionCtx())
 		router.Get("/", getSectionHandler)
@@ -29,22 +29,11 @@ func SectionRoutes() *chi.Mux {
 	return router
 }
 
-func getAllSectionsHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-
-	sections, err := repo.Repository.GetSectionByCourse(courseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, sections)
-}
-
 func getSectionHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
 	sectionID := r.Context().Value("sectionID").(string)
 
-	section, err := repo.Repository.GetSectionByID(sectionID)
+	section, err := repo.Repository.GetSectionByID(courseID, sectionID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -59,6 +48,7 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -75,16 +65,27 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
-	// courseID := r.Context().Value("courseID").(string)
-	// var req *models.UpdateSectionRequest
+	courseID := r.Context().Value("courseID").(string)
+	sectionID := r.Context().Value("sectionID").(string)
+	var req *models.UpdateSectionRequest
 
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// TODO:
+	req.CourseID = &courseID
+	req.SectionID = &sectionID
+
+	err = repo.Repository.UpdateSection(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated section " + sectionID))
 }
 
 func deleteSectionHandler(w http.ResponseWriter, r *http.Request) {
@@ -99,5 +100,4 @@ func deleteSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully deleted section " + sectionID))
-
 }

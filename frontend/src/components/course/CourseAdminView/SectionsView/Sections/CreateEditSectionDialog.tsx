@@ -1,5 +1,6 @@
 import Button from "@components/shared/Button";
 import {
+    Box,
     Dialog,
     DialogActions,
     DialogContent,
@@ -10,44 +11,94 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import errors from "@util/errors";
+import SectionAPI from "api/section/api";
 import dayjs, { Dayjs } from 'dayjs';
-import { Section } from "model/section";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { Day, Section } from "model/section";
 
 export interface CreateEditSectionDialogProps {
     open: boolean;
     onClose: () => void;
     section?: Section;
+    courseID?: string;
 }
 
 type FormData = {
-    day: string;
-    starttime: Dayjs;
-    endtime: Dayjs;
+    day: Day;
+    starttime: string;
+    endtime: string;
     location: string | null;
     capacity: number | null;
 };
 
-const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section }) => {
+const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section, courseID }) => {
+    const defaultValues = {
+        day: section ? section.day : undefined,
+        starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
+        endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
+        location: section ? section.location : undefined,
+        capacity: section ? section.capacity : undefined,
+    }
+
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
-        defaultValues: {
-            day: section ? section.day : undefined,
-            starttime: section ? section.startTime : dayjs('2014-08-18T00:00:00'),
-            endtime: section ? section.endTime : dayjs('2014-08-18T00:00:00'),
-            location: section ? section.location : undefined,
-            capacity: section ? section.capacity : undefined,
+        defaultValues: defaultValues
+    });
+
+    useEffect(() => { reset(defaultValues) }, [section]);
+
+    const onSubmit = handleSubmit(async data => {
+        const startTime = new Date(data.starttime).toISOString()
+        const endTime = new Date(data.endtime).toISOString()
+        if (section) {
+            toast.promise(SectionAPI.updateSection(
+                section.courseID, section.ID, data.day,
+                startTime, endTime,
+                data.location, data.capacity),
+                {
+                    loading: "Updating section...",
+                    success: "Section updated!",
+                    error: errors.UNKNOWN
+                })
+                .then(() => {
+                    onClose();
+                    reset();
+                })
+                .catch(() => {
+                    onClose();
+                    reset();
+                });
+        } else {
+            toast.promise(SectionAPI.createSection(
+                courseID, data.day,
+                startTime, endTime,
+                data.location, data.capacity),
+                {
+                    loading: "Creating section...",
+                    success: "section created!",
+                    error: (err) => `${err.response.data}`,
+                })
+                .then(() => {
+                    onClose();
+                    reset();
+                })
+                .catch(() => {
+                    onClose();
+                    reset();
+                });
+
         }
     });
 
-    const onSubmit = handleSubmit(async data => {
-        // TODO: submit form 
-        console.log(data)
-    });
+    const handleOnClose = () => {
+        onClose()
+        reset()
+    }
 
-    return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
-
             <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} my={1}>
@@ -69,43 +120,47 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                             <MenuItem value={"Saturday"}>Saturday</MenuItem>
                         </Select>
                     </FormControl>
-                    <Controller
-                        control={control}
-                        name="starttime"
-                        render={({ field: { onChange, onBlur, value, ref } }) => (
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <TimePicker
-                                    label="Start Time"
-                                    value={value}
-                                    onChange={onChange}
-                                    renderInput={(params) => <TextField {...params} />} />
-                            </LocalizationProvider>
-                        )}
-                    />
-                    <Controller
-                        control={control}
-                        name="endtime"
-                        render={({ field: { onChange, onBlur, value, ref } }) => (
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <TimePicker
-                                    label="End Time"
-                                    value={value}
-                                    onChange={onChange}
-                                    renderInput={(params) => <TextField {...params} />} />
-                            </LocalizationProvider>
-                        )}
-                    />
+                    <Stack direction="row" spacing={2}>
+                        <Controller
+                            control={control}
+                            name="starttime"
+                            render={({ field: { onChange, value } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                        label="Start Time"
+                                        value={value}
+                                        onChange={onChange}
+                                        renderInput={(params) => <TextField fullWidth {...params} />}
+                                    />
+                                </LocalizationProvider>
+                            )}
+                        />
+                        <Controller
+                            control={control}
+                            name="endtime"
+                            render={({ field: { onChange, value } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                        label="End Time"
+                                        value={value}
+                                        onChange={onChange}
+                                        renderInput={(params) => <TextField fullWidth {...params} />}
+                                    />
+                                </LocalizationProvider>
+                            )}
+                        />
+                    </Stack>
                     <TextField
                         {...register("location")}
-                        autoFocus
                         label="Location"
                         type="text"
                         fullWidth
                     />
                     <TextField
-                        {...register("capacity")}
+                        {...register("capacity", { valueAsNumber: true })}
                         label="Capacity"
                         type="number"
+                        required
                         InputLabelProps={{
                             shrink: true,
                         }}
@@ -113,8 +168,8 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button type="submit" variant="contained">Add</Button>
+                <Button onClick={handleOnClose}>Cancel</Button>
+                <Button type="submit" variant="contained">{section ? "Update" : "Add"}</Button>
             </DialogActions>
         </form>
     </Dialog>;

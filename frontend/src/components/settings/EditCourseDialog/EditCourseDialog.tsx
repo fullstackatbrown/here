@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from "react";
+import { FC, useEffect, useState } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -15,13 +15,13 @@ import {
 import Button from "@components/shared/Button";
 import IconButton from "@components/shared/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import {useForm} from "react-hook-form";
-import CourseAPI, {Course} from "@util/course/api";
-import {useInvitations} from "@util/course/hooks";
-import {CoursePermission} from "@util/auth/api";
-import {User} from "@util/auth/api";
-import {toast} from "react-hot-toast";
-import {useCourseStaff} from "@util/course/hooks";
+import { useForm } from "react-hook-form";
+import CourseAPI, { Course } from "api/course/api";
+import { useInvitations } from "api/course/hooks";
+import { CoursePermission } from "api/auth/api";
+import { User } from "api/auth/api";
+import { toast } from "react-hot-toast";
+import { useCourseStaff } from "api/course/hooks";
 import TabPanel from "@components/shared/TabPanel";
 import errors from "@util/errors";
 
@@ -49,13 +49,13 @@ function a11yProps(index: number) {
     };
 }
 
-const DialogButtons: FC = ({children}) => {
+const DialogButtons: FC = ({ children }) => {
     return <Stack direction="row-reverse" justifyContent="end" spacing={1} mt={4}>
         {children}
     </Stack>;
 };
 
-const EditCourseDialog: FC<EditCourseDialogProps> = ({course, open, onClose}) => {
+const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) => {
     const [currentTab, setCurrentTab] = useState(0);
     const [editLoading, setEditLoading] = useState(false);
     const [addMemberLoading, setAddMemberLoading] = useState(false);
@@ -67,7 +67,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({course, open, onClose}) =>
         register: registerEdit,
         handleSubmit: handleEditSubmit,
         reset: resetEdit,
-        formState: {}
+        formState: { }
     } = useForm<EditFormData>();
 
     const onEditSubmit = handleEditSubmit(data => {
@@ -89,7 +89,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({course, open, onClose}) =>
         register: registerAddPermission,
         handleSubmit: handleAddPermissionSubmit,
         reset: resetAddPermission,
-        formState: {}
+        formState: { }
     } = useForm<AddPermissionFormData>();
 
     const onAddPermissionSubmit = handleAddPermissionSubmit(data => {
@@ -134,15 +134,15 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({course, open, onClose}) =>
     const loading = loadingStaff || editLoading || addMemberLoading || revokeAccessLoading;
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
-        <Box sx={{opacity: loading ? 100 : 0}}>
-            <LinearProgress/>
+        <Box sx={{ opacity: loading ? 100 : 0 }}>
+            <LinearProgress />
         </Box>
         <DialogTitle>Course Settings</DialogTitle>
-        <Box sx={{width: '100%'}}>
-            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+        <Box sx={{ width: '100%' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={currentTab} onChange={(e, v) => setCurrentTab(v)} aria-label="course settings tabs"
-                      centered
-                      variant="fullWidth">
+                    centered
+                    variant="fullWidth">
                     <Tab label="Course Info" {...a11yProps(0)} />
                     <Tab label="Manage Access" {...a11yProps(1)} />
                 </Tabs>
@@ -188,7 +188,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({course, open, onClose}) =>
                 </form>
             </TabPanel>
             <TabPanel value={currentTab} index={1}>
-                <Paper variant="outlined" sx={{bgcolor: 'error'}}>
+                <Paper variant="outlined" sx={{ bgcolor: 'error' }}>
                     <Box maxHeight={300} overflow="auto">
                         <List dense>
                             {staff.map(user => (
@@ -196,9 +196,9 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({course, open, onClose}) =>
                                     key={user.id}
                                     secondaryAction={
                                         <IconButton label="Revoke access" edge="end" aria-label="delete"
-                                                    disabled={revokeAccessLoading}
-                                                    onClick={() => handleRevokeAccess(user)}>
-                                            <CloseIcon/>
+                                            disabled={revokeAccessLoading}
+                                            onClick={() => handleRevokeAccess(user)}>
+                                            <CloseIcon />
                                         </IconButton>
                                     }>
                                     <ListItemText
@@ -208,14 +208,14 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({course, open, onClose}) =>
                                 </ListItem>))}
                             {invites.map(email => (
                                 <ListItem key={email}>
-                                    <ListItemText primary={"(pending)"} secondary={email}/>
+                                    <ListItemText primary={"(pending)"} secondary={email} />
                                 </ListItem>
                             ))}
                         </List>
                     </Box>
                 </Paper>
                 <Box my={2}>
-                    <Divider/>
+                    <Divider />
                 </Box>
                 <Typography variant="h6" mb={2}>Add member</Typography>
                 <form onSubmit={onAddPermissionSubmit}>

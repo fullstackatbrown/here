@@ -14,5 +14,5 @@ export interface SwapRequest {
   reason: string;
   status: SwapRequestStatus;
   handledBy: string;
-  assignmentID?: string
+  assignmentID?: string;
 }

@@ -1,21 +1,22 @@
 import CourseCard from "@components/home/CourseCard";
 import AddCourseCard from "@components/home/CourseCard/AddCourseCard";
-import JoinCourseDialog from "@components/home/CreateCourseDialog/CreateCourseDialog";
+import JoinCourseDialog from "@components/home/JoinCourseDialog/JoinCourseDialog";
 import { Box, Button, Grid, Stack, Typography } from "@mui/material";
-import { useCourses } from "@util/course/hooks";
+import { useCourses } from "api/course/hooks";
+import organizeCourseByTerm from "@util/shared/organizeCourseByTerm";
 import sortTerms from "@util/shared/sortTerms";
 import AppLayout from "components/shared/AppLayout";
-import { useState } from "react";
-import { useAuth } from "util/auth/hooks";
+import { useEffect, useState } from "react";
+import { useAuth } from "api/auth/hooks";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
-    const [coursesByTerm, loading] = useCourses();
+    const [courses, loading] = useCourses();
     const [joinCourseDialog, setJoinCourseDialog] = useState(false);
 
     const getTerms = () => {
-        if (coursesByTerm) {
-            return sortTerms(Object.keys(coursesByTerm));
+        if (courses) {
+            return sortTerms(Object.keys(organizeCourseByTerm(courses)));
         }
         return [];
     }
@@ -30,7 +31,7 @@ export default function Home() {
         <>
             <JoinCourseDialog open={joinCourseDialog} onClose={() => { setJoinCourseDialog(false) }} />
             <AppLayout maxWidth={false} loading={loading}>
-                {coursesByTerm && Object.keys(coursesByTerm).length > 0 && (
+                {courses && Object.keys(courses).length > 0 && (
                     <Box>
                         {/* TODO: add a global value for current term instead of using index */}
                         {getTerms().map((term, index) => (
@@ -45,7 +46,7 @@ export default function Home() {
                                     alignItems="stretch"
                                 >
                                     {
-                                        coursesByTerm[term].map((course) => (
+                                        organizeCourseByTerm(courses)[term].map((course) => (
                                             <Grid key={course.code} item xs={12} md={6} lg={4} xl={3}>
                                                 <CourseCard course={course} />
                                             </Grid>
@@ -61,7 +62,7 @@ export default function Home() {
                 )
                 }
                 {
-                    coursesByTerm && Object.keys(coursesByTerm).length === 0 && (
+                    (!courses || Object.keys(courses).length === 0) && (
                         <Stack
                             mt={4}
                             spacing={2}

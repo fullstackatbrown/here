@@ -11,9 +11,9 @@ import createEmotionCache from "@util/mui/createEmotionCache";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import { createTheme } from "@mui/material/styles";
 import React, { useMemo, useState } from "react";
-import { firebaseInit } from "@util/firebase/firebase_app";
+import { firebaseInit } from "api/firebase/firebase_app";
 import { Toaster } from "react-hot-toast";
-import { useSession, AuthProvider } from "@util/auth/hooks";
+import { useSession, AuthProvider } from "api/auth/hooks";
 import { ThemeMode, ThemeModeProvider } from "@util/mui/useThemeMode";
 
 // Client-side cache, shared for the whole session of the user in the browser.

@@ -61,3 +61,14 @@ func SurveyCtx() func(handler http.Handler) http.Handler {
 		})
 	}
 }
+
+func GradeCtx() func(handler http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			gradeID := chi.URLParam(r, "gradeID")
+
+			ctx := context.WithValue(r.Context(), "gradeID", gradeID)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
