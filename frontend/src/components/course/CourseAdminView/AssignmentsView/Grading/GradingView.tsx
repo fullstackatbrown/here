@@ -64,6 +64,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     success: "Grade submitted!",
                     error: "Error submitting grade"
                 })
+                .then(() => setEditGrade(null))
+                .catch(() => setEditGrade(null))
         }
     }
 
@@ -75,6 +77,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     success: "Grade updated!",
                     error: "Error updating grade"
                 })
+                .then(() => setEditGrade(null))
+                .catch(() => setEditGrade(null))
         }
     }
 
@@ -86,6 +90,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     success: "Grade deleted",
                     error: "Error deleting grade"
                 })
+                .then(() => setEditGrade(null))
+                .catch(() => setEditGrade(null))
         }
     }
 

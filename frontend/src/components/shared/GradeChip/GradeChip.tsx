@@ -27,11 +27,19 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
 
   const onSubmit = handleSubmit(async data => {
     const grade = Number(data.grade)
+
     if (isNaN(grade)) {
       alert("Grade must be a number")
       reset()
       return
     }
+
+    if (grade > maxScore) {
+      alert("Invalid grade")
+      reset()
+      return
+    }
+
     // if there existed a grade
     if (score !== undefined) {
       // if we are trying to delete it
@@ -41,15 +49,16 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
       } else {
         handleUpdateGrade && handleUpdateGrade(grade)
       }
-    } else {
-      if (data.grade === "") {
-        alert("Please enter a grade")
-        reset()
-        return
-      }
-      handleCreateGrade && handleCreateGrade(grade)
+      return
     }
 
+    // new grade
+    if (data.grade === "") {
+      alert("Please enter a grade")
+      reset()
+      return
+    }
+    handleCreateGrade && handleCreateGrade(grade)
   })
 
   return (
