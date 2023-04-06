@@ -1,5 +1,4 @@
 import { Stack, Typography } from "@mui/material";
-import formatSectionTime from "@util/shared/formatSectionTime";
 import { SwapRequest } from "model/swapRequest";
 import { FC } from "react";
 
