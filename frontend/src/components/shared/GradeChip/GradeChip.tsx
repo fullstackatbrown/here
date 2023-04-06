@@ -1,6 +1,6 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, IconButton, Stack, TextField, Typography } from "@mui/material";
-import { FC, useEffect } from 'react';
+import { FC, Fragment, useEffect } from 'react';
 import EditIcon from "@mui/icons-material/Edit";
 import { useForm } from 'react-hook-form';
 
@@ -81,7 +81,12 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
               alignItems: "center",
             }}
           >
-            {score === undefined ? <HelpOutlineIcon fontSize="small" /> : score}
+            {score === undefined ?
+              <HelpOutlineIcon fontSize="small" /> :
+              <Fragment>
+                &nbsp;{score}
+              </Fragment>
+            }
           </Typography>
         }
 
