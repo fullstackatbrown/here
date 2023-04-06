@@ -13,6 +13,7 @@ import { Grade } from 'model/grades';
 import { Section } from 'model/section';
 import { ClickAwayListener } from '@mui/base';
 import { FC, useState } from 'react';
+import { User } from 'model/user';
 
 interface GradingViewProps {
     course: Course;
@@ -34,8 +35,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
     const [selectedSection, setSelectedSection] = useState<Section | null>(null)
     const [grades, loading] = useGrades(course.ID, assignment.ID)
-    const [editGrade, setEditGrade] = useState<Grade | null>(null)
-    // const [students, studentsLoading] = useStudentsByIDs(Object.keys(course.students || {}))
+    const [editGrade, setEditGrade] = useState<string | null>(null) // userid
 
     const getStudents = () => {
         if (!selectedSection) {
@@ -94,11 +94,10 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                 </TableHead>
                 <ClickAwayListener onClickAway={() => setEditGrade(null)}>
                     <TableBody>
-                        {grades && grades.map((grade) => {
+                        {/* {grades && grades.map((grade) => {
                             return <TableRow hover key={grade.ID} onClick={() => setEditGrade(grade)}>
                                 <TableCell component="th" scope="row">
                                     {grade.studentID}
-                                    {/* {user.displayName} */}
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     <GradeChip
@@ -112,23 +111,26 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                                 </TableCell>
                             </TableRow>
                         }
+                        )} */}
+                        {getStudents().map((userID) => {
+                            const grade = grades && userID in grades ? grades[userID] : undefined
+                            return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
+                                <TableCell component="th" scope="row">
+                                    {userID}
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <GradeChip
+                                        score={grade ? grade.grade : undefined}
+                                        maxScore={assignment.maxScore}
+                                        editable={editGrade && editGrade === userID}
+                                    />
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    {grade ? grade.gradedBy : "/"}
+                                </TableCell>
+                            </TableRow>
+                        }
                         )}
-                        {/* {students && students.map((user) => {
-                        const grade = grades && user.ID in grades ? grades[user.ID] : undefined
-                        // const gradeID = getGradeByStudent(user.ID)
-                        return <TableRow key={user.ID} hover>
-                            <TableCell component="th" scope="row">
-                                {user.displayName}
-                            </TableCell>
-                            <TableCell component="th" scope="row">
-                                <GradeChip score={grade ? grade.grade : undefined} maxScore={assignment.maxScore} />
-                            </TableCell>
-                            <TableCell component="th" scope="row">
-                                {grade ? grade.gradedBy : "/"}
-                            </TableCell>
-                        </TableRow>
-                    }
-                    )} */}
                     </TableBody>
                 </ClickAwayListener>
             </Table>
