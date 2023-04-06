@@ -12,7 +12,7 @@ const PastRequestsView: FC<PastRequestViewProps> = ({
 }) => {
   return (
     <>
-      <Stack direction="column" justifyContent="space-between" mb={1}>
+      <Stack direction="column" spacing={2}>
         {pastRequests.map((r, index) => (
           <PastRequest key={index} pastRequest={r} />
         ))}
