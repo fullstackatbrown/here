@@ -71,7 +71,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
 
     const handleUpdateGrade = (gradeID: string, userID: string) => {
         return (grade: number) => {
-            toast.promise(GradeAPI.updateGrade(course.ID, assignment.ID, gradeID, userID, grade, "temp_ta_id"),
+            toast.promise(GradeAPI.updateGrade(course.ID, assignment.ID, gradeID, grade, "temp_ta_id"),
                 {
                     loading: "Updating grade...",
                     success: "Grade updated!",
@@ -124,9 +124,10 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     <TableBody>
                         {getStudents().map((userID) => {
                             const grade = grades && userID in grades ? grades[userID] : undefined
+                            console.log(course.students)
                             return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
                                 <TableCell component="th" scope="row">
-                                    {userID}
+                                    {course.students && course.students[userID] && course.students[userID].displayName}
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     <GradeChip

@@ -124,7 +124,6 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 		Code:      req.Code,
 		Term:      req.Term,
 		EntryCode: entryCode,
-		Students:  make(map[string]string),
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Add(firebase.Context, course)

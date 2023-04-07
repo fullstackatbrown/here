@@ -7,12 +7,20 @@ const (
 )
 
 type Course struct {
-	ID        string            `firestore:"id,omitempty"`
-	Title     string            `firestore:"title"`
-	Code      string            `firestore:"code"`
-	Term      string            `firestore:"term"`
-	EntryCode string            `firestore:"entryCode"`
-	Students  map[string]string `firestore:"students,omitempty"`
+	ID        string                    `firestore:"id,omitempty"`
+	Title     string                    `firestore:"title"`
+	Code      string                    `firestore:"code"`
+	Term      string                    `firestore:"term"`
+	EntryCode string                    `firestore:"entryCode"`
+	Students  map[string]CourseUserData `firestore:"students,omitempty"`
+}
+
+type CourseUserData struct {
+	StudentID      string `firestore:"studentid"`
+	Email          string `firestore:"email"`
+	DisplayName    string `firestore:"displayName"`
+	Pronouns       string `firestore:"pronouns"`
+	DefaultSection string `firestore:"defaultSection"`
 }
 
 type GetCourseRequest struct {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
+	"github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -24,25 +25,31 @@ func AuthCtx() func(http.Handler) http.Handler {
 			// 	return
 			// }
 
+			userID := chi.URLParam(r, "userID")
+
 			// Verify the session cookie. In this case an additional check is added to detect
 			// if the user's Firebase session was revoked, user deleted/disabled, etc.
-			// user, err := repository.Repository.VerifySessionCookie(tokenCookie)
+
+			// TODO: verify session cookie
+			// user, err := repository.Repository.GetUserByID(userID)
 			// if err != nil {
 			// 	// Missing session cookie.
 			// 	rejectUnauthorizedRequest(w)
 			// 	return
 			// }
 
+			// For testing only
+			user, err := repository.Repository.GetProfileById(userID)
+			if err != nil {
+				http.Error(w, "testing error: user doesnt exist", http.StatusUnauthorized)
+				return
+			}
+
 			// create a new request context containing the authenticated user
-			// ctxWithUser := context.WithValue(r.Context(), "currentUser", user)
-			// rWithUser := r.WithContext(ctxWithUser)
+			ctxWithUser := context.WithValue(r.Context(), "currentUser", user)
+			rWithUser := r.WithContext(ctxWithUser)
 
-			// next.ServeHTTP(w, rWithUser)
-
-			userID := chi.URLParam(r, "userID")
-
-			ctx := context.WithValue(r.Context(), "userID", userID)
-			next.ServeHTTP(w, r.WithContext(ctx))
+			next.ServeHTTP(w, rWithUser)
 		})
 	}
 }
@@ -68,8 +75,18 @@ func AuthCtx() func(http.Handler) http.Handler {
 
 // GetUserFromRequest returns a User if it exists within the request context. Only works with routes that implement the
 // RequireAuth middleware.
-func GetUserFromRequest(r *http.Request) (*models.User, error) {
-	user := r.Context().Value("currentUser").(*models.User)
+// func GetUserFromRequest(r *http.Request) (*models.User, error) {
+// 	user := r.Context().Value("currentUser").(*models.User)
+// 	if user != nil {
+// 		return user, nil
+// 	}
+
+// 	return nil, qerrors.UserNotFoundError
+// }
+
+// Testing Only
+func GetUserFromRequest(r *http.Request) (*models.Profile, error) {
+	user := r.Context().Value("currentUser").(*models.Profile)
 	if user != nil {
 		return user, nil
 	}

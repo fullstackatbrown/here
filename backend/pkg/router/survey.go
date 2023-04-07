@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -150,7 +149,6 @@ func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = repo.Repository.PublishSurvey(courseID, surveyID)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
