@@ -1,0 +1,67 @@
+import { Table, TableBody, TableHead, TableRow } from "@mui/material";
+import MuiTableCell from "@mui/material/TableCell";
+import { styled } from "@mui/material/styles";
+import { CourseUserData } from 'model/course';
+import { FC } from "react";
+
+export interface PeopleTableProps {
+    students: Record<string, CourseUserData>;
+}
+
+const TableCell = styled(MuiTableCell)(({ theme }) => ({
+    ":first-of-type": {
+        paddingLeft: 0,
+    },
+    ":last-of-type": {
+        width: 80,
+        maxWidth: 80,
+        overflow: "hidden",
+    },
+}))
+
+const PeopleTable: FC<PeopleTableProps> = ({ students }) => {
+    return (
+        <>
+            <Table>
+                <colgroup>
+                    <col width="20%" />
+                    <col width="30%" />
+                    <col width="20%" />
+                    <col width="30%" />
+                </colgroup>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Role</TableCell>
+                        <TableCell>Section</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {students && Object.keys(students).map((sID) => {
+                        const student = students[sID];
+                        return (
+                            <TableRow key={sID} hover onClick={() => { }}>
+                                <TableCell component="th" scope="row">
+                                    {student.displayName}
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    {student.email}
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    Student
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    {/* TODO: Format section */}
+                                    {student.defaultSection ? student.defaultSection : "Unassigned"}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+        </>
+    )
+}
+
+export default PeopleTable;
