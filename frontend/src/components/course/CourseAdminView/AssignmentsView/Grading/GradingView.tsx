@@ -7,16 +7,16 @@ import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import formatSectionInfo from '@util/shared/formatSectionInfo';
 import getStudentsInSection from '@util/shared/getStudentsInSection';
+import listToMap from '@util/shared/listToMap';
 import GradeAPI from 'api/grades/api';
 import { useGrades } from 'api/grades/hooks';
 import { useSections } from 'api/section/hooks';
 import { Assignment } from 'model/assignment';
 import { Course } from 'model/course';
+import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import SectionsMenu from './MyMenu';
-import listToMap from '@util/shared/listToMap';
-import { Section } from 'model/section';
+import MyMenu from './MyMenu';
 
 interface GradingViewProps {
     course: Course;
@@ -124,9 +124,9 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                         {assignment.name}
                     </Typography>
                 </Stack>
-                <SectionsMenu
+                <MyMenu
                     value={selectedSection}
-                    formatOption={(val) => val ? formatSectionInfo(sectionsMap[val], true, true) : "All Sections"}
+                    formatOption={(val) => val ? formatSectionInfo(sectionsMap[val], true) : "All Sections"}
                     options={sectionOptions()}
                     onSelect={(val) => setSelectedSection(val)}
                 />

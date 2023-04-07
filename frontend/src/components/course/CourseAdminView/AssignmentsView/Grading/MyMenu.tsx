@@ -1,11 +1,10 @@
-import { Button, MenuItem, Divider, styled, MenuProps, Menu, alpha } from "@mui/material";
+import { Button, MenuItem, Divider, styled, MenuProps, Menu, alpha, Typography } from "@mui/material";
 import { FC, useState } from "react";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 interface MyMenuProps {
     value: string;
     options: string[];
-    // options: Record<string, string>; // a map from the value to the display name
     onSelect: (value: string) => void;
     formatOption: (value: string) => string;
 }
