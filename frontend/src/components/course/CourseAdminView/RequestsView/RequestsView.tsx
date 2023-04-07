@@ -26,7 +26,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
   const pastSwapRequests = swapRequests.filter((r) => r.status !== "pending");
 
   return (
-    <Stack spacing={2} ml={-1}>
+    <Stack spacing={2} ml={-1} mt={-1}>
       <Stack direction="row" justifyContent="space-between">
         <Button
           color="inherit" variant="text" sx={{ fontSize: 17 }}

@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 
 export default function CourseAdminViewNavigation() {
   const router = useRouter();
+  const { query } = router;
 
   const [swapRequests, _] = useSwapRequests();
   const numPendingRequests = swapRequests.filter(
@@ -17,22 +18,42 @@ export default function CourseAdminViewNavigation() {
     }
   }
 
+  function capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function getButton(view: View) {
+    return (
+      <Button
+        sx={{
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          fontWeight: query.view === view ? 700 : 400,
+        }}
+        color={query.view === view ? "inherit" : "secondary"}
+        variant="text" onClick={navigateTo(view)}
+      >
+        {capitalizeFirstLetter(view)}
+      </Button >
+    )
+  }
+
   return (
     <Stack alignItems="start">
-      <Button variant="text" onClick={navigateTo("sections")}>Sections</Button>
-      <Button variant="text" onClick={navigateTo("assignments")}>Assignments</Button>
-      <Button variant="text" onClick={navigateTo("people")}>People</Button>
+      {getButton("sections")}
+      {getButton("assignments")}
+      {getButton("people")}
       <Badge
-        color="secondary"
+        color="primary"
         badgeContent={numPendingRequests}
         sx={{
           "& .MuiBadge-badge": {
-            right: -8,
+            right: -10,
             top: "50%",
           },
         }}
       >
-        <Button variant="text" onClick={navigateTo("requests")}>Requests</Button>
+        {getButton("requests")}
       </Badge>
     </Stack>
   )
