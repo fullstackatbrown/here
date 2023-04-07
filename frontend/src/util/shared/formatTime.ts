@@ -1,14 +1,42 @@
 import { format } from 'date-fns-tz'
 import { Section } from 'model/section'
 
-export default function formatSectionTime(section: Section): string {
+const days = {
+  "Sunday": "Sun",
+  "Monday": "Mon",
+  "Tuesday": "Tue",
+  "Wednesday": "Wed",
+  "Thursday": "Thu",
+  "Friday": "Fri",
+  "Saturday": "Sat",
+}
+
+export function formatSectionTime(section: Section, abbreviated = false): string {
   const startTime = new Date(section.startTime)
   const endTime = new Date(section.endTime)
   const timeZone = "America/New_York"
-  const formattedStartTime = format(startTime, "h:mma", { timeZone })
-  const formattedEndTime = format(endTime, "h:mma", { timeZone })
 
-  return `${section.day} ${formattedStartTime} - ${formattedEndTime}`
+  const amPmEqual = format(startTime, "a", { timeZone }) === format(endTime, "a", { timeZone })
+  let startTimeFormat = "h:mma"
+  let endTimeFormat = "h:mma"
+
+  // Adjust format for abbreviation
+  if (abbreviated) {
+    if (startTime.getMinutes() === 0) {
+      startTimeFormat = amPmEqual ? "h" : "ha"
+    } else {
+      startTimeFormat = amPmEqual ? "h:mm" : "h:mma"
+    }
+
+    if (endTime.getMinutes() === 0) {
+      endTimeFormat = "ha"
+    }
+  }
+
+  const formattedStartTime = format(startTime, startTimeFormat, { timeZone })
+  const formattedEndTime = format(endTime, endTimeFormat, { timeZone })
+  const day = abbreviated ? days[section.day] : section.day
+  return `${day} ${formattedStartTime.toLocaleLowerCase()} - ${formattedEndTime.toLocaleLowerCase()}`
 }
 
 export function formatDateTime(timeISO: string, f: string = "MM/dd/yyyy h:mma"): string {
@@ -26,5 +54,4 @@ export function formatSurveyTime(time: string): string {
   const formattedEndTime = formatDateTime(endTimeStr, "h:mma")
 
   return `${day} ${formattedStartTime} - ${formattedEndTime}`
-
 }

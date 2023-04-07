@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react";
 import { Box, Card, IconButton, Paper, Stack, Typography } from "@mui/material";
-import formatSectionTime from "@util/shared/formatTime";
+import { formatSectionTime } from "@util/shared/formatTime";
 import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Section } from "model/section";

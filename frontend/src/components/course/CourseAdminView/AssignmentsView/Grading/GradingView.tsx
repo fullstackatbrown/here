@@ -1,18 +1,22 @@
 import GradeChip from '@components/shared/GradeChip/GradeChip';
 import { ClickAwayListener } from '@mui/base';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, IconButton, Stack, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material';
+import { IconButton, Stack, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material';
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
+import formatSectionInfo from '@util/shared/formatSectionInfo';
 import getStudentsInSection from '@util/shared/getStudentsInSection';
 import GradeAPI from 'api/grades/api';
 import { useGrades } from 'api/grades/hooks';
+import { useSections } from 'api/section/hooks';
 import { Assignment } from 'model/assignment';
 import { Course } from 'model/course';
-import { Section } from 'model/section';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import SectionsMenu from './MyMenu';
+import listToMap from '@util/shared/listToMap';
+import { Section } from 'model/section';
 
 interface GradingViewProps {
     course: Course;
@@ -32,25 +36,31 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 }))
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
-    const [selectedSection, setSelectedSection] = useState<Section | null>(null)
-    const [grades, loading] = useGrades(course.ID, assignment.ID)
+    const [sections, sectionsLoading] = useSections(course.ID)
+    const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
+    const [selectedSection, setSelectedSection] = useState<string | undefined>(undefined)
+    const [grades, gradesLoading] = useGrades(course.ID, assignment.ID)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid
+
+    useEffect(() => {
+        sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
+    }, [sections])
 
     const getStudents = () => {
         if (!selectedSection) {
             return course.students ? Object.keys(course.students) : []
         } else {
             if (!course.students) return []
-            let students = getStudentsInSection(course.students, selectedSection.ID)
-
+            const section = sectionsMap[selectedSection]
+            let students = getStudentsInSection(course.students, selectedSection)
             // filter out swapped out students
-            if (selectedSection.swappedOutStudents && assignment.ID in selectedSection.swappedOutStudents) {
-                students = arraySubtract(students, selectedSection.swappedOutStudents[assignment.ID])
+            if (section.swappedOutStudents && assignment.ID in section.swappedOutStudents) {
+                students = arraySubtract(students, section.swappedOutStudents[assignment.ID])
             }
 
             // add in swapped in students
-            if (selectedSection.swappedInStudents && assignment.ID in selectedSection.swappedInStudents) {
-                students = arrayUnion(students, selectedSection.swappedInStudents[assignment.ID])
+            if (section.swappedInStudents && assignment.ID in section.swappedInStudents) {
+                students = arrayUnion(students, section.swappedInStudents[assignment.ID])
             }
             return students
         }
@@ -95,9 +105,17 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
         }
     }
 
+    const sectionOptions = () => {
+        let options = [undefined]
+        sectionsMap && Object.keys(sectionsMap).forEach((sectionID) => {
+            options.push(sectionID)
+        })
+        return options
+    }
+
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" mb={1} ml={-4.5}>
+            <Stack direction="row" justifyContent="space-between" mb={1} ml={-4.5} alignItems="center">
                 <Stack direction="row" spacing={1} alignItems="center">
                     <IconButton size="small" sx={{ p: 0.5 }} onClick={handleNavigateBack}>
                         <ArrowBackIcon sx={{ fontSize: 18 }} />
@@ -106,7 +124,13 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                         {assignment.name}
                     </Typography>
                 </Stack>
-            </Stack>
+                <SectionsMenu
+                    value={selectedSection}
+                    formatOption={(val) => val ? formatSectionInfo(sectionsMap[val], true, true) : "All Sections"}
+                    options={sectionOptions()}
+                    onSelect={(val) => setSelectedSection(val)}
+                />
+            </Stack >
             <Table>
                 <colgroup>
                     <col width="40%" />
@@ -124,7 +148,6 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     <TableBody>
                         {getStudents().map((userID) => {
                             const grade = grades && userID in grades ? grades[userID] : undefined
-                            console.log(course.students)
                             return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
                                 <TableCell component="th" scope="row">
                                     {course.students && course.students[userID] && course.students[userID].displayName}
