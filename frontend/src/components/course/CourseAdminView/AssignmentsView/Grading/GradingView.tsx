@@ -1,7 +1,7 @@
 import GradeChip from '@components/shared/GradeChip/GradeChip';
 import { ClickAwayListener } from '@mui/base';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { IconButton, Stack, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, IconButton, Stack, Table, TableBody, TableHead, TableRow, Typography } from '@mui/material';
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
@@ -97,14 +97,14 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
 
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" mb={1}>
-                <Stack direction="row" spacing={2}>
+            <Stack direction="row" justifyContent="space-between" mb={1} ml={-4.5}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <IconButton size="small" sx={{ p: 0.5 }} onClick={handleNavigateBack}>
+                        <ArrowBackIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
                     <Typography variant="h6" fontWeight={600}>
                         {assignment.name}
                     </Typography>
-                    <IconButton size="small" onClick={handleNavigateBack}>
-                        <ArrowBackIcon />
-                    </IconButton>
                 </Stack>
             </Stack>
             <Table>
