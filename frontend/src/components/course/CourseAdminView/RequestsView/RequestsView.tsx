@@ -10,6 +10,7 @@ import { Course } from "model/course";
 import { useState } from "react";
 import PastRequestsView from "./PastRequests/PastRequestsView";
 import PendingRequestsView from "./PendingRequests/PendingRequestsView";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 export interface RequestsViewProps {
   course: Course;
@@ -30,14 +31,14 @@ export default function RequestsView({ course }: RequestsViewProps) {
       <Stack direction="row" justifyContent="space-between">
         <Button
           color="inherit" variant="text" sx={{ fontSize: 17 }}
-          startIcon={pendingRequestsOpen ? <ExpandLess /> : <ExpandMore />}
+          startIcon={pendingRequestsOpen ? <ExpandMore /> : <KeyboardArrowRightIcon />}
           onClick={() => setPendingRequestsOpen(!pendingRequestsOpen)}
         >
           Pending Requests
         </Button>
       </Stack>
       <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
-        <Box ml={4}>
+        <Box>
           <PendingRequestsView pendingRequests={pendingSwapRequests} />
         </Box>
       </Collapse>
@@ -45,16 +46,14 @@ export default function RequestsView({ course }: RequestsViewProps) {
       <Stack direction="row" justifyContent="space-between">
         <Button
           color="inherit" variant="text" sx={{ fontSize: 17 }}
-          startIcon={pendingRequestsOpen ? <ExpandLess /> : <ExpandMore />}
+          startIcon={pastRequestsOpen ? <ExpandMore /> : <KeyboardArrowRightIcon />}
           onClick={() => setPastRequestsOpen(!pastRequestsOpen)}
         >
           Past Requests
         </Button>
       </Stack>
       <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
-        <Box ml={4}>
-          <PastRequestsView pastRequests={pastSwapRequests} />
-        </Box>
+        <PastRequestsView pastRequests={pastSwapRequests} />
       </Collapse>
     </Stack >
   );
