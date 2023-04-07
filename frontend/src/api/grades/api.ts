@@ -5,11 +5,11 @@ async function createGrade(
   assignmentID: string,
   studentID: string,
   grade: number,
-  taID: string
+  gradedByID: string
 ): Promise<string> {
   return APIClient.post(
     `/courses/${courseID}/assignments/${assignmentID}/grades`,
-    { studentID, grade, taID }
+    { studentID, grade, gradedByID }
   );
 }
 
@@ -17,13 +17,12 @@ async function updateGrade(
   courseID: string,
   assignmentID: string,
   gradeID: string,
-  studentID: string,
   grade: number,
-  taID: string
+  gradedByID: string
 ): Promise<boolean> {
   return APIClient.patch(
     `/courses/${courseID}/assignments/${assignmentID}/grades/${gradeID}`,
-    { studentID, grade, taID }
+    { grade, gradedByID }
   );
 }
 

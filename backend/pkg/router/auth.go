@@ -26,19 +26,6 @@ func AuthRoutes() *chi.Mux {
 	return router
 }
 
-func getMeHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := auth.GetUserFromRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	render.JSON(w, r, struct {
-		*models.Profile
-		ID string `json:"id"`
-	}{user.Profile, user.ID})
-}
-
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	var req *models.CreateUserProfileRequest
 
@@ -70,16 +57,20 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(string)
+	user, err := auth.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	var req *models.JoinCourseRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	req.UserID = userID
+	req.User = user
 
 	course, err := repo.Repository.JoinCourse(req)
 	if err != nil {
@@ -92,16 +83,20 @@ func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func quitCourseHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(string)
+	user, err := auth.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	var req *models.QuitCourseRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	req.UserID = userID
+	req.UserID = user.ID
 
 	err = repo.Repository.QuitCourse(req)
 	if err != nil {

@@ -23,8 +23,8 @@ func Contains(s []string, str string) bool {
 	return false
 }
 
-func CopyStringMap(m map[string]string) map[string]string {
-	cp := make(map[string]string)
+func CopyMap[T any](m map[string]T) map[string]T {
+	cp := make(map[string]T)
 	for k, v := range m {
 		cp[k] = v
 	}

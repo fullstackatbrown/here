@@ -14,6 +14,7 @@ type Profile struct {
 	ID              string                       `firestore:"id,omitempty"`
 	DisplayName     string                       `firestore:"displayName"`
 	Email           string                       `firestore:"email"`
+	Pronouns        string                       `firestore:"pronouns"`
 	Access          map[string]string            `firestore:"access"`
 	Courses         []string                     `firestore:"courses"`
 	DefaultSections map[string]string            `firestore:"defaultSections"`
@@ -34,11 +35,11 @@ type CreateUserProfileRequest struct {
 }
 
 type JoinCourseRequest struct {
-	UserID    string `json:"join,omitempty"`
-	EntryCode string `json:"entryCode"`
+	User      *Profile `json:"user,omitempty"`
+	EntryCode string   `json:"entryCode"`
 }
 
 type QuitCourseRequest struct {
-	UserID   string `json:"join,omitempty"`
+	UserID   string `json:"userID,omitempty"`
 	CourseID string `json:"courseID"`
 }
