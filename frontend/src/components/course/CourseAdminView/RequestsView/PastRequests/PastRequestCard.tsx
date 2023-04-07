@@ -40,7 +40,7 @@ const PastRequest: FC<PastRequestProps> = ({ request }) => {
           />
           <Typography color="secondary" fontSize={14}>{formatRequestTime(request)}</Typography>
         </Stack>
-      </Box>
+      </Box >
       <Collapse in={expanded}>
         <Box ml={4} mt={1} mb={2}>
           <RequestInformation request={request} />
