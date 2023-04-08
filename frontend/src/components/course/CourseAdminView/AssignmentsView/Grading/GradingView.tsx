@@ -6,7 +6,7 @@ import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import formatSectionInfo from '@util/shared/formatSectionInfo';
-import getStudentsInSection from '@util/shared/getStudentsInSection';
+import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
 import listToMap from '@util/shared/listToMap';
 import GradeAPI from 'api/grades/api';
 import { useGrades } from 'api/grades/hooks';
@@ -37,22 +37,23 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
     const [sections, sectionsLoading] = useSections(course.ID)
-    const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
-    const [selectedSection, setSelectedSection] = useState<string | undefined>(undefined)
     const [grades, gradesLoading] = useGrades(course.ID, assignment.ID)
-    const [editGrade, setEditGrade] = useState<string | null>(null) // userid
+    const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
+    const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
+    const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
 
     useEffect(() => {
         sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
     }, [sections])
 
     const getStudents = () => {
-        if (!selectedSection) {
+        // get students based on filtered section
+        if (!filterBySection) {
             return course.students ? Object.keys(course.students) : []
         } else {
             if (!course.students) return []
-            const section = sectionsMap[selectedSection]
-            let students = getStudentsInSection(course.students, selectedSection)
+            const section = sectionsMap[filterBySection]
+            let students = getStudentsInSection(course.students, filterBySection)
             // filter out swapped out students
             if (section.swappedOutStudents && assignment.ID in section.swappedOutStudents) {
                 students = arraySubtract(students, section.swappedOutStudents[assignment.ID])
@@ -106,11 +107,16 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
     }
 
     const sectionOptions = () => {
-        let options = [undefined]
+        let options = [ALL_STUDENTS]
         sectionsMap && Object.keys(sectionsMap).forEach((sectionID) => {
             options.push(sectionID)
         })
         return options
+    }
+
+    const formatOptions = (val: string | undefined) => {
+        if (val === ALL_STUDENTS) return ALL_STUDENTS
+        return formatSectionInfo(sectionsMap[val], true)
     }
 
     return (
@@ -125,10 +131,10 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     </Typography>
                 </Stack>
                 <SelectMenu
-                    value={selectedSection}
-                    formatOption={(val) => val ? formatSectionInfo(sectionsMap[val], true) : "All Sections"}
+                    value={filterBySection}
+                    formatOption={formatOptions}
                     options={sectionOptions()}
-                    onSelect={(val) => setSelectedSection(val)}
+                    onSelect={(val) => setFilterBySection(val)}
                 />
             </Stack >
             <Table>

@@ -1,11 +1,14 @@
 import { Table, TableBody, TableHead, TableRow } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
+import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { CourseUserData } from 'model/course';
+import { Section } from "model/section";
 import { FC } from "react";
 
 export interface PeopleTableProps {
-    students: Record<string, CourseUserData>;
+    students: CourseUserData[];
+    sectionsMap: Record<string, Section>;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -19,7 +22,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const PeopleTable: FC<PeopleTableProps> = ({ students }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ students, sectionsMap }) => {
     return (
         <>
             <Table>
@@ -38,10 +41,9 @@ const PeopleTable: FC<PeopleTableProps> = ({ students }) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {students && Object.keys(students).map((sID) => {
-                        const student = students[sID];
+                    {students && students.map((student) => {
                         return (
-                            <TableRow key={sID} hover onClick={() => { }}>
+                            <TableRow key={student.studentID} hover onClick={() => { }}>
                                 <TableCell component="th" scope="row">
                                     {student.displayName}
                                 </TableCell>
@@ -52,8 +54,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ students }) => {
                                     Student
                                 </TableCell>
                                 <TableCell component="th" scope="row">
-                                    {/* TODO: Format section */}
-                                    {student.defaultSection ? student.defaultSection : "Unassigned"}
+                                    {student.defaultSection ? formatSectionInfo(sectionsMap[student.defaultSection], true) : "Unassigned"}
                                 </TableCell>
                             </TableRow>
                         );

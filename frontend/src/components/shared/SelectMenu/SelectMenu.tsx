@@ -57,11 +57,9 @@ const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOptio
 
         >
             {options.map((val) => {
-                return <>
-                    <MenuItem sx={{ fontSize: 14 }} value={val} key={val} onClick={() => onSelect(val)} >
-                        {formatOption(val)}
-                    </MenuItem>
-                </>
+                return <MenuItem sx={{ fontSize: 14 }} value={val} key={val} onClick={() => onSelect(val)} >
+                    {formatOption(val)}
+                </MenuItem>
             })}
         </StyledMenu >
     </>
