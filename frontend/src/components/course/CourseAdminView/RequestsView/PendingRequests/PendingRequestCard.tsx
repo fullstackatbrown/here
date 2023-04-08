@@ -1,5 +1,5 @@
 import { ExpandMore } from "@mui/icons-material";
-import { Box, Collapse, IconButton, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import theme from "@util/theme";
 import { Swap } from "model/swap";
 import { FC, useState } from "react";
@@ -60,15 +60,21 @@ const PendingRequest: FC<PendingRequestProps> = ({ request }) => {
 
           {hover ?
             <Stack direction="row" py={0} display="flex" alignItems="center">
-              <IconButton sx={{ fontSize: "small", p: 0.8, color: "inherit" }} onClick={handleRequest("approve")}>
-                <CheckIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-              <IconButton sx={{ fontSize: "small", p: 0.8, color: "inherit" }} onClick={handleRequest("deny")}>
-                <CloseIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-              <IconButton sx={{ fontSize: "small", p: 0.8, color: "inherit" }} onClick={handleRequest("archive")}>
-                <ArchiveOutlinedIcon sx={{ fontSize: 18 }} />
-              </IconButton>
+              <Tooltip title="approve">
+                <IconButton sx={{ fontSize: "small", p: 0.8, color: "inherit" }} onClick={handleRequest("approve")}>
+                  <CheckIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="deny">
+                <IconButton sx={{ fontSize: "small", p: 0.8, color: "inherit" }} onClick={handleRequest("deny")}>
+                  <CloseIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="archive">
+                <IconButton sx={{ fontSize: "small", p: 0.8, color: "inherit" }} onClick={handleRequest("archive")}>
+                  <ArchiveOutlinedIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
             </Stack> :
             <Typography py={1} color="secondary" fontSize={14}>{formatRequestTime(request)}</Typography>
           }
