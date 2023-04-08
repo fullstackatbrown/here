@@ -105,7 +105,10 @@ export default function PeopleView({ course }: PeopleViewProps) {
 
         </Stack>
       </Stack >
-      {sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection())} sectionsMap={sectionsMap} />}
+      {Object.keys(course.students).length === 0 ?
+        <Typography variant="body1">No students have joined this course yet.</Typography> :
+        (sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection())} sectionsMap={sectionsMap} />)
+      }
     </>
   );
 }

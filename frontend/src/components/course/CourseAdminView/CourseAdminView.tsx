@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { View } from "model/general";
 import { useEffect, useState } from "react";
 import CourseHeader from "../CourseHeader";
