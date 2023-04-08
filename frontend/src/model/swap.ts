@@ -1,18 +1,18 @@
-export type SwapRequestStatus =
+export type SwapStatus =
   | "pending"
   | "cancelled"
   | "approved"
   | "denied"
   | "archived";
 
-export interface SwapRequest {
+export interface Swap {
   ID: string;
   studentID: string;
   oldSectionID: string;
   newSectionID: string;
   requestTime: string;
   reason: string;
-  status: SwapRequestStatus;
+  status: SwapStatus;
   handledBy: string;
   assignmentID?: string;
 }

@@ -1,9 +1,9 @@
 import React, { FC } from "react";
 import { Chip } from "@mui/material";
-import { SwapRequestStatus } from "model/swapRequest";
+import { SwapStatus } from "model/swap";
 
 export interface RequestStatusChipProps {
-    status: SwapRequestStatus;
+    status: SwapStatus;
     size?: "small" | "medium";
     style?: React.CSSProperties
 }

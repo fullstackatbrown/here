@@ -1,5 +1,5 @@
 import { Box, Collapse, ListItemButton, Stack, TableRow, Typography, useTheme } from "@mui/material";
-import { SwapRequest } from "model/swapRequest";
+import { Swap } from "model/swap";
 import { FC, useState } from "react";
 import RequestStatusChip from "../RequestStatusChip";
 import RequestInformation from "../RequestInformation";
@@ -8,7 +8,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { formatRequestTime } from "@util/shared/requestTime";
 
 export interface PastRequestProps {
-  request: SwapRequest;
+  request: Swap;
 }
 
 const PastRequest: FC<PastRequestProps> = ({ request }) => {

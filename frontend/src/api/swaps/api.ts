@@ -1,5 +1,5 @@
 import APIClient from "api/APIClient";
-import { SwapRequest } from "model/swapRequest";
+import { Swap } from "model/swap";
 
 async function createSwapRequest(
   courseID: string,
@@ -26,11 +26,11 @@ async function updateSwapRequest(
   return APIClient.patch(`/courses/${courseID}/swaps/${swapID}`, { status });
 }
 
-async function getSwaps(courseID: string): Promise<SwapRequest[]> {
+async function getSwaps(courseID: string): Promise<Swap[]> {
   return APIClient.get(`/courses/${courseID}/swaps`);
 }
 
-async function getSwapByStudent(courseID: string): Promise<SwapRequest> {
+async function getSwapByStudent(courseID: string): Promise<Swap> {
   return APIClient.get(`/courses/${courseID}/me`);
 }
 

@@ -1,7 +1,7 @@
 import { ExpandMore } from "@mui/icons-material";
 import { Box, Collapse, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import theme from "@util/theme";
-import { SwapRequest } from "model/swapRequest";
+import { Swap } from "model/swap";
 import { FC, useState } from "react";
 import RequestInformation from "../RequestInformation";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -13,7 +13,7 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 
 export interface PendingRequestProps {
-  request: SwapRequest;
+  request: Swap;
 }
 
 const PendingRequest: FC<PendingRequestProps> = ({ request }) => {

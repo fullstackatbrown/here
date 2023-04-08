@@ -1,5 +1,5 @@
 import { Badge, BadgeProps, Button, Stack, styled } from "@mui/material";
-import { useSwapRequests } from "api/swaps/hooks";
+import { useSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
 import { useRouter } from "next/router";
 
@@ -7,7 +7,7 @@ export default function CourseAdminViewNavigation() {
   const router = useRouter();
   const { query } = router;
 
-  const [swapRequests, _] = useSwapRequests();
+  const [swapRequests, _] = useSwaps("a");
   const numPendingRequests = swapRequests.filter(
     (r) => r.status === "pending"
   ).length;
@@ -22,7 +22,7 @@ export default function CourseAdminViewNavigation() {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  function getButton(view: View) {
+  function getNavigationButton(view: View) {
     return (
       <Button
         sx={{
@@ -40,9 +40,9 @@ export default function CourseAdminViewNavigation() {
 
   return (
     <Stack alignItems="start">
-      {getButton("sections")}
-      {getButton("assignments")}
-      {getButton("people")}
+      {getNavigationButton("sections")}
+      {getNavigationButton("assignments")}
+      {getNavigationButton("people")}
       <Badge
         color="primary"
         badgeContent={numPendingRequests}
@@ -53,7 +53,7 @@ export default function CourseAdminViewNavigation() {
           },
         }}
       >
-        {getButton("requests")}
+        {getNavigationButton("requests")}
       </Badge>
     </Stack>
   )

@@ -1,11 +1,11 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { SwapRequest } from "model/swapRequest";
+import { Swap } from "model/swap";
 import { FC } from "react";
 import PastRequest from "./PastRequestCard";
 import { sortRequestsByTime } from "@util/shared/requestTime";
 
 export interface PastRequestViewProps {
-  pastRequests: SwapRequest[];
+  pastRequests: Swap[];
 }
 
 const PastRequestsView: FC<PastRequestViewProps> = ({ pastRequests }) => {

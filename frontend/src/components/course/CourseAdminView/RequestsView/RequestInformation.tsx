@@ -1,8 +1,8 @@
-import { SwapRequest } from "model/swapRequest";
+import { Swap } from "model/swap";
 import { FC } from "react";
 
 export interface RequestInformationProps {
-    request: SwapRequest;
+    request: Swap;
 }
 
 const RequestInformation: FC<RequestInformationProps> = (request) => {
