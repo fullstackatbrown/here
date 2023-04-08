@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Collapse, IconButton, Input, Stack, TextField, Typography } from "@mui/material";
-import { Course } from "model/course";
+import { Course, CourseUserData } from "model/course";
 import PeopleTable from "./PeopleTable";
 import { useSections } from "api/section/hooks";
 import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
@@ -21,6 +21,7 @@ export default function PeopleView({ course }: PeopleViewProps) {
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [showSearchbar, setShowSearchbar] = useState<boolean>(false)
   const searchBarRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
   useEffect(() => {
     // needed to ensure that autofocus is applied after the searchbar is rendered
@@ -47,7 +48,7 @@ export default function PeopleView({ course }: PeopleViewProps) {
     return formatSectionInfo(sectionsMap[val], true)
   }
 
-  const getStudents = () => {
+  const filterStudentsBySection = () => {
     // get students based on filtered section
     let studentIDs = []
     if (!filterBySection) {
@@ -57,6 +58,13 @@ export default function PeopleView({ course }: PeopleViewProps) {
       studentIDs = getStudentsInSection(course.students, filterBySection)
     }
     return studentIDs.map((studentID) => course.students[studentID])
+  }
+
+  const filterStudentsBySearchQuery = (students: CourseUserData[]): CourseUserData[] => {
+    return students.filter((student) => {
+      // either student.displayName starts with the search query or student.email starts with the search query
+      return student.displayName.toLowerCase().startsWith(searchQuery.toLowerCase()) || student.email.toLowerCase().startsWith(searchQuery.toLowerCase())
+    })
   }
 
   return (
@@ -72,10 +80,13 @@ export default function PeopleView({ course }: PeopleViewProps) {
             options={sectionOptions()}
             onSelect={(val) => setFilterBySection(val)}
           />
-          <ClickAwayListener onClickAway={() => setShowSearchbar(false)}>
+          <ClickAwayListener
+            onClickAway={() => {
+              if (searchQuery === "") setShowSearchbar(false)
+            }}>
             <Stack direction="row" alignItems="center">
               <IconButton size="small" onClick={() => setShowSearchbar(true)}>
-                <SearchIcon sx={{ fontSize: 18 }} color="primary" />
+                <SearchIcon sx={{ fontSize: 18 }} />
               </IconButton>
               <Collapse orientation="horizontal" in={showSearchbar}>
                 <Input
@@ -86,6 +97,7 @@ export default function PeopleView({ course }: PeopleViewProps) {
                     padding: 0,
                   }}
                   inputRef={searchBarRef}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </Collapse>
             </Stack>
@@ -93,7 +105,7 @@ export default function PeopleView({ course }: PeopleViewProps) {
 
         </Stack>
       </Stack >
-      {sectionsMap && <PeopleTable students={getStudents()} sectionsMap={sectionsMap} />}
+      {sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection())} sectionsMap={sectionsMap} />}
     </>
   );
 }
