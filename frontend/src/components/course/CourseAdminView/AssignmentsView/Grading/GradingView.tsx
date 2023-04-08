@@ -48,7 +48,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
 
     const getStudents = () => {
         // get students based on filtered section
-        if (!filterBySection) {
+        if (filterBySection === ALL_STUDENTS) {
             return course.students ? Object.keys(course.students) : []
         } else {
             if (!course.students) return []
