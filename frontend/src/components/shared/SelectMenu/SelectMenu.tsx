@@ -2,7 +2,7 @@ import { Button, MenuItem, Divider, styled, MenuProps, Menu, alpha, Typography }
 import { FC, useState } from "react";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-interface MyMenuProps {
+interface SelectMenuProps {
     value: string;
     options: string[];
     onSelect: (value: string) => void;
@@ -31,7 +31,7 @@ const StyledMenu = styled((props: MenuProps) => (
     },
 }));
 
-const MyMenu: FC<MyMenuProps> = ({ value, options, onSelect, formatOption }) => {
+const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOption }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -67,4 +67,4 @@ const MyMenu: FC<MyMenuProps> = ({ value, options, onSelect, formatOption }) => 
     </>
 }
 
-export default MyMenu
+export default SelectMenu

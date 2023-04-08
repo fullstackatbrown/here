@@ -16,7 +16,7 @@ import { Course } from 'model/course';
 import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import MyMenu from './MyMenu';
+import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
 
 interface GradingViewProps {
     course: Course;
@@ -124,7 +124,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                         {assignment.name}
                     </Typography>
                 </Stack>
-                <MyMenu
+                <SelectMenu
                     value={selectedSection}
                     formatOption={(val) => val ? formatSectionInfo(sectionsMap[val], true) : "All Sections"}
                     options={sectionOptions()}
