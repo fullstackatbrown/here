@@ -21,7 +21,7 @@ const SectionsView: FC<SectionsViewProps> = ({ course }) => {
     if (!course.students) return 0;
     let count = 0;
     Object.keys(course.students).forEach((studentId) => {
-      if (course.students[studentId] === sectionId) {
+      if (course.students[studentId].defaultSection === sectionId) {
         count++;
       }
     });
@@ -41,7 +41,7 @@ const SectionsView: FC<SectionsViewProps> = ({ course }) => {
         </Button>
       </Stack>
       <Stack direction="column" spacing={2} mb={5}>
-        {sections && sortSections(sections).map((s) =>
+        {sections && sections.map((s) =>
           <SectionCard key={s.ID} section={s} enrollment={getEnrollment(s.ID)} />)
         }
       </Stack>

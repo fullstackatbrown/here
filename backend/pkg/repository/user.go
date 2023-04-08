@@ -195,11 +195,10 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models
 	// Add student to course
 	newStudentMap := utils.CopyMap(course.Students)
 	newStudentMap[req.User.ID] = models.CourseUserData{
-		StudentID:      req.User.ID,
-		Email:          req.User.Email,
-		DisplayName:    req.User.DisplayName,
-		Pronouns:       req.User.Pronouns,
-		DefaultSection: "",
+		StudentID:   req.User.ID,
+		Email:       req.User.Email,
+		DisplayName: req.User.DisplayName,
+		Pronouns:    req.User.Pronouns,
 	}
 
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)

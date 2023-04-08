@@ -5,14 +5,18 @@ import { IconButton, Stack, Table, TableBody, TableHead, TableRow, Typography } 
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
-import getStudentsInSection from '@util/shared/getStudentsInSection';
+import formatSectionInfo from '@util/shared/formatSectionInfo';
+import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
+import listToMap from '@util/shared/listToMap';
 import GradeAPI from 'api/grades/api';
 import { useGrades } from 'api/grades/hooks';
+import { useSections } from 'api/section/hooks';
 import { Assignment } from 'model/assignment';
 import { Course } from 'model/course';
 import { Section } from 'model/section';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
 
 interface GradingViewProps {
     course: Course;
@@ -32,25 +36,32 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 }))
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
-    const [selectedSection, setSelectedSection] = useState<Section | null>(null)
-    const [grades, loading] = useGrades(course.ID, assignment.ID)
-    const [editGrade, setEditGrade] = useState<string | null>(null) // userid
+    const [sections, sectionsLoading] = useSections(course.ID)
+    const [grades, gradesLoading] = useGrades(course.ID, assignment.ID)
+    const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
+    const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
+    const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
+
+    useEffect(() => {
+        sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
+    }, [sections])
 
     const getStudents = () => {
-        if (!selectedSection) {
+        // get students based on filtered section
+        if (filterBySection === ALL_STUDENTS) {
             return course.students ? Object.keys(course.students) : []
         } else {
             if (!course.students) return []
-            let students = getStudentsInSection(course.students, selectedSection.ID)
-
+            const section = sectionsMap[filterBySection]
+            let students = getStudentsInSection(course.students, filterBySection)
             // filter out swapped out students
-            if (selectedSection.swappedOutStudents && assignment.ID in selectedSection.swappedOutStudents) {
-                students = arraySubtract(students, selectedSection.swappedOutStudents[assignment.ID])
+            if (section.swappedOutStudents && assignment.ID in section.swappedOutStudents) {
+                students = arraySubtract(students, section.swappedOutStudents[assignment.ID])
             }
 
             // add in swapped in students
-            if (selectedSection.swappedInStudents && assignment.ID in selectedSection.swappedInStudents) {
-                students = arrayUnion(students, selectedSection.swappedInStudents[assignment.ID])
+            if (section.swappedInStudents && assignment.ID in section.swappedInStudents) {
+                students = arrayUnion(students, section.swappedInStudents[assignment.ID])
             }
             return students
         }
@@ -95,18 +106,37 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
         }
     }
 
+    const sectionOptions = () => {
+        let options = [ALL_STUDENTS]
+        sectionsMap && Object.keys(sectionsMap).forEach((sectionID) => {
+            options.push(sectionID)
+        })
+        return options
+    }
+
+    const formatOptions = (val: string | undefined) => {
+        if (val === ALL_STUDENTS) return ALL_STUDENTS
+        return formatSectionInfo(sectionsMap[val], true)
+    }
+
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" mb={1}>
-                <Stack direction="row" spacing={2}>
+            <Stack direction="row" justifyContent="space-between" mb={1} ml={-4.5} alignItems="center">
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <IconButton size="small" sx={{ p: 0.5 }} onClick={handleNavigateBack}>
+                        <ArrowBackIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
                     <Typography variant="h6" fontWeight={600}>
                         {assignment.name}
                     </Typography>
-                    <IconButton size="small" onClick={handleNavigateBack}>
-                        <ArrowBackIcon />
-                    </IconButton>
                 </Stack>
-            </Stack>
+                <SelectMenu
+                    value={filterBySection}
+                    formatOption={formatOptions}
+                    options={sectionOptions()}
+                    onSelect={(val) => setFilterBySection(val)}
+                />
+            </Stack >
             <Table>
                 <colgroup>
                     <col width="40%" />
@@ -124,7 +154,6 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
                     <TableBody>
                         {getStudents().map((userID) => {
                             const grade = grades && userID in grades ? grades[userID] : undefined
-                            console.log(course.students)
                             return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
                                 <TableCell component="th" scope="row">
                                     {course.students && course.students[userID] && course.students[userID].displayName}
