@@ -47,6 +47,7 @@ const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOptio
             disableElevation
             onClick={handleClick}
             endIcon={<KeyboardArrowDownIcon />}
+            sx={{ py: 0.3 }}
         >
             {formatOption(value)}
         </Button>
