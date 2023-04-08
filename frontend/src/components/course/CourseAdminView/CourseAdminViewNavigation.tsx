@@ -1,16 +1,12 @@
-import { Badge, BadgeProps, Button, Stack, styled } from "@mui/material";
-import { useSwaps } from "api/swaps/hooks";
+import { Badge, Button, Stack } from "@mui/material";
+import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
 import { useRouter } from "next/router";
 
 export default function CourseAdminViewNavigation() {
   const router = useRouter();
   const { query } = router;
-
-  const [swapRequests, _] = useSwaps("a");
-  const numPendingRequests = swapRequests.filter(
-    (r) => r.status === "pending"
-  ).length;
+  const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
 
   function navigateTo(view: View) {
     return () => {
@@ -43,18 +39,20 @@ export default function CourseAdminViewNavigation() {
       {getNavigationButton("sections")}
       {getNavigationButton("assignments")}
       {getNavigationButton("people")}
-      <Badge
-        color="primary"
-        badgeContent={numPendingRequests}
-        sx={{
-          "& .MuiBadge-badge": {
-            right: -10,
-            top: "50%",
-          },
-        }}
-      >
-        {getNavigationButton("requests")}
-      </Badge>
+      {pendingRequests && pendingRequests.length > 0 ?
+        <Badge
+          color="primary"
+          badgeContent={pendingRequests.length}
+          sx={{
+            "& .MuiBadge-badge": {
+              right: -10,
+              top: "50%",
+            },
+          }}
+        >
+          {getNavigationButton("requests")}
+        </Badge> : getNavigationButton("requests")
+      }
     </Stack>
   )
 }

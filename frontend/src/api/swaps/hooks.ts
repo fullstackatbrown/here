@@ -37,31 +37,6 @@ export const dummySwapRequest3: Swap = {
   handledBy: "unnamed TA #9328",
 };
 
-export function useSwaps(courseID: string): [Swap[] | undefined, boolean] {
-  const [loading, setLoading] = useState(true);
-  const [swaps, setSections] = useState<Swap[] | undefined>(undefined);
-
-  useEffect(() => {
-    const db = getFirestore();
-    const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection, courseID, FirestoreSwapsCollection), (querySnapshot) => {
-      const res: Swap[] = [];
-      querySnapshot.forEach((doc) => {
-        res.push({ ID: doc.id, ...doc.data() } as Swap);
-      });
-
-      setSections(res);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [courseID]);
-
-  // Uncomment for testing
-  return [[dummySwapRequest1, dummySwapRequest2, dummySwapRequest3], false];
-
-  return [swaps, loading];
-}
-
 export function usePendingSwaps(courseID: string): [Swap[] | undefined, boolean] {
   const [loading, setLoading] = useState(true);
   const [swaps, setSections] = useState<Swap[] | undefined>(undefined);
@@ -82,5 +57,29 @@ export function usePendingSwaps(courseID: string): [Swap[] | undefined, boolean]
     return () => unsubscribe();
   }, [courseID]);
 
+  return [swaps, loading];
+}
+
+export function usePastSwaps(courseID: string): [Swap[] | undefined, boolean] {
+  const [loading, setLoading] = useState(true);
+  const [swaps, setSections] = useState<Swap[] | undefined>(undefined);
+
+  useEffect(() => {
+    const db = getFirestore();
+    const unsubscribe = onSnapshot(query(collection(db, FirestoreCoursesCollection,
+      courseID, FirestoreSwapsCollection), where("status", "!=", "pending")), (querySnapshot) => {
+        const res: Swap[] = [];
+        querySnapshot.forEach((doc) => {
+          res.push({ ID: doc.id, ...doc.data() } as Swap);
+        });
+
+        setSections(res);
+        setLoading(false);
+      });
+
+    return () => unsubscribe();
+  }, [courseID]);
+
+  return [[dummySwapRequest1, dummySwapRequest2, dummySwapRequest3], false];
   return [swaps, loading];
 }

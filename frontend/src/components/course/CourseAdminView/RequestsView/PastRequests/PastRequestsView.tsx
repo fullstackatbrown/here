@@ -3,12 +3,17 @@ import { Swap } from "model/swap";
 import { FC } from "react";
 import PastRequest from "./PastRequestCard";
 import { sortRequestsByTime } from "@util/shared/requestTime";
+import { Course } from "model/course";
+import { Assignment } from "model/assignment";
+import { usePastSwaps } from "api/swaps/hooks";
 
 export interface PastRequestViewProps {
-  pastRequests: Swap[];
+  course: Course;
+  assignmentsMap: Record<string, Assignment>;
 }
 
-const PastRequestsView: FC<PastRequestViewProps> = ({ pastRequests }) => {
+const PastRequestsView: FC<PastRequestViewProps> = ({ course, assignmentsMap }) => {
+  const [pastRequests, _] = usePastSwaps(course.ID);
 
   return (
     <Stack direction="column">

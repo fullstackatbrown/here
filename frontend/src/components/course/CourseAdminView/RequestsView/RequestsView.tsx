@@ -5,7 +5,6 @@ import {
   Collapse,
   Stack
 } from "@mui/material";
-import { useSwaps } from "api/swaps/hooks";
 import { Course } from "model/course";
 import { useState } from "react";
 import PastRequestsView from "./PastRequests/PastRequestsView";
@@ -21,12 +20,6 @@ export default function RequestsView({ course }: RequestsViewProps) {
   const [pendingRequestsOpen, setPendingRequestsOpen] = useState(true);
   const [pastRequestsOpen, setPastRequestsOpen] = useState(false);
   const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
-
-  const [swapRequests, swapRequestsLoading] = useSwaps(course.ID);
-  const pendingSwapRequests = swapRequests.filter(
-    (r) => r.status === "pending"
-  );
-  const pastSwapRequests = swapRequests.filter((r) => r.status !== "pending");
 
   return (
     <Stack spacing={2} ml={-1} mt={-1}>
@@ -55,7 +48,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
         </Button>
       </Stack>
       <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
-        <PastRequestsView pastRequests={pastSwapRequests} />
+        <PastRequestsView course={course} assignmentsMap={assignmentsMap} />
       </Collapse>
     </Stack >
   );
