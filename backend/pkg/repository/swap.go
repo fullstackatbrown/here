@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -41,7 +42,7 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 		OldSectionID: req.OldSectionID,
 		NewSectionID: req.NewSectionID,
 		Reason:       req.Reason,
-		RequestTime:  req.RequestTime,
+		RequestTime:  time.Now().Format(models.ISO8601TimeFormat),
 		Status:       models.STATUS_PENDING,
 	}
 
