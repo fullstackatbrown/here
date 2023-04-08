@@ -2,6 +2,7 @@ import { Table, TableBody, TableFooter, TableHead, TablePagination, TableRow } f
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
+import { sortStudentsByName } from "@util/shared/formatStudentsList";
 import { CourseUserData } from 'model/course';
 import { Section } from "model/section";
 import { FC, useEffect, useState } from "react";
@@ -22,21 +23,13 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const sortByName = (students: CourseUserData[]) => {
-    return students.sort((a, b) => {
-        if (a.displayName < b.displayName) return -1;
-        if (a.displayName > b.displayName) return 1;
-        return 0;
-    })
-}
-
 const PeopleTable: FC<PeopleTableProps> = ({ students, sectionsMap }) => {
     const rowsPerPage = 10;
-    const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortByName(students));
+    const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortStudentsByName(students));
     const [page, setPage] = useState(0);
 
     useEffect(() => {
-        setStudentsSorted(sortByName(students))
+        setStudentsSorted(sortStudentsByName(students))
     }, [students])
 
     return (

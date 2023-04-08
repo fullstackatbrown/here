@@ -18,7 +18,7 @@ import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
-import { filterStudentsBySearchQuery } from '@util/shared/filterStudents';
+import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
 
 interface GradingViewProps {
     course: Course;
@@ -43,6 +43,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
     const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
+
     const rowsPerPage = 10;
     const [page, setPage] = useState(0);
     const [currentStudentsDisplayed, setCurrentStudentsDisplayed] = useState<CourseUserData[]>([])
@@ -73,7 +74,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
             }
         }
         let students = studentIDs.map((studentID) => course.students[studentID])
-        setCurrentStudentsDisplayed(filterStudentsBySearchQuery(students, searchQuery))
+        students = filterStudentsBySearchQuery(students, searchQuery)
+        setCurrentStudentsDisplayed(sortStudentsByName(students))
     }, [filterBySection, page, course.students, assignment.ID, sectionsMap, searchQuery])
 
     const handleSubmitGrade = (userID: string) => {

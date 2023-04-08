@@ -6,3 +6,11 @@ export const filterStudentsBySearchQuery = (students: CourseUserData[], searchQu
         return student.displayName.toLowerCase().startsWith(searchQuery.toLowerCase()) || student.email.toLowerCase().startsWith(searchQuery.toLowerCase())
     })
 }
+
+export const sortStudentsByName = (students: CourseUserData[]) => {
+    return students.sort((a, b) => {
+        if (a.displayName < b.displayName) return -1;
+        if (a.displayName > b.displayName) return 1;
+        return 0;
+    })
+}

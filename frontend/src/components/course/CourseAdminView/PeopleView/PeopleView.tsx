@@ -1,7 +1,7 @@
 import SearchBar from "@components/shared/SearchBar/SearchBar";
 import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
 import { Stack, Typography } from "@mui/material";
-import { filterStudentsBySearchQuery } from "@util/shared/filterStudents";
+import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
 import listToMap from "@util/shared/listToMap";
