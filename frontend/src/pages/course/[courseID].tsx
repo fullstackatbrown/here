@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { toast } from "react-hot-toast";
-import AppLayout from "@components/shared/AppLayout";
 import CourseAdminView from "@components/course/CourseAdminView";
-import { useCourse } from "api/course/hooks";
-import { CourseStudentView } from "@components/course/CourseStudentView/CourseStudentView";
 import CourseHeader from "@components/course/CourseHeader";
-import { Stack, Grid } from "@mui/material";
+import AppLayout from "@components/shared/AppLayout";
+import { Grid, Stack, useTheme } from "@mui/material";
+import { useCourse } from "api/course/hooks";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 export default function CoursePage() {
   const router = useRouter();
+  const theme = useTheme();
   const { courseID } = router.query;
   const [course, courseLoading] = useCourse(courseID as string);
 
