@@ -9,6 +9,7 @@ export interface PastRequestViewProps {
 }
 
 const PastRequestsView: FC<PastRequestViewProps> = ({ pastRequests }) => {
+
   return (
     <Stack direction="column">
       {sortRequestsByTime(pastRequests).map((r) => (

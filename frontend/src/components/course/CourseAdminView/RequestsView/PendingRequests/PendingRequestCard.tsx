@@ -11,18 +11,20 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import { CourseUserData } from "model/course";
+import { Assignment } from "model/assignment";
 
 export interface PendingRequestProps {
   request: Swap;
+  student: CourseUserData;
+  assignment?: Assignment;
 }
 
-const PendingRequest: FC<PendingRequestProps> = ({ request }) => {
+const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment }) => {
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const theme = useTheme();
-  const whichSection = request.assignmentID
-    ? request.newSectionID
-    : "Permanent";
+  const whichSection = assignment ? assignment.name : "Permanent";
 
   function handleRequest(action: "approve" | "deny" | "archive") {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -36,26 +38,27 @@ const PendingRequest: FC<PendingRequestProps> = ({ request }) => {
       <Box
         sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
         px={1}
+        py={1}
         onClick={() => setExpanded(!expanded)}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        <Stack direction="row" spacing={1} justifyContent="space-between">
-          <Stack direction="row" spacing={4} py={1}>
-            <Stack direction="row" spacing={1} width={350} >
-              <Box width={17} display="flex" alignItems="center">
-                {expanded ?
-                  <ExpandMore sx={{ fontSize: 16 }} /> :
-                  <KeyboardArrowRightIcon
-                    sx={{ fontSize: 16, color: "text.disabled" }}
-                  />
-                }
-              </Box>
-              <Typography>{`${request.studentID} - ${whichSection}`}</Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" spacing={1}>
+            <Box width={17} mt={0.5}>
+              {expanded ?
+                <ExpandMore sx={{ fontSize: 16 }} /> :
+                <KeyboardArrowRightIcon
+                  sx={{ fontSize: 16, color: "text.disabled" }}
+                />
+              }
+            </Box>
+            <Stack direction="column" alignItems="flex-start">
+              <Typography>{`${student.displayName} - ${whichSection}`}</Typography>
+              <Typography color="secondary">
+                todo: some more info here
+              </Typography>
             </Stack>
-            <Typography color="secondary">
-              todo: some more info here
-            </Typography>
           </Stack>
 
           {hover ?
@@ -78,8 +81,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request }) => {
             </Stack> :
             <Typography py={1} color="secondary" fontSize={14}>{formatRequestTime(request)}</Typography>
           }
-
-        </Stack >
+        </Stack>
       </Box >
       <Collapse in={expanded}>
         <Box ml={4} mt={1} mb={2}>

@@ -11,6 +11,7 @@ import { useState } from "react";
 import PastRequestsView from "./PastRequests/PastRequestsView";
 import PendingRequestsView from "./PendingRequests/PendingRequestsView";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { useAssignments, useAssignmentsMap } from "api/assignment/hooks";
 
 export interface RequestsViewProps {
   course: Course;
@@ -19,8 +20,9 @@ export interface RequestsViewProps {
 export default function RequestsView({ course }: RequestsViewProps) {
   const [pendingRequestsOpen, setPendingRequestsOpen] = useState(true);
   const [pastRequestsOpen, setPastRequestsOpen] = useState(false);
+  const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
 
-  const [swapRequests, _] = useSwaps(course.ID);
+  const [swapRequests, swapRequestsLoading] = useSwaps(course.ID);
   const pendingSwapRequests = swapRequests.filter(
     (r) => r.status === "pending"
   );
@@ -39,7 +41,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
       </Stack>
       <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
         <Box>
-          <PendingRequestsView pendingRequests={pendingSwapRequests} />
+          <PendingRequestsView course={course} assignmentsMap={assignmentsMap} />
         </Box>
       </Collapse>
 
