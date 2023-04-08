@@ -1,12 +1,14 @@
-import { Stack, Typography } from "@mui/material";
+import { Autocomplete, Box, Collapse, IconButton, Input, Stack, TextField, Typography } from "@mui/material";
 import { Course } from "model/course";
 import PeopleTable from "./PeopleTable";
 import { useSections } from "api/section/hooks";
 import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { Section } from "model/section";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import listToMap from "@util/shared/listToMap";
+import SearchIcon from '@mui/icons-material/Search';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
 
 export interface PeopleViewProps {
@@ -15,8 +17,17 @@ export interface PeopleViewProps {
 
 export default function PeopleView({ course }: PeopleViewProps) {
   const [sections, sectionsLoading] = useSections(course.ID)
-  const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
+  const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>(undefined)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
+  const [showSearchbar, setShowSearchbar] = useState<boolean>(false)
+  const searchBarRef = useRef(null);
+
+  useEffect(() => {
+    // needed to ensure that autofocus is applied after the searchbar is rendered
+    if (showSearchbar && searchBarRef.current) {
+      searchBarRef.current.focus();
+    }
+  }, [showSearchbar]);
 
   useEffect(() => {
     sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
@@ -54,14 +65,35 @@ export default function PeopleView({ course }: PeopleViewProps) {
         <Typography variant="h6" fontWeight={600}>
           People
         </Typography>
-        <SelectMenu
-          value={filterBySection}
-          formatOption={formatOptions}
-          options={sectionOptions()}
-          onSelect={(val) => setFilterBySection(val)}
-        />
+        <Stack direction="row" alignItems="center">
+          <SelectMenu
+            value={filterBySection}
+            formatOption={formatOptions}
+            options={sectionOptions()}
+            onSelect={(val) => setFilterBySection(val)}
+          />
+          <ClickAwayListener onClickAway={() => setShowSearchbar(false)}>
+            <Stack direction="row" alignItems="center">
+              <IconButton size="small" onClick={() => setShowSearchbar(true)}>
+                <SearchIcon sx={{ fontSize: 18 }} color="primary" />
+              </IconButton>
+              <Collapse orientation="horizontal" in={showSearchbar}>
+                <Input
+                  placeholder="Type to search"
+                  disableUnderline
+                  style={{
+                    fontSize: 14,
+                    padding: 0,
+                  }}
+                  inputRef={searchBarRef}
+                />
+              </Collapse>
+            </Stack>
+          </ClickAwayListener>
+
+        </Stack>
       </Stack >
-      <PeopleTable students={getStudents()} />
+      {sectionsMap && <PeopleTable students={getStudents()} sectionsMap={sectionsMap} />}
     </>
   );
 }
