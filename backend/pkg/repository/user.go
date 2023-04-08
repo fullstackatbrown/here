@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 
@@ -29,6 +30,7 @@ func (fr *FirebaseRepository) initializeProfilesListener() {
 				return err
 			}
 
+			c.ID = doc.Ref.ID
 			newProfiles[doc.Ref.ID] = &c
 		}
 
@@ -95,46 +97,34 @@ func (fr *FirebaseRepository) GetUserByID(id string) (*models.User, error) {
 	// 	return nil, err
 	// }
 
-	// fbUser, err := fr.authClient.GetUser(firebase.Context, id)
-	// if err != nil {
-	// 	return nil, qerrors.UserNotFoundError
-	// }
+	fbUser, err := fr.authClient.GetUser(firebase.Context, id)
+	if err != nil {
+		return nil, qerrors.UserNotFoundError
+	}
 
-	// TODO: Refactor email verification into separate function.
+	// TODO: email verification
 
-	// Check the Firebase user's email against the list of allowed domains.
-	// if len(config.Config.AllowedEmailDomains) > 0 {
-	// 	domain := strings.Split(fbUser.Email, "@")[1]
-	// 	if !utils.Contains(config.Config.AllowedEmailDomains, domain) {
-	// 		// invalid email domain, delete the user from Firebase Auth
-	// 		_ = fr.authClient.DeleteUser(firebase.Context, fbUser.UID)
-	// 		return nil, qerrors.InvalidEmailError
-	// 	}
-	// }
-
-	// profile, err := fr.getUserProfile(fbUser.UID)
-
-	profile, err := fr.getProfileById(id)
+	profile, err := fr.GetProfileById(fbUser.UID)
 	if err != nil {
 		// TODO: no profile for the user found, create one.
 		// fr.CreateUserProfile()
 	}
 
-	// return fbUserToUserRecord(fbUser, profile), nil
-	return &models.User{Profile: profile}, nil
+	return fbUserToUserRecord(fbUser, profile), nil
 }
 
-// getUserProfile gets the Profile from the userProfiles map corresponding to the provided user ID.
-func (fr *FirebaseRepository) getProfileById(id string) (*models.Profile, error) {
+func (fr *FirebaseRepository) GetProfileById(id string) (*models.Profile, error) {
 	fr.profilesLock.RLock()
 	defer fr.profilesLock.RUnlock()
 
 	if val, ok := fr.profiles[id]; ok {
 		return val, nil
 	} else {
-		return nil, fmt.Errorf("No profile found for ID %v\n", id)
+		return nil, qerrors.UserProfileNotFoundError
 	}
 }
+
+// getUserProfile gets the Profile from the userProfiles map corresponding to the provided user ID.
 
 func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 	// Check if course exists
@@ -154,7 +144,7 @@ func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 	})
 
 	// remove student from course
-	newStudentMap := utils.CopyStringMap(course.Students)
+	newStudentMap := utils.CopyMap(course.Students)
 	delete(newStudentMap, req.UserID)
 
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
@@ -175,17 +165,15 @@ func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 }
 
 func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models.Course, error) {
-
-	fmt.Println(req.EntryCode)
 	// Check if course exists
 	course, err := fr.GetCourseByEntryCode(req.EntryCode)
-	fmt.Println(course, err)
 	if err != nil {
 		return nil, err
 	}
 
+	fmt.Println(req.User.ID)
 	// Check if already enrolled
-	profile, err := fr.getProfileById(req.UserID)
+	profile, err := fr.GetProfileById(req.User.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +184,7 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models
 
 	batch := fr.firestoreClient.Batch()
 	// Add course to student
-	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.UserID)
+	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.User.ID)
 	batch.Update(userProfileRef, []firestore.Update{
 		{
 			Path:  "courses",
@@ -205,8 +193,13 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models
 	})
 
 	// Add student to course
-	newStudentMap := utils.CopyStringMap(course.Students)
-	newStudentMap[req.UserID] = ""
+	newStudentMap := utils.CopyMap(course.Students)
+	newStudentMap[req.User.ID] = models.CourseUserData{
+		StudentID:   req.User.ID,
+		Email:       req.User.Email,
+		DisplayName: req.User.DisplayName,
+		Pronouns:    req.User.Pronouns,
+	}
 
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
 	batch.Update(coursesRef, []firestore.Update{

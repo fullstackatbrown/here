@@ -1,33 +1,15 @@
 import APIClient from "api/APIClient";
-import { Grade } from "../../model/grades";
-
-async function getGradesByAssignmentID(
-  courseID: string,
-  assignmentID: string
-): Promise<Grade[]> {
-  return APIClient.get(
-    `/courses/${courseID}/assignments/${assignmentID}/grades`
-  );
-}
-
-// ! This might be changed?
-async function getGradesByStudentID(
-  courseID: string,
-  studentID: string
-): Promise<Grade[]> {
-  return APIClient.get(`/courses/${courseID}/grades`);
-}
 
 async function createGrade(
   courseID: string,
   assignmentID: string,
   studentID: string,
-  grade: string,
-  taID: string
+  grade: number,
+  gradedByID: string
 ): Promise<string> {
   return APIClient.post(
     `/courses/${courseID}/assignments/${assignmentID}/grades`,
-    { studentID, grade, taID }
+    { studentID, grade, gradedByID }
   );
 }
 
@@ -35,13 +17,22 @@ async function updateGrade(
   courseID: string,
   assignmentID: string,
   gradeID: string,
-  studentID: string,
-  grade: string,
-  taID: string
+  grade: number,
+  gradedByID: string
 ): Promise<boolean> {
   return APIClient.patch(
     `/courses/${courseID}/assignments/${assignmentID}/grades/${gradeID}`,
-    { studentID, grade, taID }
+    { grade, gradedByID }
+  );
+}
+
+async function deleteGrade(
+  courseID: string,
+  assignmentID: string,
+  gradeID: string,
+): Promise<boolean> {
+  return APIClient.delete(
+    `/courses/${courseID}/assignments/${assignmentID}/grades/${gradeID}`
   );
 }
 
@@ -50,10 +41,9 @@ async function exportGrades(courseID: string): Promise<string> {
 }
 
 const GradeAPI = {
-  getGradesByAssignmentID,
-  getGradesByStudentID,
   createGrade,
   updateGrade,
+  deleteGrade,
 };
 
 export default GradeAPI;
