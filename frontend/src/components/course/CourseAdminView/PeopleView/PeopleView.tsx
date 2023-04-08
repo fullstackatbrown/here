@@ -1,15 +1,15 @@
-import { Autocomplete, Box, Collapse, IconButton, Input, Stack, TextField, Typography } from "@mui/material";
-import { Course, CourseUserData } from "model/course";
-import PeopleTable from "./PeopleTable";
-import { useSections } from "api/section/hooks";
+import SearchBar from "@components/shared/SearchBar/SearchBar";
 import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
+import { Stack, Typography } from "@mui/material";
+import { filterStudentsBySearchQuery } from "@util/shared/filterStudents";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
-import { Section } from "model/section";
-import { useEffect, useRef, useState } from "react";
-import listToMap from "@util/shared/listToMap";
-import SearchIcon from '@mui/icons-material/Search';
-import ClickAwayListener from '@mui/base/ClickAwayListener';
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
+import listToMap from "@util/shared/listToMap";
+import { useSections } from "api/section/hooks";
+import { Course } from "model/course";
+import { Section } from "model/section";
+import { useEffect, useState } from "react";
+import PeopleTable from "./PeopleTable";
 
 export interface PeopleViewProps {
   course: Course;
@@ -19,16 +19,7 @@ export default function PeopleView({ course }: PeopleViewProps) {
   const [sections, sectionsLoading] = useSections(course.ID)
   const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>(undefined)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
-  const [showSearchbar, setShowSearchbar] = useState<boolean>(false)
-  const searchBarRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState<string>("")
-
-  useEffect(() => {
-    // needed to ensure that autofocus is applied after the searchbar is rendered
-    if (showSearchbar && searchBarRef.current) {
-      searchBarRef.current.focus();
-    }
-  }, [showSearchbar]);
 
   useEffect(() => {
     sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
@@ -60,13 +51,6 @@ export default function PeopleView({ course }: PeopleViewProps) {
     return studentIDs.map((studentID) => course.students[studentID])
   }
 
-  const filterStudentsBySearchQuery = (students: CourseUserData[]): CourseUserData[] => {
-    return students.filter((student) => {
-      // either student.displayName starts with the search query or student.email starts with the search query
-      return student.displayName.toLowerCase().startsWith(searchQuery.toLowerCase()) || student.email.toLowerCase().startsWith(searchQuery.toLowerCase())
-    })
-  }
-
   return (
     <>
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
@@ -80,34 +64,12 @@ export default function PeopleView({ course }: PeopleViewProps) {
             options={sectionOptions()}
             onSelect={(val) => setFilterBySection(val)}
           />
-          <ClickAwayListener
-            onClickAway={() => {
-              if (searchQuery === "") setShowSearchbar(false)
-            }}>
-            <Stack direction="row" alignItems="center">
-              <IconButton size="small" onClick={() => setShowSearchbar(true)}>
-                <SearchIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-              <Collapse orientation="horizontal" in={showSearchbar}>
-                <Input
-                  placeholder="Type to search"
-                  disableUnderline
-                  style={{
-                    fontSize: 14,
-                    padding: 0,
-                  }}
-                  inputRef={searchBarRef}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </Collapse>
-            </Stack>
-          </ClickAwayListener>
-
+          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </Stack>
       </Stack >
       {Object.keys(course.students).length === 0 ?
         <Typography variant="body1">No students have joined this course yet.</Typography> :
-        (sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection())} sectionsMap={sectionsMap} />)
+        (sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} sectionsMap={sectionsMap} />)
       }
     </>
   );
