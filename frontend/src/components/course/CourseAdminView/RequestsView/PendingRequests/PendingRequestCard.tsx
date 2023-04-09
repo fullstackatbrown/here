@@ -68,7 +68,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
               {formatSectionInfo(oldSection, true)}
               &nbsp;&nbsp;{'->'}&nbsp;&nbsp;
               {formatSectionInfo(newSection, true)}&nbsp;
-              {getSectionAvailableSeats(newSection, assignment.ID) <= 0 &&
+              {getSectionAvailableSeats(newSection, assignment?.ID) <= 0 &&
                 <Box component="span" color={theme.palette.error.main}>(!)</Box>}
             </Typography>
             }

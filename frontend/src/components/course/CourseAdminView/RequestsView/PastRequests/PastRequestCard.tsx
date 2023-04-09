@@ -29,7 +29,7 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-      const confirmed = confirm(`This request has already been ${status}. Are you sure you want to mark this request as pending?`);
+      const confirmed = confirm(`This request has already been ${request.status}. Are you sure you want to mark this request as pending?`);
       if (confirmed) handleSwap(request, status);
     };
   }
