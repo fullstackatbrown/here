@@ -165,6 +165,17 @@ func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) erro
 }
 
 func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsRequest) error {
+	batch, err := fr.assignStudentToSection(req)
+	if err != nil {
+		return err
+	}
+
+	_, err = batch.Commit(firebase.Context)
+	return err
+}
+
+// Helpers
+func (fr *FirebaseRepository) assignStudentToSection(req *models.AssignSectionsRequest) (*firestore.WriteBatch, error) {
 	// In a batch
 	// 1. Update the course.students map
 	// 2. decrease the enrolled count of the old section, if it exists
@@ -175,7 +186,7 @@ func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsR
 	// get the course.students object from the course document
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	oldSectionID := course.Students[req.StudentID].DefaultSection
@@ -202,6 +213,5 @@ func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsR
 			{Path: "defaultSections." + req.CourseID, Value: req.NewSectionID},
 		})
 
-	_, err = batch.Commit(firebase.Context)
-	return err
+	return batch, nil
 }
