@@ -47,7 +47,9 @@ type UpdateCourseRequest struct {
 type AssignSectionsRequest struct {
 	CourseID     string `json:"courseID,omitempty"`
 	StudentID    string `json:"studentID"`
+	OldSectionID string `json:"oldSectionID,omitempty"`
 	NewSectionID string `json:"newSectionID"`
+	AssignmentID string `json:"assignmentID,omitempty"`
 }
 
 func CreateCourseID(req *CreateCourseRequest) string {

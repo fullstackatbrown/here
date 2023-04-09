@@ -36,6 +36,8 @@ func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*mode
 
 func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models.Swap, error) {
 
+	// TODO: Check for conflicting swaps
+
 	swap := &models.Swap{
 		StudentID:    req.StudentID,
 		AssignmentID: req.AssignmentID,
@@ -81,16 +83,16 @@ func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) error {
 func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 	batch := fr.firestoreClient.Batch()
 
+	swap, err := fr.GetSwapByID(req.CourseID, req.SwapID)
+	if err != nil {
+		return err
+	}
+
 	// Assign sections if the swap is approved
 	if req.Status == models.STATUS_APPROVED {
-		swap, err := fr.GetSwapByID(req.CourseID, req.SwapID)
-		if err != nil {
-			return err
-		}
-
-		// Permanent Swap
 		if swap.AssignmentID == "" {
-			batch, err = fr.assignStudentToSection(&models.AssignSectionsRequest{
+			// Permanent Swap
+			batch, err = fr.assignPermanentSection(&models.AssignSectionsRequest{
 				CourseID:     req.CourseID,
 				StudentID:    swap.StudentID,
 				NewSectionID: swap.NewSectionID,
@@ -98,12 +100,42 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 			if err != nil {
 				return err
 			}
+		} else {
+			// Temporary Swap
+			batch, err = fr.assignTemporarySection(&models.AssignSectionsRequest{
+				CourseID:     req.CourseID,
+				StudentID:    swap.StudentID,
+				OldSectionID: swap.OldSectionID,
+				NewSectionID: swap.NewSectionID,
+				AssignmentID: swap.AssignmentID,
+			})
+		}
+	}
+
+	// If status was approved, but now marking as pending, undo the swap
+	if req.Status == models.STATUS_PENDING && swap.Status == models.STATUS_APPROVED {
+		if swap.AssignmentID == "" {
+			// Permanent Swap
+			batch, err = fr.assignPermanentSection(&models.AssignSectionsRequest{
+				CourseID:     req.CourseID,
+				StudentID:    swap.StudentID,
+				NewSectionID: swap.OldSectionID,
+			})
+			if err != nil {
+				return err
+			}
 
 		} else {
 			// Temporary Swap
+			batch, err = fr.assignTemporarySection(&models.AssignSectionsRequest{
+				CourseID:     req.CourseID,
+				StudentID:    swap.StudentID,
+				OldSectionID: swap.NewSectionID,
+				NewSectionID: swap.OldSectionID,
+				AssignmentID: swap.AssignmentID,
+			})
 
 		}
-
 	}
 
 	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
@@ -112,7 +144,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		{Path: "handledBy", Value: req.HandledBy},
 	})
 
-	_, err := batch.Commit(firebase.Context)
+	_, err = batch.Commit(firebase.Context)
 	return err
 }
 
