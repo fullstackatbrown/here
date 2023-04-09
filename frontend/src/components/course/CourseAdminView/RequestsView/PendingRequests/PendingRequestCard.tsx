@@ -1,20 +1,18 @@
 import { ExpandMore } from "@mui/icons-material";
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
-import theme from "@util/theme";
+import { red } from '@mui/material/colors';
+import formatSectionInfo, { formatSectionCapacity } from "@util/shared/formatSectionInfo";
+import { formatRequestTime } from "@util/shared/requestTime";
+import { Assignment } from "model/assignment";
+import { CourseUserData } from "model/course";
+import { Section } from "model/section";
 import { Swap } from "model/swap";
 import { FC, useState } from "react";
 import RequestInformation from "../RequestInformation";
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import RequestStatusChip from "../RequestStatusChip";
-import { formatRequestTime } from "@util/shared/requestTime";
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import { CourseUserData } from "model/course";
-import { Assignment } from "model/assignment";
-import { Section } from "model/section";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
 
 export interface PendingRequestProps {
   request: Swap;
@@ -29,6 +27,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
   const [hover, setHover] = useState(false);
   const theme = useTheme();
   const whichSection = assignment ? "Temporary" : "Permanent";
+  const [capacity, overlimit] = formatSectionCapacity(newSection, assignment?.ID);
 
   function handleRequest(action: "approve" | "deny" | "archive") {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -47,7 +46,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        <Stack direction="row" spacing={1} justifyContent="space-between">
+        <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
           <Stack direction="row" spacing={4} alignItems="center" py={0.5}>
             <Stack direction="row" spacing={1} width={350} alignItems="center">
               <Box width={17} display="flex" alignItems="center">
@@ -63,7 +62,10 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
             </Stack>
 
             <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
-              {formatSectionInfo(oldSection, true)}&nbsp;&nbsp;{'->'}&nbsp;&nbsp;{formatSectionInfo(newSection, true)}
+              {formatSectionInfo(oldSection, true)}
+              &nbsp;&nbsp;{'->'}&nbsp;&nbsp;
+              {formatSectionInfo(newSection, true)}&nbsp;
+              <Box component="span" color={overlimit ? red[500] : "secondary"}>{capacity}</Box>
             </Typography>
           </Stack>
           {hover ?

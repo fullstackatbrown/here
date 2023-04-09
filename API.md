@@ -88,6 +88,7 @@
         endTime: string                            # the time the section ends
         location: string                           # where the section takes place
         capacity: int                              # max section capacity
+        numEnrolled: int                           # number of students enrolled for this section by default
         swappedInStudents: map[string][]string     # maps assignmentIDs to studentIDs that swap into this section
         swappedOutStudents: map[string][]string    # maps assignmentIDs to studentIDs that swapped out of this section
 
