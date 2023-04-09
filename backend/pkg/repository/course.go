@@ -120,10 +120,11 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 	}
 
 	course = &models.Course{
-		Title:     req.Title,
-		Code:      req.Code,
-		Term:      req.Term,
-		EntryCode: entryCode,
+		Title:               req.Title,
+		Code:                req.Code,
+		Term:                req.Term,
+		EntryCode:           entryCode,
+		AutoApproveRequests: req.AutoApproveRequests,
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Add(firebase.Context, course)

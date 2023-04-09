@@ -76,6 +76,7 @@
     title: string                                  # name of the course
     code: string                                   # course's course code
     entryCode: string                              # course's entry code, 6 randomly generated characters
+    autoApproveRequests: boolean                   # whether swap requests will be automatically approved
     term: string                                   # semester this course is offered
     students: map[string]string                    # map from studentIDs to sectionIDs
     swapRequests: []string

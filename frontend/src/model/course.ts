@@ -11,9 +11,7 @@ export interface Course {
   title: string;
   code: string;
   term: string;
+  entryCode: string;
+  autoApproveRequests: boolean;
   students?: Record<string, CourseUserData>;
-  surveyID?: string;
-  sectionIDs?: string[];
-  assignmentIDs?: string[];
-  swapRequests?: string[];
 }

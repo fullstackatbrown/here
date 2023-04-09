@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import { Course } from "model/course";
 import { FC } from "react";
 
@@ -8,10 +8,10 @@ export interface CourseHeaderProps {
 
 export const CourseHeader: FC<CourseHeaderProps> = ({ course }) => {
   return (
-    <Box width="100%" position="relative">
+    <Stack direction="row" spacing={2} alignItems="center">
       <Typography variant="h5" fontWeight={600}>
         {course.code}: {course.title}
       </Typography>
-    </Box>
+    </Stack>
   );
 }
