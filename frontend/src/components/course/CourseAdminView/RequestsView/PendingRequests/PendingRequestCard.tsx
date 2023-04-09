@@ -8,13 +8,17 @@ import { red } from '@mui/material/colors';
 import formatSectionInfo, { formatSectionCapacity } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
-import { CourseUserData } from "model/course";
+import { Course, CourseUserData } from "model/course";
 import { Section } from "model/section";
-import { Swap } from "model/swap";
+import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
 import RequestInformation from "../RequestInformation";
+import toast from "react-hot-toast";
+import SwapAPI from "api/swaps/api";
+import errors from "@util/errors";
 
 export interface PendingRequestProps {
+  course: Course;
   request: Swap;
   student: CourseUserData;
   assignment?: Assignment;
@@ -22,17 +26,22 @@ export interface PendingRequestProps {
   newSection: Section;
 }
 
-const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment, oldSection, newSection }) => {
+const PendingRequest: FC<PendingRequestProps> = ({ course, request, student, assignment, oldSection, newSection }) => {
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const theme = useTheme();
   const whichSection = assignment ? "Temporary" : "Permanent";
   const [capacity, overlimit] = formatSectionCapacity(newSection, assignment?.ID);
 
-  function handleRequest(action: "approve" | "deny" | "archive") {
+  function handleRequest(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-      // TODO:
+      toast.promise(SwapAPI.handleSwap(course.ID, request.ID, status, "test_TA"),
+        {
+          loading: "Updating request...",
+          success: "Request updated!",
+          error: errors.UNKNOWN,
+        })
     };
   }
 
@@ -71,17 +80,17 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
           {hover ?
             <Stack direction="row" display="flex" alignItems="center">
               <Tooltip title="approve">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("approve")}>
+                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("approved")}>
                   <CheckIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="deny">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("deny")}>
+                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("denied")}>
                   <CloseIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="archive">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("archive")}>
+                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("archived")}>
                   <ArchiveOutlinedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>

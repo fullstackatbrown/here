@@ -24,9 +24,9 @@ const RequestStatusChip: FC<RequestStatusChipProps> = ({ status, style }) => {
         case "denied":
             return <MyChip label="denied" variant="outlined" color="error" style={style} />;
         case "archived":
-            return <MyChip label="archived" variant="outlined" style={style} />;
+            return <MyChip label="archived" variant="outlined" color="secondary" style={style} />;
         case "cancelled":
-            return <MyChip label="cancelled" variant="outlined" style={style} />;
+            return <MyChip label="cancelled" variant="outlined" color="secondary" style={style} />;
     }
 };
 

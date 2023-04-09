@@ -26,6 +26,7 @@ const PendingRequestsView: FC<PendingRequestViewProps> = ({ course, assignmentsM
         const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
         return <PendingRequest
           key={`request${r.ID}`}
+          course={course}
           request={r} student={student} assignment={assignment}
           oldSection={oldSection} newSection={newSection} />
       })}
