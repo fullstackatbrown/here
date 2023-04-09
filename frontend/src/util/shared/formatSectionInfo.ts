@@ -8,12 +8,17 @@ export default function formatSectionInfo(section: Section, abbreviated = false)
     return timeFormatted + location
 }
 
-export function formatSectionCapacity(section: Section, assignmentID: string = undefined): [string, boolean] {
+export function getSectionAvailableSeats(section: Section, assignmentID: string = undefined): number {
     let numEnrolled = section.numEnrolled;
     if (assignmentID) {
         numEnrolled -= section.swappedOutStudents[assignmentID]?.length ?? 0;
         numEnrolled += section.swappedInStudents[assignmentID]?.length ?? 0;
     }
-    return [`(${numEnrolled}/${section.capacity})`, true];
-    return [`(${numEnrolled}/${section.capacity})`, numEnrolled >= section.capacity];
+
+    return section.capacity - numEnrolled;
+}
+
+export function formatSectionCapacity(section: Section, assignmentID: string = undefined): [number, string] {
+    const availableSeats = getSectionAvailableSeats(section, assignmentID)
+    return [availableSeats, `${availableSeats}/${section.capacity} seats available`];
 }

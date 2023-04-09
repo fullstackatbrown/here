@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableRow, styled, useTheme } from "@mui/material";
+import { Box, Table, TableBody, TableCell, TableRow, styled, useTheme } from "@mui/material";
 import formatSectionInfo, { formatSectionCapacity } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
@@ -18,9 +18,7 @@ export interface RequestInformationProps {
 
 
 const RequestInformation: FC<RequestInformationProps> = ({ request, oldSection, newSection, assignment }) => {
-
     const theme = useTheme();
-
     const StyledTableCell = styled(TableCell)({
         borderBottom: 'none',
         color: theme.palette.secondary.main,
@@ -28,9 +26,9 @@ const RequestInformation: FC<RequestInformationProps> = ({ request, oldSection, 
     });
 
     const information = {
+        "Type": assignment ? `One Time - ${assignment.name}` : "Permanent",
         "Old Section": formatSectionInfo(oldSection, true),
         "New Section": formatSectionInfo(newSection, true),
-        "Type": assignment ? `One Time - ${assignment.name}` : "Permanent",
         "Time": formatRequestTime(request, true),
         "Reason": request.reason,
     }
@@ -42,12 +40,18 @@ const RequestInformation: FC<RequestInformationProps> = ({ request, oldSection, 
         </colgroup>
         <TableBody>
             {Object.keys(information).map((key) => {
+                const [availableSeats, availableSeatsString] = formatSectionCapacity(newSection, assignment?.ID)
                 return <TableRow key={key}>
                     <StyledTableCell component="th" scope="row">
                         {key}
                     </StyledTableCell>
                     <StyledTableCell component="th" scope="row">
                         {information[key]}
+                        {key === "New Section" &&
+                            <Box component="span" color={availableSeats <= 0 ? theme.palette.error.main : "inherit"}>
+                                &nbsp;({availableSeatsString})
+                            </Box>
+                        }
                     </StyledTableCell>
                 </TableRow>
             })}

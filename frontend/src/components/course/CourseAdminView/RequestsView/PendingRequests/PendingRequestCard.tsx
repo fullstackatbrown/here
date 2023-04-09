@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import { red } from '@mui/material/colors';
-import formatSectionInfo, { formatSectionCapacity } from "@util/shared/formatSectionInfo";
+import formatSectionInfo, { formatSectionCapacity, getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
 import { Course, CourseUserData } from "model/course";
@@ -31,8 +31,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const theme = useTheme();
-  const whichSection = assignment ? "Temporary" : "Permanent";
-  const [capacity, overlimit] = formatSectionCapacity(newSection, assignment?.ID);
+  const whichSection = assignment ? "One Time" : "Permanent";
 
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -53,7 +52,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
       >
         <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
           <Stack direction="row" spacing={4} alignItems="center" py={0.5}>
-            <Stack direction="row" spacing={1} width={350} alignItems="center">
+            <Stack direction="row" spacing={1} width={320} alignItems="center">
               <Box width={17} display="flex" alignItems="center">
                 {expanded ?
                   <ExpandMore sx={{ fontSize: 16 }} /> :
@@ -69,7 +68,8 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
               {formatSectionInfo(oldSection, true)}
               &nbsp;&nbsp;{'->'}&nbsp;&nbsp;
               {formatSectionInfo(newSection, true)}&nbsp;
-              <Box component="span" color={overlimit ? red[500] : "secondary"}>{capacity}</Box>
+              {getSectionAvailableSeats(newSection, assignment.ID) <= 0 &&
+                <Box component="span" color={theme.palette.error.main}>(!)</Box>}
             </Typography>
             }
           </Stack>
