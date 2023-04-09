@@ -24,15 +24,12 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
   const [requests, _] = type === "pending" ? usePendingSwaps(course.ID) : usePastSwaps(course.ID);
 
   function handleSwap(request: Swap, status: SwapStatus) {
-    return (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      toast.promise(SwapAPI.handleSwap(course.ID, request.ID, status, "test_TA"),
-        {
-          loading: "Updating request...",
-          success: "Request updated!",
-          error: errors.UNKNOWN,
-        })
-    };
+    toast.promise(SwapAPI.handleSwap(course.ID, request.ID, status, "test_TA"),
+      {
+        loading: "Updating request...",
+        success: "Request updated!",
+        error: errors.UNKNOWN,
+      })
   }
 
   return (
