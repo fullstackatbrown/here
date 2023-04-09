@@ -25,18 +25,6 @@ export const dummySwapRequest2: Swap = {
   handledBy: "unnamed TA #4429",
 };
 
-export const dummySwapRequest3: Swap = {
-  ID: "swap-request-3",
-  studentID: "unnamed student #438",
-  oldSectionID: "section3",
-  newSectionID: "section1",
-  requestTime: "2023-03-03T09:00:00.000Z",
-  reason:
-    "My phone went off last section when everything was quiet and not I'm too embarrassed to go back :(",
-  status: "pending",
-  handledBy: "unnamed TA #9328",
-};
-
 export function usePendingSwaps(courseID: string): [Swap[] | undefined, boolean] {
   const [loading, setLoading] = useState(true);
   const [swaps, setSections] = useState<Swap[] | undefined>(undefined);
@@ -80,6 +68,6 @@ export function usePastSwaps(courseID: string): [Swap[] | undefined, boolean] {
     return () => unsubscribe();
   }, [courseID]);
 
-  return [[dummySwapRequest1, dummySwapRequest2, dummySwapRequest3], false];
+  return [[dummySwapRequest1, dummySwapRequest2], false];
   return [swaps, loading];
 }

@@ -1,16 +1,17 @@
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
   Box,
   Button,
   Collapse,
   Stack
 } from "@mui/material";
+import { useAssignmentsMap } from "api/assignment/hooks";
+import { useSectionsMap } from "api/section/hooks";
 import { Course } from "model/course";
 import { useState } from "react";
 import PastRequestsView from "./PastRequests/PastRequestsView";
 import PendingRequestsView from "./PendingRequests/PendingRequestsView";
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { useAssignments, useAssignmentsMap } from "api/assignment/hooks";
 
 export interface RequestsViewProps {
   course: Course;
@@ -20,6 +21,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
   const [pendingRequestsOpen, setPendingRequestsOpen] = useState(true);
   const [pastRequestsOpen, setPastRequestsOpen] = useState(false);
   const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
+  const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
 
   return (
     <Stack spacing={2} ml={-1} mt={-1}>
@@ -34,7 +36,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
       </Stack>
       <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
         <Box>
-          <PendingRequestsView course={course} assignmentsMap={assignmentsMap} />
+          <PendingRequestsView course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} />
         </Box>
       </Collapse>
 
