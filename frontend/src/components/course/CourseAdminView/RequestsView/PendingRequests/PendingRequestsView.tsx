@@ -19,17 +19,23 @@ const PendingRequestsView: FC<PendingRequestViewProps> = ({ course, assignmentsM
 
   return (
     <Stack direction="column">
-      {pendingRequests && assignmentsMap && sectionsMap && sortRequestsByTime(pendingRequests).map((r) => {
-        const student = course.students[r.studentID];
-        const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;
-        const oldSection = r.oldSectionID ? sectionsMap[r.oldSectionID] : undefined;
-        const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
-        return <PendingRequest
-          key={`request${r.ID}`}
-          course={course}
-          request={r} student={student} assignment={assignment}
-          oldSection={oldSection} newSection={newSection} />
-      })}
+      {pendingRequests &&
+
+        (pendingRequests.length === 0 ?
+          <Typography variant="body1" mx={4} mt={2} mb={4} textAlign="center">You've handled all requests in your inbox!</Typography> :
+
+          (assignmentsMap && sectionsMap && sortRequestsByTime(pendingRequests).map((r) => {
+            const student = course.students[r.studentID];
+            const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;
+            const oldSection = r.oldSectionID ? sectionsMap[r.oldSectionID] : undefined;
+            const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
+            return <PendingRequest
+              key={`request${r.ID}`}
+              course={course}
+              request={r} student={student} assignment={assignment}
+              oldSection={oldSection} newSection={newSection} />
+          })))
+      }
     </Stack>
   );
 };

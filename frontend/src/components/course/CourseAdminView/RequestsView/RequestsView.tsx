@@ -38,7 +38,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
         <PendingRequestsView course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} />
       </Collapse>
 
-      <Box height={6} />
+      <Box height={10} />
       <Stack direction="row" justifyContent="space-between">
         <Button
           color="inherit" variant="text" sx={{ fontSize: 17 }}
