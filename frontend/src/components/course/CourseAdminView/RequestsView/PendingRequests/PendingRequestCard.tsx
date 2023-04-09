@@ -60,13 +60,13 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
               {/* TODO: handle exceptionally long string */}
               <Typography>{`${student.displayName} - ${whichSection}`}</Typography>
             </Stack>
-
-            <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
+            {!expanded && <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
               {formatSectionInfo(oldSection, true)}
               &nbsp;&nbsp;{'->'}&nbsp;&nbsp;
               {formatSectionInfo(newSection, true)}&nbsp;
               <Box component="span" color={overlimit ? red[500] : "secondary"}>{capacity}</Box>
             </Typography>
+            }
           </Stack>
           {hover ?
             <Stack direction="row" display="flex" alignItems="center">
@@ -92,7 +92,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
       </Box >
       <Collapse in={expanded}>
         <Box ml={4} mt={1} mb={2}>
-          <RequestInformation request={request} />
+          <RequestInformation {...{ request, student, assignment, oldSection, newSection }} />
         </Box>
       </Collapse>
     </>

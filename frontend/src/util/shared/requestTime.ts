@@ -7,9 +7,15 @@ export const sortRequestsByTime = (swapRequests: Swap[]): Swap[] => {
     })
 }
 
-export const formatRequestTime = (request: Swap): string => {
-    return new Date(request.requestTime).toLocaleString("default", {
+export const formatRequestTime = (request: Swap, detailed = false): string => {
+    const options: Intl.DateTimeFormatOptions = {
         month: "short",
         day: "2-digit",
-    });
+    };
+    if (detailed) {
+        options.hour = "numeric"
+        options.minute = "numeric"
+        options.hour12 = true
+    }
+    return new Date(request.requestTime).toLocaleString("default", options);
 }
