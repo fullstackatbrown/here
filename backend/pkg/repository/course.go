@@ -163,3 +163,45 @@ func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) erro
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Update(firebase.Context, updates)
 	return err
 }
+
+func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsRequest) error {
+	// In a batch
+	// 1. Update the course.students map
+	// 2. decrease the enrolled count of the old section, if it exists
+	// 3. increase the enrolled count of the new section
+	// 4. update the student's default section
+	batch := fr.firestoreClient.Batch()
+
+	// get the course.students object from the course document
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return err
+	}
+
+	oldSectionID := course.Students[req.StudentID].DefaultSection
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID),
+		[]firestore.Update{
+			{Path: "students." + req.StudentID + ".defaultSection", Value: req.NewSectionID},
+		})
+
+	if oldSectionID != "" {
+		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+			req.CourseID).Collection(models.FirestoreSectionsCollection).Doc(oldSectionID), []firestore.Update{
+			{Path: "numEnrolled", Value: firestore.Increment(-1)},
+		})
+	}
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+		req.CourseID).Collection(models.FirestoreSectionsCollection).Doc(req.NewSectionID), []firestore.Update{
+		{Path: "numEnrolled", Value: firestore.Increment(1)},
+	})
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.StudentID),
+		[]firestore.Update{
+			{Path: "defaultSections." + req.CourseID, Value: req.NewSectionID},
+		})
+
+	_, err = batch.Commit(firebase.Context)
+	return err
+}

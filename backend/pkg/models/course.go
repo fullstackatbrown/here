@@ -44,6 +44,12 @@ type UpdateCourseRequest struct {
 	Term     *string `json:"term,omitempty"`
 }
 
+type AssignSectionsRequest struct {
+	CourseID     string `json:"courseID,omitempty"`
+	StudentID    string `json:"studentID"`
+	NewSectionID string `json:"newSectionID"`
+}
+
 func CreateCourseID(req *CreateCourseRequest) string {
 	return strings.ToLower(req.Code + req.Term)
 }
