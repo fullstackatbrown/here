@@ -28,23 +28,27 @@ async function assignSections(
 async function createCourse(
   title: string,
   code: string,
-  term: string
+  term: string,
+  autoApproveRequests: boolean,
 ): Promise<string> {
-  return APIClient.post(`/courses/`, { title, code, term });
+  return APIClient.post(`/courses/`, { title, code, term, autoApproveRequests });
 }
 
 async function updateCourse(
   courseID: string,
-  gradeOptions?: string,
-  surveyID?: string
+  title?: string,
+  code?: string,
+  term?: string,
+  autoApproveRequests?: boolean,
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}`, { gradeOptions, surveyID });
+  return APIClient.patch(`/courses/${courseID}`, { title, code, term, autoApproveRequests });
 }
 
 const CourseAPI = {
   getCourse,
   createCourse,
   deleteCourse,
+  updateCourse,
 };
 
 export default CourseAPI;

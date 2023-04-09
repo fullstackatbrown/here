@@ -131,7 +131,7 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest, capa
 func (fr *FirebaseRepository) DeleteSurvey(courseID string, surveyID string) error {
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSectionsCollection).Doc(surveyID).Delete(firebase.Context)
+		models.FirestoreSurveysCollection).Doc(surveyID).Delete(firebase.Context)
 
 	return err
 }
