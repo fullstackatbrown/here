@@ -1,23 +1,32 @@
 import React, { FC } from "react";
-import { Chip } from "@mui/material";
+import { Chip, styled } from "@mui/material";
 import { SwapStatus } from "model/swap";
 
 export interface RequestStatusChipProps {
     status: SwapStatus;
-    size?: "small" | "medium";
     style?: React.CSSProperties
 }
 
-const RequestStatusChip: FC<RequestStatusChipProps> = ({ status, size, style }) => {
+const MyChip = styled(Chip)({
+    height: 20,
+    fontSize: 12,
+    fontWeight: 500,
+    '& .MuiChip-label': {
+        paddingLeft: 8,
+        paddingRight: 8,
+    },
+});
+
+const RequestStatusChip: FC<RequestStatusChipProps> = ({ status, style }) => {
     switch (status) {
         case "approved":
-            return <Chip label="approved" variant="outlined" size={size} color="success" style={style} />;
+            return <MyChip label="approved" variant="outlined" color="success" style={style} />;
         case "denied":
-            return <Chip label="denied" variant="outlined" size={size} color="error" style={style} />;
+            return <MyChip label="denied" variant="outlined" color="error" style={style} />;
         case "archived":
-            return <Chip label="archived" variant="outlined" size={size} style={style} />;
+            return <MyChip label="archived" variant="outlined" style={style} />;
         case "cancelled":
-            return <Chip label="cancelled" variant="outlined" size={size} style={style} />;
+            return <MyChip label="cancelled" variant="outlined" style={style} />;
     }
 };
 

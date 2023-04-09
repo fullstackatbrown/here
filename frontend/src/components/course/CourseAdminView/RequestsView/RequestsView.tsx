@@ -24,7 +24,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
 
   return (
-    <Stack spacing={2} ml={-1} mt={-1}>
+    <Stack ml={-1} mt={-1}>
       <Stack direction="row" justifyContent="space-between">
         <Button
           color="inherit" variant="text" sx={{ fontSize: 17 }}
@@ -35,11 +35,10 @@ export default function RequestsView({ course }: RequestsViewProps) {
         </Button>
       </Stack>
       <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
-        <Box>
-          <PendingRequestsView course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} />
-        </Box>
+        <PendingRequestsView course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} />
       </Collapse>
 
+      <Box height={6} />
       <Stack direction="row" justifyContent="space-between">
         <Button
           color="inherit" variant="text" sx={{ fontSize: 17 }}
@@ -50,7 +49,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
         </Button>
       </Stack>
       <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
-        <PastRequestsView course={course} assignmentsMap={assignmentsMap} />
+        <PastRequestsView course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} />
       </Collapse>
     </Stack >
   );

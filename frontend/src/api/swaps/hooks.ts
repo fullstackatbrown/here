@@ -68,6 +68,5 @@ export function usePastSwaps(courseID: string): [Swap[] | undefined, boolean] {
     return () => unsubscribe();
   }, [courseID]);
 
-  return [[dummySwapRequest1, dummySwapRequest2], false];
   return [swaps, loading];
 }
