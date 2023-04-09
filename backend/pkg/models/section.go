@@ -31,7 +31,7 @@ type Section struct {
 	EndTime            string              `firestore:"endTime"`
 	Location           string              `firestore:"location"`
 	Capacity           int                 `firestore:"capacity"`
-	EnrolledStudents   []string            `firestore:"enrolledStudents"`
+	NumEnrolled        int                 `firestore:"numEnrolled"`
 	SwappedInStudents  map[string][]string `firestore:"swappedInStudents"`
 	SwappedOutStudents map[string][]string `firestore:"swappedOutStudents"`
 }

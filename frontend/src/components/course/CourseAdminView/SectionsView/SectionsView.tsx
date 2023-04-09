@@ -1,9 +1,8 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { useSections } from "api/section/hooks";
 import { sortSections } from "@util/shared/sortSectionTime";
+import { useSections } from "api/section/hooks";
 import { Course } from "model/course";
-import { Section } from "model/section";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";

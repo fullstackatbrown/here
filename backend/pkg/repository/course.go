@@ -164,3 +164,74 @@ func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) erro
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Update(firebase.Context, updates)
 	return err
 }
+
+func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsRequest) error {
+	batch, err := fr.assignPermanentSection(req)
+	if err != nil {
+		return err
+	}
+
+	_, err = batch.Commit(firebase.Context)
+	return err
+}
+
+// Helpers
+func (fr *FirebaseRepository) assignPermanentSection(req *models.AssignSectionsRequest) (*firestore.WriteBatch, error) {
+	// In a batch
+	// 1. Update the course.students map
+	// 2. decrease the enrolled count of the old section, if it exists
+	// 3. increase the enrolled count of the new section
+	// 4. update the student's default section
+	batch := fr.firestoreClient.Batch()
+
+	// get the course.students object from the course document
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return nil, err
+	}
+
+	oldSectionID := course.Students[req.StudentID].DefaultSection
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID),
+		[]firestore.Update{
+			{Path: "students." + req.StudentID + ".defaultSection", Value: req.NewSectionID},
+		})
+
+	if oldSectionID != "" {
+		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+			req.CourseID).Collection(models.FirestoreSectionsCollection).Doc(oldSectionID), []firestore.Update{
+			{Path: "numEnrolled", Value: firestore.Increment(-1)},
+		})
+	}
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+		req.CourseID).Collection(models.FirestoreSectionsCollection).Doc(req.NewSectionID), []firestore.Update{
+		{Path: "numEnrolled", Value: firestore.Increment(1)},
+	})
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.StudentID),
+		[]firestore.Update{
+			{Path: "defaultSections." + req.CourseID, Value: req.NewSectionID},
+		})
+
+	return batch, nil
+}
+
+func (fr *FirebaseRepository) assignTemporarySection(req *models.AssignSectionsRequest) (*firestore.WriteBatch, error) {
+	// In a batch
+	// 1. Update the swappedOutStudents map of the old section
+	// 2. Update the swappedInStudents map of the new section
+	batch := fr.firestoreClient.Batch()
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSectionsCollection).Doc(req.NewSectionID), []firestore.Update{
+		{Path: "swappedInStudents." + req.AssignmentID, Value: req.StudentID},
+	})
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSectionsCollection).Doc(req.OldSectionID), []firestore.Update{
+		{Path: "swappedOutStudents." + req.AssignmentID, Value: req.StudentID},
+	})
+
+	return batch, nil
+}

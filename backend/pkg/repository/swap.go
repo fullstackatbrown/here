@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -35,13 +36,15 @@ func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*mode
 
 func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models.Swap, error) {
 
+	// TODO: Check for conflicting swaps
+
 	swap := &models.Swap{
 		StudentID:    req.StudentID,
 		AssignmentID: req.AssignmentID,
 		OldSectionID: req.OldSectionID,
 		NewSectionID: req.NewSectionID,
 		Reason:       req.Reason,
-		RequestTime:  req.RequestTime,
+		RequestTime:  time.Now().Format(models.ISO8601TimeFormat),
 		Status:       models.STATUS_PENDING,
 	}
 
@@ -78,18 +81,77 @@ func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) error {
 }
 
 func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
-		models.FirestoreSwapsCollection).Doc(req.SwapID).Update(firebase.Context, []firestore.Update{
-		{Path: "Status", Value: req.Status},
-		{Path: "HandledBy", Value: req.HandledBy},
+	batch := fr.firestoreClient.Batch()
+
+	swap, err := fr.GetSwapByID(req.CourseID, req.SwapID)
+	if err != nil {
+		return err
+	}
+
+	// Assign sections if the swap is approved
+	if req.Status == models.STATUS_APPROVED {
+		if swap.AssignmentID == "" {
+			// Permanent Swap
+			batch, err = fr.assignPermanentSection(&models.AssignSectionsRequest{
+				CourseID:     req.CourseID,
+				StudentID:    swap.StudentID,
+				NewSectionID: swap.NewSectionID,
+			})
+			if err != nil {
+				return err
+			}
+		} else {
+			// Temporary Swap
+			batch, err = fr.assignTemporarySection(&models.AssignSectionsRequest{
+				CourseID:     req.CourseID,
+				StudentID:    swap.StudentID,
+				OldSectionID: swap.OldSectionID,
+				NewSectionID: swap.NewSectionID,
+				AssignmentID: swap.AssignmentID,
+			})
+		}
+	}
+
+	// If status was approved, but now marking as pending, undo the swap
+	if req.Status == models.STATUS_PENDING && swap.Status == models.STATUS_APPROVED {
+		if swap.AssignmentID == "" {
+			// Permanent Swap
+			batch, err = fr.assignPermanentSection(&models.AssignSectionsRequest{
+				CourseID:     req.CourseID,
+				StudentID:    swap.StudentID,
+				NewSectionID: swap.OldSectionID,
+			})
+			if err != nil {
+				return err
+			}
+
+		} else {
+			// Temporary Swap
+			batch, err = fr.assignTemporarySection(&models.AssignSectionsRequest{
+				CourseID:     req.CourseID,
+				StudentID:    swap.StudentID,
+				OldSectionID: swap.NewSectionID,
+				NewSectionID: swap.OldSectionID,
+				AssignmentID: swap.AssignmentID,
+			})
+
+		}
+	}
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSwapsCollection).Doc(req.SwapID), []firestore.Update{
+		{Path: "status", Value: req.Status},
+		{Path: "handledBy", Value: req.HandledBy},
 	})
+
+	_, err = batch.Commit(firebase.Context)
 	return err
 }
 
 func (fr *FirebaseRepository) CancelSwap(courseID string, swapID string) error {
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
 		models.FirestoreSwapsCollection).Doc(swapID).Update(firebase.Context, []firestore.Update{
-		{Path: "Status", Value: models.STATUS_CANCELLED},
+		{Path: "status", Value: models.STATUS_CANCELLED},
 	})
 	return err
 }

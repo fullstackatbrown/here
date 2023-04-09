@@ -81,7 +81,7 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 		EndTime:            req.EndTime,
 		Location:           req.Location,
 		Capacity:           req.Capacity,
-		EnrolledStudents:   make([]string, 0),
+		NumEnrolled:        0,
 		SwappedInStudents:  make(map[string][]string),
 		SwappedOutStudents: make(map[string][]string),
 	}

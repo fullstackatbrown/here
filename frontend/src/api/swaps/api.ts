@@ -1,7 +1,7 @@
 import APIClient from "api/APIClient";
-import { SwapRequest } from "model/swapRequest";
+import { Swap } from "model/swap";
 
-async function createSwapRequest(
+async function createSwap(
   courseID: string,
   studentID: string,
   oldSectionID: string,
@@ -18,7 +18,7 @@ async function createSwapRequest(
   });
 }
 
-async function updateSwapRequest(
+async function updateSwap(
   courseID: string,
   swapID: string,
   status: boolean
@@ -26,19 +26,19 @@ async function updateSwapRequest(
   return APIClient.patch(`/courses/${courseID}/swaps/${swapID}`, { status });
 }
 
-async function getSwaps(courseID: string): Promise<SwapRequest[]> {
-  return APIClient.get(`/courses/${courseID}/swaps`);
+async function handleSwap(
+  courseID: string,
+  swapID: string,
+  status: string,
+  handledBy: string
+): Promise<Swap> {
+  return APIClient.patch(`/courses/${courseID}/swaps/${swapID}/handle`, { status, handledBy });
 }
 
-async function getSwapByStudent(courseID: string): Promise<SwapRequest> {
-  return APIClient.get(`/courses/${courseID}/me`);
-}
-
-const SwapRequestAPI = {
-  createSwapRequest,
-  updateSwapRequest,
-  getSwaps,
-  getSwapByStudent,
+const SwapAPI = {
+  createSwap,
+  updateSwap,
+  handleSwap,
 };
 
-export default SwapRequestAPI;
+export default SwapAPI;

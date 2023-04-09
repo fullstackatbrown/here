@@ -44,7 +44,7 @@ export function CourseAdminView({ course }: CourseAdminViewProps) {
           </>
         }
       </Grid>
-      <Grid xs={2} />
+      <Grid xs={router.query.view === "requests" ? 0.5 : 2} />
     </Grid>
   );
 }

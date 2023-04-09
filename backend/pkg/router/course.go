@@ -102,5 +102,25 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+
+	var req *models.AssignSectionsRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	req.CourseID = courseID
+
+	err = repo.Repository.AssignStudentToSection(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully assigned sections to course " + courseID))
 
 }

@@ -47,6 +47,14 @@ type UpdateCourseRequest struct {
 	AutoApproveRequests *bool   `json:"autoApproveRequests,omitempty"`
 }
 
+type AssignSectionsRequest struct {
+	CourseID     string `json:"courseID,omitempty"`
+	StudentID    string `json:"studentID"`
+	OldSectionID string `json:"oldSectionID,omitempty"`
+	NewSectionID string `json:"newSectionID"`
+	AssignmentID string `json:"assignmentID,omitempty"`
+}
+
 func CreateCourseID(req *CreateCourseRequest) string {
 	return strings.ToLower(req.Code + req.Term)
 }
