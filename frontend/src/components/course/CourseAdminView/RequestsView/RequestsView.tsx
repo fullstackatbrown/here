@@ -10,8 +10,7 @@ import { useAssignmentsMap } from "api/assignment/hooks";
 import { useSectionsMap } from "api/section/hooks";
 import { Course } from "model/course";
 import { useState } from "react";
-import PastRequestsView from "./PastRequests/PastRequestsView";
-import PendingRequestsView from "./PendingRequests/PendingRequestsView";
+import RequestsList from "./RequestsList";
 
 export interface RequestsViewProps {
   course: Course;
@@ -35,7 +34,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
         </Button>
       </Stack>
       <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
-        <PendingRequestsView course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} />
+        <RequestsList course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} type="pending" />
       </Collapse>
 
       <Box height={10} />
@@ -49,7 +48,7 @@ export default function RequestsView({ course }: RequestsViewProps) {
         </Button>
       </Stack>
       <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
-        <PastRequestsView course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} />
+        <RequestsList course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} type="past" />
       </Collapse>
     </Stack >
   );

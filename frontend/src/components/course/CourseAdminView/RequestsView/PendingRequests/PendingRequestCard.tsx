@@ -18,30 +18,26 @@ import SwapAPI from "api/swaps/api";
 import errors from "@util/errors";
 
 export interface PendingRequestProps {
-  course: Course;
   request: Swap;
   student: CourseUserData;
   assignment?: Assignment;
   oldSection: Section;
   newSection: Section;
+  handleSwap: (request: Swap, status: SwapStatus) => void;
+
 }
 
-const PendingRequest: FC<PendingRequestProps> = ({ course, request, student, assignment, oldSection, newSection }) => {
+const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment, oldSection, newSection, handleSwap }) => {
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const theme = useTheme();
   const whichSection = assignment ? "Temporary" : "Permanent";
   const [capacity, overlimit] = formatSectionCapacity(newSection, assignment?.ID);
 
-  function handleRequest(status: SwapStatus) {
+  function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-      toast.promise(SwapAPI.handleSwap(course.ID, request.ID, status, "test_TA"),
-        {
-          loading: "Updating request...",
-          success: "Request updated!",
-          error: errors.UNKNOWN,
-        })
+      handleSwap(request, status);
     };
   }
 
@@ -80,17 +76,17 @@ const PendingRequest: FC<PendingRequestProps> = ({ course, request, student, ass
           {hover ?
             <Stack direction="row" display="flex" alignItems="center">
               <Tooltip title="approve">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("approved")}>
+                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={onClickHandleSwap("approved")}>
                   <CheckIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="deny">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("denied")}>
+                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={onClickHandleSwap("denied")}>
                   <CloseIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="archive">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={handleRequest("archived")}>
+                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={onClickHandleSwap("archived")}>
                   <ArchiveOutlinedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
