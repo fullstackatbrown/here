@@ -1,44 +1,31 @@
-import { Button, Stack, Typography } from "@mui/material";
-import { Swap, SwapStatus } from "model/swap";
-import { FC } from "react";
-import { sortRequestsByTime } from "@util/shared/requestTime";
-import { Course } from "model/course";
-import { usePastSwaps, usePendingSwaps } from "api/swaps/hooks";
-import { Assignment } from "model/assignment";
-import { Section } from "model/section";
+import { Stack, Typography } from "@mui/material";
 import errors from "@util/errors";
+import { sortRequestsByTime } from "@util/shared/requestTime";
+import { useAssignmentsMap } from "api/assignment/hooks";
+import { useSectionsMap } from "api/section/hooks";
 import SwapAPI from "api/swaps/api";
-import { request } from "http";
-import toast from "react-hot-toast";
+import { useSwapsByStudent } from "api/swaps/hooks";
+import { Course } from "model/course";
+import { Swap } from "model/swap";
 import { User } from "model/user";
+import { FC } from "react";
+import toast from "react-hot-toast";
 import StudentRequestCard from "./StudentRequestCard";
 
 export interface StudentRequestsListProps {
     course: Course;
     student: User;
-    assignmentsMap: Record<string, Assignment>;
-    sectionsMap: Record<string, Section>;
-    type: "pending" | "past";
 }
 
-const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, assignmentsMap, sectionsMap, type }) => {
-    const [requests, _] = type === "pending" ? usePendingSwaps(course.ID, student.ID) : usePastSwaps(course.ID, student.ID);
-
-    function handleCancelSwap(request: Swap) {
-        toast.promise(SwapAPI.cancelSwap(course.ID, request.ID),
-            {
-                loading: "Cancelling request...",
-                success: "Request cancelled!",
-                error: errors.UNKNOWN,
-            })
-    }
+const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student }) => {
+    const [requests, _] = useSwapsByStudent(course.ID, student.ID);
+    const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
+    const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
 
     return (
         <Stack direction="column" minHeight={60}>
             {requests && requests.length === 0 &&
-                (type === "pending" ?
-                    <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You have no pending requests</Typography> :
-                    <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You have no past requests</Typography>)
+                <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You have made no swap requests</Typography>
             }
             {requests && assignmentsMap && sectionsMap && sortRequestsByTime(requests).map((r) => {
                 const student = course.students[r.studentID];
@@ -47,9 +34,8 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, as
                 const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
                 return <StudentRequestCard
                     key={`request${r.ID}`}
-                    request={r} student={student} assignment={assignment}
-                    oldSection={oldSection} newSection={newSection} pending={type === "pending"}
-                    handleCancelSwap={type === "pending" && handleCancelSwap}
+                    request={r} courseID={course.ID} student={student} assignment={assignment}
+                    oldSection={oldSection} newSection={newSection} pending={r.status === "pending"}
                 />
             })}
         </Stack>

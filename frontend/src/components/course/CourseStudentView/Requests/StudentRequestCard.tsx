@@ -1,35 +1,32 @@
+import RequestInformation from "@components/course/CourseAdminView/RequestsView/RequestInformation";
+import RequestStatusChip from "@components/course/CourseAdminView/RequestsView/RequestStatusChip";
 import { ExpandMore } from "@mui/icons-material";
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
-import { red } from '@mui/material/colors';
-import formatSectionInfo, { formatSectionCapacity, getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
+import errors from "@util/errors";
+import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
+import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
-import { Course, CourseUserData } from "model/course";
+import { CourseUserData } from "model/course";
 import { Section } from "model/section";
-import { Swap, SwapStatus } from "model/swap";
-import UndoIcon from '@mui/icons-material/Undo';
-import EditIcon from '@mui/icons-material/Edit';
+import { Swap } from "model/swap";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
-import SwapAPI from "api/swaps/api";
-import errors from "@util/errors";
-import RequestStatusChip from "@components/course/CourseAdminView/RequestsView/RequestStatusChip";
 
 export interface StudentRequestCardProps {
     request: Swap;
+    courseID: string;
     student: CourseUserData;
     assignment?: Assignment;
     oldSection: Section;
     newSection: Section;
     pending: boolean;
-    handleCancelSwap?: (request: Swap) => void;
 }
 
-const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, assignment, oldSection, newSection, pending, handleCancelSwap }) => {
+const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, courseID, assignment, oldSection, newSection, pending }) => {
     const [expanded, setExpanded] = useState(false);
     const [hover, setHover] = useState(false);
     const theme = useTheme();
@@ -40,7 +37,12 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, ass
             e.stopPropagation();
             const confirmed = confirm("Are you sure you want to cancel this request?");
             if (confirmed) {
-                handleCancelSwap && handleCancelSwap(request)
+                toast.promise(SwapAPI.cancelSwap(courseID, request.ID),
+                    {
+                        loading: "Cancelling request...",
+                        success: "Request cancelled!",
+                        error: errors.UNKNOWN,
+                    })
             }
         };
     }
@@ -107,7 +109,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, ass
             </Box >
             <Collapse in={expanded}>
                 <Box ml={4} mt={1} mb={2}>
-                    {/* <RequestInformation {...{ request, student, assignment, oldSection, newSection }} /> */}
+                    <RequestInformation {...{ request, student, assignment, oldSection, newSection }} />
                 </Box>
             </Collapse>
         </>
