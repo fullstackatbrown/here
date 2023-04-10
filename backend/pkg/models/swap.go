@@ -30,14 +30,11 @@ type CreateSwapRequest struct {
 	NewSectionID string `json:"newSectionID"`
 	AssignmentID string `json:"assignmentID"`
 	Reason       string `json:"reason"`
-	RequestTime  string `json:"requestTime"`
 }
 
 type UpdateSwapRequest struct {
 	CourseID     *string `json:"courseID,omitempty"`
 	SwapID       *string `json:"swapID,omitempty"`
-	StudentID    *string `json:"studentID,omitempty"`
-	OldSectionID *string `json:"oldSectionID,omitempty"`
 	NewSectionID *string `json:"newSectionID,omitempty"`
 	AssignmentID *string `json:"assignmentID,omitempty"`
 	Reason       *string `json:"reason,omitempty"`

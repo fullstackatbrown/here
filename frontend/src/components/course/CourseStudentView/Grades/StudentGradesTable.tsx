@@ -1,7 +1,7 @@
 import GradeChip from "@components/shared/GradeChip/GradeChip";
 import { Box, Chip, Stack, Table, TableBody, TableHead, TableRow } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { useGradesForStudent } from "api/grades/hooks";
 import dayjs from "dayjs";

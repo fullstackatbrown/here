@@ -1,13 +1,17 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled, useTheme } from "@mui/material";
+import errors from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import listToMap from "@util/shared/listToMap";
 import { sortSections } from "@util/shared/sortSectionTime";
+import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
+import { Swap } from "model/swap";
 import { User } from "model/user";
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export interface SwapRequestDialogProps {
     open: boolean;
@@ -16,6 +20,7 @@ export interface SwapRequestDialogProps {
     assignments: Assignment[];
     student: User;
     sectionsMap: Record<string, Section>;
+    swap?: Swap;
 }
 
 type FormData = {
@@ -53,15 +58,15 @@ const DisabledTextField = styled(TextField)({
     },
 });
 
-const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap }) => {
-
+const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap, swap }) => {
+    console.log(swap)
     const defaultValues: FormData = {
         courseID: course.ID,
-        isPermanent: true,
-        reason: "",
-        assignmentID: "",
+        isPermanent: swap ? swap.assignmentID === "" : true,
+        reason: swap ? swap.reason : "",
+        assignmentID: swap ? swap.assignmentID : "",
         oldSectionID: student.defaultSection[course.ID],
-        newSectionID: "",
+        newSectionID: swap ? swap.newSectionID : "",
     }
 
     const { register, handleSubmit, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
@@ -81,8 +86,8 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
             register("assignmentID")
             setValue("oldSectionID", "")
         }
-        setValue("newSectionID", "")
-        setValue("reason", "")
+        setValue("newSectionID", defaultValues["newSectionID"])
+        setValue("reason", defaultValues["reason"])
     }, [watchIsPermanent]);
 
     useEffect(() => {
@@ -104,10 +109,25 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     }
 
     const onSubmit = handleSubmit(async data => {
-        // const assignmentID = isPermanent ? undefined : data.assignmentID
-
-        // onClose()
-        // reset()
+        if (swap) {
+            // Update a swap
+            toast.promise(SwapAPI.updateSwap(data.courseID, swap.ID, data.newSectionID, data.assignmentID, data.reason),
+                {
+                    loading: "Updating request...",
+                    success: "Request updated!",
+                    error: errors.UNKNOWN
+                })
+                .then(() => handleOnClose())
+                .catch(() => handleOnClose())
+        } else {
+            // create a swap
+            toast.promise(SwapAPI.createSwap(data.courseID, data.oldSectionID, data.newSectionID, data.assignmentID, data.reason),
+                {
+                    loading: "Submitting request...",
+                    success: "Request requested!",
+                    error: errors.UNKNOWN
+                })
+        }
     })
 
     const getCurrentSectionID = (assignmentID): string => {
@@ -159,6 +179,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 label="Assignment"
                                 required
                             >
+                                {/* TODO: filter assignment to remove all past assignments */}
                                 {assignments.map((a) => <MenuItem key={`select-assignment-${a.ID}`} value={a.ID}>{a.name}</MenuItem>)}
                             </Select>
                         </FormControl>

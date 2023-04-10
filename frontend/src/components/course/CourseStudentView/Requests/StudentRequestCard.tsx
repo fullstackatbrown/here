@@ -24,34 +24,31 @@ export interface StudentRequestCardProps {
     oldSection: Section;
     newSection: Section;
     pending: boolean;
+    handleOpenSwapRequestDialog: (swap: Swap) => void;
 }
 
-const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, courseID, assignment, oldSection, newSection, pending }) => {
+const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, courseID, assignment, oldSection, newSection, pending, handleOpenSwapRequestDialog }) => {
     const [expanded, setExpanded] = useState(false);
     const [hover, setHover] = useState(false);
-    const theme = useTheme();
-    const whichSection = assignment ? "One Time" : "Permanent";
 
-    function onClickCancelSwap() {
-        return (e: React.MouseEvent<HTMLButtonElement>) => {
-            e.stopPropagation();
-            const confirmed = confirm("Are you sure you want to cancel this request?");
-            if (confirmed) {
-                toast.promise(SwapAPI.cancelSwap(courseID, request.ID),
-                    {
-                        loading: "Cancelling request...",
-                        success: "Request cancelled!",
-                        error: errors.UNKNOWN,
-                    })
-            }
-        };
+    const theme = useTheme();
+
+    function onClickCancelSwap(e: React.MouseEvent<HTMLButtonElement>) {
+        e.stopPropagation();
+        const confirmed = confirm("Are you sure you want to cancel this request?");
+        if (confirmed) {
+            toast.promise(SwapAPI.cancelSwap(courseID, request.ID),
+                {
+                    loading: "Cancelling request...",
+                    success: "Request cancelled!",
+                    error: errors.UNKNOWN,
+                })
+        }
     }
 
-    function onClickEditSwap() {
-        return (e: React.MouseEvent<HTMLButtonElement>) => {
-            e.stopPropagation();
-
-        };
+    function onClickEditSwap(e: React.MouseEvent<HTMLButtonElement>) {
+        e.stopPropagation();
+        handleOpenSwapRequestDialog(request);
     }
 
     return (
@@ -65,7 +62,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                 onMouseLeave={() => setHover(false)}
             >
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" spacing={4} alignItems="center" py={0.5}>
+                    <Stack direction="row" spacing={5} alignItems="center" py={0.5}>
                         <Stack direction="row" spacing={1} alignItems="center" py={0.5}>
                             <Box width={17} display="flex" alignItems="center">
                                 {expanded ?
@@ -75,13 +72,13 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                                     />
                                 }
                             </Box>
-                            <Typography>{whichSection}</Typography>
+                            <Typography sx={{ fontSize: 14 }}>{assignment ? "One Time Swap" : "Permanent Swap"}</Typography>
                             <RequestStatusChip
                                 status={request.status}
                                 style={{ marginRight: "auto" }}
                             />
                         </Stack>
-                        {!expanded && <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
+                        {!expanded && <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 14 }}>
                             {formatSectionInfo(oldSection, true)}
                             &nbsp;&nbsp;{'->'}&nbsp;&nbsp;
                             {formatSectionInfo(newSection, true)}&nbsp;

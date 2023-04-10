@@ -3,17 +3,17 @@ import { Swap } from "model/swap";
 
 async function createSwap(
   courseID: string,
-  studentID: string,
   oldSectionID: string,
-  toSectionID: string,
-  isTemporary: boolean,
+  newSectionID: string,
+  assignmentID: string,
   reason: string
 ): Promise<string> {
+  const studentID = "omlAafBhRN9Aghvgz8qG" // TODO: get studentID from auth
   return APIClient.post(`/courses/${courseID}/swaps`, {
     studentID,
     oldSectionID,
-    toSectionID,
-    isTemporary,
+    newSectionID,
+    assignmentID,
     reason,
   });
 }
@@ -21,9 +21,11 @@ async function createSwap(
 async function updateSwap(
   courseID: string,
   swapID: string,
-  status: boolean
+  newSectionID: string,
+  assignmentID: string,
+  reason: string
 ): Promise<boolean> {
-  return APIClient.patch(`/courses/${courseID}/swaps/${swapID}`, { status });
+  return APIClient.patch(`/courses/${courseID}/swaps/${swapID}`, { newSectionID, assignmentID, reason });
 }
 
 async function handleSwap(

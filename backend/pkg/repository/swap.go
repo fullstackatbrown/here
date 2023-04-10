@@ -75,6 +75,8 @@ func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) error {
 		}
 	}
 
+	updates = append(updates, firestore.Update{Path: "requestTime", Value: time.Now().Format(models.ISO8601TimeFormat)})
+
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
 		models.FirestoreSwapsCollection).Doc(*req.SwapID).Update(firebase.Context, updates)
 	return err
