@@ -1,29 +1,7 @@
+import { collection, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
+import { FirestoreCoursesCollection, FirestoreSwapsCollection } from "api/firebaseConst";
 import { Swap } from "model/swap";
 import { useEffect, useState } from "react";
-import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
-import { FirestoreCoursesCollection, FirestoreSwapsCollection } from "api/firebaseConst";
-
-export const dummySwapRequest1: Swap = {
-  ID: "swap-request-1",
-  studentID: "unnamed student #667",
-  oldSectionID: "section1",
-  newSectionID: "section2",
-  requestTime: "2023-03-03T09:00:00.000Z",
-  reason: "I screen shotted classmate's NFT and now he's out to get me",
-  status: "approved",
-  handledBy: "unnamed TA #2301",
-};
-
-export const dummySwapRequest2: Swap = {
-  ID: "swap-request-2",
-  studentID: "unnamed student #97",
-  oldSectionID: "section2",
-  newSectionID: "section3",
-  requestTime: "2023-03-03T09:00:00.000Z",
-  reason: "I want to work in a room with windows and natural light",
-  status: "denied",
-  handledBy: "unnamed TA #4429",
-};
 
 export function usePendingSwaps(courseID: string): [Swap[] | undefined, boolean] {
   const [loading, setLoading] = useState(true);

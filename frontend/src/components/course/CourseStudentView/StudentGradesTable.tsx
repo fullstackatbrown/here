@@ -1,41 +1,53 @@
 import GradeChip from "@components/shared/GradeChip/GradeChip";
-import { Assignment } from "model/assignment";
-import { styled } from "@mui/material/styles";
+import { Box, Chip, Stack, Table, TableBody, TableHead, TableRow } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
-import { Table, TableHead, TableRow, TableBody, Stack, Box, Chip } from "@mui/material";
-import { FC } from "react";
-import { User } from "model/user";
-import { Section } from "model/section";
+import { styled } from "@mui/material/styles";
+import formatSectionInfo from "@util/shared/formatSectionInfo";
+import { useGrades } from "api/grades/hooks";
 import dayjs from "dayjs";
-import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
+import { Assignment } from "model/assignment";
+import { Course } from "model/course";
+import { Section } from "model/section";
+import { User } from "model/user";
+import { FC } from "react";
 
 interface StudentGradesTableProps {
+    course: Course;
     assignments: Assignment[];
     student: User;
-    sections: Section[];
+    sectionsMap: Record<string, Section>;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
+    padding: theme.spacing(1.5),
     ":first-of-type": {
         paddingLeft: 0,
     },
     ":last-of-type": {
-        width: 100,
-        maxWidth: 100,
-        overflow: "hidden",
+        paddingRight: 0,
     },
 }))
 
-const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments, student }) => {
+const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, assignments, student, sectionsMap }) => {
+    const [grades, gradesLoading] = useGrades(course.ID, student.ID)
 
-    const getScores = (assignment: Assignment) => {
-        const gradeID = assignment.gradesByStudent[student.ID];
-        // TODO: get grade from gradeID
+    const getSection = (assignmentID: string): Section => {
+        let sectionID = student.actualSection?.[course.ID]?.[assignmentID]
+        if (sectionID) return sectionsMap[sectionID]
+
+        sectionID = student.defaultSection?.[course.ID]
+        if (sectionID) return sectionsMap[sectionID]
+
+        return undefined
     }
 
-    // TODO: firestore listener function to get all grades for this student, for a class
-
     return <Table>
+        <colgroup>
+            <col width="35%" />
+            <col width="20%" />
+            <col width="30%" />
+            <col width="15%" />
+        </colgroup>
         <TableHead>
             <TableRow>
                 <TableCell>Assignment</TableCell>
@@ -45,8 +57,9 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments, student 
             </TableRow>
         </TableHead>
         <TableBody>
-            {filterAssignmentsByReleaseDate(assignments).map((assignment) => (
-                <TableRow key={assignment.ID}>
+            {assignments.map((assignment) => {
+                const section = sectionsMap && getSection(assignment.ID)
+                return <TableRow key={assignment.ID}>
                     <TableCell component="th" scope="row">
                         <Stack direction="row" spacing={1} alignItems="center">
                             <Box>{assignment.name}</Box>
@@ -57,15 +70,13 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ assignments, student 
                         {dayjs(assignment.dueDate).format("MMM D, YYYY")}
                     </TableCell>
                     <TableCell component="th" scope="row">
-
-                        {/* {student.actualSection[assignment.courseID][assignment.ID]} */}
-                        Section name
+                        {section ? formatSectionInfo(section, true) : "Unassigned"}
                     </TableCell>
                     <TableCell component="th" scope="row" >
-                        <GradeChip score={1} maxScore={assignment.maxScore} />
+                        <GradeChip score={grades && grades[assignment.ID]?.grade} maxScore={assignment.maxScore} />
                     </TableCell>
                 </TableRow>
-            ))}
+            })}
         </TableBody>
     </Table>
 

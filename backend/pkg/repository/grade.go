@@ -17,10 +17,12 @@ func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*mode
 	}
 
 	grade := &models.Grade{
-		StudentID:   req.StudentID,
-		Grade:       req.Grade,
-		GradedBy:    req.GradedBy,
-		TimeUpdated: time.Now().Format(models.ISO8601TimeFormat),
+		StudentID:    req.StudentID,
+		Grade:        req.Grade,
+		GradedBy:     req.GradedBy,
+		TimeUpdated:  time.Now().Format(models.ISO8601TimeFormat),
+		CourseID:     req.CourseID,
+		AssignmentID: req.AssignmentID,
 	}
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
@@ -29,6 +31,8 @@ func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*mode
 	if err != nil {
 		return nil, fmt.Errorf("error creating grade: %v\n", err)
 	}
+
+	grade.ID = gradeID
 
 	return grade, nil
 }

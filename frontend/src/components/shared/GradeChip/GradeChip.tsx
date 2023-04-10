@@ -63,7 +63,7 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Box width={40} ml={editable ? -1 : 0} mr={editable ? 1 : 0} height={30} display="flex" alignItems="center">
+      <Box width={editable ? 40 : 28} ml={editable ? -1 : 0} mr={editable ? 1 : 0} height={30} display="flex" alignItems="center">
         {editable ?
           <form onSubmit={onSubmit}>
             <TextField
@@ -101,7 +101,7 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
           /
         </Typography>
       </Box>
-      <Box display="flex" width={35} justifyContent="flex-end">
+      <Box display="flex" width={editable ? 35 : 22} justifyContent="flex-end">
         <Typography
           variant="body2"
           sx={{

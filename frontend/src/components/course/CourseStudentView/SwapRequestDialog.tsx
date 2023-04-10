@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled, useTheme } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import listToMap from "@util/shared/listToMap";
 import { sortSections } from "@util/shared/sortSectionTime";
@@ -15,7 +15,7 @@ export interface SwapRequestDialogProps {
     course: Course;
     assignments: Assignment[];
     student: User;
-    sections: Section[];
+    sectionsMap: Record<string, Section>;
 }
 
 type FormData = {
@@ -27,7 +27,34 @@ type FormData = {
     newSectionID: string,
 };
 
-const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sections }) => {
+const DisabledTextField = styled(TextField)({
+    '& .MuiInput-underline:before': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '&:hover .MuiInput-underline:before': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '&.Mui-focused .MuiInput-underline:before': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '& .MuiInputLabel-root': {
+        color: 'rgba(0, 0, 0, 0.54)',
+        fontSize: '1rem',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: 'rgba(0, 0, 0, 0.54)',
+    },
+});
+
+const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap }) => {
+
     const defaultValues: FormData = {
         courseID: course.ID,
         isPermanent: true,
@@ -100,7 +127,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                     otherwise an instructor will handle the request manually.
                 </Typography>
                 <Stack spacing={2} my={1}>
-                    <TextField
+                    <DisabledTextField
                         required
                         autoFocus
                         label="Course"
@@ -109,7 +136,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                         size="small"
                         variant="standard"
                         defaultValue={`${course.code} ${course.title}`}
-                        InputProps={{ readOnly: true, }}
+                        InputProps={{ readOnly: true }}
                     />
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="body1">Permanent</Typography>
@@ -140,12 +167,12 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                         name="oldSectionID"
                         control={control}
                         render={({ field: { value } }) => (
-                            <TextField
+                            <DisabledTextField
                                 label="Current Section"
                                 type="text"
                                 fullWidth
                                 size="small"
-                                value={value === "" ? "" : formatSectionInfo(listToMap(sections)[value] as Section)}
+                                value={value === "" ? "" : formatSectionInfo(sectionsMap[value] as Section)}
                                 variant="standard"
                                 InputProps={{ readOnly: true, }}
                             />
@@ -163,7 +190,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                     onChange={onChange}
                                     value={value}
                                 >
-                                    {sections && sortSections(sections).map((s) => {
+                                    {sectionsMap && sortSections(Object.values(sectionsMap)).map((s) => {
                                         return <MenuItem
                                             key={`select-section-${s.ID}`}
                                             value={s.ID}

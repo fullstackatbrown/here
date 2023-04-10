@@ -5,7 +5,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useAssignments } from "api/assignment/hooks";
-import { useSections } from "api/section/hooks";
+import { useSections, useSectionsMap } from "api/section/hooks";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import listToMap from "@util/shared/listToMap";
 import { useSurvey } from "api/surveys/hooks";
@@ -16,6 +16,7 @@ import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/Sur
 import StudentGradesTable from "./StudentGradesTable";
 import SwapRequestDialog from "./SwapRequestDialog";
 import { Section } from "model/section";
+import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -26,22 +27,22 @@ const student: User = {
   displayName: "Student Name",
   email: "",
   access: {},
-  courses: ["r5fOh8uw28B0uM2GAPNf"],
-  defaultSection: { "r5fOh8uw28B0uM2GAPNf": "35s1joLA4EBawZqKpyeX" },
-  actualSection: { "r5fOh8uw28B0uM2GAPNf": {} },
+  courses: ["2dIFx5URWkWZjfL4D6Ta"],
+  defaultSection: { "2dIFx5URWkWZjfL4D6Ta": "Sunday,4:00AM,6:00PM,cit244" },
+  actualSection: { "2dIFx5URWkWZjfL4D6Ta": {} },
 }
 
-export function CourseStudentView({ course }: CourseStudentViewProps) {
+function CourseStudentView({ course }: CourseStudentViewProps) {
   const [assignments, assignmentsLoading] = useAssignments(course.ID)
-  const [sections, sectionsLoading] = useSections(course.ID)
+  const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID)
   const [survey, surveyLoading] = useSurvey(course.ID || undefined);
   const [surveyDialog, setSurveyDialog] = useState(false)
   const [swapRequestDialog, setSwapRequestDialog] = useState(false)
 
   const getAssignedSection = () => {
     const defaultSection = student.defaultSection[course.ID]
-    if (defaultSection && defaultSection !== "" && sections) {
-      const section = listToMap(sections)[defaultSection] as Section
+    if (defaultSection && defaultSection !== "" && sectionsMap) {
+      const section = sectionsMap[defaultSection] as Section
       return formatSectionInfo(section)
     }
     return undefined
@@ -51,18 +52,6 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
     if (survey && survey.responses) {
       return survey.responses[student.ID] !== undefined
     }
-  }
-
-  const handleRequestSwap = () => {
-    setSwapRequestDialog(true)
-  }
-
-  const handleFillSurvey = () => {
-    setSurveyDialog(true)
-  }
-
-  const handleUpdateSurvey = () => {
-    setSurveyDialog(true)
   }
 
 
@@ -81,7 +70,7 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
         course={course}
         assignments={assignments}
         student={student}
-        sections={sections}
+        sectionsMap={sectionsMap}
       />
       <Grid container>
         <Grid xs={2}>
@@ -96,19 +85,21 @@ export function CourseStudentView({ course }: CourseStudentViewProps) {
                 {getAssignedSection() || "Unassigned"}
               </Typography>
               {getAssignedSection() !== undefined ?
-                <Button startIcon={<Autorenew />} onClick={handleRequestSwap}>Request Swap</Button> :
+                <Button startIcon={<Autorenew />} onClick={() => { setSwapRequestDialog(true) }}>Request Swap</Button> :
                 // TODO: check if course has survey
                 (hasFilledOutSurvey() ?
-                  <Button variant="text" startIcon={<CalendarMonth />} onClick={handleUpdateSurvey}>Update Your Availability</Button> :
-                  <Button variant="text" startIcon={<CalendarMonth />} onClick={handleFillSurvey}> Indicate Your Availability</Button>)}
+                  <Button variant="text" startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}>Update Your Availability</Button> :
+                  <Button variant="text" startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}> Indicate Your Availability</Button>)}
             </Stack>
           </Box>
-          {(assignments && assignments.length > 0) ?
-            <StudentGradesTable assignments={assignments} student={student} sections={sections} /> :
-            <Typography>Your instructor has not published any assignments yet</Typography>}
+          {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
+            <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
+            <Typography>Your instructor has not released any assignments yet</Typography>}
         </Grid>
         <Grid xs={2} />
       </Grid>
     </>
   );
 }
+
+export default CourseStudentView
