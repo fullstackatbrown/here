@@ -43,19 +43,19 @@ async function generateResults(
 async function createSurveyResponse(
   courseID: string,
   surveyID: string,
-  times: string[]
+  availability: string[]
 ): Promise<string> {
-  return APIClient.post(`/courses/${courseID}/surveys/${surveyID}/responses`);
+  return APIClient.post(`/courses/${courseID}/surveys/${surveyID}/responses`, { availability });
 }
 
 async function editSurveyResponse(
   courseID: string,
   surveyID: string,
   responseID: string,
-  times: string[]
+  availability: string[]
 ): Promise<boolean> {
   return APIClient.patch(
-    `/courses/${courseID}/surveys/${surveyID}/responses/${responseID}`
+    `/courses/${courseID}/surveys/${surveyID}/responses/${responseID}`, { availability }
   );
 }
 

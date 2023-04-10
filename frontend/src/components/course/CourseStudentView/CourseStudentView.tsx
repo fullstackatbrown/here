@@ -43,7 +43,7 @@ function CourseStudentView({ course }: CourseStudentViewProps) {
     return undefined
   }
 
-  const courseHasSurvey = () => !surveyLoading && survey && survey.published
+  const courseHasSurvey = () => !surveyLoading && survey && survey.published && survey.endTime > new Date().toISOString()
 
   const studentHasFilledOutSurvey = () => survey.responses && survey.responses[student.ID] !== undefined
 
