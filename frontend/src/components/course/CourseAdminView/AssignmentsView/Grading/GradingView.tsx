@@ -27,6 +27,7 @@ interface GradingViewProps {
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
+    padding: 15,
     ":first-of-type": {
         paddingLeft: 0,
     },
