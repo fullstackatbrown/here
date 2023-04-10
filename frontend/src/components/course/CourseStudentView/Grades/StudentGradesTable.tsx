@@ -19,7 +19,7 @@ interface StudentGradesTableProps {
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
-    padding: theme.spacing(1.5),
+    padding: theme.spacing(1),
     ":first-of-type": {
         paddingLeft: 0,
     },
@@ -41,7 +41,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, assignments, 
         return undefined
     }
 
-    return <Table>
+    return <Table sx={{ marginTop: 1 }}>
         <colgroup>
             <col width="35%" />
             <col width="20%" />

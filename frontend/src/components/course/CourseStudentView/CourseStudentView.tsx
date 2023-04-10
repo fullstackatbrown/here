@@ -1,23 +1,20 @@
 import { Autorenew, CalendarMonth } from "@mui/icons-material";
 import {
   Box,
-  Button, Stack, Typography
+  Button, IconButton, Stack, Tooltip, Typography
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useAssignments } from "api/assignment/hooks";
-import { useSections, useSectionsMap } from "api/section/hooks";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
-import listToMap from "@util/shared/listToMap";
+import { useAssignments } from "api/assignment/hooks";
+import { useSectionsMap } from "api/section/hooks";
 import { useSurvey } from "api/surveys/hooks";
 import { Course } from "model/course";
+import { Section } from "model/section";
 import { User } from "model/user";
 import { useState } from "react";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
-import StudentGradesTable from "./StudentGradesTable";
-import SwapRequestDialog from "./SwapRequestDialog";
-import { Section } from "model/section";
-import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
-import StudentRequestsView from "./Requests/StudentRequestsView";
+import StudentViewList from "./StudentViewList";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -34,11 +31,9 @@ const student: User = {
 }
 
 function CourseStudentView({ course }: CourseStudentViewProps) {
-  const [assignments, assignmentsLoading] = useAssignments(course.ID)
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID)
   const [survey, surveyLoading] = useSurvey(course.ID || undefined);
   const [surveyDialog, setSurveyDialog] = useState(false)
-  const [swapRequestDialog, setSwapRequestDialog] = useState(false)
 
   const getAssignedSection = () => {
     const defaultSection = student.defaultSection[course.ID]
@@ -65,38 +60,36 @@ function CourseStudentView({ course }: CourseStudentViewProps) {
           survey={survey}
           studentID={student.ID}
         />}
-      <SwapRequestDialog
-        open={swapRequestDialog}
-        onClose={() => { setSwapRequestDialog(false) }}
-        course={course}
-        assignments={assignments}
-        student={student}
-        sectionsMap={sectionsMap}
-      />
+
       <Grid container>
         <Grid xs={2}>
         </Grid>
         <Grid xs>
-          <Box mb={2.5} mt={1}>
-            <Typography variant="body2" fontWeight={500}>
+          {/* <Box mt={1}> */}
+          <Box height={10} />
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="button" fontSize={17}>
               Regular Section:
             </Typography>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>
-                {getAssignedSection() || "Unassigned"}
-              </Typography>
-              {getAssignedSection() !== undefined ?
-                <Button startIcon={<Autorenew />} onClick={() => { setSwapRequestDialog(true) }}>Request Swap</Button> :
+            <Typography variant="button" fontSize={17} fontWeight={400}>
+              {getAssignedSection() || "Unassigned"}
+            </Typography>
+            <Tooltip title="This is the default section you will attend if you have not requested a swap for a particular assignment." placement="right">
+              <IconButton sx={{ p: 0.5 }}>
+                <HelpOutlineIcon fontSize="small" color="secondary" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          {/* 
+              {
                 // TODO: check if course has survey
                 (hasFilledOutSurvey() ?
                   <Button variant="text" startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}>Update Your Availability</Button> :
                   <Button variant="text" startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}> Indicate Your Availability</Button>)}
-            </Stack>
-          </Box>
-          {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
-            <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
-            <Typography>Your instructor has not released any assignments yet</Typography>}
-          <StudentRequestsView course={course} student={student} />
+            </Stack> */}
+          <Box height={40} />
+          <StudentViewList course={course} student={student} sectionsMap={sectionsMap} />
+
         </Grid>
         <Grid xs={2} />
       </Grid>

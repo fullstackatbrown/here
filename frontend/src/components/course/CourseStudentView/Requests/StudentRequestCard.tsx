@@ -59,7 +59,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
             <Box
                 sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
                 px={1}
-                py={1}
+                py={0.3}
                 onClick={() => setExpanded(!expanded)}
                 onMouseEnter={() => setHover(true)}
                 onMouseLeave={() => setHover(false)}
