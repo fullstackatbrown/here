@@ -19,7 +19,6 @@ type FormData = {
 };
 
 const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, editable = false, handleCreateGrade, handleUpdateGrade, handleDeleteGrade }) => {
-
   const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
     defaultValues: { grade: score ? score.toString() : "" }
   });

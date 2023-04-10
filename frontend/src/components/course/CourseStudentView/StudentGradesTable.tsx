@@ -3,7 +3,7 @@ import { Box, Chip, Stack, Table, TableBody, TableHead, TableRow } from "@mui/ma
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
-import { useGrades } from "api/grades/hooks";
+import { useGradesForStudent } from "api/grades/hooks";
 import dayjs from "dayjs";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -29,7 +29,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 }))
 
 const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, assignments, student, sectionsMap }) => {
-    const [grades, gradesLoading] = useGrades(course.ID, student.ID)
+    const [grades, gradesLoading] = useGradesForStudent(course.ID, student.ID)
 
     const getSection = (assignmentID: string): Section => {
         let sectionID = student.actualSection?.[course.ID]?.[assignmentID]

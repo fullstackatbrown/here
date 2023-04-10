@@ -10,7 +10,7 @@ import formatSectionInfo from '@util/shared/formatSectionInfo';
 import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
 import listToMap from '@util/shared/listToMap';
 import GradeAPI from 'api/grades/api';
-import { useGrades } from 'api/grades/hooks';
+import { useGradesForStudent, useGradesForAssignment } from 'api/grades/hooks';
 import { useSections } from 'api/section/hooks';
 import { Assignment } from 'model/assignment';
 import { Course, CourseUserData } from 'model/course';
@@ -40,7 +40,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
     const [sections, sectionsLoading] = useSections(course.ID)
-    const [grades, gradesLoading] = useGrades(course.ID, assignment.ID)
+    const [grades, gradesLoading] = useGradesForAssignment(course.ID, assignment.ID)
     const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
