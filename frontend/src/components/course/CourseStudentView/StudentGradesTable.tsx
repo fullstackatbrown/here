@@ -73,7 +73,11 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, assignments, 
                         {section ? formatSectionInfo(section, true) : "Unassigned"}
                     </TableCell>
                     <TableCell component="th" scope="row" >
-                        <GradeChip score={grades && grades[assignment.ID]?.grade} maxScore={assignment.maxScore} />
+                        <GradeChip
+                            score={grades && grades[assignment.ID]?.grade}
+                            maxScore={assignment.maxScore}
+                            instructor={false}
+                        />
                     </TableCell>
                 </TableRow>
             })}
