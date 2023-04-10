@@ -36,8 +36,8 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
     <Stack direction="column" minHeight={60}>
       {requests && requests.length === 0 &&
         (type === "pending" ?
-          <Typography variant="body1" mx={4} mt={2} textAlign="center">You've handled all requests in your inbox!</Typography> :
-          <Typography variant="body1" mx={4} mt={2} textAlign="center">You have no past requests</Typography>)
+          <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You've handled all requests in your inbox!</Typography> :
+          <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You have no past requests</Typography>)
       }
       {requests && assignmentsMap && sectionsMap && sortRequestsByTime(requests).map((r) => {
         const student = course.students[r.studentID];
