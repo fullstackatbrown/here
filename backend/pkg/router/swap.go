@@ -20,7 +20,7 @@ func SwapRoutes() *chi.Mux {
 		router.Use(middleware.SwapCtx())
 		router.Patch("/", updateSwapHandler)
 		router.Patch("/handle", handleSwapHandler)
-		router.Delete("/", cancelSwapHandler)
+		router.Patch("/cancel", cancelSwapHandler)
 	})
 
 	return router
@@ -102,7 +102,19 @@ func cancelSwapHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
 	swapID := r.Context().Value("swapID").(string)
 
-	err := repo.Repository.CancelSwap(courseID, swapID)
+	swap, err := repo.Repository.GetSwapByID(courseID, swapID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// only allow cancel if it's still pending
+	if swap.Status != "pending" {
+		http.Error(w, "Swap is not pending", http.StatusBadRequest)
+		return
+	}
+
+	err = repo.Repository.CancelSwap(courseID, swapID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

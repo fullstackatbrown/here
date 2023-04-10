@@ -4,4 +4,6 @@ export interface Grade {
   grade: number;
   gradedBy: string;
   timeUpdated: Date;
+  assignmentID: string;
+  courseID: string;
 }

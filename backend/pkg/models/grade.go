@@ -7,11 +7,13 @@ const (
 )
 
 type Grade struct {
-	ID          string `firestore:"id,omitempty"`
-	StudentID   string `firestore:"studentID"`
-	Grade       int    `firestore:"grade"`
-	GradedBy    string `firestore:"gradedBy"`
-	TimeUpdated string `firestore:"timeUpdated"`
+	ID           string `firestore:"id,omitempty"`
+	StudentID    string `firestore:"studentID"`
+	Grade        int    `firestore:"grade"`
+	GradedBy     string `firestore:"gradedBy"`
+	TimeUpdated  string `firestore:"timeUpdated"`
+	AssignmentID string `firestore:"assignmentID"`
+	CourseID     string `firestore:"courseID"`
 }
 
 type CreateGradeRequest struct {

@@ -106,6 +106,7 @@
             id: string                             # unique grade id
             studentID: string                      # the id of the student the grade is for
             assignmentID: string
+            courseID: string
             grade: int                             # grade
             gradedBy: string                       # id of the TA that graded the assignment
             timeUpdated: string                    # when the time was updated

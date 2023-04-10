@@ -1,27 +1,25 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
+import errors from "@util/errors";
+import { sortRequestsByTime } from "@util/shared/requestTime";
+import SwapAPI from "api/swaps/api";
+import { Assignment } from "model/assignment";
+import { Course } from "model/course";
+import { Section } from "model/section";
 import { Swap, SwapStatus } from "model/swap";
 import { FC } from "react";
-import { sortRequestsByTime } from "@util/shared/requestTime";
-import { Course } from "model/course";
-import { usePastSwaps, usePendingSwaps } from "api/swaps/hooks";
-import { Assignment } from "model/assignment";
-import { Section } from "model/section";
+import toast from "react-hot-toast";
 import PastRequest from "./PastRequests/PastRequestCard";
 import PendingRequest from "./PendingRequests/PendingRequestCard";
-import errors from "@util/errors";
-import SwapAPI from "api/swaps/api";
-import { request } from "http";
-import toast from "react-hot-toast";
 
 export interface RequestsListProps {
   course: Course;
   assignmentsMap: Record<string, Assignment>;
   sectionsMap: Record<string, Section>;
   type: "pending" | "past";
+  requests: Swap[];
 }
 
-const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsMap, type }) => {
-  const [requests, _] = type === "pending" ? usePendingSwaps(course.ID) : usePastSwaps(course.ID);
+const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsMap, type, requests }) => {
 
   function handleSwap(request: Swap, status: SwapStatus) {
     toast.promise(SwapAPI.handleSwap(course.ID, request.ID, status, "test_TA"),
@@ -36,8 +34,8 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
     <Stack direction="column" minHeight={60}>
       {requests && requests.length === 0 &&
         (type === "pending" ?
-          <Typography variant="body1" mx={4} mt={2} textAlign="center">You've handled all requests in your inbox!</Typography> :
-          <Typography variant="body1" mx={4} mt={2} textAlign="center">You have no past requests</Typography>)
+          <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You've handled all requests in your inbox!</Typography> :
+          <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You have no past requests</Typography>)
       }
       {requests && assignmentsMap && sectionsMap && sortRequestsByTime(requests).map((r) => {
         const student = course.students[r.studentID];

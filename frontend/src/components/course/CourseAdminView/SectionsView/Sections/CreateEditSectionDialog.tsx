@@ -62,14 +62,8 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                     success: "Section updated!",
                     error: errors.UNKNOWN
                 })
-                .then(() => {
-                    onClose();
-                    reset();
-                })
-                .catch(() => {
-                    onClose();
-                    reset();
-                });
+                .then(() => handleOnClose())
+                .catch(() => handleOnClose())
         } else {
             toast.promise(SectionAPI.createSection(
                 courseID, data.day,
@@ -80,15 +74,8 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                     success: "section created!",
                     error: (err) => `${err.response.data}`,
                 })
-                .then(() => {
-                    onClose();
-                    reset();
-                })
-                .catch(() => {
-                    onClose();
-                    reset();
-                });
-
+                .then(() => handleOnClose())
+                .catch(() => handleOnClose())
         }
     });
 

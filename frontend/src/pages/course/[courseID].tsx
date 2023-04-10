@@ -1,5 +1,6 @@
 import CourseAdminView from "@components/course/CourseAdminView";
 import CourseHeader from "@components/course/CourseHeader";
+import CourseStudentView from "@components/course/CourseStudentView/CourseStudentView";
 import AppLayout from "@components/shared/AppLayout";
 import { Grid, Stack, useTheme } from "@mui/material";
 import { useCourse } from "api/course/hooks";

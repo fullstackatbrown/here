@@ -1,13 +1,17 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled, useTheme } from "@mui/material";
+import errors from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import listToMap from "@util/shared/listToMap";
 import { sortSections } from "@util/shared/sortSectionTime";
+import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
+import { Swap } from "model/swap";
 import { User } from "model/user";
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export interface SwapRequestDialogProps {
     open: boolean;
@@ -15,7 +19,8 @@ export interface SwapRequestDialogProps {
     course: Course;
     assignments: Assignment[];
     student: User;
-    sections: Section[];
+    sectionsMap: Record<string, Section>;
+    swap?: Swap;
 }
 
 type FormData = {
@@ -27,14 +32,40 @@ type FormData = {
     newSectionID: string,
 };
 
-const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sections }) => {
+const DisabledTextField = styled(TextField)({
+    '& .MuiInput-underline:before': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '&:hover .MuiInput-underline:before': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '&.Mui-focused .MuiInput-underline:before': {
+        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
+        borderBottomWidth: 1,
+    },
+    '& .MuiInputLabel-root': {
+        color: 'rgba(0, 0, 0, 0.54)',
+        fontSize: '1rem',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: 'rgba(0, 0, 0, 0.54)',
+    },
+});
+
+const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap, swap }) => {
     const defaultValues: FormData = {
         courseID: course.ID,
-        isPermanent: true,
-        reason: "",
-        assignmentID: "",
+        isPermanent: swap ? swap.assignmentID === "" : true,
+        reason: swap ? swap.reason : "",
+        assignmentID: swap ? swap.assignmentID : "",
         oldSectionID: student.defaultSection[course.ID],
-        newSectionID: "",
+        newSectionID: swap ? swap.newSectionID : "",
     }
 
     const { register, handleSubmit, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
@@ -47,21 +78,25 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
 
     useEffect(() => {
         if (watchIsPermanent) {
+            // If permanent swap, unregister assignmentID and set oldSectionID to current default section
             unregister("assignmentID")
             const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
         } else {
+            // If temporary swap, register assignmentID and set oldSectionID to empty
             register("assignmentID")
             setValue("oldSectionID", "")
         }
-        setValue("newSectionID", "")
-        setValue("reason", "")
+        setValue("newSectionID", defaultValues["newSectionID"])
+        setValue("reason", defaultValues["reason"])
     }, [watchIsPermanent]);
 
     useEffect(() => {
         if (watchAssignmentID === "") {
+            // If user did not select an assignment, set oldSectionID to empty
             setValue("oldSectionID", "")
         } else {
+            // If user selected an assignment, set oldSectionID to the section for that assignment
             const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
         }
@@ -69,7 +104,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
 
     useEffect(() => {
         reset(defaultValues);
-    }, [student])
+    }, [student, swap])
 
     const handleOnClose = () => {
         onClose()
@@ -77,10 +112,25 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     }
 
     const onSubmit = handleSubmit(async data => {
-        // const assignmentID = isPermanent ? undefined : data.assignmentID
-
-        // onClose()
-        // reset()
+        if (swap) {
+            // Update a swap
+            toast.promise(SwapAPI.updateSwap(data.courseID, swap.ID, data.newSectionID, data.assignmentID, data.reason),
+                {
+                    loading: "Updating request...",
+                    success: "Request updated!",
+                    error: errors.UNKNOWN
+                })
+                .then(() => handleOnClose())
+                .catch(() => handleOnClose())
+        } else {
+            // create a swap
+            toast.promise(SwapAPI.createSwap(data.courseID, data.oldSectionID, data.newSectionID, data.assignmentID, data.reason),
+                {
+                    loading: "Submitting request...",
+                    success: "Request requested!",
+                    error: errors.UNKNOWN
+                })
+        }
     })
 
     const getCurrentSectionID = (assignmentID): string => {
@@ -100,7 +150,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                     otherwise an instructor will handle the request manually.
                 </Typography>
                 <Stack spacing={2} my={1}>
-                    <TextField
+                    <DisabledTextField
                         required
                         autoFocus
                         label="Course"
@@ -109,7 +159,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                         size="small"
                         variant="standard"
                         defaultValue={`${course.code} ${course.title}`}
-                        InputProps={{ readOnly: true, }}
+                        InputProps={{ readOnly: true }}
                     />
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="body1">Permanent</Typography>
@@ -132,6 +182,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 label="Assignment"
                                 required
                             >
+                                {/* TODO: filter assignment to remove all past assignments */}
                                 {assignments.map((a) => <MenuItem key={`select-assignment-${a.ID}`} value={a.ID}>{a.name}</MenuItem>)}
                             </Select>
                         </FormControl>
@@ -140,12 +191,12 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                         name="oldSectionID"
                         control={control}
                         render={({ field: { value } }) => (
-                            <TextField
+                            <DisabledTextField
                                 label="Current Section"
                                 type="text"
                                 fullWidth
                                 size="small"
-                                value={value === "" ? "" : formatSectionInfo(listToMap(sections)[value] as Section)}
+                                value={value === "" ? "" : formatSectionInfo(sectionsMap[value] as Section)}
                                 variant="standard"
                                 InputProps={{ readOnly: true, }}
                             />
@@ -163,7 +214,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                     onChange={onChange}
                                     value={value}
                                 >
-                                    {sections && sortSections(sections).map((s) => {
+                                    {sectionsMap && sortSections(Object.values(sectionsMap)).map((s) => {
                                         return <MenuItem
                                             key={`select-section-${s.ID}`}
                                             value={s.ID}

@@ -1,4 +1,4 @@
-import {FC} from "react";
+import { FC } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -12,14 +12,13 @@ export interface AboutDialogProps {
     onClose: () => void;
 }
 
-const AboutDialog: FC<AboutDialogProps> = ({open, onClose}) => {
+const AboutDialog: FC<AboutDialogProps> = ({ open, onClose }) => {
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-        <DialogTitle>About Hours</DialogTitle>
+        <DialogTitle>About Here</DialogTitle>
         <DialogContent>
             <Stack spacing={2.5} my={1}>
                 <Typography>
-                    Hours was created by Nathan Luu, Nick Young, and Neil Ramaswamy at Brown University to facilitate
-                    office hours for courses in the CS Department and beyond.
+                    Here is a web app created to streamline the lab management process for CS classes at Brown University.
                 </Typography>
                 {/*<Button startIcon={<GitHubIcon/>} color="inherit" variant="outlined"*/}
                 {/*        href="https://github.com/nthnluu/hours-frontend/wiki/Contributing">*/}

@@ -1,8 +1,8 @@
+import { collection, getFirestore, onSnapshot } from "@firebase/firestore";
+import { sortSections } from "@util/shared/sortSectionTime";
+import { FirestoreCoursesCollection, FirestoreSectionsCollection } from "api/firebaseConst";
 import { Section } from "model/section";
 import { useEffect, useState } from "react";
-import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
-import { FirestoreCoursesCollection, FirestoreSectionsCollection } from "api/firebaseConst";
-import { sortSections } from "@util/shared/sortSectionTime";
 
 export function useSections(courseID: string): [Section[] | undefined, boolean] {
   const [loading, setLoading] = useState(true);

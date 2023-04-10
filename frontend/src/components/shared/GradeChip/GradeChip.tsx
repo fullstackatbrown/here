@@ -1,5 +1,5 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Box, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Box, IconButton, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { FC, Fragment, useEffect } from 'react';
 import EditIcon from "@mui/icons-material/Edit";
 import { useForm } from 'react-hook-form';
@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 interface GradeChipProps {
   score: number | undefined;
   maxScore: number;
+  instructor?: boolean;
   editable?: boolean;
   handleCreateGrade?: (grade: number) => void;
   handleUpdateGrade?: (grade: number) => void;
@@ -17,8 +18,7 @@ type FormData = {
   grade: string
 };
 
-const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, handleCreateGrade, handleUpdateGrade, handleDeleteGrade }) => {
-
+const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, editable = false, handleCreateGrade, handleUpdateGrade, handleDeleteGrade }) => {
   const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
     defaultValues: { grade: score ? score.toString() : "" }
   });
@@ -62,8 +62,8 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
   })
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
-      <Box width={40} ml={editable ? -1 : 0} mr={editable ? 1 : 0} height={30} display="flex" alignItems="center">
+    <Stack direction="row" spacing={0.5} alignItems="center">
+      <Box width={instructor ? 40 : 28} ml={editable ? -1 : 0} mr={editable ? 1 : 0} height={30} display="flex" alignItems="center">
         {editable ?
           <form onSubmit={onSubmit}>
             <TextField
@@ -82,7 +82,11 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
             }}
           >
             {score === undefined ?
-              <HelpOutlineIcon fontSize="small" /> :
+              (instructor ? <HelpOutlineIcon fontSize="small" /> :
+                <Tooltip title="Instructor has not released this grade" placement="right">
+                  <HelpOutlineIcon fontSize="small" />
+                </Tooltip>)
+              :
               <Fragment>
                 &nbsp;{score}
               </Fragment>
@@ -101,7 +105,7 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, editable = false, hand
           /
         </Typography>
       </Box>
-      <Box display="flex" width={35} justifyContent="flex-end">
+      <Box display="flex" width={instructor ? 35 : 22} justifyContent="flex-end">
         <Typography
           variant="body2"
           sx={{

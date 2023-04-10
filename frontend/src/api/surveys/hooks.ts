@@ -57,29 +57,6 @@ const exampleSurvey: Survey = {
     published: true,
 }
 
-// export function useSurvey(surveyID: string | undefined): [Survey | undefined, boolean] {
-//     const [loading, setLoading] = useState(true);
-//     const [survey, setSurvey] = useState<Survey | undefined>(undefined);
-
-//     useEffect(() => {
-//         if (surveyID && surveyID !== "") {
-//             const db = getFirestore();
-//             const unsubscribe = onSnapshot(doc(db, "surveys", surveyID), (doc) => {
-//                 if (doc.exists()) {
-//                     setSurvey({ ID: doc.id, ...doc.data() } as Survey);
-//                 }
-//                 setLoading(false);
-//             });
-//             return () => unsubscribe();
-//         } else {
-//             setSurvey(undefined)
-//         }
-//     }, [surveyID]);
-
-//     // return [exampleSurvey, false]
-//     return [survey, loading];
-// }
-
 export function useSurvey(courseID: string): [Survey | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [survey, setSurvey] = useState<Survey | undefined>(undefined);

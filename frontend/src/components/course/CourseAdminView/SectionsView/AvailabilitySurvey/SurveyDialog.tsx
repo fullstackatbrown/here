@@ -24,7 +24,7 @@ export interface SurveyDialogProps {
 
 const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID }) => {
     // If student has already responded, show their response
-    const [times, setTimes] = useState<string[]>((survey.responses && studentID && survey.responses[studentID]) || []);
+    const [availability, setAvailability] = useState<string[]>((survey.responses && studentID && survey.responses[studentID]) || []);
 
     const getExistingResponse = (studentID: string) => {
         if (survey.responses && survey.responses[studentID]) {
@@ -46,30 +46,37 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
                     loading: "Publishing survey...",
                     success: "Survey published!",
                     error: "Failed to publish survey"
-                });
+                })
+                    .then(() => onClose())
+                    .catch(() => onClose())
             }
-            onClose();
             return;
         } else {
             if (new Date(survey.endTime) < new Date()) {
                 alert("This survey has already ended")
                 return;
             }
-            if (times.length === 0) {
+            if (availability.length === 0) {
                 alert("Please select at least one time slot");
                 return;
             }
-            // TODO: submit form
+            toast.promise(SurveyAPI.createSurveyResponse(survey.courseID, survey.ID, availability), {
+                loading: "Submitting response...",
+                success: "Response submitted!",
+                error: "Failed to submit response"
+            })
+                .then(() => onClose())
+                .catch(() => onClose())
         }
     }
 
     function onChangeCheckbox(time: string) {
         return (e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.checked) {
-                setTimes([...times, time])
+                setAvailability([...availability, time])
             } else {
-                let newTimes = times.filter(t => t !== time)
-                setTimes([...newTimes])
+                let newTimes = availability.filter(t => t !== time)
+                setAvailability([...newTimes])
             }
         }
     }
@@ -87,7 +94,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
                         key={time}
                         control={<Checkbox onChange={onChangeCheckbox(time)} />}
                         label={formatSurveyTime(time)}
-                        checked={times.includes(time)}
+                        checked={availability.includes(time)}
                     />
                 )}
             </Stack>
