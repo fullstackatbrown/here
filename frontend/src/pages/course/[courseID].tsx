@@ -35,8 +35,8 @@ export default function CoursePage() {
               <CourseHeader course={course} />
             </Grid>
           </Grid>
-          {/* <CourseAdminView course={course} /> */}
-          <CourseStudentView course={course} />
+          <CourseAdminView course={course} />
+          {/* <CourseStudentView course={course} /> */}
         </Stack>
       }
     </AppLayout>
