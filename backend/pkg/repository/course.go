@@ -176,6 +176,28 @@ func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsR
 }
 
 // Helpers
+func (fr *FirebaseRepository) approveSwap(courseID string, swap *models.Swap) (batch *firestore.WriteBatch, err error) {
+	if swap.AssignmentID == "" {
+		// Permanent Swap
+		batch, err = fr.assignPermanentSection(&models.AssignSectionsRequest{
+			CourseID:     courseID,
+			StudentID:    swap.StudentID,
+			NewSectionID: swap.NewSectionID,
+		})
+		return
+	} else {
+		// Temporary Swap
+		batch, err = fr.assignTemporarySection(&models.AssignSectionsRequest{
+			CourseID:     courseID,
+			StudentID:    swap.StudentID,
+			OldSectionID: swap.OldSectionID,
+			NewSectionID: swap.NewSectionID,
+			AssignmentID: swap.AssignmentID,
+		})
+		return
+	}
+}
+
 func (fr *FirebaseRepository) assignPermanentSection(req *models.AssignSectionsRequest) (*firestore.WriteBatch, error) {
 	// In a batch
 	// 1. Update the course.students map

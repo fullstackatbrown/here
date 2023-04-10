@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"log"
 	"reflect"
 	"time"
@@ -37,6 +36,7 @@ func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*mode
 func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models.Swap, error) {
 
 	// TODO: Check for conflicting swaps
+	// If there exists a swap for the exact same student, assignment, old section, and new section, return an error
 
 	swap := &models.Swap{
 		StudentID:    req.StudentID,
@@ -48,10 +48,54 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 		Status:       models.STATUS_PENDING,
 	}
 
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
-		models.FirestoreSwapsCollection).Add(firebase.Context, swap)
+	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
-		return nil, fmt.Errorf("error creating assignment: %v\n", err)
+		return nil, err
+	}
+
+	if course.AutoApproveRequests {
+		// check the availability of the new section
+		section, err := fr.GetSectionByID(course.ID, req.NewSectionID)
+		if err != nil {
+			return nil, err
+		}
+
+		enrolled := section.NumEnrolled
+		if req.AssignmentID != "" {
+			if swappedIn, ok := section.SwappedInStudents[req.AssignmentID]; ok {
+				enrolled += len(swappedIn)
+			}
+			if swappedOut, ok := section.SwappedOutStudents[req.AssignmentID]; ok {
+				enrolled -= len(swappedOut)
+			}
+		}
+
+		if enrolled < section.Capacity {
+			// auto approve the swap
+			swap.Status = models.STATUS_APPROVED
+		}
+
+	}
+
+	batch := fr.firestoreClient.Batch()
+
+	// If the swap is approved, assign the sections
+	if swap.Status == models.STATUS_APPROVED {
+		batch, err = fr.approveSwap(req.CourseID, swap)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Create the swap in the batch
+	ref := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSwapsCollection).NewDoc()
+	batch.Create(ref, swap)
+
+	// Commit the batch
+	_, err = batch.Commit(firebase.Context)
+	if err != nil {
+		return nil, err
 	}
 
 	swap.ID = ref.ID
@@ -92,25 +136,9 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 
 	// Assign sections if the swap is approved
 	if req.Status == models.STATUS_APPROVED {
-		if swap.AssignmentID == "" {
-			// Permanent Swap
-			batch, err = fr.assignPermanentSection(&models.AssignSectionsRequest{
-				CourseID:     req.CourseID,
-				StudentID:    swap.StudentID,
-				NewSectionID: swap.NewSectionID,
-			})
-			if err != nil {
-				return err
-			}
-		} else {
-			// Temporary Swap
-			batch, err = fr.assignTemporarySection(&models.AssignSectionsRequest{
-				CourseID:     req.CourseID,
-				StudentID:    swap.StudentID,
-				OldSectionID: swap.OldSectionID,
-				NewSectionID: swap.NewSectionID,
-				AssignmentID: swap.AssignmentID,
-			})
+		batch, err = fr.approveSwap(req.CourseID, swap)
+		if err != nil {
+			return err
 		}
 	}
 
