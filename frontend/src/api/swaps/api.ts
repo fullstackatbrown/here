@@ -35,10 +35,15 @@ async function handleSwap(
   return APIClient.patch(`/courses/${courseID}/swaps/${swapID}/handle`, { status, handledBy });
 }
 
+async function cancelSwap(courseID: string, swapID: string): Promise<boolean> {
+  return APIClient.patch(`/courses/${courseID}/swaps/${swapID}/cancel`);
+}
+
 const SwapAPI = {
   createSwap,
   updateSwap,
   handleSwap,
+  cancelSwap,
 };
 
 export default SwapAPI;
