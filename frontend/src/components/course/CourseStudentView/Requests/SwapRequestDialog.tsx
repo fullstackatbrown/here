@@ -59,7 +59,6 @@ const DisabledTextField = styled(TextField)({
 });
 
 const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap, swap }) => {
-    console.log(swap)
     const defaultValues: FormData = {
         courseID: course.ID,
         isPermanent: swap ? swap.assignmentID === "" : true,
@@ -79,10 +78,12 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
 
     useEffect(() => {
         if (watchIsPermanent) {
+            // If permanent swap, unregister assignmentID and set oldSectionID to current default section
             unregister("assignmentID")
             const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
         } else {
+            // If temporary swap, register assignmentID and set oldSectionID to empty
             register("assignmentID")
             setValue("oldSectionID", "")
         }
@@ -92,8 +93,10 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
 
     useEffect(() => {
         if (watchAssignmentID === "") {
+            // If user did not select an assignment, set oldSectionID to empty
             setValue("oldSectionID", "")
         } else {
+            // If user selected an assignment, set oldSectionID to the section for that assignment
             const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
         }
@@ -101,7 +104,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
 
     useEffect(() => {
         reset(defaultValues);
-    }, [student])
+    }, [student, swap])
 
     const handleOnClose = () => {
         onClose()
