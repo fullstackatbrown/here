@@ -49,6 +49,7 @@ function CourseStudentView({ course }: CourseStudentViewProps) {
 
 
   return (
+    !sectionsMapLoading && !surveyLoading &&
     <>
       {surveyDialog &&
         <SurveyDialog
@@ -85,7 +86,6 @@ function CourseStudentView({ course }: CourseStudentViewProps) {
           </Stack>
           <Box height={40} />
           <StudentViewList course={course} student={student} sectionsMap={sectionsMap} />
-
         </Grid>
         <Grid xs={2} />
       </Grid>

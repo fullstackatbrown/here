@@ -12,16 +12,18 @@ import { FC, useState } from "react";
 import toast from "react-hot-toast";
 import StudentRequestCard from "./StudentRequestCard";
 import SwapRequestDialog from "./SwapRequestDialog";
+import { Section } from "model/section";
+import { Assignment } from "model/assignment";
 
 export interface StudentRequestsListProps {
     course: Course;
     student: User;
+    sectionsMap: Record<string, Section>;
+    assignmentsMap: Record<string, Assignment>;
+    requests: Swap[];
 }
 
-const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student }) => {
-    const [requests, _] = useSwapsByStudent(course.ID, student.ID);
-    const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
-    const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
+const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, sectionsMap, assignmentsMap, requests }) => {
     const [swapRequestDialog, setSwapRequestDialog] = useState<Swap | undefined>(undefined)
 
     const handleOpenSwapRequestDialog = (swap: Swap) => {

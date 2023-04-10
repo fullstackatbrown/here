@@ -1,4 +1,4 @@
-import { Autorenew, ExpandMore } from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
     Box,
@@ -7,14 +7,17 @@ import {
     Stack,
     Typography
 } from "@mui/material";
-import { Course } from "model/course";
-import { User } from "model/user";
-import { useState } from "react";
-import StudentRequestsList from "./Requests/StudentRequestsList";
-import { useAssignments } from "api/assignment/hooks";
 import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
-import StudentGradesTable from "./Grades/StudentGradesTable";
+import listToMap from "@util/shared/listToMap";
+import { useAssignments } from "api/assignment/hooks";
+import { useSwapsByStudent } from "api/swaps/hooks";
+import { Assignment } from "model/assignment";
+import { Course } from "model/course";
 import { Section } from "model/section";
+import { User } from "model/user";
+import { useEffect, useState } from "react";
+import StudentGradesTable from "./Grades/StudentGradesTable";
+import StudentRequestsList from "./Requests/StudentRequestsList";
 import SwapRequestDialog from "./Requests/SwapRequestDialog";
 
 export interface StudentViewListProps {
@@ -25,9 +28,15 @@ export interface StudentViewListProps {
 
 export default function StudentViewList({ course, sectionsMap, student }: StudentViewListProps) {
     const [assignments, assignmentsLoading] = useAssignments(course.ID)
-    const [requestsOpen, setRequestsOpen] = useState(true);
-    const [gradesOpen, setGradesOpen] = useState(true);
+    const [requests, requestsLoading] = useSwapsByStudent(course.ID, student.ID);
+    const [requestsOpen, setRequestsOpen] = useState(!requestsLoading && !assignmentsLoading);
+    const [gradesOpen, setGradesOpen] = useState(!assignmentsLoading);
     const [swapRequestDialog, setSwapRequestDialog] = useState(false)
+
+    useEffect(() => {
+        setGradesOpen(!assignmentsLoading)
+        setRequestsOpen(!requestsLoading && !assignmentsLoading)
+    }, [assignmentsLoading, requestsLoading, assignmentsLoading])
 
     return (
         <>
@@ -68,7 +77,8 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                     {requestsOpen && <Button size="small" onClick={() => setSwapRequestDialog(true)}> + New Request</Button>}
                 </Stack>
                 <Collapse in={requestsOpen} timeout="auto" unmountOnExit sx={{ ml: -4 }}>
-                    <StudentRequestsList course={course} student={student} />
+                    {assignments && <StudentRequestsList course={course} student={student} requests={requests} sectionsMap={sectionsMap}
+                        assignmentsMap={listToMap(assignments) as Record<string, Assignment>} />}
                 </Collapse>
 
             </Stack >
