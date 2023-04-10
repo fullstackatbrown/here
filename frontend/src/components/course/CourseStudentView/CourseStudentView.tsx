@@ -76,8 +76,8 @@ function CourseStudentView({ course }: CourseStudentViewProps) {
         <Grid xs={2}>
         </Grid>
         <Grid xs>
-          <Box mb={2}>
-            <Typography color="text.secondary" variant="body2">
+          <Box mb={2.5} mt={1}>
+            <Typography variant="body2" fontWeight={500}>
               Regular Section:
             </Typography>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
