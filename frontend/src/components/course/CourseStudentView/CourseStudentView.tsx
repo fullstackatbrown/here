@@ -17,13 +17,14 @@ import StudentGradesTable from "./StudentGradesTable";
 import SwapRequestDialog from "./SwapRequestDialog";
 import { Section } from "model/section";
 import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
+import StudentRequestsView from "./Requests/StudentRequestsView";
 
 export interface CourseStudentViewProps {
   course: Course;
 }
 
 const student: User = {
-  ID: "p3d5eSnr3H621G3SwzEL",
+  ID: "2V5CjjV6Z7fbOAFwO2TI",
   displayName: "Student Name",
   email: "",
   access: {},
@@ -95,6 +96,7 @@ function CourseStudentView({ course }: CourseStudentViewProps) {
           {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
             <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
             <Typography>Your instructor has not released any assignments yet</Typography>}
+          <StudentRequestsView course={course} student={student} />
         </Grid>
         <Grid xs={2} />
       </Grid>
