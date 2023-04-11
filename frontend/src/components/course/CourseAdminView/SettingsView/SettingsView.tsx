@@ -1,5 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
-import errors from "@util/errors";
+import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
 import { Course } from "model/course";
 import toast from "react-hot-toast";
@@ -15,8 +15,9 @@ export default function SettingsView({ course }: SettingsViewProps) {
             {
                 loading: "Updating course...",
                 success: "Course updated!",
-                error: errors.UNKNOWN
+                error: (err) => handleBadRequestError(err)
             })
+            .catch(() => { })
     }
 
     return (

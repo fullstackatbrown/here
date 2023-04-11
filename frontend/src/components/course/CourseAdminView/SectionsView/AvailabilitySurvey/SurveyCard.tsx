@@ -1,16 +1,15 @@
+import ClearIcon from "@mui/icons-material/Clear";
+import CreateIcon from "@mui/icons-material/Create";
 import { Box, Card, IconButton, Stack, Typography } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
+import SurveyAPI from "api/surveys/api";
+import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { FC, useState } from "react";
-import SurveyDialog from "./SurveyDialog";
-import SurveyListItemMenu from "./SurveyListItemMenu";
-import CreateIcon from "@mui/icons-material/Create";
-import ClearIcon from "@mui/icons-material/Clear";
-import CreateSurveyDialog from "./CreateEditSurveyDialog";
-import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 import toast from "react-hot-toast";
-import SurveyAPI from "api/surveys/api";
-import errors from "@util/errors";
-import { Section } from "model/section";
+import CreateSurveyDialog from "./CreateEditSurveyDialog";
+import SurveyDialog from "./SurveyDialog";
+import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 
 export interface SurveyCardProps {
   survey: Survey;
@@ -46,8 +45,9 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections }) => {
       toast.promise(SurveyAPI.deleteSurvey(survey.courseID, survey.ID), {
         loading: "Deleting survey...",
         success: "Survey deleted!",
-        error: errors.UNKNOWN
+        error: (err) => handleBadRequestError(err)
       })
+        .catch(() => { })
     }
   }
 

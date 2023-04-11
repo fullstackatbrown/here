@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import errors from "@util/errors";
+import { Errors, handleBadRequestError } from "@util/errors";
 import { getNextWeekDate } from '@util/shared/time';
 import AssignmentAPI from "api/assignment/api";
 import { Assignment } from 'model/assignment';
@@ -55,32 +55,20 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
                 {
                     loading: "Updating assignment...",
                     success: "Assignment updated!",
-                    error: errors.UNKNOWN
+                    error: (err) => handleBadRequestError(err)
                 })
-                .then(() => {
-                    onClose()
-                    reset()
-                })
-                .catch(() => {
-                    onClose()
-                    reset()
-                });
+                .then(() => handleOnClose())
+                .catch(() => { })
         } else {
             toast.promise(AssignmentAPI.createAssignment(
                 course.ID, data.name, data.optional, releaseDate, dueDate, data.maxScore),
                 {
                     loading: "Creating assignment...",
                     success: "Assignment created!",
-                    error: (err) => `${err.response.data}`,
+                    error: (err) => handleBadRequestError(err)
                 })
-                .then(() => {
-                    onClose()
-                    reset()
-                })
-                .catch(() => {
-                    onClose()
-                    reset()
-                })
+                .then(() => handleOnClose())
+                .catch(() => { })
         }
     })
 

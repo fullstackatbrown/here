@@ -1,15 +1,15 @@
-import { HelpOutline } from '@mui/icons-material';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import {
     Box,
     Button, Dialog, DialogActions, DialogContent,
-    DialogTitle, IconButton, Stack, Typography
+    DialogTitle,
+    Stack, Typography
 } from "@mui/material";
-import errors from '@util/errors';
+import { handleBadRequestError } from '@util/errors';
 import formatSectionResponses, { TimeCount } from "@util/shared/formatSectionResponses";
 import SurveyAPI from 'api/surveys/api';
 import { Section } from 'model/section';
-import { GenerateResultsResponse, Survey } from "model/survey";
+import { Survey } from "model/survey";
 import { FC, useEffect, useState } from "react";
 import toast from 'react-hot-toast';
 import AllocatedSectionsTable from './AllocatedSectionsTable';
@@ -37,8 +37,9 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         toast.promise(SurveyAPI.generateResults(survey.courseID, survey.ID), {
             loading: "Running algorithm...",
             success: "Algorithm ran!",
-            error: errors.UNKNOWN
+            error: (err) => handleBadRequestError(err)
         })
+            .catch(() => { })
     }
 
     const getNumResponses = () => survey.responses ? Object.keys(survey.responses).length : 0

@@ -1,13 +1,13 @@
-import React, { FC, useState } from "react";
-import { Box, Card, IconButton, Paper, Stack, Typography } from "@mui/material";
-import { formatSectionTime } from "@util/shared/formatTime";
-import CreateIcon from "@mui/icons-material/Create";
 import ClearIcon from "@mui/icons-material/Clear";
-import { Section } from "model/section";
+import CreateIcon from "@mui/icons-material/Create";
+import { Box, Card, IconButton, Stack, Typography } from "@mui/material";
+import { formatSectionTime } from "@util/shared/formatTime";
 import SectionAPI from "api/section/api";
-import CreateEditSectionDialog from "./CreateEditSectionDialog";
+import { Section } from "model/section";
+import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
-import errors from "@util/errors";
+import CreateEditSectionDialog from "./CreateEditSectionDialog";
+import { handleBadRequestError } from "@util/errors";
 
 export interface SectionCardProps {
   enrollment: number;
@@ -28,8 +28,9 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
       toast.promise(SectionAPI.deleteSection(section.courseID, section.ID), {
         loading: "Deleting section...",
         success: "Section deleted!",
-        error: errors.UNKNOWN
+        error: (err) => handleBadRequestError(err)
       })
+        .catch(() => { })
     }
   }
 

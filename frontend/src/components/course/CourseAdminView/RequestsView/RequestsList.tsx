@@ -1,5 +1,5 @@
-import { Divider, Pagination, Stack, TablePagination, Typography } from "@mui/material";
-import errors from "@util/errors";
+import { Stack, TablePagination, Typography } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import { sortRequestsByTime } from "@util/shared/requestTime";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
@@ -28,8 +28,9 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
       {
         loading: "Updating request...",
         success: "Request updated!",
-        error: errors.UNKNOWN,
+        error: (err) => handleBadRequestError(err),
       })
+      .catch(() => { })
   }
 
   const handleChangePage = (
