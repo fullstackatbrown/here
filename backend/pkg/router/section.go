@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -18,7 +17,6 @@ func SectionRoutes() *chi.Mux {
 
 	router.Post("/", createSectionHandler)
 	router.Route("/{sectionID}", func(router chi.Router) {
-		router.Use(middleware.SectionCtx())
 		router.Get("/", getSectionHandler)
 		router.Delete("/", deleteSectionHandler)
 		router.Patch("/", updateSectionHandler)
@@ -29,8 +27,8 @@ func SectionRoutes() *chi.Mux {
 }
 
 func getSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	sectionID := r.Context().Value("sectionID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	sectionID := chi.URLParam(r, "sectionID")
 
 	section, err := repo.Repository.GetSectionByID(courseID, sectionID)
 	if err != nil {
@@ -42,7 +40,7 @@ func getSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
 	var req *models.CreateSectionRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -63,8 +61,8 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	sectionID := r.Context().Value("sectionID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	sectionID := chi.URLParam(r, "sectionID")
 	var req *models.UpdateSectionRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -87,8 +85,8 @@ func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	sectionID := r.Context().Value("sectionID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	sectionID := chi.URLParam(r, "sectionID")
 
 	err := repo.Repository.DeleteSection(&models.DeleteSectionRequest{CourseID: courseID, SectionID: sectionID})
 	if err != nil {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -18,7 +17,6 @@ func GradesRoutes() *chi.Mux {
 	router.Post("/", createGradeHandler)
 	router.Post("/export", exportGradesHandler)
 	router.Route("/{gradeID}", func(router chi.Router) {
-		router.Use(middleware.GradeCtx())
 		router.Patch("/", updateGradeHandler)
 		router.Delete("/", deleteGradeHandler)
 	})
@@ -27,8 +25,8 @@ func GradesRoutes() *chi.Mux {
 }
 
 func createGradeHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	assignmentID := r.Context().Value("assignmentID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	assignmentID := chi.URLParam(r, "assignmentID")
 
 	var req *models.CreateGradeRequest
 
@@ -51,9 +49,9 @@ func createGradeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateGradeHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	assignmentID := r.Context().Value("assignmentID").(string)
-	gradeID := r.Context().Value("gradeID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	assignmentID := chi.URLParam(r, "assignmentID")
+	gradeID := chi.URLParam(r, "gradeID")
 
 	var req *models.UpdateGradeRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -77,9 +75,9 @@ func updateGradeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteGradeHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	assignmentID := r.Context().Value("assignmentID").(string)
-	gradeID := r.Context().Value("gradeID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	assignmentID := chi.URLParam(r, "assignmentID")
+	gradeID := chi.URLParam(r, "gradeID")
 
 	req := &models.DeleteGradeRequest{
 		CourseID:     courseID,

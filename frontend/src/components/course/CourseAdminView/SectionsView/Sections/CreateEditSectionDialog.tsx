@@ -43,7 +43,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         capacity: section ? section.capacity : undefined,
     }
 
-    const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
+    const { register, handleSubmit, control, reset, watch, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     });
 
@@ -96,7 +96,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                             {...register("day")}
                             label="Day"
                             required
-                            value={section ? section.day : undefined}
+                            value={watch("day")}
                         >
                             <MenuItem value={"Sunday"}>Sunday</MenuItem>
                             <MenuItem value={"Monday"}>Monday</MenuItem>
