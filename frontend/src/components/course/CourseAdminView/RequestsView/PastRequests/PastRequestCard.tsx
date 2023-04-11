@@ -24,7 +24,6 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
   const [hover, setHover] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const theme = useTheme();
-  const whichSection = request.assignmentID ? "One-Time" : "Permanent";
 
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,7 +37,8 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
     <>
       <Box
         sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
-        p={1}
+        px={1}
+        py={0.5}
         onClick={() => setExpanded(!expanded)}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
@@ -53,7 +53,7 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
                 />
               }
             </Box>
-            <Typography>{`${student.displayName} - ${whichSection}`}</Typography>
+            <Typography sx={{ fontSize: 15 }}>{student.displayName} - {assignment ? "One Time" : "Permanent"}</Typography>
             <RequestStatusChip
               status={request.status}
               style={{ marginRight: "auto" }}

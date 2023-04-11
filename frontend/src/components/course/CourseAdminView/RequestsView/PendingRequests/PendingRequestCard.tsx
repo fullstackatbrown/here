@@ -31,7 +31,6 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const theme = useTheme();
-  const whichSection = assignment ? "One Time" : "Permanent";
 
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,7 +44,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
       <Box
         sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
         px={1}
-        py={1}
+        py={0.5}
         onClick={() => setExpanded(!expanded)}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
@@ -62,7 +61,7 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
                 }
               </Box>
               {/* TODO: handle exceptionally long string */}
-              <Typography>{`${student.displayName} - ${whichSection}`}</Typography>
+              <Typography sx={{ fontSize: 15 }}>{student.displayName} - {assignment ? "One Time" : "Permanent"}</Typography>
             </Stack>
             {!expanded && <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
               {formatSectionInfo(oldSection, true)}
