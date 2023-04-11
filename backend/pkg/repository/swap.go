@@ -44,7 +44,7 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 		OldSectionID: req.OldSectionID,
 		NewSectionID: req.NewSectionID,
 		Reason:       req.Reason,
-		RequestTime:  time.Now().Format(models.ISO8601TimeFormat),
+		RequestTime:  time.Now(),
 		Status:       models.STATUS_PENDING,
 	}
 
@@ -119,7 +119,7 @@ func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) error {
 		}
 	}
 
-	updates = append(updates, firestore.Update{Path: "requestTime", Value: time.Now().Format(models.ISO8601TimeFormat)})
+	updates = append(updates, firestore.Update{Path: "requestTime", Value: time.Now()})
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
 		models.FirestoreSwapsCollection).Doc(*req.SwapID).Update(firebase.Context, updates)
