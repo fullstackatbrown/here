@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/fullstackatbrown/here/pkg/utils"
@@ -19,7 +18,6 @@ func SurveyRoutes() *chi.Mux {
 	// TODO: Authentication
 	router.Post("/", createSurveyHandler)
 	router.Route("/{surveyID}", func(router chi.Router) {
-		router.Use(middleware.SurveyCtx())
 		router.Get("/", getSurveyHandler)
 		router.Patch("/", updateSurveyHandler)
 		router.Delete("/", deleteSurveyHandler)
@@ -41,8 +39,8 @@ func ResponsesRoutes() *chi.Mux {
 }
 
 func getSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	surveyID := r.Context().Value("surveyID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
 
 	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
@@ -53,7 +51,8 @@ func getSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
+
 	var req *models.CreateSurveyRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -75,8 +74,9 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 
 func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: what if the survey is already published
-	courseID := r.Context().Value("courseID").(string)
-	surveyID := r.Context().Value("surveyID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
+
 	var req *models.UpdateSurveyRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -116,8 +116,9 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	surveyID := r.Context().Value("surveyID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
+
 	err := repo.Repository.DeleteSurvey(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -129,8 +130,8 @@ func deleteSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	surveyID := r.Context().Value("surveyID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
 
 	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
@@ -159,8 +160,8 @@ func publishSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	surveyID := r.Context().Value("surveyID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
 
 	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
@@ -201,8 +202,8 @@ func confirmResultsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	surveyID := r.Context().Value("surveyID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
 
 	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {

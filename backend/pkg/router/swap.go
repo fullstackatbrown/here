@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -17,7 +16,6 @@ func SwapRoutes() *chi.Mux {
 
 	router.Post("/", createSwapHandler)
 	router.Route("/{swapID}", func(router chi.Router) {
-		router.Use(middleware.SwapCtx())
 		router.Patch("/", updateSwapHandler)
 		router.Patch("/handle", handleSwapHandler)
 		router.Patch("/cancel", cancelSwapHandler)
@@ -27,7 +25,8 @@ func SwapRoutes() *chi.Mux {
 }
 
 func createSwapHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
+
 	var req *models.CreateSwapRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -50,8 +49,9 @@ func createSwapHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	swapID := r.Context().Value("swapID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	swapID := chi.URLParam(r, "swapID")
+
 	var req *models.UpdateSwapRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -75,8 +75,8 @@ func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	swapID := r.Context().Value("swapID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	swapID := chi.URLParam(r, "swapID")
 	var req *models.HandleSwapRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -99,8 +99,8 @@ func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func cancelSwapHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	swapID := r.Context().Value("swapID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	swapID := chi.URLParam(r, "swapID")
 
 	swap, err := repo.Repository.GetSwapByID(courseID, swapID)
 	if err != nil {
