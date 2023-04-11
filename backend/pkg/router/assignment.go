@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -17,7 +16,6 @@ func AssignmentRoutes() *chi.Mux {
 
 	router.Post("/", createAssignmentHandler)
 	router.Route("/{assignmentID}", func(router chi.Router) {
-		router.Use(middleware.AssignmentCtx())
 		router.Get("/", getAssignmentHandler)
 		router.Delete("/", deleteAssignmentHandler)
 		router.Patch("/", updateAssignmentHandler)
@@ -28,8 +26,8 @@ func AssignmentRoutes() *chi.Mux {
 }
 
 func getAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	assignmentID := r.Context().Value("assignmentID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	assignmentID := chi.URLParam(r, "assignmentID")
 
 	assignment, err := repo.Repository.GetAssignmentByID(courseID, assignmentID)
 	if err != nil {
@@ -41,7 +39,7 @@ func getAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
 	var req *models.CreateAssignmentRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -62,8 +60,8 @@ func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	assignmentID := r.Context().Value("assignmentID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	assignmentID := chi.URLParam(r, "assignmentID")
 	var req *models.UpdateAssignmentRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -86,8 +84,8 @@ func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	assignmentID := r.Context().Value("assignmentID").(string)
+	courseID := chi.URLParam(r, "courseID")
+	assignmentID := chi.URLParam(r, "assignmentID")
 
 	err := repo.Repository.DeleteAssignment(&models.DeleteAssignmentRequest{CourseID: courseID, AssignmentID: assignmentID})
 	if err != nil {

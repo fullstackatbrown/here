@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -19,8 +18,6 @@ func CourseRoutes() *chi.Mux {
 	// router.With(auth.RequireAdmin()).Post("/", createCourseHandler)
 	router.Post("/", createCourseHandler)
 	router.Route("/{courseID}", func(r chi.Router) {
-		r.Use(middleware.CourseCtx())
-
 		r.Get("/", getCourseHandler)
 		r.Delete("/", deleteCourseHandler)
 		r.Patch("/", updateCourseHandler)
@@ -36,7 +33,7 @@ func CourseRoutes() *chi.Mux {
 }
 
 func getCourseHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
 
 	course, err := repo.Repository.GetCourseByID(courseID)
 	if err != nil {
@@ -66,7 +63,7 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
 
 	err := repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: courseID})
 	if err != nil {
@@ -79,7 +76,7 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
 
 	var req *models.UpdateCourseRequest
 
@@ -102,7 +99,7 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
+	courseID := chi.URLParam(r, "courseID")
 
 	var req *models.AssignSectionsRequest
 
