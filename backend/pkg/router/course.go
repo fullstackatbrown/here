@@ -24,7 +24,7 @@ func CourseRoutes() *chi.Mux {
 		r.Get("/", getCourseHandler)
 		r.Delete("/", deleteCourseHandler)
 		r.Patch("/", updateCourseHandler)
-		r.Post("/assignSections", assignSectionsHandler)
+		r.Post("/assignSection", assignSectionHandler)
 
 		r.Mount("/sections", SectionRoutes())
 		r.Mount("/assignments", AssignmentRoutes())
@@ -101,7 +101,7 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Successfully updated course " + courseID))
 }
 
-func assignSectionsHandler(w http.ResponseWriter, r *http.Request) {
+func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := r.Context().Value("courseID").(string)
 
 	var req *models.AssignSectionsRequest

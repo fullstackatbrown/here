@@ -9,11 +9,11 @@ type Survey struct {
 	CourseID    string                    `firestore:"courseID"`
 	Name        string                    `firestore:"name"`
 	Description string                    `firestore:"description"`
+	Published   bool                      `firestore:"published"`
 	EndTime     string                    `firestore:"endTime"`
 	Capacity    map[string]map[string]int `firestore:"capacity"`
 	Responses   map[string][]string       `firestore:"responses"`
-	Exceptions  []string                  `firestore:"exceptions"`
-	Published   bool                      `firestore:"published"`
+	Results     map[string][]string       `firestore:"results"`
 }
 
 type Times struct {
