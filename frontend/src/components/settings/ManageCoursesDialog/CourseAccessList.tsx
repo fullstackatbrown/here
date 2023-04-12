@@ -5,7 +5,7 @@ import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/format
 import { useCourseStaff } from "api/course/hooks";
 import { Course } from "model/course";
 import { CoursePermission } from "model/user";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import CourseAccessListItem from "./CourseAccessListItem";
 
 interface CourseAccessListProps {
@@ -16,6 +16,12 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
     const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
     const theme = useTheme();
+
+    useEffect(() => {
+        if (!staffLoading && !adminLoading) {
+            setExpanded(true);
+        }
+    }, [staffLoading, adminLoading])
 
     return (
         <>

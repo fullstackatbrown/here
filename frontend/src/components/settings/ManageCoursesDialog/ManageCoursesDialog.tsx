@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogContent, DialogTitle, Stack } from "@mui/material";
+import { Button, Dialog, DialogContent, DialogTitle, Stack, Typography } from "@mui/material";
 import { CapitalizeFirstLetter } from "@util/shared/string";
 import { Course } from "model/course";
 import { FC } from "react"
@@ -22,6 +22,10 @@ const ManageCoursesDialog: FC<ManageCoursesDialogProps> = ({ term, courses, open
 
             </DialogTitle>
             <DialogContent>
+                {courses.length === 0 &&
+                    <Typography textAlign="center">
+                        No courses added for the semester yet.
+                    </Typography>}
                 {courses.map((course) => (
                     <CourseAccessList key={course.ID} course={course} />)
                 )}
