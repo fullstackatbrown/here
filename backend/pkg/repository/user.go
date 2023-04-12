@@ -69,33 +69,40 @@ func (fr *FirebaseRepository) VerifySessionCookie(sessionCookie *http.Cookie) (*
 	return user, nil
 }
 
-func (fr *FirebaseRepository) CreateUserProfile(req *models.CreateUserProfileRequest) (*models.Profile, error) {
+func (fr *FirebaseRepository) CreateUser(req *models.CreateUserRequest) (*models.User, error) {
+	if err := utils.ValidateCreateUserRequest(req); err != nil {
+		return nil, err
+	}
+
+	// Create a user in Firebase Auth.
+	u := (&firebaseAuth.UserToCreate{}).Email(req.Email).Password(req.Password)
+	fbUser, err := fr.authClient.CreateUser(firebase.Context, u)
+	if err != nil {
+		return nil, fmt.Errorf("error creating user: %v\n", err)
+	}
+
 	profile := &models.Profile{
+		ID:              fbUser.UID,
 		DisplayName:     req.DisplayName,
 		Email:           req.Email,
-		Access:          make(map[string]string),
 		Courses:         make([]string, 0),
 		DefaultSections: make(map[string]string),
 		ActualSections:  make(map[string]map[string]string),
+		Permissions:     map[string]models.CoursePermission{},
 	}
 
-	// TESTING ONLY
-	profile.Access["rE3HqlVQ8dT1e1hwkN8I"] = "admin"
-
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Add(firebase.Context, profile)
+	_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(profile.ID).Set(firebase.Context, profile)
 	if err != nil {
 		return nil, fmt.Errorf("error creating user profile: %v\n", err)
 	}
-	profile.ID = ref.ID
 
-	return profile, nil
-
+	return fbUserToUserRecord(fbUser, profile), nil
 }
 
 func (fr *FirebaseRepository) GetUserByID(id string) (*models.User, error) {
-	// if err := utils.ValidateID(id); err != nil {
-	// 	return nil, err
-	// }
+	if err := utils.ValidateID(id); err != nil {
+		return nil, err
+	}
 
 	fbUser, err := fr.authClient.GetUser(firebase.Context, id)
 	if err != nil {
@@ -124,7 +131,27 @@ func (fr *FirebaseRepository) GetProfileById(id string) (*models.Profile, error)
 	}
 }
 
-// getUserProfile gets the Profile from the userProfiles map corresponding to the provided user ID.
+// GetUserByEmail retrieves the User associated with the given email.
+func (fr *FirebaseRepository) GetUserByEmail(email string) (*models.User, error) {
+	userID, err := fr.GetIDByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	return fr.GetUserByID(userID)
+}
+
+func (fr *FirebaseRepository) GetIDByEmail(email string) (string, error) {
+	// Get user by email.
+	iter := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Where("email", "==", email).Documents(firebase.Context)
+	doc, err := iter.Next()
+	if err != nil {
+		return "", err
+	}
+	// Cast.
+	data := doc.Data()
+	return data["id"].(string), nil
+}
 
 func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 	// Check if course exists
@@ -171,7 +198,6 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models
 		return nil, err
 	}
 
-	fmt.Println(req.User.ID)
 	// Check if already enrolled
 	profile, err := fr.GetProfileById(req.User.ID)
 	if err != nil {

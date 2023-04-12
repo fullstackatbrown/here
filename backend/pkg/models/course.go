@@ -7,20 +7,22 @@ import (
 
 const (
 	FirestoreCoursesCollection = "courses"
+	FirestoreInvitesCollection = "invites"
 )
 
 type Course struct {
-	ID                  string                    `firestore:"id,omitempty"`
-	Title               string                    `firestore:"title"`
-	Code                string                    `firestore:"code"`
-	Term                string                    `firestore:"term"`
-	EntryCode           string                    `firestore:"entryCode"`
-	AutoApproveRequests bool                      `firestore:"autoApproveRequests"`
-	Students            map[string]CourseUserData `firestore:"students,omitempty"`
-	SectionsLock        sync.RWMutex              `firestore:"-"`
-	Sections            map[string]*Section       `firestore:"-"`
-	AssignmentsLock     sync.RWMutex              `firestore:"-"`
-	Assignments         map[string]*Assignment    `firestore:"-"`
+	ID                  string                      `firestore:"id,omitempty"`
+	Title               string                      `firestore:"title"`
+	Code                string                      `firestore:"code"`
+	Term                string                      `firestore:"term"`
+	EntryCode           string                      `firestore:"entryCode"`
+	AutoApproveRequests bool                        `firestore:"autoApproveRequests"`
+	Students            map[string]CourseUserData   `firestore:"students,omitempty"`
+	Permissions         map[string]CoursePermission `firestore:"permissions,omitempty"` // map from userID to permission
+	SectionsLock        sync.RWMutex                `firestore:"-"`
+	Sections            map[string]*Section         `firestore:"-"`
+	AssignmentsLock     sync.RWMutex                `firestore:"-"`
+	Assignments         map[string]*Assignment      `firestore:"-"`
 }
 
 type CourseUserData struct {
@@ -60,6 +62,16 @@ type AssignSectionsRequest struct {
 	OldSectionID string `json:"oldSectionID,omitempty"`
 	NewSectionID string `json:"newSectionID"`
 	AssignmentID string `json:"assignmentID,omitempty"`
+}
+
+type CreatePermissionsRequest struct {
+	CourseID    string            `json:"courseID,omitempty"`
+	Permissions map[string]string `json:"permissions"` // map from email to permission
+}
+
+type DeletePermissionRequest struct {
+	CourseID string `json:"courseID"`
+	UserID   string `json:"userID"`
 }
 
 func CreateCourseID(req *CreateCourseRequest) string {

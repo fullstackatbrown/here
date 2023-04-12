@@ -27,7 +27,7 @@ func AuthRoutes() *chi.Mux {
 }
 
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
-	var req *models.CreateUserProfileRequest
+	var req *models.CreateUserRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -35,7 +35,7 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c, err := repo.Repository.CreateUserProfile(req)
+	c, err := repo.Repository.CreateUser(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

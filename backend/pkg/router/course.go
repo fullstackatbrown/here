@@ -27,6 +27,8 @@ func CourseRoutes() *chi.Mux {
 		r.Mount("/assignments", AssignmentRoutes())
 		r.Mount("/swaps", SwapRoutes())
 		r.Mount("/surveys", SurveyRoutes())
+
+		r.Mount("/permissions", PermissionRoutes())
 	})
 
 	return router

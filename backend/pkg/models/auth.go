@@ -1,11 +1,14 @@
 package models
 
-type ActionType string
+const (
+	FirestoreProfilesCollection = "user_profiles"
+)
+
+type CoursePermission string
 
 const (
-	FirestoreProfilesCollection            = "user_profiles"
-	ACTION_JOIN                 ActionType = "JOIN"
-	ACTION_QUIT                 ActionType = "QUIT"
+	CourseAdmin CoursePermission = "ADMIN"
+	CourseStaff CoursePermission = "STAFF"
 )
 
 // Profile is a collection of standard profile information for a user.
@@ -15,23 +18,25 @@ type Profile struct {
 	DisplayName     string                       `firestore:"displayName"`
 	Email           string                       `firestore:"email"`
 	Pronouns        string                       `firestore:"pronouns"`
-	Access          map[string]string            `firestore:"access"`
 	Courses         []string                     `firestore:"courses"`
 	DefaultSections map[string]string            `firestore:"defaultSections"`
 	ActualSections  map[string]map[string]string `firestore:"actualSections"`
+	isAdmin         bool                         `firestore:"isAdmin"`
+	Permissions     map[string]CoursePermission  `firebase:"coursePermissions"` // map from courseID to permission
 }
 
 type User struct {
 	*Profile
-	ID                 string `json:"id" mapstructure:"id"`
+	ID                 string
 	Disabled           bool
 	CreationTimestamp  int64
 	LastLogInTimestamp int64
 }
 
-type CreateUserProfileRequest struct {
+type CreateUserRequest struct {
 	Email       string `json:"email"`
 	DisplayName string `json:"displayName"`
+	Password    string `json:"password"`
 }
 
 type JoinCourseRequest struct {
