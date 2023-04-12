@@ -18,11 +18,12 @@ type Profile struct {
 	DisplayName     string                       `firestore:"displayName"`
 	Email           string                       `firestore:"email"`
 	Pronouns        string                       `firestore:"pronouns"`
+	PhotoURL        string                       `firestore:"photoUrl"`
 	Courses         []string                     `firestore:"courses"`
 	DefaultSections map[string]string            `firestore:"defaultSections"`
 	ActualSections  map[string]map[string]string `firestore:"actualSections"`
 	isAdmin         bool                         `firestore:"isAdmin"`
-	Permissions     map[string]CoursePermission  `firebase:"coursePermissions"` // map from courseID to permission
+	Permissions     map[string]CoursePermission  `firestore:"permissions"` // map from courseID to permission
 }
 
 type User struct {
