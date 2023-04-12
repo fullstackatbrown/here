@@ -42,10 +42,10 @@ export default function SettingsView({ course }: SettingsViewProps) {
             <Stack direction="column" spacing={3} my={2}>
                 <Stack direction="column" maxWidth="70%">
                     <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <Typography fontSize={16} fontWeight={500}>
+                        <Typography fontWeight={500}>
                             Course Entry Code:
                         </Typography>
-                        <Button color="inherit" style={{ paddingTop: 2, paddingBottom: 2 }} ref={copyButtonRef}>
+                        <Button color="inherit" sx={{ paddingTop: 0, paddingBottom: 0, fontSize: 16 }} ref={copyButtonRef}>
                             {course.entryCode}
                             <ContentCopyIcon
                                 style={{ fontSize: 13, marginLeft: 5 }} />
