@@ -26,13 +26,19 @@ const CourseListItem: FC<CourseListItemProps> = ({ course, isLastChild }) => {
     const handleChangeCourseStatus = (status: CourseStatus) => {
         return (e: React.MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();
+
+            if (course.students && Object.keys(course.students).length > 0 && course.status === CourseStatus.CourseInactive) {
+                alert("Cannot deactivate a course when students have enrolled. Consider archiving it to prevent future changes.")
+                return;
+            }
+
             let confirmString = "";
             switch (status) {
                 case CourseStatus.CourseInactive:
-                    confirmString = `Are you sure you want to deactivate ${course.title}? All past data will be kept, but students will not be able to access the course.`;
+                    confirmString = `Are you sure you want to deactivate ${course.title}? All past data will be kept, but students will not be able to see or join the course.`;
                     break;
                 case CourseStatus.CourseArchived:
-                    confirmString = `Are you sure you want to archive ${course.title} on Here? Students and TAs will no longer be able to make any modifications.`;
+                    confirmString = `Are you sure you want to archive ${course.title} on Here? Students and TAs can still see the course but cannot make any modifications.`;
                     break;
                 case CourseStatus.CourseActive:
                     confirmString = `Are you sure you want to re-activate ${course.title}? Students will be able to access the course.`;

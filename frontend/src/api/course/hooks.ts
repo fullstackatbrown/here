@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, doc, getFirestore, onSnapshot, query, where, documentId } from "@firebase/firestore";
 import AuthAPI from "api/auth/api";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { FirestoreCoursesCollection } from "api/firebaseConst";
 
 export function useCourses(): [Course[] | undefined, boolean] {
@@ -26,7 +26,8 @@ export function useCourses(): [Course[] | undefined, boolean] {
     return [courses, loading];
 }
 
-export function useCoursesByIDsByTerm(ids: string[]): [Record<string, Course[]> | undefined, boolean] {
+// Only courses that are active or archived
+export function useCoursesByIDsTerm(ids: string[]): [Record<string, Course[]> | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [courses, setCourses] = useState<Record<string, Course[]> | undefined>(undefined);
 
@@ -40,10 +41,13 @@ export function useCoursesByIDsByTerm(ids: string[]): [Record<string, Course[]> 
                 (querySnapshot) => {
                     const res: Record<string, Course[]> = {};
                     querySnapshot.forEach((doc) => {
-                        if (!res[doc.data().term]) {
-                            res[doc.data().term] = [];
+                        const data = doc.data();
+                        if (data.status !== CourseStatus.CourseInactive) {
+                            if (!res[data.term]) {
+                                res[data.term] = [];
+                            }
+                            res[data.term].push({ ID: doc.id, ...doc.data() } as Course);
                         }
-                        res[doc.data().term].push({ ID: doc.id, ...doc.data() } as Course);
                     });
 
                     setCourses(res);
