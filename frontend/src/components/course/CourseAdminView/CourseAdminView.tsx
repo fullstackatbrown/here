@@ -11,12 +11,14 @@ import AssignmentsView from "./AssignmentsView/AssignmentsView";
 import PeopleView from "./PeopleView/PeopleView";
 import { useRouter } from "next/router";
 import SettingsView from "./SettingsView/SettingsView";
+import { CoursePermission } from "model/user";
 
 export interface CourseAdminViewProps {
   course: Course;
+  access: CoursePermission;
 }
 
-export function CourseAdminView({ course }: CourseAdminViewProps) {
+export default function CourseAdminView({ course, access }: CourseAdminViewProps) {
   const router = useRouter();
   const { courseID } = router.query;
 
@@ -40,7 +42,7 @@ export function CourseAdminView({ course }: CourseAdminViewProps) {
             {router.query.view === "people" && <PeopleView course={course} />}
             {router.query.view === "requests" && <RequestsView course={course} />}
             {/* TODO: protect the settings view route to be only accessible by admin */}
-            {router.query.view === "settings" && <SettingsView course={course} />}
+            {router.query.view === "settings" && access && <SettingsView course={course} />}
           </>
         }
       </Grid>

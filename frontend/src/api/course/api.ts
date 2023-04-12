@@ -1,10 +1,6 @@
 import APIClient from "api/APIClient";
 import { Course } from "model/course";
 
-export const enum CoursePermission {
-  CourseAdmin = "ADMIN",
-  CourseStaff = "STAFF",
-}
 
 async function getCourse(courseID: string): Promise<Course> {
   return await APIClient.get(`/courses/${courseID}`, {});

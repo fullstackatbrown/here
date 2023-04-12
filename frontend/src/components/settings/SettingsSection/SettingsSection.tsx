@@ -33,8 +33,8 @@ const SettingsSection: FC<SettingsSectionProps> = ({
     children
 }) => {
     const { currentUser } = useAuth();
-    const isTA = currentUser && Object.values(currentUser.permissions).filter(perm => perm === CoursePermission.CourseAdmin).length > 0;
-    const display = ((adminOnly && currentUser?.isAdmin) || !adminOnly) && (!taOnly || (taOnly && isTA));
+    const isAdmin = currentUser && Object.values(currentUser.permissions).filter(perm => perm === CoursePermission.CourseAdmin).length > 0;
+    const display = ((adminOnly && currentUser?.isAdmin) || !adminOnly) && (!taOnly || (taOnly && isAdmin));
 
     return display ? <Paper variant="outlined">
         <Box p={3}>

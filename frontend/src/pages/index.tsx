@@ -15,6 +15,7 @@ export default function Home() {
     const [courses, loading] = useCoursesByIDsTerm([...currentUser.courses, ...Object.keys(currentUser.permissions)]);
     const [joinCourseDialog, setJoinCourseDialog] = useState(false);
 
+    // TODO: current term
     const currentTerm = "spring 2023"
     const getTerms = () => {
         let terms = []
