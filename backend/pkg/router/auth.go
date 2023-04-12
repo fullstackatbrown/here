@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fullstackatbrown/here/pkg/auth"
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -14,7 +14,7 @@ import (
 func AuthRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Use(auth.AuthCtx())
+	router.Use(middleware.AuthCtx())
 	router.Post("/", createUserHandler)
 	router.Get("/me", getMeHandler)
 
@@ -26,13 +26,13 @@ func AuthRoutes() *chi.Mux {
 		// r.Patch("/", updateUserHandler)
 	})
 
-	router.With(auth.RequireAdmin()).Patch("/editAdminAccess", editAdminAccessHandler)
+	router.With(middleware.RequireAdmin()).Patch("/editAdminAccess", editAdminAccessHandler)
 
 	return router
 }
 
 func getMeHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := auth.GetUserFromRequest(r)
+	user, err := middleware.GetUserFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -75,7 +75,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := auth.GetUserFromRequest(r)
+	user, err := middleware.GetUserFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -110,7 +110,7 @@ func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func quitCourseHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := auth.GetUserFromRequest(r)
+	user, err := middleware.GetUserFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
