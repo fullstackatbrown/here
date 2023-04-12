@@ -6,7 +6,7 @@ import AuthAPI from "api/auth/api";
 import { toast } from "react-hot-toast";
 import { Errors } from "@util/errors";
 
-export default function Home() {
+export default function Login() {
     function handleSignIn() {
         AuthAPI.signInWithGoogle()
             .then(() => (window.location.href = "/"))

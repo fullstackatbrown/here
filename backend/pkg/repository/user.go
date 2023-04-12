@@ -54,7 +54,6 @@ func (fr *FirebaseRepository) initializeProfilesListener() {
 
 // VerifySessionCookie verifies that the given session cookie is valid and returns the associated User if valid.
 func (fr *FirebaseRepository) VerifySessionCookie(sessionCookie *http.Cookie) (*models.User, error) {
-	fmt.Printf("sessioncookie %s", sessionCookie)
 	decoded, err := fr.authClient.VerifySessionCookieAndCheckRevoked(firebase.Context, sessionCookie.Value)
 
 	if err != nil {

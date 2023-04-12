@@ -1,9 +1,9 @@
 import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
+import { FirestoreProfilesCollection } from "api/firebaseConst";
+import { useAsyncEffect } from "api/hooks/useAsyncEffect";
 import { User } from "model/user";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import AuthAPI from "./api";
-import { FirestoreCoursesCollection, FirestoreProfilesCollection } from "api/firebaseConst";
-import { useAsyncEffect } from "api/hooks/useAsyncEffect";
 
 type AuthState = {
     loading: boolean;
@@ -18,25 +18,6 @@ const initialAuthState: AuthState = {
     currentUser: undefined,
     isTA: () => false,
 };
-
-// const initialAuthState: AuthState = {
-//     loading: false,
-//     isAuthenticated: true,
-//     currentUser: {
-//         ID: "3mVvKLpz1SceBaPxcKkYUEsuuy72",
-//         email: "blueno@brown.edu",
-//         displayName: "Blueno",
-//         pronouns: "he/him",
-//         photoUrl:
-//             "https://www.brown.edu/sites/default/files/styles/wide_xlrg/public/2020-09/20191015_COMM_Bruno010_0.jpg?h=04531eed&itok=06s1nX88",
-//         courses: [],
-//         defaultSection: {},
-//         actualSection: {},
-//         isAdmin: true,
-//         permissions: {},
-//     },
-//     isTA: () => true,
-// };
 
 const authContext = createContext(initialAuthState);
 
@@ -58,7 +39,6 @@ export function useSession(): AuthState {
                     (doc) => {
                         if (doc.exists()) {
                             const user = doc.data() as User;
-                            console.log(user)
                             setAuthState({
                                 loading: false,
                                 isAuthenticated: true,
@@ -68,13 +48,12 @@ export function useSession(): AuthState {
                                 },
                                 isTA: (courseID) =>
                                     user.permissions != null &&
-                                    user.permissions[courseID] !=
-                                    undefined,
+                                    user.permissions[courseID] != undefined,
                             });
                         }
                     }
                 );
-            } catch {
+            } catch (err) {
                 setAuthState({
                     loading: false,
                     isAuthenticated: false,

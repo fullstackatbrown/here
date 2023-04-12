@@ -12,7 +12,6 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import { Notification } from "api/auth/api";
 import { useAuth, useNotifications } from "api/auth/hooks";
 import Head from "next/head";
 import { Router } from "next/router";
@@ -42,9 +41,9 @@ const AppLayout: FC<AppLayoutProps> = ({
     const { currentUser, isAuthenticated } = useAuth();
     const [notificationMenu, setNotificationMenu] = useState(false);
 
-    useNotifications(currentUser, (a: Notification) => {
-        toast.success(a.Title, { duration: 5000 });
-    });
+    // useNotifications(currentUser, (a: Notification) => {
+    //     toast.success(a.Title, { duration: 5000 });
+    // });
 
     // Bind page load events to pageLoading state so loading bar is displayed on navigation.
     useEffect(() => {
@@ -54,10 +53,10 @@ const AppLayout: FC<AppLayoutProps> = ({
     }, []);
 
     // Redirect user to login page if unauthenticated unless isPublic prop is true.
-    // if (!isAuthenticated) {
-    //     window.location.href = "/login";
-    //     return <></>;
-    // }
+    if (!isAuthenticated) {
+        window.location.href = "/login";
+        return <></>;
+    }
 
     // const badgedNotificationIcon: JSX.Element =
     //     currentUser?.notifications.length === 0 ? (

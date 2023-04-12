@@ -125,7 +125,6 @@ export function useCourseStaff(courseID: string, access: CoursePermission): [Use
 
                     Promise.all(uids.map(uid => AuthAPI.getUserById(uid)))
                         .then(res => {
-                            console.log(res)
                             setStaff(res);
                             setLoading(false);
                         });
