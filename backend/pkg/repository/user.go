@@ -153,44 +153,6 @@ func (fr *FirebaseRepository) GetIDByEmail(email string) (string, error) {
 	return data["id"].(string), nil
 }
 
-func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
-	// Check if course exists
-	course, err := fr.GetCourseByID(req.CourseID)
-	if err != nil {
-		return err
-	}
-
-	batch := fr.firestoreClient.Batch()
-	// Remove course for student
-	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.User.ID)
-	batch.Update(userProfileRef, []firestore.Update{
-		{
-			Path:  "courses",
-			Value: firestore.ArrayRemove(course.ID),
-		},
-	})
-
-	// remove student from course
-	newStudentMap := utils.CopyMap(course.Students)
-	delete(newStudentMap, req.User.ID)
-
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
-	batch.Update(coursesRef, []firestore.Update{
-		{
-			Path:  "students",
-			Value: newStudentMap,
-		},
-	})
-
-	// Commit the batch.
-	_, err = batch.Commit(firebase.Context)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (fr *FirebaseRepository) ValidateJoinCourseRequest(req *models.JoinCourseRequest) (course *models.Course, internalError error, requestError error) {
 	// Check if course exists
 	course, err := fr.GetCourseByEntryCode(req.EntryCode)
@@ -251,7 +213,62 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest, course *
 	}
 
 	return course, nil
+}
 
+func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
+	// Check if course exists
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return err
+	}
+
+	batch := fr.firestoreClient.Batch()
+	// Remove course for student
+	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.User.ID)
+	batch.Update(userProfileRef, []firestore.Update{
+		{
+			Path:  "courses",
+			Value: firestore.ArrayRemove(course.ID),
+		},
+	})
+
+	// remove student from course
+	newStudentMap := utils.CopyMap(course.Students)
+	delete(newStudentMap, req.User.ID)
+
+	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
+	batch.Update(coursesRef, []firestore.Update{
+		{
+			Path:  "students",
+			Value: newStudentMap,
+		},
+	})
+
+	// Commit the batch.
+	_, err = batch.Commit(firebase.Context)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest) error {
+	user, err := fr.GetUserByEmail(req.Email)
+	if err != nil {
+		return err
+	}
+
+	// TODO: handle the case where user has not logged in before
+
+	_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID).Update(firebase.Context, []firestore.Update{
+		{
+			Path:  "isAdmin",
+			Value: req.IsAdmin,
+		},
+	})
+
+	return err
 }
 
 // Helpers

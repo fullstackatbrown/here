@@ -26,6 +26,8 @@ func AuthRoutes() *chi.Mux {
 		// r.Patch("/", updateUserHandler)
 	})
 
+	router.With(auth.RequireAdmin()).Patch("/editAdminAccess", editAdminAccessHandler)
+
 	return router
 }
 
@@ -131,4 +133,26 @@ func quitCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully quit course " + req.CourseID))
+}
+
+func editAdminAccessHandler(w http.ResponseWriter, r *http.Request) {
+	var req *models.EditAdminAccessRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = repo.Repository.EditAdminAccess(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	_, err = w.Write([]byte("Successfully edited user " + req.Email))
+	if err != nil {
+		return
+	}
 }

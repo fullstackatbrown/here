@@ -52,37 +52,27 @@ func AuthCtx() func(http.Handler) http.Handler {
 	}
 }
 
-// func RequireAdmin() func(http.Handler) http.Handler {
-// 	return func(next http.Handler) http.Handler {
-// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			user, err := GetUserFromRequest(r)
-// 			if err != nil {
-// 				rejectUnauthorizedRequest(w)
-// 				return
-// 			}
+func RequireAdmin() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			user, err := GetUserFromRequest(r)
+			if err != nil {
+				rejectUnauthorizedRequest(w)
+				return
+			}
 
-// 			if !user.IsAdmin {
-// 				rejectForbiddenRequest(w)
-// 				return
-// 			}
+			if !user.IsAdmin {
+				rejectForbiddenRequest(w)
+				return
+			}
 
-// 			next.ServeHTTP(w, r)
-// 		})
-// 	}
-// }
+			next.ServeHTTP(w, r)
+		})
+	}
+}
 
 // GetUserFromRequest returns a User if it exists within the request context. Only works with routes that implement the
 // RequireAuth middleware.
-// func GetUserFromRequest(r *http.Request) (*models.User, error) {
-// 	user := r.Context().Value("currentUser").(*models.User)
-// 	if user != nil {
-// 		return user, nil
-// 	}
-
-// 	return nil, qerrors.UserNotFoundError
-// }
-
-// Testing Only
 func GetUserFromRequest(r *http.Request) (*models.User, error) {
 	user := r.Context().Value("currentUser").(*models.User)
 	if user != nil {
@@ -93,7 +83,6 @@ func GetUserFromRequest(r *http.Request) (*models.User, error) {
 }
 
 // Helpers
-
 func rejectUnauthorizedRequest(w http.ResponseWriter) {
 	http.Error(w, "You must be authenticated to access this resource", http.StatusUnauthorized)
 }

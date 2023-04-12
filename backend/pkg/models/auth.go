@@ -22,7 +22,7 @@ type Profile struct {
 	Courses         []string                     `firestore:"courses"`
 	DefaultSections map[string]string            `firestore:"defaultSections"`
 	ActualSections  map[string]map[string]string `firestore:"actualSections"`
-	isAdmin         bool                         `firestore:"isAdmin"`
+	IsAdmin         bool                         `firestore:"isAdmin"`
 	Permissions     map[string]CoursePermission  `firestore:"permissions"` // map from courseID to permission
 }
 
@@ -48,4 +48,9 @@ type JoinCourseRequest struct {
 type QuitCourseRequest struct {
 	User     *User  `json:"user,omitempty"`
 	CourseID string `json:"courseID"`
+}
+
+type EditAdminAccessRequest struct {
+	Email   string `json:"email"`
+	IsAdmin bool   `json:"isAdmin"`
 }
