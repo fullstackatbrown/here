@@ -13,36 +13,89 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+func (fr *FirebaseRepository) initializeAssignmentsListener(courseID string) {
+	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
+		newAssignments := make(map[string]*models.Assignment)
+		for _, doc := range docs {
+			if !doc.Exists() {
+				continue
+			}
+
+			var c models.Assignment
+			err := mapstructure.Decode(doc.Data(), &c)
+			if err != nil {
+				log.Panicf("Error destructuring document: %v", err)
+				return err
+			}
+
+			c.ID = doc.Ref.ID
+			newAssignments[doc.Ref.ID] = &c
+		}
+
+		course, err := fr.GetCourseByID(courseID)
+		if err != nil {
+			return err
+		}
+
+		course.AssignmentsLock.Lock()
+		defer course.AssignmentsLock.Unlock()
+
+		course.Assignments = newAssignments
+
+		return nil
+	}
+
+	done := make(chan bool)
+	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+		courseID).Collection(models.FirestoreAssignmentsCollection).Query
+	go func() {
+		err := fr.createCollectionInitializer(query, &done, handleDocs)
+		if err != nil {
+			log.Panicf("error creating section collection listener: %v\n", err)
+		}
+	}()
+	<-done
+}
+
 func (fr *FirebaseRepository) GetAssignmentByID(courseID string, assignmentID string) (*models.Assignment, error) {
-
-	doc, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreAssignmentsCollection).Doc(assignmentID).Get(firebase.Context)
-
+	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
 
-	var assignment models.Assignment
-	err = mapstructure.Decode(doc.Data(), &assignment)
+	course.AssignmentsLock.RLock()
+	defer course.AssignmentsLock.RUnlock()
+
+	assignment, ok := course.Assignments[assignmentID]
+	if !ok {
+		return nil, qerrors.AssignmentNotFoundError
+	}
+
+	return assignment, nil
+}
+
+func (fr *FirebaseRepository) GetAssignmentByName(courseID string, name string) (assignment *models.Assignment, err error) {
+
+	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
-		log.Panicf("Error destructuring document: %v", err)
 		return nil, err
 	}
 
-	assignment.ID = doc.Ref.ID
+	nameCollapsed := utils.CollapseString(name)
 
-	return &assignment, nil
+	course.AssignmentsLock.RLock()
+	defer course.AssignmentsLock.RUnlock()
+
+	for _, assignment := range course.Assignments {
+		if utils.CollapseString(assignment.Name) == nameCollapsed {
+			return assignment, nil
+		}
+	}
+
+	return nil, nil
 }
 
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
-
-	assignmentID := models.CreateAssignmentID(req)
-
-	// Check if an assignment with the same name already exists
-	a, err := fr.GetAssignmentByID(req.CourseID, assignmentID)
-	if err == nil && a != nil {
-		return nil, qerrors.AssignmentAlreadyExistsError
-	}
 
 	assignment = &models.Assignment{
 		CourseID:    req.CourseID,
@@ -53,13 +106,13 @@ func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentReque
 		DueDate:     req.DueDate,
 	}
 
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
-		models.FirestoreAssignmentsCollection).Doc(assignmentID).Set(firebase.Context, assignment)
+	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreAssignmentsCollection).Add(firebase.Context, assignment)
 	if err != nil {
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
 	}
 
-	assignment.ID = assignmentID
+	assignment.ID = ref.ID
 
 	return assignment, nil
 }

@@ -11,7 +11,7 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import errors from "@util/errors";
+import { Errors, handleBadRequestError } from "@util/errors";
 import SectionAPI from "api/section/api";
 import dayjs, { Dayjs } from 'dayjs';
 import { FC, useEffect } from "react";
@@ -60,10 +60,10 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                 {
                     loading: "Updating section...",
                     success: "Section updated!",
-                    error: errors.UNKNOWN
+                    error: (err) => handleBadRequestError(err)
                 })
                 .then(() => handleOnClose())
-                .catch(() => handleOnClose())
+                .catch(() => { })
         } else {
             toast.promise(SectionAPI.createSection(
                 courseID, data.day,
@@ -72,10 +72,10 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                 {
                     loading: "Creating section...",
                     success: "section created!",
-                    error: (err) => `${err.response.data}`,
+                    error: (err) => handleBadRequestError(err)
                 })
                 .then(() => handleOnClose())
-                .catch(() => handleOnClose())
+                .catch(() => { })
         }
     });
 

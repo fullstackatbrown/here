@@ -51,6 +51,18 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 
+	// Check if a section with the same time and location already exists
+	s, err := repo.Repository.GetSectionByInfo(courseID, req.StartTime, req.EndTime, req.Location)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if s != nil {
+		http.Error(w, "A section with the same time and location already exists", http.StatusBadRequest)
+		return
+	}
+
 	c, err := repo.Repository.CreateSection(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

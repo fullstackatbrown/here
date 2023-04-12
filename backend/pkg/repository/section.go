@@ -11,68 +11,108 @@ import (
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
-	"google.golang.org/api/iterator"
 )
+
+func (fr *FirebaseRepository) initializeSectionsListener(courseID string) {
+	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
+		newSections := make(map[string]*models.Section)
+		for _, doc := range docs {
+			if !doc.Exists() {
+				continue
+			}
+
+			var c models.Section
+			err := mapstructure.Decode(doc.Data(), &c)
+			if err != nil {
+				log.Panicf("Error destructuring document: %v", err)
+				return err
+			}
+
+			c.ID = doc.Ref.ID
+			newSections[doc.Ref.ID] = &c
+		}
+
+		course, err := fr.GetCourseByID(courseID)
+		if err != nil {
+			return err
+		}
+
+		course.SectionsLock.Lock()
+		defer course.SectionsLock.Unlock()
+
+		course.Sections = newSections
+
+		return nil
+	}
+
+	done := make(chan bool)
+	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+		courseID).Collection(models.FirestoreSectionsCollection).Query
+	go func() {
+		err := fr.createCollectionInitializer(query, &done, handleDocs)
+		if err != nil {
+			log.Panicf("error creating section collection listener: %v\n", err)
+		}
+	}()
+	<-done
+}
 
 // GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
 func (fr *FirebaseRepository) GetSectionByID(courseID string, sectionID string) (*models.Section, error) {
-	doc, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSectionsCollection).Doc(sectionID).Get(firebase.Context)
-
+	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
 
-	var section models.Section
-	err = mapstructure.Decode(doc.Data(), &section)
-	if err != nil {
-		log.Panicf("Error destructuring document: %v", err)
-		return nil, err
+	course.SectionsLock.RLock()
+	defer course.SectionsLock.RUnlock()
+
+	section, ok := course.Sections[sectionID]
+	if !ok {
+		return nil, qerrors.SectionNotFoundError
 	}
 
-	section.ID = doc.Ref.ID
-
-	return &section, nil
+	return section, nil
 }
 
 func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Section, error) {
-	var sections []*models.Section
-	iter := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSectionsCollection).Documents(firebase.Context)
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-
-		var section models.Section
-		err = mapstructure.Decode(doc.Data(), &section)
-		if err != nil {
-			log.Panicf("Error destructuring document: %v", err)
-			return nil, err
-		}
-
-		section.ID = doc.Ref.ID
-		sections = append(sections, &section)
-	}
-	return sections, nil
-}
-
-func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
-
-	sectionID, err := models.CreateSectionID(req)
+	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Check if a section with the same name already exists
-	s, err := fr.GetSectionByID(req.CourseID, sectionID)
-	if err == nil && s != nil {
-		return nil, qerrors.SectionAlreadyExistsError
+	course.SectionsLock.RLock()
+	defer course.SectionsLock.RUnlock()
+	// TODO: check this
+	sections := make([]*models.Section, 0)
+	for _, section := range course.Sections {
+		sections = append(sections, section)
 	}
+
+	return sections, nil
+}
+
+func (fr *FirebaseRepository) GetSectionByInfo(courseID string, startTime string, endTime string, location string) (*models.Section, error) {
+	course, err := fr.GetCourseByID(courseID)
+	if err != nil {
+		return nil, err
+	}
+
+	locationCollapsed := utils.CollapseString(location)
+
+	course.SectionsLock.RLock()
+	defer course.SectionsLock.RUnlock()
+
+	for _, section := range course.Sections {
+		if section.StartTime == startTime && section.EndTime == endTime && utils.CollapseString(section.Location) == locationCollapsed {
+			return section, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
 
 	section = &models.Section{
 		Day:                models.Day(req.Day),
@@ -86,13 +126,13 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 		SwappedOutStudents: make(map[string][]string),
 	}
 
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
-		models.FirestoreSectionsCollection).Doc(sectionID).Set(firebase.Context, section)
+	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSectionsCollection).Add(firebase.Context, section)
 	if err != nil {
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
 	}
 
-	section.ID = sectionID
+	section.ID = ref.ID
 
 	return section, nil
 }

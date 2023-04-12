@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type RequestStatus string
 
 const (
@@ -17,7 +19,7 @@ type Swap struct {
 	OldSectionID string        `firestore:"oldSectionID"`
 	NewSectionID string        `firestore:"newSectionID"`
 	AssignmentID string        `firestore:"assignmentID"`
-	RequestTime  string        `firestore:"requestTime"`
+	RequestTime  time.Time     `firestore:"requestTime"`
 	Reason       string        `firestore:"reason"`
 	Status       RequestStatus `firestore:"status"`
 	HandledBy    string        `firestore:"handledBy"`

@@ -23,6 +23,7 @@ func SurveyRoutes() *chi.Mux {
 		router.Delete("/", deleteSurveyHandler)
 		router.Post("/publish", publishSurveyHandler)
 		router.Post("/results", generateResultsHandler)
+		router.Post("/confirmResults", confirmResultsHandler)
 		router.Mount("/responses", ResponsesRoutes())
 
 	})
@@ -182,6 +183,22 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, readableResults)
+}
+
+func confirmResultsHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := r.Context().Value("courseID").(string)
+	surveyID := r.Context().Value("surveyID").(string)
+
+	err := repo.Repository.ConfirmSurveyResults(courseID, surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// TODO: send notification to students
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully confirmed survey results " + surveyID))
 }
 
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {

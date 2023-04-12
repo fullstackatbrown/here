@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import errors from "@util/errors";
+import { Errors, handleBadRequestError } from "@util/errors";
 import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
@@ -58,30 +58,30 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
             toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, endDate.toISOString()), {
                 loading: "Updating survey...",
                 success: "Survey updated!",
-                error: errors.UNKNOWN,
+                error: (err) => {
+                    if (err.code === "ERR_BAD_REQUEST") {
+                        return err.response.data
+                    } else {
+                        return (err) => handleBadRequestError(err)
+                    }
+                }
             })
-                .then(() => {
-                    onClose()
-                    reset()
-                })
-                .catch((err) => {
-                    onClose()
-                    reset()
-                });
+                .then(() => handleOnClose())
+                .catch(() => { })
         } else {
             toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description, endDate.toISOString()), {
                 loading: "Creating survey...",
                 success: "Survey created!",
-                error: errors.UNKNOWN,
+                error: (err) => {
+                    if (err.code === "ERR_BAD_REQUEST") {
+                        return err.response.data
+                    } else {
+                        return (err) => handleBadRequestError(err)
+                    }
+                }
             })
-                .then(() => {
-                    onClose()
-                    reset()
-                })
-                .catch((err) => {
-                    onClose()
-                    reset()
-                });
+                .then(() => handleOnClose())
+                .catch(() => { })
         }
     });
 

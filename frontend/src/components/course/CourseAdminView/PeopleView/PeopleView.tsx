@@ -67,8 +67,8 @@ export default function PeopleView({ course }: PeopleViewProps) {
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </Stack>
       </Stack >
-      {Object.keys(course.students).length === 0 ?
-        <Typography variant="body1">No students have joined this course yet.</Typography> :
+      {!course.students || Object.keys(course.students).length === 0 ?
+        <Typography variant="body1" ml={1} mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} sectionsMap={sectionsMap} />)
       }
     </>

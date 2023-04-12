@@ -50,6 +50,18 @@ func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 
+	// Check if an assignment with the same name exists
+	a, err := repo.Repository.GetAssignmentByName(courseID, req.Name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if a != nil {
+		http.Error(w, "An assignment with the same name already exists", http.StatusBadRequest)
+		return
+	}
+
 	c, err := repo.Repository.CreateAssignment(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

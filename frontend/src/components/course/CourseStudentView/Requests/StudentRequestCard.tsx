@@ -62,8 +62,8 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                 onMouseLeave={() => setHover(false)}
             >
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" spacing={5} alignItems="center" py={0.5}>
-                        <Stack direction="row" spacing={1} alignItems="center" py={0.5}>
+                    <Stack direction="row" alignItems="center" py={0.5}>
+                        <Stack direction="row" spacing={1} alignItems="center" py={0.5} width={280}>
                             <Box width={17} display="flex" alignItems="center">
                                 {expanded ?
                                     <ExpandMore sx={{ fontSize: 16 }} /> :

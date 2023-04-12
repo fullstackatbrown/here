@@ -1,6 +1,9 @@
 package models
 
-import "strings"
+import (
+	"strings"
+	"sync"
+)
 
 const (
 	FirestoreCoursesCollection = "courses"
@@ -14,6 +17,10 @@ type Course struct {
 	EntryCode           string                    `firestore:"entryCode"`
 	AutoApproveRequests bool                      `firestore:"autoApproveRequests"`
 	Students            map[string]CourseUserData `firestore:"students,omitempty"`
+	SectionsLock        sync.RWMutex              `firestore:"-"`
+	Sections            map[string]*Section       `firestore:"-"`
+	AssignmentsLock     sync.RWMutex              `firestore:"-"`
+	Assignments         map[string]*Assignment    `firestore:"-"`
 }
 
 type CourseUserData struct {

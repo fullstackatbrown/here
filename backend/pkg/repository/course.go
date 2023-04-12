@@ -14,6 +14,7 @@ import (
 )
 
 func (fr *FirebaseRepository) initializeCoursesListener() {
+	firstTime := true
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newCourses := make(map[string]*models.Course)
 		newCoursesEntryCodes := make(map[string]string)
@@ -36,13 +37,21 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 		}
 
 		fr.coursesLock.Lock()
-		defer fr.coursesLock.Unlock()
-
 		fr.coursesEntryCodesLock.Lock()
-		defer fr.coursesEntryCodesLock.Unlock()
 
 		fr.courses = newCourses
 		fr.coursesEntryCodes = newCoursesEntryCodes
+
+		fr.coursesEntryCodesLock.Unlock()
+		fr.coursesLock.Unlock()
+
+		if firstTime {
+			for courseID := range fr.courses {
+				fr.initializeSectionsListener(courseID)
+				fr.initializeAssignmentsListener(courseID)
+			}
+			firstTime = false
+		}
 
 		return nil
 	}
@@ -52,7 +61,7 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)
 		if err != nil {
-			log.Panicf("error creating course collection listner: %v\n", err)
+			log.Panicf("error creating course collection listener: %v\n", err)
 		}
 	}()
 	<-done

@@ -91,7 +91,7 @@ func (fr *FirebaseRepository) CreateSurvey(req *models.CreateSurveyRequest) (*mo
 		Capacity:    capacity,
 		Published:   false,
 		Responses:   make(map[string][]string),
-		Exceptions:  make([]string, 0),
+		Results:     make(map[string][]string),
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
@@ -128,6 +128,15 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest, capa
 	return err
 }
 
+func (fr *FirebaseRepository) PublishSurvey(courseID string, surveyID string) error {
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+		{Path: "published", Value: true},
+	})
+	return err
+}
+
 func (fr *FirebaseRepository) DeleteSurvey(courseID string, surveyID string) error {
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
@@ -145,13 +154,35 @@ func (fr *FirebaseRepository) UpdateSurveyResults(courseID string, surveyID stri
 	return err
 }
 
-func (fr *FirebaseRepository) PublishSurvey(courseID string, surveyID string) error {
+func (fr *FirebaseRepository) ConfirmSurveyResults(courseID string, surveyID string) error {
+	survey, err := fr.GetSurveyByID(courseID, surveyID)
+	if err != nil {
+		return fmt.Errorf("error getting survey: %v\n", err)
+	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
-		{Path: "published", Value: true},
-	})
-	return err
+	// survey.results is a map of sectionID to a list of userIDs
+	// assign every student to the section
+
+	for sectionID, userIDs := range survey.Results {
+		for _, uid := range userIDs {
+
+			batch, err := fr.assignPermanentSection(&models.AssignSectionsRequest{
+				CourseID:     courseID,
+				StudentID:    uid,
+				NewSectionID: sectionID,
+			})
+
+			if err != nil {
+				return fmt.Errorf("error assigning section: %v", err)
+			}
+
+			if _, err := batch.Commit(firebase.Context); err != nil {
+				return fmt.Errorf("error committing batch: %v", err)
+			}
+		}
+	}
+
+	return nil
 }
 
 func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyResponseRequest) (survey *models.Survey, err error) {

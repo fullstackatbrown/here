@@ -10,7 +10,7 @@ export interface Swap {
   studentID: string;
   oldSectionID: string;
   newSectionID: string;
-  requestTime: string;
+  requestTime: Date;
   reason: string;
   status: SwapStatus;
   handledBy: string;

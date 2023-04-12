@@ -1,7 +1,6 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled, useTheme } from "@mui/material";
-import errors from "@util/errors";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
-import listToMap from "@util/shared/listToMap";
 import { sortSections } from "@util/shared/sortSectionTime";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
@@ -118,7 +117,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                 {
                     loading: "Updating request...",
                     success: "Request updated!",
-                    error: errors.UNKNOWN
+                    error: (err) => handleBadRequestError(err)
                 })
                 .then(() => handleOnClose())
                 .catch(() => handleOnClose())
@@ -128,8 +127,10 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                 {
                     loading: "Submitting request...",
                     success: "Request requested!",
-                    error: errors.UNKNOWN
+                    error: (err) => handleBadRequestError(err)
                 })
+                .then(() => handleOnClose())
+                .catch(() => handleOnClose())
         }
     })
 

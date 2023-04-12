@@ -28,25 +28,22 @@ type FirebaseRepository struct {
 	authClient      *firebaseAuth.Client
 	firestoreClient *firestore.Client
 
-	coursesLock *sync.RWMutex
+	coursesLock sync.RWMutex
 	courses     map[string]*models.Course
 
 	// map from valid course entry codes to courseID
-	coursesEntryCodesLock *sync.RWMutex
+	coursesEntryCodesLock sync.RWMutex
 	coursesEntryCodes     map[string]string
 
-	profilesLock *sync.RWMutex
+	profilesLock sync.RWMutex
 	profiles     map[string]*models.Profile
 }
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {
 	fr := &FirebaseRepository{
-		coursesLock:           &sync.RWMutex{},
-		courses:               make(map[string]*models.Course),
-		coursesEntryCodesLock: &sync.RWMutex{},
-		coursesEntryCodes:     make(map[string]string),
-		profilesLock:          &sync.RWMutex{},
-		profiles:              make(map[string]*models.Profile),
+		courses:           make(map[string]*models.Course),
+		coursesEntryCodes: make(map[string]string),
+		profiles:          make(map[string]*models.Profile),
 	}
 
 	authClient, err := firebase.App.Auth(firebase.Context)
