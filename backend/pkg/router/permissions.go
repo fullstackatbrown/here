@@ -13,9 +13,8 @@ func PermissionRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
 	// router.With(auth.RequireCourseAdmin()).Post("/", createPermissionsHandler)
-
-	router.Post("/", createPermissionsHandler)
-	router.Delete("/", deletePermissionHandler)
+	router.Patch("/add", createPermissionsHandler)
+	router.Patch("/revoke", revokePermissionHandler)
 	return router
 }
 
@@ -39,7 +38,7 @@ func createPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Successfully added course permission to " + req.CourseID))
 }
 
-func deletePermissionHandler(w http.ResponseWriter, r *http.Request) {
+func revokePermissionHandler(w http.ResponseWriter, r *http.Request) {
 
 	var req *models.DeletePermissionRequest
 

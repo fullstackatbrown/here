@@ -17,11 +17,12 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
     const handleRevokeUserAccess = (user: User) => {
         const confirmed = confirm(`Are you sure you want to revoke ${user.displayName}'s ${access.toLowerCase()} access?`);
         if (confirmed) {
-            toast.promise(CourseAPI.deletePermission(course.ID, user.ID), {
+            toast.promise(CourseAPI.revokePermission(course.ID, user.ID), {
                 loading: "Revoking access...",
                 success: "Access revoked!",
-                error: (err) => handleBadRequestError(err)
+                error: (err) => handleBadRequestError(err),
             })
+                .catch(() => { })
         }
     }
 

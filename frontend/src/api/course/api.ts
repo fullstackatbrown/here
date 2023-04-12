@@ -46,14 +46,14 @@ async function createPermission(
   userID: string,
   permission: CoursePermission,
 ): Promise<string> {
-  return APIClient.post(`/courses/${courseID}/permissions`, { userID, permission });
+  return APIClient.patch(`/courses/${courseID}/permissions/add`, { userID, permission });
 }
 
-async function deletePermission(
+async function revokePermission(
   courseID: string,
   userID: string,
 ): Promise<boolean> {
-  return APIClient.delete(`/courses/${courseID}/permissions/${userID}`);
+  return APIClient.patch(`/courses/${courseID}/permissions/revoke`, { userID });
 }
 
 const CourseAPI = {
@@ -62,7 +62,7 @@ const CourseAPI = {
   deleteCourse,
   updateCourse,
   createPermission,
-  deletePermission,
+  revokePermission,
 };
 
 export default CourseAPI;

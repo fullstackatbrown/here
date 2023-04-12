@@ -3,7 +3,7 @@ export enum Errors {
 }
 
 export const handleBadRequestError = (err: any) => {
-    if (err.code === "ERR_BAD_REQUEST") {
+    if (err.response.status === 400) {
         return err.response.data
     } else {
         return Errors.UNKNOWN
