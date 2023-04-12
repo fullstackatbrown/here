@@ -23,7 +23,7 @@ const AddCourseCard: FC<AddCourseCardProps> = ({ onClick }) => {
                     alignItems="center"
                 >
                     <Typography variant="button" color="primary" fontSize={16}>
-                        + Add A Course
+                        + Join A Course
                     </Typography>
                 </Box>
             </ButtonBase>
