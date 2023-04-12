@@ -61,7 +61,7 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                 <Collapse in={gradesOpen} timeout="auto" unmountOnExit>
                     {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
                         <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
-                        <Typography>Your instructor has not released any assignments yet</Typography>}
+                        <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Collapse>
 
                 <Box height={40} />
