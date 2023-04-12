@@ -1,4 +1,4 @@
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Chip, Stack, Tooltip, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { CapitalizeFirstLetter } from "@util/shared/string";
 import CourseAPI from "api/course/api";
@@ -26,6 +26,12 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
         }
     }
 
+    const tooltipPopperProps = {
+        style: {
+            margin: '-3px', // set your desired distance here
+        },
+    };
+
     return (
         <Stack direction="row" alignItems="start">
             <Box mt={0.3} width={50}>
@@ -33,11 +39,13 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
             </Box>
             <Box>
                 {users.map((user) => (
-                    <Chip
-                        label={user.displayName}
-                        size="small"
-                        onDelete={() => handleRevokeUserAccess(user)}
-                    />
+                    <Tooltip title={user.email} placement="right" sx={{ marginX: 0.5 }}>
+                        <Chip
+                            label={user.displayName}
+                            size="small"
+                            onDelete={() => handleRevokeUserAccess(user)}
+                        />
+                    </Tooltip>
                 ))}
                 {users.length === 0 &&
                     <Typography ml={0.5} mt={0.3} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography>
