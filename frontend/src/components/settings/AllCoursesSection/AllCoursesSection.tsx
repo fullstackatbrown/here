@@ -38,8 +38,9 @@ const AllCoursesSection: FC<AllCoursesSectionProps> = ({ }) => {
         <BulkUploadDialog open={openBulk} onClose={() => setOpenBulk(false)} /> */}
         <SettingsSection adminOnly title="Manage all courses">
             {
-                courses && getTerms(courses).map((term, index) => (
+                courses && getTerms(courses).map((term) => (
                     <ListItemButton
+                        key={term}
                         disableRipple
                         onClick={() => setSelectedTerm(term)}
                         sx={{ paddingLeft: 0 }}
@@ -51,18 +52,6 @@ const AllCoursesSection: FC<AllCoursesSectionProps> = ({ }) => {
                             {courses[term].length} course{courses[term].length > 1 ? "s" : ""}
                         </Typography>
                     </ListItemButton>
-                    // <Box display="flex" flexDirection="row" alignItems="center" sx={{
-                    //     '&:hover': {
-                    //         backgroundColor: 'disabled.main',
-                    //     },
-                    // }}>
-                    //     <Typography width={100}>
-                    //         {term}
-                    //     </Typography>
-                    //     <Typography color="secondary" fontSize={14}>
-                    //         {courses[term].length} course{courses[term].length > 1 ? "s" : ""}
-                    //     </Typography>
-                    // </Box>
                 ))
 
             }

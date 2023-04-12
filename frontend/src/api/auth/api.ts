@@ -6,9 +6,6 @@ const enum Endpoint {
     USER = '/users',
 }
 
-/**
- * Fetches profile information corresponding to the currently logged in user.
- */
 async function getCurrentUser(): Promise<User> {
     try {
         return await APIClient.get(Endpoint.ME);
@@ -17,9 +14,6 @@ async function getCurrentUser(): Promise<User> {
     }
 }
 
-/**
- * Fetches profile information corresponding to the currently logged in user.
- */
 async function getUserById(id: string): Promise<User> {
     try {
         return await APIClient.get(`${Endpoint.USER}/${id}`);
@@ -27,12 +21,6 @@ async function getUserById(id: string): Promise<User> {
         throw e;
     }
 }
-
-/**
- * 
- * @param id 
- * @returns 
- */
 
 async function joinCourse(entryCode: string): Promise<string> {
     try {
@@ -49,7 +37,6 @@ async function quitCourse(courseID: string): Promise<string> {
         throw e;
     }
 }
-
 
 const AuthAPI = {
     getCurrentUser,

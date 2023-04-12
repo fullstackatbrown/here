@@ -2,6 +2,7 @@ import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
 import { User } from "model/user";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import AuthAPI from "./api";
+import { FirestoreCoursesCollection, FirestoreProfilesCollection } from "api/firebaseConst";
 import { useAsyncEffect } from "api/hooks/useAsyncEffect";
 
 type AuthState = {
@@ -10,6 +11,7 @@ type AuthState = {
     currentUser: User | undefined;
     isTA: (courseID: string) => boolean;
 };
+
 const initialAuthState: AuthState = {
     loading: true,
     isAuthenticated: false,
@@ -21,7 +23,7 @@ const initialAuthState: AuthState = {
 //     loading: false,
 //     isAuthenticated: true,
 //     currentUser: {
-//         ID: "1",
+//         ID: "3mVvKLpz1SceBaPxcKkYUEsuuy72",
 //         email: "blueno@brown.edu",
 //         displayName: "Blueno",
 //         pronouns: "he/him",
@@ -52,10 +54,11 @@ export function useSession(): AuthState {
                 const sessionUser = await AuthAPI.getCurrentUser();
                 const db = getFirestore();
                 unsubscribe = onSnapshot(
-                    doc(db, "user_profiles", sessionUser.ID),
+                    doc(db, FirestoreProfilesCollection, sessionUser.ID),
                     (doc) => {
                         if (doc.exists()) {
                             const user = doc.data() as User;
+                            console.log(user)
                             setAuthState({
                                 loading: false,
                                 isAuthenticated: true,
@@ -103,7 +106,7 @@ export function useUser(
         if (userID) {
             const db = getFirestore();
             const unsubscribe = onSnapshot(
-                doc(db, "user_profiles", userID),
+                doc(db, FirestoreProfilesCollection, userID),
                 (doc) => {
                     if (doc.exists()) {
                         const user = doc.data();
@@ -128,7 +131,7 @@ export function useAdmins(): [User[] | undefined, boolean] {
     useEffect(() => {
         const db = getFirestore();
         const unsubscribe = onSnapshot(
-            collection(db, "user_profiles"),
+            collection(db, FirestoreProfilesCollection),
             (querySnapshot) => {
                 const res: User[] = [];
                 querySnapshot.forEach((doc) => {

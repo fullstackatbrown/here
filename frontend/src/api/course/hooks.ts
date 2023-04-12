@@ -3,6 +3,7 @@ import { collection, doc, getFirestore, onSnapshot, query, where, documentId } f
 import AuthAPI from "api/auth/api";
 import { Course, CourseStatus } from "model/course";
 import { FirestoreCoursesCollection } from "api/firebaseConst";
+import { CoursePermission, User } from "model/user";
 
 export function useCourses(): [Course[] | undefined, boolean] {
     const [loading, setLoading] = useState(true);
@@ -100,7 +101,6 @@ export function useCourse(courseID: string): [Course | undefined, boolean] {
             const unsubscribe = onSnapshot(doc(db, FirestoreCoursesCollection, courseID), (doc) => {
                 if (doc.exists()) {
                     setCourse({ ID: doc.id, ...doc.data() } as Course);
-
                 }
                 setLoading(false);
             });
@@ -109,4 +109,57 @@ export function useCourse(courseID: string): [Course | undefined, boolean] {
     }, [courseID]);
 
     return [course, loading];
+}
+
+export function useCourseStaff(courseID: string, access: CoursePermission): [User[], boolean] {
+    const [loading, setLoading] = useState(true);
+    const [staff, setStaff] = useState<User[]>([]);
+
+    useEffect(() => {
+        if (courseID) {
+            const db = getFirestore();
+            const unsubscribe = onSnapshot(doc(db, FirestoreCoursesCollection, courseID), (doc) => {
+                const data = doc.data();
+                if (data?.permissions) {
+                    const uids = Object.keys(data.permissions).filter((id) => data.permissions[id] === access);
+
+                    Promise.all(uids.map(uid => AuthAPI.getUserById(uid)))
+                        .then(res => {
+                            console.log(res)
+                            setStaff(res);
+                            setLoading(false);
+                        });
+                } else {
+                    setLoading(false);
+                }
+            });
+
+            return () => unsubscribe();
+        }
+    }, [courseID]);
+
+    return [staff, loading];
+}
+
+export function useInvitations(courseID: string): [string[], boolean] {
+    const [loading, setLoading] = useState(true);
+    const [invites, setInvites] = useState<string[]>([]);
+
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(collection(db, "invites"), (querySnapshot) => {
+            const res: string[] = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.courseID === courseID) res.push(data.email);
+            });
+
+            setInvites(res);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [courseID]);
+
+    return [invites, loading];
 }

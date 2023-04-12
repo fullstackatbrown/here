@@ -150,7 +150,7 @@ func (fr *FirebaseRepository) GetIDByEmail(email string) (string, error) {
 	}
 	// Cast.
 	data := doc.Data()
-	return data["id"].(string), nil
+	return data["ID"].(string), nil
 }
 
 func (fr *FirebaseRepository) ValidateJoinCourseRequest(req *models.JoinCourseRequest) (course *models.Course, internalError error, requestError error) {

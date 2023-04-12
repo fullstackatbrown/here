@@ -1,5 +1,6 @@
 import APIClient from "api/APIClient";
 import { Course } from "model/course";
+import { CoursePermission } from "model/user";
 
 
 async function getCourse(courseID: string): Promise<Course> {
@@ -40,12 +41,28 @@ async function updateCourse(
   return APIClient.patch(`/courses/${courseID}`, { title, code, term, autoApproveRequests, status });
 }
 
+async function createPermission(
+  courseID: string,
+  userID: string,
+  permission: CoursePermission,
+): Promise<string> {
+  return APIClient.post(`/courses/${courseID}/permissions`, { userID, permission });
+}
+
+async function deletePermission(
+  courseID: string,
+  userID: string,
+): Promise<boolean> {
+  return APIClient.delete(`/courses/${courseID}/permissions/${userID}`);
+}
 
 const CourseAPI = {
   getCourse,
   createCourse,
   deleteCourse,
   updateCourse,
+  createPermission,
+  deletePermission,
 };
 
 export default CourseAPI;

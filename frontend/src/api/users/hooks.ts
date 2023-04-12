@@ -1,7 +1,7 @@
 import { User } from "model/user";
 import { useEffect, useState } from "react";
 import { collection, doc, getFirestore, onSnapshot, query, where, documentId } from "@firebase/firestore";
-import { FirestoreUsersCollection } from "api/firebaseConst";
+import { FirestoreProfilesCollection } from "api/firebaseConst";
 import firebase from 'firebase/app'
 
 export function useStudentsByIDs(studentIDs: string[]): [User[], boolean] {
@@ -10,7 +10,7 @@ export function useStudentsByIDs(studentIDs: string[]): [User[], boolean] {
 
     useEffect(() => {
         const db = getFirestore();
-        const q = query(collection(db, FirestoreUsersCollection), where(documentId(), "in", studentIDs));
+        const q = query(collection(db, FirestoreProfilesCollection), where(documentId(), "in", studentIDs));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const res: User[] = [];
             querySnapshot.forEach((doc) => {

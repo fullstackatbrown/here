@@ -13,7 +13,7 @@ import { CapitalizeFirstLetter } from "@util/shared/string";
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
     // This will not include inactive courses
-    const [courses, loading] = useCoursesByIDsTerm([...currentUser.courses, ...Object.keys(currentUser.permissions)]);
+    const [courses, loading] = useCoursesByIDsTerm(currentUser && isAuthenticated ? [...currentUser.courses, ...Object.keys(currentUser.permissions)] : []);
     const [joinCourseDialog, setJoinCourseDialog] = useState(false);
 
     return (

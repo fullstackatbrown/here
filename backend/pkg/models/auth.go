@@ -14,16 +14,16 @@ const (
 // Profile is a collection of standard profile information for a user.
 // This struct separates client-safe profile information from internal user metadata.
 type Profile struct {
-	ID              string                       `firestore:"id,omitempty"`
-	DisplayName     string                       `firestore:"displayName"`
-	Email           string                       `firestore:"email"`
-	Pronouns        string                       `firestore:"pronouns"`
-	PhotoURL        string                       `firestore:"photoUrl"`
-	Courses         []string                     `firestore:"courses"`
-	DefaultSections map[string]string            `firestore:"defaultSections"`
-	ActualSections  map[string]map[string]string `firestore:"actualSections"`
-	IsAdmin         bool                         `firestore:"isAdmin"`
-	Permissions     map[string]CoursePermission  `firestore:"permissions"` // map from courseID to permission
+	ID              string                       `json:"id" firestore:"id,omitempty"`
+	DisplayName     string                       `json:"displayName" firestore:"displayName"`
+	Email           string                       `json:"email" firestore:"email"`
+	Pronouns        string                       `json:"pronouns" firestore:"pronouns"`
+	PhotoURL        string                       `json:"photoUrl" firestore:"photoUrl"`
+	Courses         []string                     `json:"courses" firestore:"courses"`
+	DefaultSections map[string]string            `json:"defaultSections" firestore:"defaultSections"`
+	ActualSections  map[string]map[string]string `json:"actualSections" firestore:"actualSections"`
+	IsAdmin         bool                         `json:"isAdmin" firestore:"isAdmin"`
+	Permissions     map[string]CoursePermission  `json:"permissions" firestore:"permissions"` // map from courseID to permission
 }
 
 type User struct {

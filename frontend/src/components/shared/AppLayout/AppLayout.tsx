@@ -54,10 +54,10 @@ const AppLayout: FC<AppLayoutProps> = ({
     }, []);
 
     // Redirect user to login page if unauthenticated unless isPublic prop is true.
-    if (!isAuthenticated) {
-        window.location.href = "/login";
-        return <></>;
-    }
+    // if (!isAuthenticated) {
+    //     window.location.href = "/login";
+    //     return <></>;
+    // }
 
     // const badgedNotificationIcon: JSX.Element =
     //     currentUser?.notifications.length === 0 ? (

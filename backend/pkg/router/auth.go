@@ -26,6 +26,7 @@ func AuthRoutes() *chi.Mux {
 		// r.Patch("/", updateUserHandler)
 	})
 
+	// Edits site wide admin access
 	router.With(middleware.RequireAdmin()).Patch("/editAdminAccess", editAdminAccessHandler)
 
 	return router
@@ -63,7 +64,7 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(string)
+	userID := chi.URLParam(r, "userID")
 
 	user, err := repo.Repository.GetUserByID(userID)
 	if err != nil {

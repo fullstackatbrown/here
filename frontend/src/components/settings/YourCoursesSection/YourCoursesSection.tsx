@@ -24,8 +24,7 @@ const YourCoursesSection: FC<YourCoursesSectionProps> = ({ }) => {
         {filteredCourses &&
             <List>
                 {sortCoursesByTerm(filteredCourses).map((course, index) =>
-                    <CourseListItem key={course.ID} course={course}
-                        isLastChild={index === (filteredCourses.length - 1)} />)}
+                    <CourseListItem key={course.ID} course={course} />)}
             </List>}
     </SettingsSection>;
 };
