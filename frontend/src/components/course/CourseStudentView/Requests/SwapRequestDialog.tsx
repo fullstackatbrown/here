@@ -1,3 +1,4 @@
+import { DisabledTextField } from "@components/shared/DisabledTextField/DisabledTextField";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
@@ -30,32 +31,6 @@ type FormData = {
     oldSectionID: string,
     newSectionID: string,
 };
-
-const DisabledTextField = styled(TextField)({
-    '& .MuiInput-underline:before': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '&:hover .MuiInput-underline:before': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '&.Mui-focused .MuiInput-underline:before': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '& .MuiInputLabel-root': {
-        color: 'rgba(0, 0, 0, 0.54)',
-        fontSize: '1rem',
-    },
-    '& .MuiInputLabel-root.Mui-focused': {
-        color: 'rgba(0, 0, 0, 0.54)',
-    },
-});
 
 const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap, swap }) => {
     const defaultValues: FormData = {

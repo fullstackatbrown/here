@@ -1,11 +1,16 @@
 import React, { FC, useState } from "react";
 import EditCourseDialog from "@components/settings/EditCourseDialog";
-import { Box, Divider, ListItem, ListItemText } from "@mui/material";
+import { Box, Button, Divider, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import IconButton from "@components/shared/IconButton";
 import ConfirmButton from "@components/shared/ConfirmButton";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import CourseAPI, { Course } from "api/course/api";
+import CourseAPI from "api/course/api";
+import { Course, CourseStatus } from "model/course";
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import ActivateCourseDialog from "../ActivateCourseDialog/ActivateCourseDialog";
+import { handleBadRequestError } from "@util/errors";
+import toast from "react-hot-toast";
 
 export interface CourseListItemProps {
     course: Course;
@@ -13,48 +18,80 @@ export interface CourseListItemProps {
 }
 
 const CourseListItem: FC<CourseListItemProps> = ({ course, isLastChild }) => {
-    const [openConfirm, setOpenConfirm] = useState(false);
+    // const [openConfirm, setOpenConfirm] = useState(false);
+    const [activateCourseDialogOpen, setActivateCourseDialogOpen] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const handleCloseEdit = () => setOpenEdit(false);
 
-    return (<>
-        <EditCourseDialog course={course} open={openEdit} onClose={handleCloseEdit} />
-        <ListItem
-            disableGutters
-            secondaryAction={
-                <>
-                    <Box display="inline" mr={2}>
-                        <IconButton label="Edit course" edge="end" aria-label="delete"
-                            onClick={() => setOpenEdit(true)}>
-                            <EditIcon />
-                        </IconButton>
-                    </Box>
-                    <ConfirmButton
-                        message={`Delete course ${course.title}?`}
-                        open={openConfirm}
-                        confirmButtonText="Delete course"
-                        onClose={() => setOpenConfirm(false)}
-                        onConfirm={() => CourseAPI.deleteCourse(course.id)}>
-                        <IconButton label="Delete course" edge="end" aria-label="delete"
-                            onClick={() => setOpenConfirm(true)}>
-                            <CloseIcon />
-                        </IconButton>
-                    </ConfirmButton>
-                </>
-            }>
-            <ListItemText
-                primary={`${course.code}: ${course.title}`}
-                secondary={course.term}
-                primaryTypographyProps={{
-                    noWrap: true,
-                    sx: {
-                        marginRight: 3
+    const handleChangeCourseStatus = (status: CourseStatus) => {
+        return (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            let confirmString = "";
+            switch (status) {
+                case CourseStatus.CourseInactive:
+                    confirmString = `Are you sure you want to deactivate ${course.title}? All past data will be kept, but students will not be able to access the course.`;
+                    break;
+                case CourseStatus.CourseArchived:
+                    confirmString = `Are you sure you want to archive ${course.title} on Here? Students and TAs will no longer be able to make any modifications.`;
+                    break;
+                case CourseStatus.CourseActive:
+                    confirmString = `Are you sure you want to re-activate ${course.title}? Students will be able to access the course.`;
+                    break;
+            }
+            const confirmed = confirm(confirmString);
+            if (confirmed) {
+                toast.promise(CourseAPI.updateCourse(course.ID, course.title, course.code, course.term, course.autoApproveRequests, status), {
+                    loading: "Updating course status...",
+                    success: "Course status updated!",
+                    error: (err) => handleBadRequestError(err)
+                })
+                    .catch(() => { })
+            }
+        }
+    }
+
+    return (
+        <>
+            <ActivateCourseDialog course={course} open={activateCourseDialogOpen} onClose={() => { setActivateCourseDialogOpen(false) }} />
+            <EditCourseDialog course={course} open={openEdit} onClose={handleCloseEdit} />
+            <Stack direction="row" display="flex" justifyContent="space-between">
+                <Stack>
+                    <Typography>{course.code}: {course.title}</Typography>
+                    <Typography color="secondary" fontSize={14}>{course.term}</Typography>
+                </Stack>
+                <Stack>
+                    {course.status === CourseStatus.CourseInactive &&
+                        <Button onClick={() => { setActivateCourseDialogOpen(true) }}>
+                            Activate
+                        </Button>
                     }
-                }}
-            />
-        </ListItem>
-        {!isLastChild && <Divider />}
-    </>);
+                    {course.status === CourseStatus.CourseActive &&
+                        <Stack direction="row" spacing={0.5}>
+                            <IconButton label="Edit" size="small"
+                                onClick={() => setOpenEdit(true)}>
+                                <EditIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                            <IconButton label="Deactivate" size="small"
+                                onClick={handleChangeCourseStatus(CourseStatus.CourseInactive)}>
+                                <CloseIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                            <IconButton label="Archive" size="small"
+                                onClick={handleChangeCourseStatus(CourseStatus.CourseArchived)} >
+                                <ArchiveOutlinedIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                        </Stack>
+                    }
+                    {course.status === CourseStatus.CourseArchived &&
+                        <Button onClick={handleChangeCourseStatus(CourseStatus.CourseActive)} >
+                            Reactivate
+                        </Button>
+                    }
+                </Stack>
+            </Stack>
+            {!isLastChild && <Divider />}
+        </>
+
+    );
 };
 
 export default CourseListItem;

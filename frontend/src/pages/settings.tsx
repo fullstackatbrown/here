@@ -13,7 +13,7 @@ export default function Settings() {
                 <ProfileInfoSection />
                 {/* <AdminList /> */}
                 <YourCoursesSection />
-                <AllCoursesSection />
+                {/* <AllCoursesSection /> */}
             </Stack>
         </AppLayout>
     );

@@ -1,4 +1,10 @@
-import { CoursePermission } from "api/auth/api";
+import { CoursePermission } from "./user";
+
+export const enum CourseStatus {
+  CourseArchived = "archived",
+  CourseInactive = "inactive",
+  CourseActive = "active",
+}
 
 export interface CourseUserData {
   studentID: string;
@@ -14,6 +20,7 @@ export interface Course {
   code: string;
   term: string;
   entryCode: string;
+  status: CourseStatus;
   autoApproveRequests: boolean;
   students: Record<string, CourseUserData>;
   permissions: Record<string, CoursePermission>;

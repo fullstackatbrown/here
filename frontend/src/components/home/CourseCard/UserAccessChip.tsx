@@ -1,14 +1,14 @@
 import React, { FC } from "react";
 import { Chip } from "@mui/material";
 import { Course } from "model/course";
-import { CoursePermission } from "api/auth/api";
+import { CoursePermission } from "model/user";
 
 export interface UserAccessChipProps {
     access: CoursePermission;
     size?: "small" | "medium";
 }
 
-const QueueStatusChip: FC<UserAccessChipProps> = ({ access, size }) => {
+const UserAccessChip: FC<UserAccessChipProps> = ({ access, size }) => {
     switch (access) {
         case CoursePermission.CourseAdmin:
             return <Chip label="Admin" size={size} color="primary" sx={{ fontWeight: 600 }} />;
@@ -21,6 +21,6 @@ const QueueStatusChip: FC<UserAccessChipProps> = ({ access, size }) => {
     }
 };
 
-export default QueueStatusChip;
+export default UserAccessChip;
 
 

@@ -1,8 +1,9 @@
-type CoursePermission = string
 
-export const CourseAdmin: CoursePermission = "ADMIN"
-export const CourseStaff: CoursePermission = "STAFF"
-
+export const enum CoursePermission {
+  CourseAdmin = "ADMIN",
+  CourseStaff = "STAFF",
+  CourseStudent = "STUDENT",
+}
 
 export interface User {
   ID: string;

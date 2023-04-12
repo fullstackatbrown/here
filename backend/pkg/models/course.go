@@ -16,6 +16,7 @@ type Course struct {
 	Code                string                      `firestore:"code"`
 	Term                string                      `firestore:"term"`
 	EntryCode           string                      `firestore:"entryCode"`
+	Status              CourseStatus                `firestore:"status"`
 	AutoApproveRequests bool                        `firestore:"autoApproveRequests"`
 	Students            map[string]CourseUserData   `firestore:"students,omitempty"`
 	Permissions         map[string]CoursePermission `firestore:"permissions,omitempty"` // map from userID to permission
@@ -24,6 +25,14 @@ type Course struct {
 	AssignmentsLock     sync.RWMutex                `firestore:"-"`
 	Assignments         map[string]*Assignment      `firestore:"-"`
 }
+
+type CourseStatus string
+
+const (
+	CourseArchived CourseStatus = "archived"
+	CourseInactive CourseStatus = "inactive"
+	CourseActive   CourseStatus = "active"
+)
 
 type CourseUserData struct {
 	StudentID      string `firestore:"studentID"`
@@ -38,10 +47,9 @@ type GetCourseRequest struct {
 }
 
 type CreateCourseRequest struct {
-	Title               string `json:"title"`
-	Code                string `json:"code"`
-	Term                string `json:"term"`
-	AutoApproveRequests bool   `json:"autoApproveRequests,omitempty"`
+	Title string `json:"title"`
+	Code  string `json:"code"`
+	Term  string `json:"term"`
 }
 
 type DeleteCourseRequest struct {
@@ -54,6 +62,7 @@ type UpdateCourseRequest struct {
 	Code                *string `json:"code,omitempty"`
 	Term                *string `json:"term,omitempty"`
 	AutoApproveRequests *bool   `json:"autoApproveRequests,omitempty"`
+	Status              *string `json:"status,omitempty"`
 }
 
 type AssignSectionsRequest struct {

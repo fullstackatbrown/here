@@ -29,9 +29,8 @@ async function createCourse(
   title: string,
   code: string,
   term: string,
-  autoApproveRequests: boolean,
 ): Promise<string> {
-  return APIClient.post(`/courses/`, { title, code, term, autoApproveRequests });
+  return APIClient.post(`/courses/`, { title, code, term });
 }
 
 async function updateCourse(
@@ -40,9 +39,11 @@ async function updateCourse(
   code?: string,
   term?: string,
   autoApproveRequests?: boolean,
+  status?: string,
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}`, { title, code, term, autoApproveRequests });
+  return APIClient.patch(`/courses/${courseID}`, { title, code, term, autoApproveRequests, status });
 }
+
 
 const CourseAPI = {
   getCourse,

@@ -16,14 +16,11 @@ import Button from "@components/shared/Button";
 import IconButton from "@components/shared/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { useForm } from "react-hook-form";
-import CourseAPI, { Course } from "api/course/api";
-import { useInvitations } from "api/course/hooks";
-import { CoursePermission } from "api/auth/api";
-import { User } from "api/auth/api";
 import { toast } from "react-hot-toast";
-import { useCourseStaff } from "api/course/hooks";
 import TabPanel from "@components/shared/TabPanel";
-import errors from "@util/errors";
+import CourseAPI from "api/course/api";
+import { Course } from "model/course";
+import { User, CoursePermission } from "model/user";
 
 export interface EditCourseDialogProps {
     course: Course;
@@ -60,7 +57,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) 
     const [editLoading, setEditLoading] = useState(false);
     const [addMemberLoading, setAddMemberLoading] = useState(false);
     const [revokeAccessLoading, setRevokeAccessLoading] = useState(false);
-    const [invites, loadingInvites] = useInvitations(course.id);
+    // const [invites, loadingInvites] = useInvitations(course.id);
 
     // Edit form
     const {
@@ -94,7 +91,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) 
 
     const onAddPermissionSubmit = handleAddPermissionSubmit(data => {
         setAddMemberLoading(true);
-        CourseAPI.addCoursePermission(course.id, data.email, data.permission)
+        CourseAPI.addCoursePermission(course.ID, data.email, data.permission)
             .then(() => {
                 toast.success(`${data.email} has been added.`);
                 resetAddPermission();
@@ -106,7 +103,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) 
             });
     });
 
-    const [staff, loadingStaff] = useCourseStaff(course?.id);
+    // const [staff, loadingStaff] = useCourseStaff(course?.ID);
 
     // Reset edit form when dialog is opened.
     useEffect(() => {
@@ -119,7 +116,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) 
         const confirmed = confirm(`Are you sure you want to revoke ${user.displayName}'s (${user.email}) permissions?`);
         if (confirmed) {
             setRevokeAccessLoading(true);
-            CourseAPI.removeCoursePermission(course.id, user.id)
+            CourseAPI.removeCoursePermission(course.ID, user.id)
                 .then(() => {
                     toast.success(`${user.displayName} (${user.email}) removed.`);
                     setRevokeAccessLoading(false);
@@ -131,12 +128,12 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) 
         }
     }
 
-    const loading = loadingStaff || editLoading || addMemberLoading || revokeAccessLoading;
+    // const loading = loadingStaff || editLoading || addMemberLoading || revokeAccessLoading;
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
-        <Box sx={{ opacity: loading ? 100 : 0 }}>
+        {/* <Box sx={{ opacity: loading ? 100 : 0 }}>
             <LinearProgress />
-        </Box>
+        </Box> */}
         <DialogTitle>Course Settings</DialogTitle>
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -191,7 +188,7 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) 
                 <Paper variant="outlined" sx={{ bgcolor: 'error' }}>
                     <Box maxHeight={300} overflow="auto">
                         <List dense>
-                            {staff.map(user => (
+                            {/* {staff.map(user => (
                                 <ListItem
                                     key={user.id}
                                     secondaryAction={
@@ -205,12 +202,12 @@ const EditCourseDialog: FC<EditCourseDialogProps> = ({ course, open, onClose }) 
                                         primary={`${user.displayName} (${user.coursePermissions[course.id] === CoursePermission.CourseAdmin ? "Admin" : "Staff"})`}
                                         secondary={user.email}
                                     />
-                                </ListItem>))}
-                            {invites.map(email => (
+                                </ListItem>))} */}
+                            {/* {invites.map(email => (
                                 <ListItem key={email}>
                                     <ListItemText primary={"(pending)"} secondary={email} />
                                 </ListItem>
-                            ))}
+                            ))} */}
                         </List>
                     </Box>
                 </Paper>

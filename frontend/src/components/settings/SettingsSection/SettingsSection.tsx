@@ -2,8 +2,8 @@ import React, { FC } from "react";
 import { Box, CircularProgress, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import Button from "@components/shared/Button";
 import { useAuth } from "api/auth/hooks";
-import { CoursePermission } from "api/auth/api";
 import GppGoodIcon from '@mui/icons-material/GppGood';
+import { CoursePermission } from "model/user";
 
 export interface SettingsSectionProps {
     title: string;

@@ -133,7 +133,8 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 		Code:                req.Code,
 		Term:                req.Term,
 		EntryCode:           entryCode,
-		AutoApproveRequests: req.AutoApproveRequests,
+		AutoApproveRequests: false,
+		Status:              models.CourseInactive,
 		Students:            map[string]models.CourseUserData{},
 		Permissions:         map[string]models.CoursePermission{},
 	}

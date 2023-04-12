@@ -4,18 +4,14 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
-import { red } from '@mui/material/colors';
-import formatSectionInfo, { formatSectionCapacity, getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
+import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
-import { Course, CourseUserData } from "model/course";
+import { CourseUserData } from "model/course";
 import { Section } from "model/section";
 import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
 import RequestInformation from "../RequestInformation";
-import toast from "react-hot-toast";
-import SwapAPI from "api/swaps/api";
-import errors from "@util/errors";
 
 export interface PendingRequestProps {
   request: Swap;

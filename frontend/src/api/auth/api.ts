@@ -6,12 +6,6 @@ const enum Endpoint {
     USER = '/users',
 }
 
-export const enum CoursePermission {
-    CourseAdmin = "ADMIN",
-    CourseStaff = "STAFF",
-    CourseStudent = "STUDENT",
-}
-
 /**
  * Fetches profile information corresponding to the currently logged in user.
  */

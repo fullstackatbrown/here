@@ -191,23 +191,32 @@ func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 	return nil
 }
 
-func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models.Course, error) {
+func (fr *FirebaseRepository) ValidateJoinCourseRequest(req *models.JoinCourseRequest) (course *models.Course, internalError error, requestError error) {
 	// Check if course exists
 	course, err := fr.GetCourseByEntryCode(req.EntryCode)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+
+	// Check if course is active
+	if course.Status != models.CourseActive {
+		return nil, nil, fmt.Errorf("Cannot join an inactive or archived course")
 	}
 
 	// Check if already enrolled
 	profile, err := fr.GetProfileById(req.User.ID)
 	if err != nil {
-		return nil, err
+		return nil, err, nil
 	}
 
 	if utils.Contains(profile.Courses, course.ID) {
-		return nil, fmt.Errorf("Student is already enrolled in course")
+		return nil, nil, fmt.Errorf("Student is already enrolled in course")
 	}
 
+	return course, nil, nil
+}
+
+func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest, course *models.Course) (*models.Course, error) {
 	batch := fr.firestoreClient.Batch()
 	// Add course to student
 	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.User.ID)
@@ -236,7 +245,7 @@ func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models
 	})
 
 	// Commit the batch.
-	_, err = batch.Commit(firebase.Context)
+	_, err := batch.Commit(firebase.Context)
 	if err != nil {
 		return nil, err
 	}
