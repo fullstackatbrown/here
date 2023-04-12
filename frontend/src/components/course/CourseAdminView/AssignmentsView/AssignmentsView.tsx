@@ -8,12 +8,14 @@ import { FC, useEffect, useState } from 'react';
 import AssignmentsTable from "./AssignmentsTable";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
+import { CoursePermission } from "model/user";
 
 export interface AssignmentsViewProps {
   course: Course;
+  access: CoursePermission;
 }
 
-const AssignmentsView: FC<AssignmentsViewProps> = ({ course }) => {
+const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access }) => {
   const router = useRouter();
   const { query } = router;
   const [assignments, loading] = useAssignments(course.ID)
@@ -56,11 +58,21 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course }) => {
         <Typography variant="h6" fontWeight={600}>
           Assignments
         </Typography>
-        <Button onClick={() => setCreateAssignmentDialog(true)}>
-          + New
-        </Button>
+        {access === CoursePermission.CourseAdmin &&
+          <Button onClick={() => setCreateAssignmentDialog(true)}>
+            + New
+          </Button>
+        }
       </Stack>
-      <AssignmentsTable course={course} assignments={assignments} handleNavigate={handleNavigate} />
+      {assignments && assignments.length == 0 &&
+        <Typography textAlign="center" mt={3}>
+          {access === CoursePermission.CourseAdmin ?
+            "Add the first assignment here" :
+            "No assignment has been added yet."
+          }
+        </Typography>
+      }
+      {assignments && assignments.length > 0 && <AssignmentsTable course={course} assignments={assignments} handleNavigate={handleNavigate} />}
     </>
   );
 }

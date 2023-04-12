@@ -6,12 +6,14 @@ import { FC, useState } from "react";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
+import { CoursePermission } from "model/user";
 
 export interface SectionsViewProps {
   course: Course;
+  access: CoursePermission;
 }
 
-const SectionsView: FC<SectionsViewProps> = ({ course }) => {
+const SectionsView: FC<SectionsViewProps> = ({ course, access }) => {
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
   const [sections, loading] = useSections(course.ID);
 
@@ -35,10 +37,20 @@ const SectionsView: FC<SectionsViewProps> = ({ course }) => {
         <Typography variant="h6" fontWeight={600}>
           Sections
         </Typography>
-        <Button onClick={() => setcreateSectionDialog(true)}>
-          + New
-        </Button>
+        {access === CoursePermission.CourseAdmin &&
+          <Button onClick={() => setcreateSectionDialog(true)}>
+            + New
+          </Button>
+        }
       </Stack>
+      {sections && sections.length == 0 &&
+        <Typography textAlign="center" mt={3}>
+          {access === CoursePermission.CourseAdmin ?
+            "Add the first section here" :
+            "No section has been added yet."
+          }
+        </Typography>
+      }
       <Stack direction="column" spacing={2} mb={5}>
         {sections && sections.map((s) =>
           <SectionCard key={s.ID} section={s} enrollment={getEnrollment(s.ID)} />)

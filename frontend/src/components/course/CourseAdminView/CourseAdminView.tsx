@@ -37,8 +37,8 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
       <Grid xs>
         {router.query.view &&
           <>
-            {router.query.view === "sections" && <SectionsView course={course} />}
-            {router.query.view === "assignments" && <AssignmentsView course={course} />}
+            {router.query.view === "sections" && <SectionsView course={course} access={access} />}
+            {router.query.view === "assignments" && <AssignmentsView course={course} access={access} />}
             {router.query.view === "people" && <PeopleView course={course} />}
             {router.query.view === "requests" && <RequestsView course={course} />}
             {router.query.view === "settings" &&
