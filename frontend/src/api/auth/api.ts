@@ -8,7 +8,8 @@ const enum Endpoint {
 
 export const enum CoursePermission {
     CourseAdmin = "ADMIN",
-    CourseStaff = "STAFF"
+    CourseStaff = "STAFF",
+    CourseStudent = "STUDENT",
 }
 
 /**

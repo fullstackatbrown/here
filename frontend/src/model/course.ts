@@ -1,3 +1,5 @@
+import { CoursePermission } from "api/auth/api";
+
 export interface CourseUserData {
   studentID: string;
   email: string;
@@ -13,5 +15,6 @@ export interface Course {
   term: string;
   entryCode: string;
   autoApproveRequests: boolean;
-  students?: Record<string, CourseUserData>;
+  students: Record<string, CourseUserData>;
+  permissions: Record<string, CoursePermission>;
 }

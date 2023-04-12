@@ -4,22 +4,27 @@ import { Course } from "model/course";
 import { useRouter } from "next/router";
 import { FC } from "react";
 import UserAccessChip from "./UserAccessChip";
+import { User } from "model/user";
+import { CoursePermission } from "api/auth/api";
 
 export interface CourseCardProps {
   course: Course;
+  user: User;
 }
 
 /**
  * CourseCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const CourseCard: FC<CourseCardProps> = ({ course }) => {
+const CourseCard: FC<CourseCardProps> = ({ course, user }) => {
   const router = useRouter();
 
-  const numAssignments = course.assignmentIDs ? course.assignmentIDs.length : 0;
+  const getAccess = (): CoursePermission => {
+    const permission = user.permissions[course.ID];
+    return permission as CoursePermission || CoursePermission.CourseStudent
+  }
 
   return (
-    // <Paper variant="outlined" sx={{ overflow: "hidden" }}>
     <Card variant="outlined" sx={{ ':hover': { boxShadow: 2 } }}>
       <ButtonBase
         onClick={() => router.push("/course/" + course.ID)}
@@ -46,12 +51,11 @@ const CourseCard: FC<CourseCardProps> = ({ course }) => {
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" noWrap>
-            {numAssignments > 0 ? `${numAssignments} Assignments` : "No Assignments"}
+            {/* {numAssignments > 0 ? `${numAssignments} Assignments` : "No Assignments"} */}
           </Typography>
-          <UserAccessChip access="student" size="small" />
+          <UserAccessChip access={getAccess()} size="small" />
         </Stack>
       </Box>
-      {/* </Paper> */}
     </Card>
   );
 };

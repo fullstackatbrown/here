@@ -10,31 +10,31 @@ type AuthState = {
     currentUser: User | undefined;
     isTA: (courseID: string) => boolean;
 };
-const actualInitialAuthState: AuthState = {
+const initialAuthState: AuthState = {
     loading: true,
     isAuthenticated: false,
     currentUser: undefined,
     isTA: () => false,
 };
 
-const initialAuthState: AuthState = {
-    loading: false,
-    isAuthenticated: true,
-    currentUser: {
-        ID: "1",
-        email: "blueno@brown.edu",
-        displayName: "Blueno",
-        pronouns: "he/him",
-        photoUrl:
-            "https://www.brown.edu/sites/default/files/styles/wide_xlrg/public/2020-09/20191015_COMM_Bruno010_0.jpg?h=04531eed&itok=06s1nX88",
-        courses: [],
-        defaultSection: {},
-        actualSection: {},
-        isAdmin: true,
-        permissions: {},
-    },
-    isTA: () => true,
-};
+// const initialAuthState: AuthState = {
+//     loading: false,
+//     isAuthenticated: true,
+//     currentUser: {
+//         ID: "1",
+//         email: "blueno@brown.edu",
+//         displayName: "Blueno",
+//         pronouns: "he/him",
+//         photoUrl:
+//             "https://www.brown.edu/sites/default/files/styles/wide_xlrg/public/2020-09/20191015_COMM_Bruno010_0.jpg?h=04531eed&itok=06s1nX88",
+//         courses: [],
+//         defaultSection: {},
+//         actualSection: {},
+//         isAdmin: true,
+//         permissions: {},
+//     },
+//     isTA: () => true,
+// };
 
 const authContext = createContext(initialAuthState);
 
