@@ -41,8 +41,8 @@ type CreateUserRequest struct {
 }
 
 type JoinCourseRequest struct {
-	User      *Profile `json:"user,omitempty"`
-	EntryCode string   `json:"entryCode"`
+	User      *User  `json:"user,omitempty"`
+	EntryCode string `json:"entryCode"`
 }
 
 type QuitCourseRequest struct {

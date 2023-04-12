@@ -39,7 +39,7 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
     useEffect(() => {
         if (user) {
             const zoomCallout = window.localStorage.getItem("zoom-callout");
-            if (zoomCallout === null && Object.keys(user.coursePermissions).length > 0 && user.meetingLink?.length === 0) {
+            if (zoomCallout === null && Object.keys(user.permissions).length > 0 && user.meetingLink?.length === 0) {
                 setZoomLinkCallout(true);
             }
         }

@@ -7,7 +7,6 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/repository"
-	"github.com/go-chi/chi/v5"
 )
 
 // RequireAuth is a middleware that rejects requests without a valid session cookie. The User associated with the
@@ -25,23 +24,22 @@ func AuthCtx() func(http.Handler) http.Handler {
 			// 	return
 			// }
 
-			userID := chi.URLParam(r, "userID")
+			userID := "3mVvKLpz1SceBaPxcKkYUEsuuy72"
 
 			// Verify the session cookie. In this case an additional check is added to detect
 			// if the user's Firebase session was revoked, user deleted/disabled, etc.
-
-			// TODO: verify session cookie
-			// user, err := repository.Repository.GetUserByID(userID)
+			// user, err := repository.Repository.VerifySessionCookie(tokenCookie)
 			// if err != nil {
 			// 	// Missing session cookie.
 			// 	rejectUnauthorizedRequest(w)
 			// 	return
 			// }
 
-			// For testing only
-			user, err := repository.Repository.GetProfileById(userID)
+			// Testing only
+			user, err := repository.Repository.GetUserByID(userID)
 			if err != nil {
-				http.Error(w, "testing error: user doesnt exist", http.StatusUnauthorized)
+				// Missing session cookie.
+				rejectUnauthorizedRequest(w)
 				return
 			}
 
@@ -85,8 +83,8 @@ func AuthCtx() func(http.Handler) http.Handler {
 // }
 
 // Testing Only
-func GetUserFromRequest(r *http.Request) (*models.Profile, error) {
-	user := r.Context().Value("currentUser").(*models.Profile)
+func GetUserFromRequest(r *http.Request) (*models.User, error) {
+	user := r.Context().Value("currentUser").(*models.User)
 	if user != nil {
 		return user, nil
 	}

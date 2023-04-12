@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState, useRef } from "react";
-import AuthAPI, { Notification, User } from "api/auth/api";
 import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
+import { User } from "model/user";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import AuthAPI from "./api";
 import { useAsyncEffect } from "api/hooks/useAsyncEffect";
 
 type AuthState = {
@@ -20,14 +21,17 @@ const initialAuthState: AuthState = {
     loading: false,
     isAuthenticated: true,
     currentUser: {
-        id: "1",
+        ID: "1",
         email: "blueno@brown.edu",
         displayName: "Blueno",
+        pronouns: "he/him",
         photoUrl:
             "https://www.brown.edu/sites/default/files/styles/wide_xlrg/public/2020-09/20191015_COMM_Bruno010_0.jpg?h=04531eed&itok=06s1nX88",
+        courses: [],
+        defaultSection: {},
+        actualSection: {},
         isAdmin: true,
-        coursePermissions: {},
-        notifications: [],
+        permissions: {},
     },
     isTA: () => true,
 };
@@ -42,43 +46,43 @@ export function useSession(): AuthState {
     const [authState, setAuthState] = useState(initialAuthState);
     let unsubscribe = () => { };
 
-    // useAsyncEffect(
-    //     async (): Promise<void> => {
-    //         try {
-    //             const sessionUser = await AuthAPI.getCurrentUser();
-    //             const db = getFirestore();
-    //             unsubscribe = onSnapshot(
-    //                 doc(db, "user_profiles", sessionUser.id),
-    //                 (doc) => {
-    //                     if (doc.exists()) {
-    //                         const user = doc.data() as User;
-    //                         setAuthState({
-    //                             loading: false,
-    //                             isAuthenticated: true,
-    //                             currentUser: {
-    //                                 ...user,
-    //                                 notifications: user.notifications.reverse(),
-    //                             },
-    //                             isTA: (courseID) =>
-    //                                 user.coursePermissions != null &&
-    //                                 user.coursePermissions[courseID] !=
-    //                                     undefined,
-    //                         });
-    //                     }
-    //                 }
-    //             );
-    //         } catch {
-    //             setAuthState({
-    //                 loading: false,
-    //                 isAuthenticated: false,
-    //                 currentUser: undefined,
-    //                 isTA: () => false,
-    //             });
-    //         }
-    //     },
-    //     [],
-    //     () => unsubscribe()
-    // );
+    useAsyncEffect(
+        async (): Promise<void> => {
+            try {
+                const sessionUser = await AuthAPI.getCurrentUser();
+                const db = getFirestore();
+                unsubscribe = onSnapshot(
+                    doc(db, "user_profiles", sessionUser.ID),
+                    (doc) => {
+                        if (doc.exists()) {
+                            const user = doc.data() as User;
+                            setAuthState({
+                                loading: false,
+                                isAuthenticated: true,
+                                currentUser: {
+                                    ...user,
+                                    // notifications: user.notifications.reverse(),
+                                },
+                                isTA: (courseID) =>
+                                    user.permissions != null &&
+                                    user.permissions[courseID] !=
+                                    undefined,
+                            });
+                        }
+                    }
+                );
+            } catch {
+                setAuthState({
+                    loading: false,
+                    isAuthenticated: false,
+                    currentUser: undefined,
+                    isTA: () => false,
+                });
+            }
+        },
+        [],
+        () => unsubscribe()
+    );
 
     return authState;
 }
@@ -103,7 +107,7 @@ export function useUser(
                 (doc) => {
                     if (doc.exists()) {
                         const user = doc.data();
-                        setUser({ id: user.id, ...doc.data() } as User);
+                        setUser({ ID: user.id, ...doc.data() } as User);
                         setLoading(false);
                     }
                 }
@@ -129,7 +133,7 @@ export function useAdmins(): [User[] | undefined, boolean] {
                 const res: User[] = [];
                 querySnapshot.forEach((doc) => {
                     if (doc.data().isAdmin)
-                        res.push({ id: doc.id, ...doc.data() } as User);
+                        res.push({ ID: doc.id, ...doc.data() } as User);
                 });
 
                 setUsers(res);
@@ -150,7 +154,8 @@ export function useNotifications(
     const prevNotifications = useRef<number | null>(null);
 
     useEffect(() => {
-        const notifications = user?.notifications ?? undefined;
+        const notifications = undefined;
+        // const notifications = user?.notifications ?? undefined;
 
         // If the queue doesn't exist yet, no need to run any logic.
         if (notifications === undefined) {

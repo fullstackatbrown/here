@@ -2,6 +2,7 @@ import APIClient from "api/APIClient";
 import { User } from "model/user";
 
 const enum Endpoint {
+    ME = '/users/me',
     USER = '/users',
 }
 
@@ -10,17 +11,12 @@ export const enum CoursePermission {
     CourseStaff = "STAFF"
 }
 
-export const enum ChangeCourseAction {
-    Join = "JOIN",
-    Quit = "QUIT"
-}
-
 /**
  * Fetches profile information corresponding to the currently logged in user.
  */
 async function getCurrentUser(): Promise<User> {
     try {
-        return await APIClient.get(Endpoint.USER);
+        return await APIClient.get(Endpoint.ME);
     } catch (e) {
         throw e;
     }
@@ -43,18 +39,28 @@ async function getUserById(id: string): Promise<User> {
  * @returns 
  */
 
-async function joinOrQuitCourse(userId: string, entryCode: string, action: ChangeCourseAction): Promise<string> {
+async function joinCourse(userId: string, entryCode: string): Promise<string> {
     try {
-        return await APIClient.patch(`${Endpoint.USER}/${userId}/courses`, { userId, entryCode, action });
+        return await APIClient.patch(`${Endpoint.USER}/${userId}/courses`, { userId, entryCode });
     } catch (e) {
         throw e;
     }
 }
 
+async function quitCourse(userId: string): Promise<string> {
+    try {
+        return await APIClient.patch(`${Endpoint.USER}/${userId}/courses`, { userId });
+    } catch (e) {
+        throw e;
+    }
+}
+
+
 const AuthAPI = {
     getCurrentUser,
     getUserById,
-    joinOrQuitCourse,
+    joinCourse,
+    quitCourse,
 };
 
 export default AuthAPI;

@@ -14,9 +14,11 @@ import (
 func AuthRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
+	router.Use(auth.AuthCtx())
 	router.Post("/", createUserHandler)
+	router.Get("/me", getMeHandler)
+
 	router.Route("/{userID}", func(r chi.Router) {
-		r.Use(auth.AuthCtx())
 		r.Get("/", getUserHandler)
 		// r.Patch("/", updateUserHandler)
 		r.Patch("/joinCourse", joinCourseHandler)
@@ -24,6 +26,19 @@ func AuthRoutes() *chi.Mux {
 	})
 
 	return router
+}
+
+func getMeHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := auth.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	render.JSON(w, r, struct {
+		*models.Profile
+		ID string `json:"id"`
+	}{user.Profile, user.ID})
 }
 
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
