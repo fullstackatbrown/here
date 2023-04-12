@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { View } from "model/general";
 import { useEffect, useState } from "react";
 import CourseHeader from "../CourseHeader";
@@ -32,7 +32,7 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
   return (
     <Grid container>
       <Grid xs={2}>
-        <CourseAdminViewNavigation />
+        <CourseAdminViewNavigation access={access} />
       </Grid>
       <Grid xs>
         {router.query.view &&
@@ -41,8 +41,12 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
             {router.query.view === "assignments" && <AssignmentsView course={course} />}
             {router.query.view === "people" && <PeopleView course={course} />}
             {router.query.view === "requests" && <RequestsView course={course} />}
-            {/* TODO: protect the settings view route to be only accessible by admin */}
-            {router.query.view === "settings" && access && <SettingsView course={course} />}
+            {router.query.view === "settings" &&
+              (access === CoursePermission.CourseAdmin ?
+                <SettingsView course={course} /> :
+                <Typography>
+                  Oops.. You have no permission to access this page
+                </Typography>)}
           </>
         }
       </Grid>

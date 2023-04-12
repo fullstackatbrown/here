@@ -1,9 +1,14 @@
 import { Badge, Button, Stack } from "@mui/material";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
+import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
 
-export default function CourseAdminViewNavigation() {
+interface CourseAdminViewNavigationProps {
+    access: CoursePermission;
+}
+
+export default function CourseAdminViewNavigation({ access }: CourseAdminViewNavigationProps) {
     const router = useRouter();
     const { query } = router;
     const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
@@ -53,8 +58,7 @@ export default function CourseAdminViewNavigation() {
                     {getNavigationButton("requests")}
                 </Badge> : getNavigationButton("requests")
             }
-            {/* TODO: make settings only visible to admin, add a divider here?,  */}
-            {getNavigationButton("settings")}
+            {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
         </Stack>
     )
 }
