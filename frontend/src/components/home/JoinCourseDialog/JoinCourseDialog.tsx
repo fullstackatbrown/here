@@ -6,7 +6,8 @@ import {
     DialogTitle, Stack,
     TextField
 } from "@mui/material";
-import AuthAPI, { ChangeCourseAction } from "api/auth/api";
+import { handleBadRequestError } from "@util/errors";
+import AuthAPI from "api/auth/api";
 import { FC } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -24,19 +25,13 @@ const JoinCourseDialog: FC<JoinCourseDialogProps> = ({ open, onClose }) => {
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>();
 
     const onSubmit = handleSubmit(async data => {
-        toast.promise(AuthAPI.joinOrQuitCourse("p3d5eSnr3H621G3SwzEL", data.entryCode, ChangeCourseAction.Join), {
+        toast.promise(AuthAPI.joinCourse(data.entryCode), {
             loading: "Joining Course...",
             success: "Joined Course!",
-            error: (err) => `${err.response.data}`,
+            error: (err) => handleBadRequestError(err)
         })
-            .then(() => {
-                onClose();
-                reset();
-            })
-            .catch(() => {
-                onClose();
-                reset();
-            })
+            .then(() => handleOnClose())
+            .catch(() => handleOnClose())
     });
 
     const handleOnClose = () => {
@@ -47,7 +42,6 @@ const JoinCourseDialog: FC<JoinCourseDialogProps> = ({ open, onClose }) => {
 
     return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
-
             <DialogTitle>Join Course with Entry Code</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} my={1}>

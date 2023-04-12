@@ -18,11 +18,12 @@ func AuthRoutes() *chi.Mux {
 	router.Post("/", createUserHandler)
 	router.Get("/me", getMeHandler)
 
+	router.Patch("/joinCourse", joinCourseHandler)
+	router.Patch("/quitCourse", quitCourseHandler)
+
 	router.Route("/{userID}", func(r chi.Router) {
 		r.Get("/", getUserHandler)
 		// r.Patch("/", updateUserHandler)
-		r.Patch("/joinCourse", joinCourseHandler)
-		r.Patch("/quitCourse", quitCourseHandler)
 	})
 
 	return router
@@ -120,7 +121,7 @@ func quitCourseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.UserID = user.ID
+	req.User = user
 
 	err = repo.Repository.QuitCourse(req)
 	if err != nil {

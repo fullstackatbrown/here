@@ -162,7 +162,7 @@ func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 
 	batch := fr.firestoreClient.Batch()
 	// Remove course for student
-	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.UserID)
+	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.User.ID)
 	batch.Update(userProfileRef, []firestore.Update{
 		{
 			Path:  "courses",
@@ -172,7 +172,7 @@ func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 
 	// remove student from course
 	newStudentMap := utils.CopyMap(course.Students)
-	delete(newStudentMap, req.UserID)
+	delete(newStudentMap, req.User.ID)
 
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
 	batch.Update(coursesRef, []firestore.Update{

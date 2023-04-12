@@ -34,17 +34,17 @@ async function getUserById(id: string): Promise<User> {
  * @returns 
  */
 
-async function joinCourse(userId: string, entryCode: string): Promise<string> {
+async function joinCourse(entryCode: string): Promise<string> {
     try {
-        return await APIClient.patch(`${Endpoint.USER}/${userId}/courses`, { userId, entryCode });
+        return await APIClient.patch(`${Endpoint.USER}/joinCourse`, { entryCode });
     } catch (e) {
         throw e;
     }
 }
 
-async function quitCourse(userId: string): Promise<string> {
+async function quitCourse(courseID: string): Promise<string> {
     try {
-        return await APIClient.patch(`${Endpoint.USER}/${userId}/courses`, { userId });
+        return await APIClient.patch(`${Endpoint.USER}/quitCourse`, { courseID });
     } catch (e) {
         throw e;
     }

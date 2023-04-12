@@ -46,6 +46,6 @@ type JoinCourseRequest struct {
 }
 
 type QuitCourseRequest struct {
-	UserID   string `json:"userID,omitempty"`
+	User     *User  `json:"user,omitempty"`
 	CourseID string `json:"courseID"`
 }
