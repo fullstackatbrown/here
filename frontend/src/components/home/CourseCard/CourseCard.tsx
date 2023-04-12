@@ -1,11 +1,11 @@
-import { Box, ButtonBase, Card, Paper, Stack, Typography } from "@mui/material";
+import { Box, ButtonBase, Card, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import getCourseColor from "@util/shared/getCourseColor";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { useRouter } from "next/router";
 import { FC } from "react";
 import UserAccessChip from "./UserAccessChip";
-import { User } from "model/user";
-import { CoursePermission } from "api/auth/api";
+import { CoursePermission, User } from "model/user";
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 export interface CourseCardProps {
   course: Course;
@@ -41,9 +41,15 @@ const CourseCard: FC<CourseCardProps> = ({ course, user }) => {
           <Typography variant="body1" noWrap>
             {course.code}
           </Typography>
-          <Typography variant="h6" fontWeight={600}>
-            {course.title}
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Typography variant="h6" fontWeight={600}>
+              {course.title}
+            </Typography>
+            {course.status === CourseStatus.CourseArchived &&
+              <Tooltip title="Archived by the instructor" placement="right">
+                <LockOutlinedIcon sx={{ fontSize: 18 }} />
+              </Tooltip>}
+          </Stack>
         </Box>
       </ButtonBase>
       <Box width="100%" p={2} color={"#777777"} height={55}
@@ -53,6 +59,7 @@ const CourseCard: FC<CourseCardProps> = ({ course, user }) => {
           <Typography variant="body2" noWrap>
             {/* {numAssignments > 0 ? `${numAssignments} Assignments` : "No Assignments"} */}
           </Typography>
+
           <UserAccessChip access={getAccess()} size="small" />
         </Stack>
       </Box>
