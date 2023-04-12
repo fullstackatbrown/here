@@ -40,14 +40,15 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
 
     return (
         <>
-            <SwapRequestDialog
-                open={swapRequestDialog}
-                onClose={() => { setSwapRequestDialog(false) }}
-                course={course}
-                assignments={assignments}
-                student={student}
-                sectionsMap={sectionsMap}
-            />
+            {assignments && sectionsMap &&
+                <SwapRequestDialog
+                    open={swapRequestDialog}
+                    onClose={() => { setSwapRequestDialog(false) }}
+                    course={course}
+                    assignments={assignments}
+                    student={student}
+                    sectionsMap={sectionsMap}
+                />}
             <Stack mt={-1}>
                 <Stack direction="row" justifyContent="space-between">
                     <Button
