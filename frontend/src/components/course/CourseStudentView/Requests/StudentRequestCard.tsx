@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
-import errors from "@util/errors";
+import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import SwapAPI from "api/swaps/api";
@@ -41,7 +41,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                 {
                     loading: "Cancelling request...",
                     success: "Request cancelled!",
-                    error: errors.UNKNOWN,
+                    error: (err) => handleBadRequestError(err)
                 })
         }
     }

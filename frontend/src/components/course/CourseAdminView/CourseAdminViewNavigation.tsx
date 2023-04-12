@@ -1,4 +1,5 @@
 import { Badge, Button, Stack } from "@mui/material";
+import { CapitalizeFirstLetter } from "@util/shared/string";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
 import { CoursePermission } from "model/user";
@@ -19,10 +20,6 @@ export default function CourseAdminViewNavigation({ access }: CourseAdminViewNav
         }
     }
 
-    function capitalizeFirstLetter(str: string): string {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
     function getNavigationButton(view: View) {
         return (
             <Button
@@ -34,7 +31,7 @@ export default function CourseAdminViewNavigation({ access }: CourseAdminViewNav
                 color={query.view === view ? "inherit" : "secondary"}
                 variant="text" onClick={navigateTo(view)}
             >
-                {capitalizeFirstLetter(view)}
+                {CapitalizeFirstLetter(view)}
             </Button >
         )
     }

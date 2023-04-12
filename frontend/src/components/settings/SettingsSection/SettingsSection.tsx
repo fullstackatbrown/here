@@ -11,14 +11,6 @@ export interface SettingsSectionProps {
     loading?: boolean;
     adminOnly?: boolean;
     taOnly?: boolean;
-    primaryActionButton?: {
-        label: string;
-        onClick: () => void;
-    };
-    secondaryActionButton?: {
-        label: string;
-        onClick: () => void;
-    };
     children: React.ReactNode;
 }
 
@@ -28,8 +20,6 @@ const SettingsSection: FC<SettingsSectionProps> = ({
     loading,
     adminOnly,
     taOnly,
-    primaryActionButton,
-    secondaryActionButton,
     children
 }) => {
     const { currentUser } = useAuth();
@@ -44,22 +34,13 @@ const SettingsSection: FC<SettingsSectionProps> = ({
                         <Typography variant="h6" fontWeight={600}>
                             {title}
                         </Typography>
-                        {adminOnly && <Tooltip title="Only visible to admins">
+                        {adminOnly && <Tooltip title="Only visible to admins" placement="right">
                             <GppGoodIcon sx={{ opacity: 0.36 }} />
                         </Tooltip>}
                     </Stack>
                     <Typography variant="body2" sx={{ opacity: 0.75 }}>
                         {subtitle}
                     </Typography>
-                </Stack>
-                <Stack direction={["row-reverse", null, "row"]} mt={[1, null, 0]}>
-                    {secondaryActionButton && <Button size="small" onClick={secondaryActionButton.onClick}>
-                        {secondaryActionButton.label}
-                    </Button>}
-                    {primaryActionButton &&
-                        <Button size="small" variant="contained" onClick={primaryActionButton.onClick}>
-                            {primaryActionButton.label}
-                        </Button>}
                 </Stack>
             </Stack>
             {loading ? <Box textAlign="center" py={2}>

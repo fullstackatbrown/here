@@ -5,7 +5,7 @@ import { useSession } from "api/auth/hooks";
 import CourseListItem from "../CourseListItem";
 import SettingsSection from "@components/settings/SettingsSection";
 import { CoursePermission } from "model/user";
-import { sortCoursesByTerm } from "@util/shared/sortTerms";
+import { sortCoursesByTerm } from "@util/shared/terms";
 
 export interface YourCoursesSectionProps {
 }

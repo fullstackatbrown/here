@@ -32,3 +32,17 @@ export default function sortTerms(terms: string[]): string[] {
 export function sortCoursesByTerm(courses: Course[]): Course[] {
     return courses.sort((a, b) => termComparator(a.term, b.term));
 }
+
+// TODO: current term
+const currentTerm = "spring 2023"
+export function getTerms(courses: Record<string, Course[]>): string[] {
+    let terms = []
+    if (courses) {
+        terms = sortTerms(Object.keys(courses));
+    }
+    if (terms.length === 0) { return [currentTerm] }
+    if (terms[0] !== currentTerm) {
+        terms.unshift(currentTerm);
+    }
+    return terms
+}

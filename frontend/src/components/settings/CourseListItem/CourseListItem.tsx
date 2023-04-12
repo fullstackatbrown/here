@@ -14,11 +14,9 @@ import toast from "react-hot-toast";
 
 export interface CourseListItemProps {
     course: Course;
-    isLastChild?: boolean;
 }
 
-const CourseListItem: FC<CourseListItemProps> = ({ course, isLastChild }) => {
-    // const [openConfirm, setOpenConfirm] = useState(false);
+const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
     const [activateCourseDialogOpen, setActivateCourseDialogOpen] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const handleCloseEdit = () => setOpenEdit(false);
@@ -94,7 +92,6 @@ const CourseListItem: FC<CourseListItemProps> = ({ course, isLastChild }) => {
                     }
                 </Stack>
             </Stack>
-            {!isLastChild && <Divider />}
         </>
 
     );

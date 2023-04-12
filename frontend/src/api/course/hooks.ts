@@ -26,6 +26,33 @@ export function useCourses(): [Course[] | undefined, boolean] {
     return [courses, loading];
 }
 
+export function useCoursesByTerm(): [Record<string, Course[]> | undefined, boolean] {
+    const [loading, setLoading] = useState(true);
+    const [courses, setCourses] = useState<Record<string, Course[]> | undefined>(undefined);
+
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection), (querySnapshot) => {
+            const res: Record<string, Course[]> = {};
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (!res[data.term]) {
+                    res[data.term] = [];
+                }
+                res[data.term].push({ ID: doc.id, ...doc.data() } as Course);
+            });
+
+            setCourses(res);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    return [courses, loading];
+}
+
+
 // Only courses that are active or archived
 export function useCoursesByIDsTerm(ids: string[]): [Record<string, Course[]> | undefined, boolean] {
     const [loading, setLoading] = useState(true);

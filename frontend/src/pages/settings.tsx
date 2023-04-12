@@ -11,9 +11,9 @@ export default function Settings() {
         <AppLayout maxWidth="md">
             <Stack spacing={4} mt={4}>
                 <ProfileInfoSection />
-                {/* <AdminList /> */}
                 <YourCoursesSection />
-                {/* <AllCoursesSection /> */}
+                <AllCoursesSection />
+                <AdminList />
             </Stack>
         </AppLayout>
     );

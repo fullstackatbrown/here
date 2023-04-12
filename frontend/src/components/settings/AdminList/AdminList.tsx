@@ -63,15 +63,16 @@ export default function AdminList() {
             {admins?.map(admin => (
                 <ListItem
                     disableGutters
-                    key={admin.id}
+                    key={admin.ID}
                     secondaryAction={
-                        currentUser?.id !== admin.id && <ConfirmButton
+                        currentUser?.ID !== admin.ID &&
+                        <ConfirmButton
                             message={`Delete admin ${admin.displayName}?`}
-                            open={currentConfirmDialog === admin.id}
+                            open={currentConfirmDialog === admin.ID}
                             onClose={() => setCurrentConfirmDialog("")}
                             onConfirm={() => handleDeleteAdmin(admin)}>
                             <IconButton label="Revoke admin access" edge="end" aria-label="delete"
-                                onClick={() => setCurrentConfirmDialog(admin.id)}>
+                                onClick={() => setCurrentConfirmDialog(admin.ID)}>
                                 <CloseIcon />
                             </IconButton>
                         </ConfirmButton>
