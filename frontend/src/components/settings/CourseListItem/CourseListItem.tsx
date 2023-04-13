@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import EditCourseDialog from "@components/settings/EditCourseDialog";
+import EditCourseDialog from "@components/manage/EditCourseDialog";
 import { Box, Button, Divider, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import IconButton from "@components/shared/IconButton";
 import ConfirmButton from "@components/shared/ConfirmButton";
