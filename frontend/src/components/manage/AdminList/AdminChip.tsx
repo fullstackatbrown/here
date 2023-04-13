@@ -28,10 +28,13 @@ const AdminChip: FC<AdminChipProps> = ({ admin }) => {
         })
             .catch(() => { })
     }
+
+    const notMe = currentUser?.ID !== admin.ID;
+
     return (
         <Box
-            sx={{ borderRadius: 5, p: 1, mr: 1.5, border: "1px solid #e0e0e0" }}
-            key={admin.id} display="flex" flexDirection="row" alignItems="center"
+            sx={{ borderRadius: 5, py: 1, pl: 1, pr: notMe ? 0 : 1.5, mr: 1.5, border: "1px solid #e0e0e0" }}
+            key={admin.ID} display="flex" flexDirection="row" alignItems="center"
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
         >
@@ -46,7 +49,7 @@ const AdminChip: FC<AdminChipProps> = ({ admin }) => {
                     {admin.email}
                 </Typography>
             </Stack>
-            {currentUser?.id !== admin.id &&
+            {notMe &&
                 <Box width={30}>
                     {hover &&
                         <IconButton sx={{ p: 0.5 }} onClick={handleDeleteAdmin}>

@@ -1,4 +1,4 @@
-import CourseAccessList from "@components/settings/ManageCoursesDialog/CourseAccessList";
+import CourseAccessList from "@components/manage/AllCourses/CourseAccessList";
 import { ExpandMore } from "@mui/icons-material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Button, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";

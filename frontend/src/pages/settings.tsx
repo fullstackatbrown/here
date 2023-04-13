@@ -1,9 +1,7 @@
 import React from "react";
 import { Stack } from "@mui/material";
 import AppLayout from "@components/shared/AppLayout";
-import AdminList from "@components/settings/AdminList";
 import YourCoursesSection from "@components/settings/YourCoursesSection";
-import AllCoursesSection from "@components/settings/AllCoursesSection";
 import ProfileInfoSection from "@components/settings/ProfileInfoSection";
 
 export default function Settings() {
@@ -12,8 +10,6 @@ export default function Settings() {
             <Stack spacing={4} mt={4}>
                 <ProfileInfoSection />
                 <YourCoursesSection />
-                <AllCoursesSection />
-                <AdminList />
             </Stack>
         </AppLayout>
     );

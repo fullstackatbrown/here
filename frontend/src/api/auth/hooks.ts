@@ -38,7 +38,7 @@ export function useSession(): AuthState {
                     doc(db, FirestoreProfilesCollection, sessionUser.ID),
                     (doc) => {
                         if (doc.exists()) {
-                            const user = doc.data() as User;
+                            const user = { ID: doc.data().id, ...doc.data() } as User
                             setAuthState({
                                 loading: false,
                                 isAuthenticated: true,
