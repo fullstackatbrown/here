@@ -20,7 +20,7 @@ export interface AssignmentsViewProps {
 
 const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, assignmentsMap, sectionsMap }) => {
   const router = useRouter();
-  const assignments = Object.keys(assignmentsMap).map((aid) => assignmentsMap[aid]);
+  const assignments = Object.values(assignmentsMap);
   const { query } = router;
   const [createAssignmentDialog, setCreateAssignmentDialog] = useState(false);
 

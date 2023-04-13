@@ -22,7 +22,7 @@ export interface PeopleViewProps {
 }
 
 export default function PeopleView({ course, access, assignmentsMap, sectionsMap }: PeopleViewProps) {
-  const assignments = Object.keys(assignmentsMap).map((aid) => assignmentsMap[aid]);
+  const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
 

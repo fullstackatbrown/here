@@ -16,7 +16,7 @@ export interface SectionsViewProps {
 }
 
 const SectionsView: FC<SectionsViewProps> = ({ course, access, sectionsMap }) => {
-  const sections = Object.keys(sectionsMap).map((sid) => sectionsMap[sid]);
+  const sections = Object.values(sectionsMap);
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
 
   const getEnrollment = (sectionId: string) => {

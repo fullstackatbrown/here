@@ -40,7 +40,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 }))
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, handleNavigateBack }) => {
-    const sections = Object.keys(sectionsMap).map((sid) => sectionsMap[sid])
+    const sections = Object.values(sectionsMap)
     const [grades, gradesLoading] = useGradesForAssignment(course.ID, assignment.ID)
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
