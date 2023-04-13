@@ -6,6 +6,11 @@ export const enum CourseStatus {
   CourseActive = "active",
 }
 
+export interface SinglePermissionRequest {
+  email: string;
+  permission: CoursePermission;
+}
+
 export interface CourseUserData {
   studentID: string;
   email: string;

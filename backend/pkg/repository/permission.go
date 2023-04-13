@@ -8,17 +8,17 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 )
 
-func (fr *FirebaseRepository) CreatePermissions(req *models.CreatePermissionsRequest) error {
+func (fr *FirebaseRepository) CreatePermissions(req *models.AddPermissionsRequest) error {
 
-	for email, permission := range req.Permissions {
+	for _, permission := range req.Permissions {
 		// Get user by email.
-		user, err := fr.GetUserByEmail(email)
+		user, err := fr.GetUserByEmail(permission.Email)
 		if err != nil {
 			// The user doesn't exist; add an invite to the invites collection and then return.
 			_, _, err = fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Add(firebase.Context, map[string]interface{}{
-				"email":      email,
+				"email":      permission.Email,
 				"courseID":   req.CourseID,
-				"permission": permission,
+				"permission": permission.Permission,
 			})
 			return err
 		}
@@ -29,7 +29,7 @@ func (fr *FirebaseRepository) CreatePermissions(req *models.CreatePermissionsReq
 		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID), []firestore.Update{
 			{
 				Path:  "permissions." + user.ID,
-				Value: permission,
+				Value: permission.Permission,
 			},
 		})
 
@@ -37,7 +37,7 @@ func (fr *FirebaseRepository) CreatePermissions(req *models.CreatePermissionsReq
 		batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID), []firestore.Update{
 			{
 				Path:  "permissions." + req.CourseID,
-				Value: permission,
+				Value: permission.Permission,
 			},
 		})
 

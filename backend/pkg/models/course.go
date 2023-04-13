@@ -73,9 +73,13 @@ type AssignSectionsRequest struct {
 	AssignmentID string `json:"assignmentID,omitempty"`
 }
 
-type CreatePermissionsRequest struct {
-	CourseID    string            `json:"courseID,omitempty"`
-	Permissions map[string]string `json:"permissions"` // map from email to permission
+type SinglePermissionRequest struct {
+	Email      string           `json:"email"`
+	Permission CoursePermission `json:"permission"`
+}
+type AddPermissionsRequest struct {
+	CourseID    string                    `json:"courseID,omitempty"`
+	Permissions []SinglePermissionRequest `json:"permissions"`
 }
 
 type DeletePermissionRequest struct {

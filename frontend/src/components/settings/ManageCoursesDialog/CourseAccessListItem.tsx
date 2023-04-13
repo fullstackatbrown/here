@@ -4,8 +4,9 @@ import { CapitalizeFirstLetter } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course } from "model/course";
 import { CoursePermission, User } from "model/user";
-import { FC } from "react";
+import { FC, useState } from "react";
 import toast from "react-hot-toast";
+import AddAccessButton from "./AddAccessButton";
 
 interface CourseAccessListItemProps {
     course: Course;
@@ -26,30 +27,25 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
         }
     }
 
-    const tooltipPopperProps = {
-        style: {
-            margin: '-3px', // set your desired distance here
-        },
-    };
-
     return (
         <Stack direction="row" alignItems="start">
-            <Box mt={0.3} width={50}>
+            <Box mt={0.5} width={50}>
                 <Typography color="secondary" fontSize={14}>{CapitalizeFirstLetter(access)}</Typography>
             </Box>
-            <Box>
-                {users.map((user) => (
-                    <Tooltip title={user.email} placement="right" sx={{ marginX: 0.5 }}>
-                        <Chip
-                            label={user.displayName}
-                            size="small"
-                            onDelete={() => handleRevokeUserAccess(user)}
-                        />
-                    </Tooltip>
-                ))}
-                {users.length === 0 &&
-                    <Typography ml={0.5} mt={0.3} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography>
+            <Box display="flex" flexWrap="wrap" flexDirection="row" alignItems="center">
+                {users.length === 0 ?
+                    <Typography mx={0.5} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography> :
+                    users.map((user) => (
+                        <Tooltip title={user.email} placement="right" sx={{ marginRight: 0.5 }}>
+                            <Chip
+                                label={user.displayName}
+                                size="small"
+                                onDelete={() => handleRevokeUserAccess(user)}
+                            />
+                        </Tooltip>
+                    ))
                 }
+                <AddAccessButton course={course} access={access} />
             </Box>
         </Stack>
     )

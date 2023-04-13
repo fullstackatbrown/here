@@ -1,5 +1,5 @@
 import APIClient from "api/APIClient";
-import { Course } from "model/course";
+import { Course, SinglePermissionRequest } from "model/course";
 import { CoursePermission } from "model/user";
 
 
@@ -41,12 +41,11 @@ async function updateCourse(
   return APIClient.patch(`/courses/${courseID}`, { title, code, term, autoApproveRequests, status });
 }
 
-async function createPermission(
+async function addPermission(
   courseID: string,
-  userID: string,
-  permission: CoursePermission,
+  permissions: SinglePermissionRequest[],
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}/permissions/add`, { userID, permission });
+  return APIClient.patch(`/courses/${courseID}/permissions/add`, { permissions });
 }
 
 async function revokePermission(
@@ -61,7 +60,7 @@ const CourseAPI = {
   createCourse,
   deleteCourse,
   updateCourse,
-  createPermission,
+  addPermission,
   revokePermission,
 };
 

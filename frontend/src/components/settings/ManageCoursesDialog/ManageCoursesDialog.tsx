@@ -19,7 +19,6 @@ const ManageCoursesDialog: FC<ManageCoursesDialogProps> = ({ term, courses, open
                     {CapitalizeFirstLetter(term)} Courses
                     <Button>Upload</Button>
                 </Stack>
-
             </DialogTitle>
             <DialogContent>
                 {courses.length === 0 &&

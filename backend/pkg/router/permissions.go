@@ -13,13 +13,13 @@ func PermissionRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
 	// router.With(auth.RequireCourseAdmin()).Post("/", createPermissionsHandler)
-	router.Patch("/add", createPermissionsHandler)
+	router.Patch("/add", addPermissionsHandler)
 	router.Patch("/revoke", revokePermissionHandler)
 	return router
 }
 
-func createPermissionsHandler(w http.ResponseWriter, r *http.Request) {
-	var req *models.CreatePermissionsRequest
+func addPermissionsHandler(w http.ResponseWriter, r *http.Request) {
+	var req *models.AddPermissionsRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
