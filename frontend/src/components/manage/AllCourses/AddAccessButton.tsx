@@ -51,7 +51,7 @@ const AddAccessButton: FC<AddAccessButtonProps> = ({ course, access }) => {
                 if (watch("email") === "") setShowAddAccessTextfield(false)
             }}>
             <Stack direction="row" alignItems="center">
-                <IconButton size="small" onClick={() => setShowAddAccessTextfield(true)} sx={{ padding: 0.3 }}>
+                <IconButton size="small" onClick={() => setShowAddAccessTextfield(true)} sx={{ padding: 0.5 }}>
                     <AddIcon sx={{ fontSize: 18 }} />
                 </IconButton>
                 <Collapse orientation="horizontal" in={showAddAccessTextfield}>

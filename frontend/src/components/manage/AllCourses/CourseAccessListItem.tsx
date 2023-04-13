@@ -41,24 +41,26 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
 
     return (
         <Stack direction="row" alignItems="start">
-            <Box width={65}>
+            <Box width={65} mt={0.5}>
                 <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(access)}</Typography>
             </Box>
             {data && <Box display="flex" flexWrap="wrap" flexDirection="row" alignItems="center">
                 {data.length === 0 ?
-                    <Typography mx={0.5} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography> :
+                    <Typography mx={0.5} my={0.5} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography> :
                     data.map((data) => {
                         if (data.user) {
-                            return <Tooltip title={data.user.email} placement="right" sx={{ marginRight: 0.5 }}>
+                            return <Tooltip title={data.user.email} placement="right">
                                 <Chip
+                                    sx={{ height: 26, marginRight: 0.5 }}
                                     label={data.user.displayName}
                                     size="small"
                                     onDelete={editable && handleRevokeUserAccess(data.user)}
                                 />
                             </Tooltip>
                         } else {
-                            return <Tooltip title={data.email} placement="right" sx={{ marginRight: 0.5 }}>
+                            return <Tooltip title={data.email} placement="right">
                                 <Chip
+                                    sx={{ height: 26, marginRight: 0.5 }}
                                     label={data.email}
                                     size="small"
                                 />

@@ -69,6 +69,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
         setActiveStep(0);
         setError(undefined);
         setAddCoursesData({ term: "", data: "" });
+        setPermissionsByCourse(undefined);
         setSuccess(false);
     }
 

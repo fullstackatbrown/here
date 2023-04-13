@@ -96,8 +96,8 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
             <Collapse in={expanded}>
                 {admin && staff &&
                     <Stack ml={4} mt={1} mb={2} spacing={1}>
-                        <CourseAccessListItem course={course} access={CoursePermission.CourseAdmin} users={admin} />
-                        <CourseAccessListItem course={course} access={CoursePermission.CourseStaff} users={staff} />
+                        <CourseAccessListItem course={course} access={CoursePermission.CourseAdmin} users={admin} emails={[]} />
+                        <CourseAccessListItem course={course} access={CoursePermission.CourseStaff} users={staff} emails={[]} />
                     </Stack>}
             </Collapse>
         </>
