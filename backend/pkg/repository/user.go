@@ -170,6 +170,11 @@ func (fr *FirebaseRepository) ValidateJoinCourseRequest(req *models.JoinCourseRe
 		return nil, err, nil
 	}
 
+	// Check if it's admin or staff
+	if perm, ok := req.User.Permissions[course.ID]; ok {
+		return nil, nil, fmt.Errorf("Cannot join the course as an %v", perm)
+	}
+
 	if utils.Contains(profile.Courses, course.ID) {
 		return nil, nil, fmt.Errorf("Student is already enrolled in course")
 	}
