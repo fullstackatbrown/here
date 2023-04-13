@@ -9,6 +9,7 @@ import { Course, CourseStatus } from "model/course";
 import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
 import ActivateCourseDialog from "../ActivateCourseDialog/ActivateCourseDialog";
+import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
 
 export interface CourseListItemProps {
     course: Course;
@@ -53,9 +54,12 @@ const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
     return (
         <>
             <ActivateCourseDialog course={course} open={activateCourseDialogOpen} onClose={() => { setActivateCourseDialogOpen(false) }} />
-            <Stack direction="row" display="flex" justifyContent="space-between">
+            <Stack direction="row" display="flex" justifyContent="space-between" alignItems="center">
                 <Stack>
-                    <Typography>{course.code}: {course.title}</Typography>
+                    <Stack direction="row" display="flex" alignItems="center" spacing={1}>
+                        <Typography>{course.code}: {course.title}</Typography>
+                        <CourseStatusChip status={course.status} />
+                    </Stack>
                     <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(course.term)}</Typography>
                 </Stack>
                 <Stack>
