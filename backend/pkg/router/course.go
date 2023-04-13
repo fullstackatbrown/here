@@ -67,7 +67,19 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 
-	err := repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: courseID})
+	course, err := repo.Repository.GetCourseByID(courseID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Cannot delete course if currently active or archived
+	if course.Status != models.CourseInactive {
+		http.Error(w, "Course is currently active or has students", http.StatusBadRequest)
+		return
+	}
+
+	err = repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: courseID})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

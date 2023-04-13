@@ -30,10 +30,6 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
         setEditCourseDialogOpen(course);
     }
 
-    const courseDeletable = () => {
-        const courseHasStudents = course.students && Object.keys(course.students).length > 0;
-        return !(courseHasStudents || course.status === CourseStatus.CourseActive || course.status === CourseStatus.CourseArchived);
-    }
     // CourseStatusChip
     const handleDeleteCourse = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
@@ -85,7 +81,7 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
                                     <EditIcon sx={{ fontSize: 20 }} />
                                 </IconButton>
                             </Tooltip>
-                            {courseDeletable() &&
+                            {course.status === CourseStatus.CourseInactive &&
                                 <Tooltip title="Delete Course">
                                     <IconButton sx={{ p: 0.5 }} onClick={handleDeleteCourse}>
                                         <CloseIcon sx={{ fontSize: 20 }} />
