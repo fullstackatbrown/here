@@ -9,24 +9,20 @@ import AssignmentsTable from "./AssignmentsTable";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
 import { CoursePermission } from "model/user";
+import { Section } from "model/section";
 
 export interface AssignmentsViewProps {
   course: Course;
   access: CoursePermission;
+  assignmentsMap: Record<string, Assignment>;
+  sectionsMap: Record<string, Section>;
 }
 
-const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access }) => {
+const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, assignmentsMap, sectionsMap }) => {
   const router = useRouter();
+  const assignments = Object.keys(assignmentsMap).map((aid) => assignmentsMap[aid]);
   const { query } = router;
-  const [assignments, loading] = useAssignments(course.ID)
-  const [assignmentsMap, setAssignmentsMap] = useState<Record<string, Assignment> | null>(null)
   const [createAssignmentDialog, setCreateAssignmentDialog] = useState(false);
-
-  useEffect(() => {
-    if (assignments) {
-      setAssignmentsMap(listToMap(assignments) as Record<string, Assignment>)
-    }
-  }, [assignments])
 
   const handleNavigate = (assignmentID: string) => {
     router.push(`/course/${query.courseID}?view=${query.view}&id=${assignmentID}`,
@@ -41,7 +37,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access }) => {
     // Display specific assignment page
     return (
       <GradingView
-        course={course}
+        {...{ course, sectionsMap }}
         assignment={assignmentsMap[query.id as string]}
         handleNavigateBack={handleNavigateBack} />
     )

@@ -4,8 +4,10 @@ import CourseHeader from "@components/course/CourseHeader";
 import CourseStudentView from "@components/course/CourseStudentView/CourseStudentView";
 import AppLayout from "@components/shared/AppLayout";
 import { Grid, Stack, useTheme } from "@mui/material";
+import { useAssignments, useAssignmentsMap } from "api/assignment/hooks";
 import { useAuth } from "api/auth/hooks";
 import { useCourse } from "api/course/hooks";
+import { useSections, useSectionsMap } from "api/section/hooks";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -15,6 +17,8 @@ export default function CoursePage() {
   const { currentUser, isAuthenticated } = useAuth();
   const { courseID } = router.query;
   const [course, courseLoading] = useCourse(courseID as string);
+  const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(courseID as string);
+  const [sectionsMap, sectionsMapLoading] = useSectionsMap(courseID as string);
 
   const access = currentUser && currentUser.permissions?.[courseID as string];
 
@@ -30,8 +34,8 @@ export default function CoursePage() {
   }, [router, course, courseLoading]);
 
   return (
-    <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
-      {course && !courseLoading &&
+    <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading || sectionsMapLoading || assignmentsMapLoading}>
+      {course && !courseLoading && assignmentsMap && !assignmentsMapLoading && sectionsMap && !sectionsMapLoading &&
         <Stack pt={8} gap={4}>
           <Grid container>
             <Grid item xs={2} />
@@ -40,7 +44,7 @@ export default function CoursePage() {
             </Grid>
           </Grid>
           {access ?
-            <CourseAdminView course={course} access={access} /> :
+            <CourseAdminView {...{ course, assignmentsMap, sectionsMap, access }} /> :
             <CourseStudentView course={course} />}
         </Stack>
       }

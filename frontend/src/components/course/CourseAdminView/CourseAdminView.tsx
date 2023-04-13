@@ -12,13 +12,17 @@ import PeopleView from "./PeopleView/PeopleView";
 import { useRouter } from "next/router";
 import SettingsView from "./SettingsView/SettingsView";
 import { CoursePermission } from "model/user";
+import { Assignment } from "model/assignment";
+import { Section } from "model/section";
 
 export interface CourseAdminViewProps {
   course: Course;
   access: CoursePermission;
+  assignmentsMap: Record<string, Assignment>;
+  sectionsMap: Record<string, Section>;
 }
 
-export default function CourseAdminView({ course, access }: CourseAdminViewProps) {
+export default function CourseAdminView({ course, access, sectionsMap, assignmentsMap }: CourseAdminViewProps) {
   const router = useRouter();
   const { courseID } = router.query;
 
@@ -37,10 +41,10 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
       <Grid xs>
         {router.query.view &&
           <>
-            {router.query.view === "sections" && <SectionsView course={course} access={access} />}
-            {router.query.view === "assignments" && <AssignmentsView course={course} access={access} />}
-            {router.query.view === "people" && <PeopleView course={course} />}
-            {router.query.view === "requests" && <RequestsView course={course} />}
+            {router.query.view === "sections" && <SectionsView {...{ course, access, sectionsMap }} />}
+            {router.query.view === "assignments" && <AssignmentsView {...{ course, access, assignmentsMap, sectionsMap }} />}
+            {router.query.view === "people" && <PeopleView {...{ course, access, assignmentsMap, sectionsMap }} />}
+            {router.query.view === "requests" && <RequestsView {...{ course, access, assignmentsMap, sectionsMap }} />}
             {router.query.view === "settings" &&
               (access === CoursePermission.CourseAdmin ?
                 <SettingsView course={course} /> :

@@ -11,21 +11,20 @@ import { Section } from "model/section";
 import { useEffect, useState } from "react";
 import PeopleTable from "./PeopleTable";
 import { useAssignments } from "api/assignment/hooks";
+import { Assignment } from "model/assignment";
+import { CoursePermission } from "model/user";
 
 export interface PeopleViewProps {
   course: Course;
+  access: CoursePermission;
+  assignmentsMap: Record<string, Assignment>;
+  sectionsMap: Record<string, Section>;
 }
 
-export default function PeopleView({ course }: PeopleViewProps) {
-  const [sections, sectionsLoading] = useSections(course.ID)
-  const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>(undefined)
-  const [assignments, loading] = useAssignments(course.ID);
+export default function PeopleView({ course, access, assignmentsMap, sectionsMap }: PeopleViewProps) {
+  const assignments = Object.keys(assignmentsMap).map((aid) => assignmentsMap[aid]);
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
-
-  useEffect(() => {
-    sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
-  }, [sections])
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
