@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ClipboardJS from 'clipboard';
 import { useEffect, useRef } from "react";
+import AccessList from "@components/shared/AccessList/AccessList";
+import { useCourseStaff } from "api/course/hooks";
+import { CoursePermission } from "model/user";
 
 export interface SettingsViewProps {
     course: Course;
@@ -13,6 +16,8 @@ export interface SettingsViewProps {
 
 export default function SettingsView({ course }: SettingsViewProps) {
     const copyButtonRef = useRef(null);
+    const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
+    const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
 
     useEffect(() => {
         if (copyButtonRef.current) {
@@ -39,8 +44,9 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     Settings
                 </Typography>
             </Stack>
-            <Stack direction="column" spacing={3} my={2}>
-                <Stack direction="column" maxWidth="70%">
+            <Stack direction="column" spacing={4} my={2}>
+
+                <Stack direction="column">
                     <Stack direction="row" alignItems="center" spacing={0.5}>
                         <Typography fontWeight={500}>
                             Course Entry Code:
@@ -55,9 +61,10 @@ export default function SettingsView({ course }: SettingsViewProps) {
                         Students can join this course on Here using this code.
                     </Typography>
                 </Stack>
+
                 <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} mb={2}>
                     <Stack direction="column" maxWidth="70%">
-                        <Typography fontSize={16} fontWeight={500}>
+                        <Typography fontWeight={500}>
                             Auto-Approve Swap Requests: {course.autoApproveRequests ? "On" : "Off"}
                         </Typography>
                         <Typography>
@@ -67,6 +74,18 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     <Button variant="outlined" onClick={() => changeAutoApproveRequests()}>
                         Turn {course.autoApproveRequests ? "Off" : "On"}
                     </Button>
+                </Stack>
+
+                <Stack direction="column" spacing={1.5}>
+                    <Typography fontWeight={500}>
+                        Admin & Staff
+                    </Typography>
+
+                    {admin && staff &&
+                        <Stack spacing={0.5}>
+                            <AccessList access={CoursePermission.CourseAdmin} users={admin} emails={[]} />
+                            <AccessList course={course} access={CoursePermission.CourseStaff} users={staff} emails={[]} />
+                        </Stack>}
                 </Stack>
             </Stack >
         </>

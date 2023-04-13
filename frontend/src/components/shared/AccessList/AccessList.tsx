@@ -8,8 +8,8 @@ import { FC } from "react";
 import toast from "react-hot-toast";
 import AddAccessButton from "./AddAccessButton";
 
-interface CourseAccessListItemProps {
-    course?: Course;
+interface AccessListProps {
+    course?: Course; // if course is passed in, the list is editable
     access: CoursePermission;
     users: User[];
     emails: string[];
@@ -20,7 +20,7 @@ interface UserData {
     email?: string;
 }
 
-const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, users, emails }) => {
+const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
 
     const editable = course !== undefined;
     const data: UserData[] = users && emails && users.map((user) => ({ user } as UserData)).concat(emails.map((email) => ({ email } as UserData)))
@@ -41,7 +41,7 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
 
     return (
         <Stack direction="row" alignItems="start">
-            <Box width={65} mt={0.5}>
+            <Box width={60} mt={0.5}>
                 <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(access)}</Typography>
             </Box>
             {data && <Box display="flex" flexWrap="wrap" flexDirection="row" alignItems="center">
@@ -75,4 +75,4 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
     )
 }
 
-export default CourseAccessListItem
+export default AccessList

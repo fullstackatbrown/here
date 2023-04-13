@@ -4,7 +4,7 @@ import { Box, Collapse, Stack, Typography, useTheme } from "@mui/material";
 import { SinglePermissionRequest } from "model/course";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
-import CourseAccessListItem from "../AllCourses/CourseAccessListItem";
+import AccessList from "../../shared/AccessList/AccessList";
 
 interface ConfirmUploadListItemProps {
     courseCode: string;
@@ -49,8 +49,8 @@ const ConfirmUploadListItem: FC<ConfirmUploadListItemProps> = ({ courseCode, cou
             </Box >
             <Collapse in={expanded}>
                 <Stack ml={4} mt={1} mb={2} spacing={1}>
-                    <CourseAccessListItem access={CoursePermission.CourseAdmin} users={[]} emails={getEmailsByPermission(CoursePermission.CourseAdmin)} />
-                    <CourseAccessListItem access={CoursePermission.CourseStaff} users={[]} emails={getEmailsByPermission(CoursePermission.CourseStaff)} />
+                    <AccessList access={CoursePermission.CourseAdmin} users={[]} emails={getEmailsByPermission(CoursePermission.CourseAdmin)} />
+                    <AccessList access={CoursePermission.CourseStaff} users={[]} emails={getEmailsByPermission(CoursePermission.CourseStaff)} />
                 </Stack>
             </Collapse>
         </>

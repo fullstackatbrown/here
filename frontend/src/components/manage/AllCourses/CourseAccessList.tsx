@@ -8,7 +8,7 @@ import { Course, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
 import CreateEditCourseDialog from "../CreateEditCourseDialog/CreateEditCourseDialog";
-import CourseAccessListItem from "./CourseAccessListItem";
+import CourseAccessListItem from "../../shared/AccessList/AccessList";
 import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
 import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
