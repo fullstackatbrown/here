@@ -5,8 +5,8 @@
 import { Course } from "model/course";
 
 function termComparator(a: string, b: string) {
-    const [aSeason, aYear] = a.split(" ");
-    const [bSeason, bYear] = b.split(" ");
+    const [aSeason, aYear] = a.toLowerCase().split(" ");
+    const [bSeason, bYear] = b.toLowerCase().split(" ");
 
     if (aYear > bYear) {
         return -1;
@@ -15,10 +15,10 @@ function termComparator(a: string, b: string) {
     } else {
         if (aSeason === "Winter") {
             return -1;
-        } else if (aSeason === "Spring") {
-            return bSeason === "Winter" ? 1 : -1;
-        } else if (aSeason === "Summer") {
-            return bSeason === "Fall" ? -1 : 1;
+        } else if (aSeason === "spring") {
+            return bSeason === "winter" ? 1 : -1;
+        } else if (aSeason === "wummer") {
+            return bSeason === "fall" ? -1 : 1;
         } else {
             return 1;
         }
