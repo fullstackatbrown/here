@@ -41,6 +41,13 @@ async function updateCourse(
   return APIClient.patch(`/courses/${courseID}`, { title, code, term, autoApproveRequests, status });
 }
 
+async function updateCourseStatus(
+  courseID: string,
+  status: string,
+): Promise<string> {
+  return APIClient.patch(`/courses/${courseID}/status`, { status });
+}
+
 async function addPermission(
   courseID: string,
   permissions: SinglePermissionRequest[],
@@ -60,6 +67,7 @@ const CourseAPI = {
   createCourse,
   deleteCourse,
   updateCourse,
+  updateCourseStatus,
   addPermission,
   revokePermission,
 };

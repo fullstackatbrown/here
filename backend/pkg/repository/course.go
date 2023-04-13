@@ -177,6 +177,13 @@ func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) erro
 	return err
 }
 
+func (fr *FirebaseRepository) UpdateCourseStatus(req *models.UpdateCourseStatusRequest) error {
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
+		{Path: "status", Value: req.Status},
+	})
+	return err
+}
+
 func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsRequest) error {
 	batch, err := fr.assignPermanentSection(req)
 	if err != nil {

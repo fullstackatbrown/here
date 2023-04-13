@@ -62,7 +62,11 @@ type UpdateCourseRequest struct {
 	Code                *string `json:"code,omitempty"`
 	Term                *string `json:"term,omitempty"`
 	AutoApproveRequests *bool   `json:"autoApproveRequests,omitempty"`
-	Status              *string `json:"status,omitempty"`
+}
+
+type UpdateCourseStatusRequest struct {
+	CourseID string       `json:"courseid,omitempty"`
+	Status   CourseStatus `json:"status"`
 }
 
 type AssignSectionsRequest struct {

@@ -21,6 +21,8 @@ func CourseRoutes() *chi.Mux {
 		r.Get("/", getCourseHandler)
 		r.Delete("/", deleteCourseHandler)
 		r.Patch("/", updateCourseHandler)
+		r.Patch("/status", updateCourseStatusHandler)
+
 		r.Post("/assignSection", assignSectionHandler)
 
 		r.Mount("/sections", SectionRoutes())
@@ -110,6 +112,29 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully updated course " + courseID))
+}
+
+func updateCourseStatusHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := chi.URLParam(r, "courseID")
+
+	var req *models.UpdateCourseStatusRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	req.CourseID = courseID
+
+	err = repo.Repository.UpdateCourseStatus(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated course status " + courseID))
 }
 
 func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
