@@ -53,7 +53,7 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
                     </Stack>
                     {hover &&
                         <Tooltip title="Bulk Upload" placement="right">
-                            <IconButton color="inherit" sx={{ p: 0.8 }} onClick={handleOpenBulkUploadDialog}>
+                            <IconButton sx={{ p: 0.8 }} onClick={handleOpenBulkUploadDialog}>
                                 <CloudUploadOutlinedIcon sx={{ fontSize: 20 }} />
                             </IconButton>
                         </Tooltip>

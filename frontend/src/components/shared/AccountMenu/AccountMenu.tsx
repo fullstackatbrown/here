@@ -139,7 +139,7 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                                             <ListItemIcon>
                                                 <School />
                                             </ListItemIcon>
-                                            <ListItemText primary="Manage Courses" />
+                                            <ListItemText primary="Manage Site" />
                                         </ListItemButton>
                                     </ListItem>
                                     <ListItem disablePadding>

@@ -1,27 +1,26 @@
 import { ExpandMore } from "@mui/icons-material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Box, Collapse, Stack, Typography, useTheme } from "@mui/material";
-import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
+import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import { useCourseStaff } from "api/course/hooks";
 import { Course } from "model/course";
 import { CoursePermission } from "model/user";
 import { FC, useEffect, useState } from "react";
 import CourseAccessListItem from "./CourseAccessListItem";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface CourseAccessListProps {
     course: Course;
 }
 const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     const [expanded, setExpanded] = useState(false);
+    const [hover, setHover] = useState(false);
     const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
     const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
     const theme = useTheme();
 
-    useEffect(() => {
-        if (!staffLoading && !adminLoading) {
-            setExpanded(true);
-        }
-    }, [staffLoading, adminLoading])
+    const handleOpenEditCourseDialog = (e: React.MouseEvent<HTMLElement>) => {
+        e.stopPropagation();
+    }
 
     return (
         <>
@@ -30,6 +29,8 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
                 px={1}
                 py={0.5}
                 onClick={() => setExpanded(!expanded)}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
             >
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
                     <Stack direction="row" spacing={4} alignItems="center" py={0.5}>
@@ -45,6 +46,14 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
                             <Typography>{course.code}: {course.title}</Typography>
                         </Stack>
                     </Stack>
+                    {hover &&
+                        <Tooltip title="Edit Course Info" placement="right">
+                            <IconButton sx={{ p: 0.5 }} onClick={handleOpenEditCourseDialog}>
+                                <EditIcon sx={{ fontSize: 18 }} />
+                            </IconButton>
+                        </Tooltip>
+                    }
+
                 </Stack >
             </Box >
             <Collapse in={expanded}>
