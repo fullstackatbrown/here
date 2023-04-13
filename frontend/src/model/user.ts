@@ -1,8 +1,8 @@
 
 export const enum CoursePermission {
-  CourseAdmin = "ADMIN",
-  CourseStaff = "STAFF",
-  CourseStudent = "STUDENT",
+  CourseAdmin = "admin",
+  CourseStaff = "staff",
+  CourseStudent = "student",
 }
 
 export interface User {

@@ -7,8 +7,8 @@ const (
 type CoursePermission string
 
 const (
-	CourseAdmin CoursePermission = "ADMIN"
-	CourseStaff CoursePermission = "STAFF"
+	CourseAdmin CoursePermission = "admin"
+	CourseStaff CoursePermission = "staff"
 )
 
 // Profile is a collection of standard profile information for a user.

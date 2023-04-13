@@ -3,9 +3,10 @@ import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, S
 import Button from "@components/shared/Button";
 import { useForm } from "react-hook-form";
 import AddCoursesStep, { AddCoursesData } from "./AddCoursesStep";
-import { parseCourses, parseTerm } from "@util/shared/parseBulkUpload";
+import { parseCourses, parseStaffData, parseTerm } from "@util/shared/parseBulkUpload";
 import AddStaffStep, { AddStaffData } from "./AddStaffStep";
 import { capitalizeFirstLetter } from "@util/shared/string";
+import { SinglePermissionRequest } from "model/course";
 
 // TODO: handle term name
 
@@ -18,12 +19,12 @@ const steps = ['Add Courses', 'Add Admin & Staff', 'Validate Data', 'Upload Succ
 
 const instructions = [
     [
-        "Paste comma-separated values with the following schema: (course_code,course_name). E.g.",
+        "Paste comma-separated values with the following schema: (course_code,course_name).",
         "Rows with empty course codes or names will be ignored",
     ],
     [
-        "Paste comma-separated values with the following schema: (email,[staff/admin],course_code). E.g.",
-        "Rows with invalid emails or staff options will be ignored.",
+        "Paste comma-separated values with the following schema: (email,[staff/admin],course_code).",
+        "Rows with empty fields will be ignored",
     ],
     [],
     []
@@ -50,6 +51,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
     const [addCoursesData, setAddCoursesData] = useState<AddCoursesData | undefined>({ term: "", data: "" });
     const [term, setTerm] = useState<string | undefined>(undefined);
     const [courses, setCourses] = useState<Record<string, string> | undefined>(undefined);
+    const [permissionsByCourse, setPermissionsByCourse] = useState<Record<string, SinglePermissionRequest[]> | undefined>(undefined);
 
     const [addStaffData, setAddStaffData] = useState<AddStaffData>({ data: "" });
 
@@ -94,6 +96,22 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
     }
 
     const handleValidateData = () => {
+        setError(undefined)
+
+        if (addStaffData.data === "") {
+            setError([1, "All fields must be filled out"])
+            return
+        }
+
+        const [permissions, error] = parseStaffData(addStaffData.data, courses!)
+        if (error !== undefined) {
+            setError([1, error])
+            return
+        }
+
+        setPermissionsByCourse(permissions)
+        console.log(permissions)
+
         handleNext()
     }
 
@@ -173,8 +191,8 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
                 {
                     {
                         0: <Button onClick={handleAddCourses} variant="contained">Next</Button>,
-                        1: <Button onClick={handleValidateData} variant="contained">Validate</Button>,
-                        2: <Button onClick={handleUpload} variant="contained">Upload</Button>,
+                        1: <Button onClick={handleValidateData} variant="contained">Next</Button>,
+                        2: <Button onClick={handleUpload} variant="contained">Confirm Upload</Button>,
                         3: <Button onClick={handleClose} variant="contained">Complete</Button>
                     }[activeStep]
                 }
