@@ -16,7 +16,7 @@ export interface BulkUploadDialogProps {
     onClose: () => void;
 }
 
-const steps = ['Add Courses', 'Add Admin & Staff', 'Confirm', 'Success'];
+const steps = ['Add Courses', 'Add Admin & Staff', 'Confirm'];
 
 const instructions = [
     [
@@ -53,6 +53,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
     const [term, setTerm] = useState<string | undefined>(undefined);
     const [courses, setCourses] = useState<Record<string, string> | undefined>(undefined);
     const [permissionsByCourse, setPermissionsByCourse] = useState<Record<string, SinglePermissionRequest[]> | undefined>(undefined);
+    const [success, setSuccess] = useState<boolean>(false);
 
     const [addStaffData, setAddStaffData] = useState<AddStaffData>({ data: "" });
 
@@ -68,6 +69,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
         setActiveStep(0);
         setError(undefined);
         setAddCoursesData({ term: "", data: "" });
+        setSuccess(false);
     }
 
     const handleAddCourses = () => {
@@ -116,8 +118,9 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
         handleNext()
     }
 
-    const handleUpload = () => {
-        handleNext()
+    const handleConfirmUpload = () => {
+        // TODO: make request
+        setSuccess(true)
     }
 
     const handleClose = () => {
@@ -173,10 +176,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
                         {
                             0: <AddCoursesStep addCoursesData={addCoursesData} setAddCoursesData={setAddCoursesData} />,
                             1: <AddStaffStep addStaffData={addStaffData} setAddStaffData={setAddStaffData} />,
-                            2: <ConfirmUploadStep term={term!} courses={courses!} permissionsByCourse={permissionsByCourse!} />,
-                            3: <Typography textAlign="center" mt={8} fontSize={18}>
-                                Successfully added N courses for term XXX!
-                            </Typography>
+                            2: <ConfirmUploadStep term={term!} courses={courses!} permissionsByCourse={permissionsByCourse!} success={success} />,
                         }[activeStep]
                     }
                 </Box>
@@ -184,17 +184,16 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
             </Box>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between", mx: 1 }}>
-            <Button onClick={handleClose}>Cancel</Button>
+            {success ? <Box /> : <Button onClick={handleClose}>Cancel</Button>}
             <Stack direction="row" spacing={2}>
-
-                <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>Back</Button>
-                {/* {!(activeStep === 0 || activeStep === steps.length - 1) && <Button onClick={handleBack} sx={{ mr: 1 }}>Back</Button>} */}
+                {!(activeStep === 0 || activeStep === steps.length - 1) && <Button onClick={handleBack} sx={{ mr: 1 }}>Back</Button>}
                 {
                     {
                         0: <Button onClick={handleAddCourses} variant="contained">Next</Button>,
                         1: <Button onClick={handleValidateData} variant="contained">Next</Button>,
-                        2: <Button onClick={handleUpload} variant="contained">Confirm Upload</Button>,
-                        3: <Button onClick={handleClose} variant="contained">Complete</Button>
+                        2: success ?
+                            <Button onClick={handleClose} variant="contained">Complete</Button> :
+                            <Button onClick={handleConfirmUpload} variant="contained">Confirm Upload</Button>,
                     }[activeStep]
                 }
             </Stack>
