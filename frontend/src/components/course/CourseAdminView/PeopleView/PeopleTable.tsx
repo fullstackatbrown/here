@@ -3,13 +3,19 @@ import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { sortStudentsByName } from "@util/shared/formatStudentsList";
-import { CourseUserData } from 'model/course';
+import { useAssignments } from "api/assignment/hooks";
+import { Assignment } from "model/assignment";
+import { Course, CourseUserData } from 'model/course';
 import { Section } from "model/section";
 import { FC, useEffect, useState } from "react";
+import StudentDialog from "./StudentDialog";
+import { User } from "model/user";
 
 export interface PeopleTableProps {
+    course: Course;
     students: CourseUserData[];
     sectionsMap: Record<string, Section>;
+    assignments: Assignment[];
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -23,10 +29,12 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const PeopleTable: FC<PeopleTableProps> = ({ students, sectionsMap }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap }) => {
     const rowsPerPage = 10;
     const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortStudentsByName(students));
     const [page, setPage] = useState(0);
+    const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
+
 
     useEffect(() => {
         setStudentsSorted(sortStudentsByName(students))
@@ -34,6 +42,11 @@ const PeopleTable: FC<PeopleTableProps> = ({ students, sectionsMap }) => {
 
     return (
         <>
+            <StudentDialog
+                {...{ course, assignments, sectionsMap }}
+                studentID={selectedStudent}
+                open={selectedStudent !== undefined}
+                onClose={() => setSelectedStudent(undefined)} />
             <Table>
                 <colgroup>
                     <col width="20%" />
@@ -54,7 +67,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ students, sectionsMap }) => {
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((student) => {
                             return (
-                                <TableRow key={student.studentID} hover onClick={() => { }}>
+                                <TableRow key={student.studentID} hover onClick={() => { setSelectedStudent(student.studentID) }}>
                                     <TableCell component="th" scope="row">
                                         {student.displayName}
                                     </TableCell>

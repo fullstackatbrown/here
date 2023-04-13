@@ -10,6 +10,7 @@ import { Course } from "model/course";
 import { Section } from "model/section";
 import { useEffect, useState } from "react";
 import PeopleTable from "./PeopleTable";
+import { useAssignments } from "api/assignment/hooks";
 
 export interface PeopleViewProps {
   course: Course;
@@ -18,6 +19,7 @@ export interface PeopleViewProps {
 export default function PeopleView({ course }: PeopleViewProps) {
   const [sections, sectionsLoading] = useSections(course.ID)
   const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>(undefined)
+  const [assignments, loading] = useAssignments(course.ID);
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
 
@@ -69,7 +71,9 @@ export default function PeopleView({ course }: PeopleViewProps) {
       </Stack >
       {!course.students || Object.keys(course.students).length === 0 ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-        (sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} sectionsMap={sectionsMap} />)
+        (sectionsMap && assignments &&
+          <PeopleTable {...{ course, assignments, sectionsMap }} students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} />)
+
       }
     </>
   );
