@@ -10,13 +10,14 @@ export default function Manage() {
     return (
         <AppLayout maxWidth="md" loading={loading}>
             <Stack spacing={5} mt={15}>
-                {currentUser && currentUser?.isAdmin ?
-                    <>
-                        <AllCourses />
-                        <AdminList />
-                    </> :
-                    <Typography textAlign="center" variant="h6">Sorry, you don't have the permissions to access this page.</Typography>
-                }
+                {currentUser &&
+                    (currentUser?.isAdmin ?
+                        <>
+                            <AllCourses />
+                            <AdminList />
+                        </> :
+                        <Typography textAlign="center" variant="h6">Sorry, you don't have the permissions to access this page.</Typography>
+                    )}
             </Stack>
         </AppLayout>
     );
