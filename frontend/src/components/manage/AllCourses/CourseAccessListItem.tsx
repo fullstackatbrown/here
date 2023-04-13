@@ -1,6 +1,6 @@
 import { Box, Chip, Stack, Tooltip, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { CapitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeFirstLetter } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course } from "model/course";
 import { CoursePermission, User } from "model/user";
@@ -30,7 +30,7 @@ const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, u
     return (
         <Stack direction="row" alignItems="start">
             <Box mt={0.5} width={50}>
-                <Typography color="secondary" fontSize={14}>{CapitalizeFirstLetter(access)}</Typography>
+                <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(access)}</Typography>
             </Box>
             <Box display="flex" flexWrap="wrap" flexDirection="row" alignItems="center">
                 {users.length === 0 ?

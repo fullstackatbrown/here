@@ -1,16 +1,14 @@
-import React, { FC, useState } from "react";
-import EditCourseDialog from "@components/manage/EditCourseDialog";
-import { Box, Button, Divider, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import IconButton from "@components/shared/IconButton";
-import ConfirmButton from "@components/shared/ConfirmButton";
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import DoDisturbOnOutlinedIcon from '@mui/icons-material/DoDisturbOnOutlined';
+import { Button, Stack, Typography } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
+import { capitalizeFirstLetter } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course, CourseStatus } from "model/course";
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import ActivateCourseDialog from "../ActivateCourseDialog/ActivateCourseDialog";
-import { handleBadRequestError } from "@util/errors";
+import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
+import ActivateCourseDialog from "../ActivateCourseDialog/ActivateCourseDialog";
 
 export interface CourseListItemProps {
     course: Course;
@@ -18,8 +16,6 @@ export interface CourseListItemProps {
 
 const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
     const [activateCourseDialogOpen, setActivateCourseDialogOpen] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-    const handleCloseEdit = () => setOpenEdit(false);
 
     const handleChangeCourseStatus = (status: CourseStatus) => {
         return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -57,11 +53,10 @@ const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
     return (
         <>
             <ActivateCourseDialog course={course} open={activateCourseDialogOpen} onClose={() => { setActivateCourseDialogOpen(false) }} />
-            <EditCourseDialog course={course} open={openEdit} onClose={handleCloseEdit} />
             <Stack direction="row" display="flex" justifyContent="space-between">
                 <Stack>
                     <Typography>{course.code}: {course.title}</Typography>
-                    <Typography color="secondary" fontSize={14}>{course.term}</Typography>
+                    <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(course.term)}</Typography>
                 </Stack>
                 <Stack>
                     {course.status === CourseStatus.CourseInactive &&
@@ -71,13 +66,9 @@ const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
                     }
                     {course.status === CourseStatus.CourseActive &&
                         <Stack direction="row" spacing={0.5}>
-                            <IconButton label="Edit" size="small"
-                                onClick={() => setOpenEdit(true)}>
-                                <EditIcon sx={{ fontSize: 20 }} />
-                            </IconButton>
                             <IconButton label="Deactivate" size="small"
                                 onClick={handleChangeCourseStatus(CourseStatus.CourseInactive)}>
-                                <CloseIcon sx={{ fontSize: 20 }} />
+                                <DoDisturbOnOutlinedIcon sx={{ fontSize: 20 }} />
                             </IconButton>
                             <IconButton label="Archive" size="small"
                                 onClick={handleChangeCourseStatus(CourseStatus.CourseArchived)} >

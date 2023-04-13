@@ -1,26 +1,19 @@
 import Button from "@components/shared/Button";
 import {
-    Box,
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, FormControl,
-    InputLabel, MenuItem, Select, Stack,
+    DialogTitle,
+    Stack,
     TextField
 } from "@mui/material";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { Errors, handleBadRequestError } from "@util/errors";
-import SectionAPI from "api/section/api";
-import dayjs, { Dayjs } from 'dayjs';
-import { FC, useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { Day, Section } from "model/section";
-import { Course } from "model/course";
+import { handleBadRequestError } from "@util/errors";
+import { formatCourseCode, formatCourseTerm } from "@util/shared/string";
 import CourseAPI from "api/course/api";
-import { FormatCourseCode, FormatCourseTerm } from "@util/shared/string";
+import { Course } from "model/course";
+import { FC, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export interface CreateEditCourseDialogProps {
     open: boolean;
@@ -50,7 +43,7 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
     const onSubmit = handleSubmit(async data => {
         if (course) {
             toast.promise(CourseAPI.updateCourse(
-                course.ID, data.title, FormatCourseCode(data.code), FormatCourseTerm(data.term)),
+                course.ID, data.title, formatCourseCode(data.code), formatCourseTerm(data.term)),
                 {
                     loading: 'Updating course...',
                     success: 'Course updated!',
@@ -61,7 +54,7 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
                 .catch(() => { })
         } else {
             toast.promise(CourseAPI.createCourse(
-                data.title, FormatCourseCode(data.code), FormatCourseTerm(data.term)),
+                data.title, formatCourseCode(data.code), formatCourseTerm(data.term)),
                 {
                     loading: 'Creating course...',
                     success: 'Course created!',
@@ -95,6 +88,7 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
                         type="text"
                         fullWidth
                     />
+                    {/* TODO: better way to enter term, string is too dangerous, or find a way to validate */}
                     <TextField
                         {...register("term")}
                         label="Term"

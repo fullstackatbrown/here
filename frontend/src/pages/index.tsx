@@ -8,7 +8,7 @@ import AppLayout from "components/shared/AppLayout";
 import { useEffect, useState } from "react";
 import { useAuth } from "api/auth/hooks";
 import { CourseStatus } from "model/course";
-import { CapitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeFirstLetter } from "@util/shared/string";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
@@ -24,7 +24,7 @@ export default function Home() {
                     {!loading && getTerms(courses).map((term, index) => (
                         <Box key={term} my={4}>
                             <Typography variant="body1" my={1} ml={0.5} sx={{ fontWeight: 500 }}>
-                                {CapitalizeFirstLetter(term)}
+                                {capitalizeFirstLetter(term)}
                             </Typography>
                             <Grid
                                 spacing={3}

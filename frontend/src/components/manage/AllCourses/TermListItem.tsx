@@ -3,7 +3,7 @@ import { ExpandMore } from "@mui/icons-material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Button, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
-import { CapitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeFirstLetter } from "@util/shared/string";
 import { useCourseStaff } from "api/course/hooks";
 import { Course } from "model/course";
 import { CoursePermission } from "model/user";
@@ -47,7 +47,7 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
                                     />
                                 }
                             </Box>
-                            <Typography fontSize={17} fontWeight={500}>{CapitalizeFirstLetter(term)}</Typography>
+                            <Typography fontSize={17} fontWeight={500}>{capitalizeFirstLetter(term)}</Typography>
                             <Typography fontSize={16} color="secondary">{courses.length} course{courses.length > 1 && "s"}</Typography>
                         </Stack>
                     </Stack>
