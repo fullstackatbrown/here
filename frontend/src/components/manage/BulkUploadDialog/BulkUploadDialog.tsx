@@ -7,6 +7,7 @@ import { parseCourses, parseStaffData, parseTerm } from "@util/shared/parseBulkU
 import AddStaffStep, { AddStaffData } from "./AddStaffStep";
 import { capitalizeFirstLetter } from "@util/shared/string";
 import { SinglePermissionRequest } from "model/course";
+import ConfirmUploadStep from "./ConfirmUploadStep";
 
 // TODO: handle term name
 
@@ -15,7 +16,7 @@ export interface BulkUploadDialogProps {
     onClose: () => void;
 }
 
-const steps = ['Add Courses', 'Add Admin & Staff', 'Validate Data', 'Upload Success'];
+const steps = ['Add Courses', 'Add Admin & Staff', 'Confirm', 'Success'];
 
 const instructions = [
     [
@@ -172,7 +173,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
                         {
                             0: <AddCoursesStep addCoursesData={addCoursesData} setAddCoursesData={setAddCoursesData} />,
                             1: <AddStaffStep addStaffData={addStaffData} setAddStaffData={setAddStaffData} />,
-                            2: <></>,
+                            2: <ConfirmUploadStep term={term!} courses={courses!} permissionsByCourse={permissionsByCourse!} />,
                             3: <Typography textAlign="center" mt={8} fontSize={18}>
                                 Successfully added N courses for term XXX!
                             </Typography>

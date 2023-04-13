@@ -22,7 +22,7 @@ const AddStaffStep: FC<AddStaffStepProps> = ({ addStaffData, setAddStaffData }) 
             type="textarea"
             fullWidth
             multiline
-            rows={15}
+            rows={11}
             size="small"
             variant="outlined"
             value={addStaffData.data}

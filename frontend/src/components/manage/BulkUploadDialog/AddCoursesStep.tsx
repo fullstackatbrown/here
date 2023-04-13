@@ -33,7 +33,7 @@ const AddCoursesStep: FC<AddCoursesStepProps> = ({ addCoursesData, setAddCourses
             type="textarea"
             fullWidth
             multiline
-            rows={8}
+            rows={10}
             size="small"
             variant="outlined"
             value={addCoursesData.data}

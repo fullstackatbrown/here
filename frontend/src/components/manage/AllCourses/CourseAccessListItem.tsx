@@ -9,44 +9,66 @@ import toast from "react-hot-toast";
 import AddAccessButton from "./AddAccessButton";
 
 interface CourseAccessListItemProps {
-    course: Course;
+    course?: Course;
     access: CoursePermission;
     users: User[];
+    emails: string[];
 }
-const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, users }) => {
+
+interface UserData {
+    user?: User;
+    email?: string;
+}
+
+const CourseAccessListItem: FC<CourseAccessListItemProps> = ({ course, access, users, emails }) => {
+
+    const editable = course !== undefined;
+    const data: UserData[] = users && emails && users.map((user) => ({ user } as UserData)).concat(emails.map((email) => ({ email } as UserData)))
 
     const handleRevokeUserAccess = (user: User) => {
-        const confirmed = confirm(`Are you sure you want to revoke ${user.displayName}'s ${access.toLowerCase()} access?`);
-        if (confirmed) {
-            toast.promise(CourseAPI.revokePermission(course.ID, user.ID), {
-                loading: "Revoking access...",
-                success: "Access revoked!",
-                error: (err) => handleBadRequestError(err),
-            })
-                .catch(() => { })
+        return () => {
+            const confirmed = confirm(`Are you sure you want to revoke ${user.displayName}'s ${access.toLowerCase()} access?`);
+            if (confirmed) {
+                toast.promise(CourseAPI.revokePermission(course.ID, user.ID), {
+                    loading: "Revoking access...",
+                    success: "Access revoked!",
+                    error: (err) => handleBadRequestError(err),
+                })
+                    .catch(() => { })
+            }
         }
     }
 
     return (
         <Stack direction="row" alignItems="start">
-            <Box mt={0.5} width={50}>
+            <Box width={65}>
                 <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(access)}</Typography>
             </Box>
-            <Box display="flex" flexWrap="wrap" flexDirection="row" alignItems="center">
-                {users.length === 0 ?
+            {data && <Box display="flex" flexWrap="wrap" flexDirection="row" alignItems="center">
+                {data.length === 0 ?
                     <Typography mx={0.5} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography> :
-                    users.map((user) => (
-                        <Tooltip title={user.email} placement="right" sx={{ marginRight: 0.5 }}>
-                            <Chip
-                                label={user.displayName}
-                                size="small"
-                                onDelete={() => handleRevokeUserAccess(user)}
-                            />
-                        </Tooltip>
-                    ))
+                    data.map((data) => {
+                        if (data.user) {
+                            return <Tooltip title={data.user.email} placement="right" sx={{ marginRight: 0.5 }}>
+                                <Chip
+                                    label={data.user.displayName}
+                                    size="small"
+                                    onDelete={editable && handleRevokeUserAccess(data.user)}
+                                />
+                            </Tooltip>
+                        } else {
+                            return <Tooltip title={data.email} placement="right" sx={{ marginRight: 0.5 }}>
+                                <Chip
+                                    label={data.email}
+                                    size="small"
+                                />
+                            </Tooltip>
+
+                        }
+                    })
                 }
-                <AddAccessButton course={course} access={access} />
-            </Box>
+                {editable && <AddAccessButton course={course} access={access} />}
+            </Box>}
         </Stack>
     )
 }
