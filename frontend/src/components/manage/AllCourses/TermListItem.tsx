@@ -35,7 +35,7 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
             <CreateEditCourseDialog open={addCourseDialogOpen} onClose={() => setAddCourseDialogOpen(false)} />
             <Box
                 sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
-                mx={-4}
+                ml={-4}
                 px={1}
                 py={0.5}
                 onClick={() => setExpanded(!expanded)}

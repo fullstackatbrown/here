@@ -17,7 +17,7 @@ type FormData = {
 const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
     const { register, handleSubmit, reset } = useForm<FormData>();
     const onSubmit = handleSubmit(data => {
-        CourseAPI.bulkUpload(data.term, data.data);
+        // CourseAPI.bulkUpload(data.term, data.data);
         reset();
         onClose();
     });
