@@ -8,8 +8,6 @@ import {
     Typography
 } from "@mui/material";
 import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
-import listToMap from "@util/shared/listToMap";
-import { useAssignments } from "api/assignment/hooks";
 import { useSwapsByStudent } from "api/swaps/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -44,10 +42,7 @@ export default function StudentViewList({ course, sectionsMap, assignmentsMap, s
                 <SwapRequestDialog
                     open={swapRequestDialog}
                     onClose={() => { setSwapRequestDialog(false) }}
-                    course={course}
-                    assignments={assignments}
-                    student={student}
-                    sectionsMap={sectionsMap}
+                    {...{ course, assignments, sectionsMap, student }}
                 />}
             <Stack mt={-1}>
                 <Stack direction="row" justifyContent="space-between">
@@ -61,7 +56,7 @@ export default function StudentViewList({ course, sectionsMap, assignmentsMap, s
                 </Stack>
                 <Collapse in={gradesOpen} timeout="auto" unmountOnExit>
                     {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
-                        <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
+                        <StudentGradesTable assignments={filterAssignmentsByReleaseDate(assignments)} {...{ course, sectionsMap, student }} /> :
                         <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Collapse>
 
@@ -78,8 +73,7 @@ export default function StudentViewList({ course, sectionsMap, assignmentsMap, s
                     {requestsOpen && <Button size="small" onClick={() => setSwapRequestDialog(true)}> + New Request</Button>}
                 </Stack>
                 <Collapse in={requestsOpen} timeout="auto" unmountOnExit sx={{ ml: -4 }}>
-                    {assignments && <StudentRequestsList course={course} student={student} requests={requests} sectionsMap={sectionsMap}
-                        assignmentsMap={listToMap(assignments) as Record<string, Assignment>} />}
+                    {assignments && <StudentRequestsList {...{ course, sectionsMap, student, assignmentsMap, requests }} />}
                 </Collapse>
 
             </Stack >

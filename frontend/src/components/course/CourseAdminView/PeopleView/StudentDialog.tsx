@@ -2,10 +2,10 @@ import StudentGradesTable from "@components/course/CourseStudentView/Grades/Stud
 import {
     Dialog,
     DialogContent,
-    DialogTitle, Stack, Typography
+    DialogTitle,
+    Typography
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { useAssignments } from "api/assignment/hooks";
 import AuthAPI from "api/auth/api";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -50,7 +50,7 @@ const StudentDialogDialog: FC<StudentDialogDialogProps> = ({ course, studentID, 
         <DialogContent>
             <Typography>{student.email}</Typography>
             <Typography>Regular Section: {student.defaultSection?.[course.ID] || "Unassigned"}</Typography>
-            <StudentGradesTable course={course} student={student} assignments={assignments} sectionsMap={sectionsMap} />
+            <StudentGradesTable {...{ course, student, assignments, sectionsMap }} />
         </DialogContent>
     </Dialog>;
 };
