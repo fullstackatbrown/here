@@ -1,13 +1,12 @@
-import { ClickAwayListener, Collapse, IconButton, Input, Stack } from "@mui/material";
-import { FC, useEffect, useRef, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
-import { useForm } from "react-hook-form";
-import { watch } from "fs";
-import toast from "react-hot-toast";
-import CourseAPI from "api/course/api";
+import { ClickAwayListener, Collapse, IconButton, Input, Stack } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
+import CourseAPI from "api/course/api";
 import { Course, SinglePermissionRequest } from "model/course";
 import { CoursePermission } from "model/user";
+import { FC, useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 interface AddAccessButtonProps {
     course: Course;

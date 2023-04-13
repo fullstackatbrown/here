@@ -1,8 +1,7 @@
 import { Button, Dialog, DialogContent, DialogTitle, Stack, Typography } from "@mui/material";
 import { CapitalizeFirstLetter } from "@util/shared/string";
 import { Course } from "model/course";
-import { FC } from "react"
-import CourseListItem from "../CourseListItem";
+import { FC } from "react";
 import CourseAccessList from "./CourseAccessList";
 
 interface ManageCoursesDialogProps {

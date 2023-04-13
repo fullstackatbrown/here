@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import Callout from "@components/shared/Callout";
+import { Feedback, Info, Logout, School, Settings, WbSunny } from "@mui/icons-material";
 import {
     Avatar,
     ButtonBase,
@@ -8,14 +9,14 @@ import {
     Stack, Tooltip,
     Typography
 } from "@mui/material";
-import AuthAPI, { User } from "api/auth/api";
-import FocusTrap from "focus-trap-react";
-import { Feedback, Logout, Settings, WbSunny, Info } from "@mui/icons-material";
 import useThemeMode from "@util/mui/useThemeMode";
 import getInitials from "@util/shared/getInitials";
+import AuthAPI from "api/auth/api";
+import FocusTrap from "focus-trap-react";
 import { useRouter } from "next/router";
+import { FC, useEffect, useRef, useState } from "react";
 import AboutDialog from "../AboutDialog";
-import Callout from "@components/shared/Callout";
+import { User } from "firebase/auth";
 
 export interface AccountMenuProps {
     /** The current user. */
@@ -34,21 +35,6 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
     const [openAbout, setOpenAbout] = useState(false);
     const [themeMode, setThemeMode, prefersDarkMode] = useThemeMode();
     const router = useRouter();
-
-    const [zoomLinkCallout, setZoomLinkCallout] = useState(false);
-    useEffect(() => {
-        if (user) {
-            const zoomCallout = window.localStorage.getItem("zoom-callout");
-            if (zoomCallout === null && Object.keys(user.permissions).length > 0 && user.meetingLink?.length === 0) {
-                setZoomLinkCallout(true);
-            }
-        }
-    }, [user]);
-
-    function handleCloseZoomLinkCallout() {
-        window.localStorage.setItem("zoom-callout", "1");
-        setZoomLinkCallout(false);
-    }
 
     const id = open ? 'simple-popper' : undefined;
     const buttonRef = useRef(null);
@@ -80,16 +66,11 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
     return (<>
         {/* About dialog */}
         <AboutDialog open={openAbout} onClose={() => setOpenAbout(false)} />
-        <Callout isOpen={zoomLinkCallout} title="Add a Zoom link to your profile"
-            body="By adding your Zoom link to your profile, we can automatically provide it to students when you claim them. No more putting Zoom links in the queue title!"
-            anchorComponent={buttonRef.current}
-            onContinue={() => router.push("/settings")} onClose={handleCloseZoomLinkCallout}
-            continueButtonLabel="Add Zoom link" />
         {/*Avatar button*/}
         <Tooltip title={`Signed in as ${user.displayName}`}>
             <ButtonBase aria-label="account menu" sx={{ borderRadius: '100%' }} ref={buttonRef}
                 onClick={() => setOpen(!open)} focusRipple>
-                <Avatar src={user.photoUrl}
+                <Avatar src={user.photoURL}
                     imgProps={{ referrerPolicy: "no-referrer" }}
                     sx={{
                         width: 40,
@@ -111,7 +92,7 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                             <div>
                                 <Stack sx={{ p: 4 }} alignItems="center">
                                     <Avatar
-                                        src={user.photoUrl}
+                                        src={user.photoURL}
                                         imgProps={{ referrerPolicy: "no-referrer" }}
                                         sx={{
                                             width: 96,
@@ -151,6 +132,14 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                                                 <Settings />
                                             </ListItemIcon>
                                             <ListItemText primary="Settings" />
+                                        </ListItemButton>
+                                    </ListItem>
+                                    <ListItem disablePadding>
+                                        <ListItemButton onClick={() => handleClick("/manage")}>
+                                            <ListItemIcon>
+                                                <School />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Manage Courses" />
                                         </ListItemButton>
                                     </ListItem>
                                     <ListItem disablePadding>
