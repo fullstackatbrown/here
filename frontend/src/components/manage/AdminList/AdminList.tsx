@@ -11,8 +11,6 @@ export interface AdminListProps {
 
 const AdminList: FC<AdminListProps> = ({ }) => {
     const [admins, loading] = useAdmins();
-    const { currentUser } = useAuth();
-
 
     return <>
         <Box>

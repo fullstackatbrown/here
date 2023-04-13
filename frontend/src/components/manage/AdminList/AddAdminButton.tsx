@@ -8,6 +8,7 @@ import CourseAPI from "api/course/api";
 import { handleBadRequestError } from "@util/errors";
 import { Course, SinglePermissionRequest } from "model/course";
 import { CoursePermission } from "model/user";
+import AuthAPI from "api/auth/api";
 
 interface AddAdminButtonProps {
 
@@ -31,18 +32,17 @@ const AddAdminButton: FC<AddAdminButtonProps> = ({ }) => {
     }, [showAddAccessTextfield]);
 
     const onSubmit = handleSubmit(async data => {
-        // const permissions: SinglePermissionRequest[] = [{ email: data.email, permission: access }]
-        // toast.promise(CourseAPI.addPermission(course.ID, permissions), {
-        //     loading: "Adding permission...",
-        //     success: "Added permission!",
-        //     error: (err) => handleBadRequestError(err),
-        // })
-        //     .then(() => {
-        //         reset()
-        //         AddAdminButtonRef.current.blur();
-        //         setShowAddAccessTextfield(false)
-        //     })
-        //     .catch(() => { })
+        toast.promise(AuthAPI.editAdminAccess(data.email, true), {
+            loading: "Adding admin...",
+            success: "Added admin!",
+            error: (err) => handleBadRequestError(err),
+        })
+            .then(() => {
+                reset()
+                AddAdminButtonRef.current.blur();
+                setShowAddAccessTextfield(false)
+            })
+            .catch(() => { })
     })
 
     return (

@@ -28,7 +28,7 @@ type Profile struct {
 
 type User struct {
 	*Profile
-	ID                 string
+	ID                 string `json:"id"`
 	Disabled           bool
 	CreationTimestamp  int64
 	LastLogInTimestamp int64

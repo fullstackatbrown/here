@@ -10,6 +10,7 @@ const enum Endpoint {
     ME = '/users/me',
     USER = '/users',
     GET_SESSION = '/users/session',
+    EDIT_ADMIN_ACCESS = '/users/editAdminAccess',
 }
 
 async function getCurrentUser(): Promise<User> {
@@ -70,13 +71,21 @@ async function signInWithGoogle() {
         });
 }
 
+async function editAdminAccess(email: string, isAdmin: boolean): Promise<string> {
+    try {
+        return await APIClient.patch(`${Endpoint.EDIT_ADMIN_ACCESS}`, { email, isAdmin });
+    } catch (e) {
+        throw e;
+    }
+}
 
 const AuthAPI = {
     getCurrentUser,
     getUserById,
     joinCourse,
     quitCourse,
-    signInWithGoogle
+    signInWithGoogle,
+    editAdminAccess,
 };
 
 export default AuthAPI;
