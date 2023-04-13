@@ -16,14 +16,8 @@ interface TermListItemProps {
 const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
     const [expanded, setExpanded] = useState(false);
     const [addCourseDialogOpen, setAddCourseDialogOpen] = useState(false);
-    const [bulkUploadDialogOpen, setBulkUploadDialogOpen] = useState(false);
     const [hover, setHover] = useState(false);
     const theme = useTheme();
-
-    const handleOpenBulkUploadDialog = (e: React.MouseEvent<HTMLElement>) => {
-        e.stopPropagation();
-        setBulkUploadDialogOpen(true);
-    }
 
     const handleOpenAddCourseDialog = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
@@ -32,7 +26,7 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
 
     return (
         <>
-            <CreateEditCourseDialog open={addCourseDialogOpen} onClose={() => setAddCourseDialogOpen(false)} />
+            <CreateEditCourseDialog open={addCourseDialogOpen} onClose={() => setAddCourseDialogOpen(false)} courseTerm={term} />
             <Box
                 sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
                 ml={-4}
@@ -64,13 +58,7 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
                                     <AddIcon sx={{ fontSize: 20 }} />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Bulk Upload">
-                                <IconButton sx={{ p: 0.8 }} onClick={handleOpenBulkUploadDialog}>
-                                    <CloudUploadOutlinedIcon sx={{ fontSize: 20 }} />
-                                </IconButton>
-                            </Tooltip>
                         </Stack>
-
                     }
                 </Stack >
             </Box >

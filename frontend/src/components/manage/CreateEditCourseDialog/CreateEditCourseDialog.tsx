@@ -19,6 +19,7 @@ export interface CreateEditCourseDialogProps {
     open: boolean;
     onClose: () => void;
     course?: Course;
+    courseTerm?: string;
 }
 
 type FormData = {
@@ -27,11 +28,11 @@ type FormData = {
     term: string;
 };
 
-const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose, course }) => {
+const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose, course, courseTerm }) => {
     const defaultValues = {
         title: course ? course.title : undefined,
         code: course ? course.code : undefined,
-        term: course ? course.term : undefined,
+        term: course ? course.term : courseTerm,
     }
 
     const { register, handleSubmit, control, reset, watch, formState: { } } = useForm<FormData>({
@@ -76,6 +77,13 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
             <DialogTitle>{course ? "Edit" : "Create"} Course</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} my={1}>
+                    {/* TODO: better way to enter term, string is too dangerous, or find a way to validate */}
+                    <TextField
+                        {...register("term")}
+                        label="Term"
+                        type="text"
+                        fullWidth
+                    />
                     <TextField
                         {...register("title")}
                         label="Name"
@@ -85,13 +93,6 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
                     <TextField
                         {...register("code")}
                         label="Course Code"
-                        type="text"
-                        fullWidth
-                    />
-                    {/* TODO: better way to enter term, string is too dangerous, or find a way to validate */}
-                    <TextField
-                        {...register("term")}
-                        label="Term"
                         type="text"
                         fullWidth
                     />
