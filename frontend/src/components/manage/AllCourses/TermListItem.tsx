@@ -1,14 +1,13 @@
 import CourseAccessList from "@components/manage/AllCourses/CourseAccessList";
 import { ExpandMore } from "@mui/icons-material";
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Box, Button, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
-import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
-import { capitalizeFirstLetter } from "@util/shared/string";
-import { useCourseStaff } from "api/course/hooks";
-import { Course } from "model/course";
-import { CoursePermission } from "model/user";
-import { FC, useEffect, useState } from "react";
+import AddIcon from '@mui/icons-material/Add';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
+import { capitalizeFirstLetter } from "@util/shared/string";
+import { Course } from "model/course";
+import { FC, useState } from "react";
+import CreateEditCourseDialog from "../CreateEditCourseDialog/CreateEditCourseDialog";
 
 interface TermListItemProps {
     term: string;
@@ -16,6 +15,7 @@ interface TermListItemProps {
 }
 const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
     const [expanded, setExpanded] = useState(false);
+    const [addCourseDialogOpen, setAddCourseDialogOpen] = useState(false);
     const [bulkUploadDialogOpen, setBulkUploadDialogOpen] = useState(false);
     const [hover, setHover] = useState(false);
     const theme = useTheme();
@@ -25,8 +25,14 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
         setBulkUploadDialogOpen(true);
     }
 
+    const handleOpenAddCourseDialog = (e: React.MouseEvent<HTMLElement>) => {
+        e.stopPropagation();
+        setAddCourseDialogOpen(true);
+    }
+
     return (
         <>
+            <CreateEditCourseDialog open={addCourseDialogOpen} onClose={() => setAddCourseDialogOpen(false)} />
             <Box
                 sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
                 mx={-4}
@@ -52,11 +58,19 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
                         </Stack>
                     </Stack>
                     {hover &&
-                        <Tooltip title="Bulk Upload" placement="right">
-                            <IconButton sx={{ p: 0.8 }} onClick={handleOpenBulkUploadDialog}>
-                                <CloudUploadOutlinedIcon sx={{ fontSize: 20 }} />
-                            </IconButton>
-                        </Tooltip>
+                        <Stack direction="row" alignItems="center">
+                            <Tooltip title="Add a Course">
+                                <IconButton sx={{ p: 0.8 }} onClick={handleOpenAddCourseDialog}>
+                                    <AddIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Bulk Upload">
+                                <IconButton sx={{ p: 0.8 }} onClick={handleOpenBulkUploadDialog}>
+                                    <CloudUploadOutlinedIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
+                            </Tooltip>
+                        </Stack>
+
                     }
                 </Stack >
             </Box >

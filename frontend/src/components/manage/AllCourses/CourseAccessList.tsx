@@ -1,13 +1,18 @@
 import { ExpandMore } from "@mui/icons-material";
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from "@mui/icons-material/Edit";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import { useCourseStaff } from "api/course/hooks";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
-import { FC, useEffect, useState } from "react";
-import CourseAccessListItem from "./CourseAccessListItem";
-import EditIcon from "@mui/icons-material/Edit";
+import { FC, useState } from "react";
 import CreateEditCourseDialog from "../CreateEditCourseDialog/CreateEditCourseDialog";
+import CourseAccessListItem from "./CourseAccessListItem";
+import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
+import { handleBadRequestError } from "@util/errors";
+import CourseAPI from "api/course/api";
+import toast from "react-hot-toast";
 
 interface CourseAccessListProps {
     course: Course;
@@ -23,6 +28,24 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     const handleOpenEditCourseDialog = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
         setEditCourseDialogOpen(course);
+    }
+
+    const courseDeletable = () => {
+        const courseHasStudents = course.students && Object.keys(course.students).length > 0;
+        return !(courseHasStudents || course.status === CourseStatus.CourseActive || course.status === CourseStatus.CourseArchived);
+    }
+    // CourseStatusChip
+    const handleDeleteCourse = (e: React.MouseEvent<HTMLElement>) => {
+        e.stopPropagation();
+        const confirmed = confirm("Are you sure you want to delete this course? This action cannot be undone.");
+        if (confirmed) {
+            toast.promise(CourseAPI.deleteCourse(course.ID), {
+                loading: "Deleting course...",
+                success: "Course deleted successfully",
+                error: (err) => handleBadRequestError(err),
+            })
+                .catch(() => { })
+        }
     }
 
     return (
@@ -52,14 +75,24 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
                                 }
                             </Box>
                             <Typography>{course.code}: {course.title}</Typography>
+                            <CourseStatusChip status={course.status} />
                         </Stack>
                     </Stack>
                     {hover &&
-                        <Tooltip title="Edit Course Info" placement="right">
-                            <IconButton sx={{ p: 0.5 }} onClick={handleOpenEditCourseDialog}>
-                                <EditIcon sx={{ fontSize: 20 }} />
-                            </IconButton>
-                        </Tooltip>
+                        <Stack direction="row" alignItems="center">
+                            <Tooltip title="Edit Course Info">
+                                <IconButton sx={{ p: 0.5 }} onClick={handleOpenEditCourseDialog}>
+                                    <EditIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
+                            </Tooltip>
+                            {courseDeletable() &&
+                                <Tooltip title="Delete Course">
+                                    <IconButton sx={{ p: 0.5 }} onClick={handleDeleteCourse}>
+                                        <CloseIcon sx={{ fontSize: 20 }} />
+                                    </IconButton>
+                                </Tooltip>
+                            }
+                        </Stack>
                     }
 
                 </Stack >

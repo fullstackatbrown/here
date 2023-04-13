@@ -1,14 +1,10 @@
-import { ClickAwayListener, Collapse, IconButton, Input, Stack, Tooltip } from "@mui/material";
-import { FC, useEffect, useRef, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
-import { useForm } from "react-hook-form";
-import { watch } from "fs";
-import toast from "react-hot-toast";
-import CourseAPI from "api/course/api";
+import { ClickAwayListener, Collapse, IconButton, Input, Stack, Tooltip } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { Course, SinglePermissionRequest } from "model/course";
-import { CoursePermission } from "model/user";
 import AuthAPI from "api/auth/api";
+import { FC, useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 interface AddAdminButtonProps {
 
