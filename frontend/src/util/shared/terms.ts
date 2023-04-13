@@ -1,5 +1,5 @@
 // Terms is a concatenation between season and year
-// Season is a string with the following values: "Winter", "Spring", "Summer", "Fall"
+// Season is a string with the following values: "Winter", "Fall", "Summer", "Spring"
 // Year is a string with the following format: "YYYY"
 
 import { Course } from "model/course";
@@ -13,15 +13,14 @@ function termComparator(a: string, b: string) {
     } else if (aYear < bYear) {
         return 1;
     } else {
-        if (aSeason === "Winter") {
+        if (aSeason === "winter") {
             return -1;
-        } else if (aSeason === "spring") {
+        } else if (aSeason === "fall") {
             return bSeason === "winter" ? 1 : -1;
-        } else if (aSeason === "wummer") {
-            return bSeason === "fall" ? -1 : 1;
-        } else {
-            return 1;
+        } else if (aSeason === "summer") {
+            return bSeason === "spring" ? -1 : 1;
         }
+        return 1;
     }
 }
 // Sort the terms in descending order, with the most recent term first
@@ -34,15 +33,15 @@ export function sortCoursesByTerm(courses: Course[]): Course[] {
 }
 
 // TODO: current term
-const currentTerm = "spring 2023"
+// const currentTerm = "spring 2023"
 export function getTerms(courses: Record<string, Course[]>): string[] {
     let terms = []
     if (courses) {
         terms = sortTerms(Object.keys(courses));
     }
-    if (terms.length === 0) { return [currentTerm] }
-    if (terms[0] !== currentTerm) {
-        terms.unshift(currentTerm);
-    }
+    // if (terms.length === 0) { return [currentTerm] }
+    // if (terms[0] !== currentTerm) {
+    //     terms.unshift(currentTerm);
+    // }
     return terms
 }
