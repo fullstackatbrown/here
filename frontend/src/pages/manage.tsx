@@ -1,11 +1,7 @@
-import React from "react";
-import { Stack } from "@mui/material";
-import AppLayout from "@components/shared/AppLayout";
-import YourCoursesSection from "@components/settings/YourCoursesSection";
-import AllCoursesSection from "@components/settings/AllCoursesSection";
-import ProfileInfoSection from "@components/settings/ProfileInfoSection";
-import AllCourses from "@components/manage/AllCourses/AllCourses";
 import AdminList from "@components/manage/AdminList/AdminList";
+import AllCourses from "@components/manage/AllCourses/AllCourses";
+import AppLayout from "@components/shared/AppLayout";
+import { Stack } from "@mui/material";
 
 export default function Manage() {
     return (
