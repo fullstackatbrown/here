@@ -112,13 +112,7 @@ func (fr *FirebaseRepository) checkUniqueEntryCode(entryCode string) bool {
 
 func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (course *models.Course, err error) {
 
-	courseID := models.CreateCourseID(req)
-
-	// Check if an assignment with the same name already exists
-	c, err := fr.GetCourseByID(courseID)
-	if err == nil && c != nil {
-		return nil, qerrors.CourseAlreadyExistsError
-	}
+	// TODO: check same course code and term does not exist
 
 	var entryCode string
 	for {
@@ -297,4 +291,29 @@ func (fr *FirebaseRepository) assignTemporarySection(req *models.AssignSectionsR
 	}
 
 	return batch, nil
+}
+
+func (fr *FirebaseRepository) BulkUpload(req *models.BulkUploadRequest) error {
+	for _, r := range req.Requests {
+		// Create the course
+		course, err := fr.CreateCourse(&models.CreateCourseRequest{
+			Title: r.Title,
+			Code:  r.Code,
+			Term:  r.Term,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		// Add permissions
+		err = fr.CreatePermissions(&models.AddPermissionsRequest{
+			CourseID:    course.ID,
+			Permissions: r.Permissions,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

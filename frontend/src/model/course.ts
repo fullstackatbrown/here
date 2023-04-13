@@ -11,6 +11,13 @@ export interface SinglePermissionRequest {
   permission: CoursePermission;
 }
 
+export interface createCourseAndPermissionsRequest {
+  title: string;
+  code: string;
+  term: string;
+  permissions: SinglePermissionRequest[];
+}
+
 export interface CourseUserData {
   studentID: string;
   email: string;

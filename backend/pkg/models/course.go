@@ -91,6 +91,17 @@ type DeletePermissionRequest struct {
 	UserID   string `json:"userID"`
 }
 
+type CreateCourseAndPermissionsRequest struct {
+	Title       string                    `json:"title"`
+	Code        string                    `json:"code"`
+	Term        string                    `json:"term"`
+	Permissions []SinglePermissionRequest `json:"permissions"`
+}
+
+type BulkUploadRequest struct {
+	Requests []CreateCourseAndPermissionsRequest `json:"requests"`
+}
+
 func CreateCourseID(req *CreateCourseRequest) string {
 	return strings.ToLower(req.Code + req.Term)
 }

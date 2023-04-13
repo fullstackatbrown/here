@@ -3,9 +3,9 @@ import { List } from "@mui/material";
 import { useCourses } from "api/course/hooks";
 import { useSession } from "api/auth/hooks";
 import CourseListItem from "../CourseListItem";
-import SettingsSection from "@components/settings/SettingsSection";
 import { CoursePermission } from "model/user";
 import { sortCoursesByTerm } from "@util/shared/terms";
+import SettingsSection from "../SettingsSection/SettingsSection";
 
 export interface YourCoursesSectionProps {
 }

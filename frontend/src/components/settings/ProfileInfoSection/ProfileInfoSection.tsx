@@ -1,12 +1,12 @@
 import React, { FC, useState } from "react";
 import { Stack, TextField } from "@mui/material";
 import Button from "@components/shared/Button";
-import SettingsSection from "@components/settings/SettingsSection";
 import { useAuth } from "api/auth/hooks";
 import { useForm } from "react-hook-form";
 import AuthAPI from "api/auth/api";
 import { toast } from "react-hot-toast";
 import { handleBadRequestError } from "@util/errors";
+import SettingsSection from "../SettingsSection/SettingsSection";
 
 export interface ProfileInfoSectionProps {
 }

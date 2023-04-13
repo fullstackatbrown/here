@@ -17,6 +17,8 @@ func CourseRoutes() *chi.Mux {
 
 	// router.With(auth.RequireAdmin()).Post("/", createCourseHandler)
 	router.Post("/", createCourseHandler)
+	router.Post("/bulkUpload", bulkUploadHandler)
+
 	router.Route("/{courseID}", func(r chi.Router) {
 		r.Get("/", getCourseHandler)
 		r.Delete("/", deleteCourseHandler)
@@ -159,4 +161,23 @@ func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully assigned sections to course " + courseID))
 
+}
+
+func bulkUploadHandler(w http.ResponseWriter, r *http.Request) {
+	var req *models.BulkUploadRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = repo.Repository.BulkUpload(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully uploaded permission"))
 }

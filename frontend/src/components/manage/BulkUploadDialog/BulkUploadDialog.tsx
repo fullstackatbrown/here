@@ -1,12 +1,14 @@
-import { FC, useState } from "react";
-import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Step, StepLabel, Stepper, TextField, Typography, useTheme } from "@mui/material";
 import Button from "@components/shared/Button";
-import { useForm } from "react-hook-form";
-import AddCoursesStep, { AddCoursesData } from "./AddCoursesStep";
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import { parseCourses, parseStaffData, parseTerm } from "@util/shared/parseBulkUpload";
-import AddStaffStep, { AddStaffData } from "./AddStaffStep";
 import { capitalizeFirstLetter } from "@util/shared/string";
-import { SinglePermissionRequest } from "model/course";
+import CourseAPI from "api/course/api";
+import { SinglePermissionRequest, createCourseAndPermissionsRequest } from "model/course";
+import { FC, useState } from "react";
+import toast from "react-hot-toast";
+import AddCoursesStep, { AddCoursesData } from "./AddCoursesStep";
+import AddStaffStep, { AddStaffData } from "./AddStaffStep";
 import ConfirmUploadStep from "./ConfirmUploadStep";
 
 // TODO: handle term name
@@ -120,8 +122,28 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
     }
 
     const handleConfirmUpload = () => {
-        // TODO: make request
-        setSuccess(true)
+        let courseAndPermReqs: createCourseAndPermissionsRequest[] = []
+
+        for (const courseCode in courses!) {
+            courseAndPermReqs.push({
+                code: courseCode,
+                title: courses![courseCode],
+                term: term!,
+                permissions: permissionsByCourse![courseCode] || []
+            })
+        }
+
+        // loop through each course 
+        toast.promise(CourseAPI.bulkUpload(courseAndPermReqs), {
+            loading: "Uploading...",
+            success: "Upload successful",
+            error: (err) => handleBadRequestError(err)
+        })
+            .then(() => {
+                setSuccess(true)
+                handleClose()
+            })
+            .catch((err) => { console.log(err) })
     }
 
     const handleClose = () => {

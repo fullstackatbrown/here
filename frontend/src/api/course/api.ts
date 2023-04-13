@@ -1,6 +1,5 @@
 import APIClient from "api/APIClient";
-import { Course, SinglePermissionRequest } from "model/course";
-import { CoursePermission } from "model/user";
+import { Course, SinglePermissionRequest, createCourseAndPermissionsRequest } from "model/course";
 
 
 async function getCourse(courseID: string): Promise<Course> {
@@ -62,6 +61,13 @@ async function revokePermission(
   return APIClient.patch(`/courses/${courseID}/permissions/revoke`, { userID });
 }
 
+async function bulkUpload(
+  requests: createCourseAndPermissionsRequest[],
+): Promise<string> {
+  console.log(requests)
+  return APIClient.post(`/courses/bulkUpload`, { requests });
+}
+
 const CourseAPI = {
   getCourse,
   createCourse,
@@ -70,6 +76,7 @@ const CourseAPI = {
   updateCourseStatus,
   addPermission,
   revokePermission,
+  bulkUpload,
 };
 
 export default CourseAPI;

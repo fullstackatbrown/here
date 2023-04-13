@@ -39,7 +39,6 @@ func addPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func revokePermissionHandler(w http.ResponseWriter, r *http.Request) {
-
 	var req *models.DeletePermissionRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
