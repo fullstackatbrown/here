@@ -1,4 +1,4 @@
-import { SinglePermissionRequest } from "model/course";
+import { AddPermissionRequest } from "model/course";
 import { formatCourseCode, formatCourseName, validateCourseCode, validateEmail } from "./string";
 import { CoursePermission } from "model/user";
 
@@ -77,12 +77,12 @@ export function parseTerm(term: string): [string | undefined, string | undefined
 // 4. course code must be a valid course code, i.e. can be found in the courses Record
 // 5. one email cannot have two roles for the same course
 
-// Returns a map from coursecode to a list of SinglePermissionRequest, or an error message if any
-export function parseStaffData(data: string, courses: Record<string, string>): [Record<string, SinglePermissionRequest[]> | undefined, string | undefined] {
+// Returns a map from coursecode to a list of AddPermissionRequest, or an error message if any
+export function parseStaffData(data: string, courses: Record<string, string>): [Record<string, AddPermissionRequest[]> | undefined, string | undefined] {
 
     const lines = data.split("\n");
-    const staff: Record<string, SinglePermissionRequest> = {};
-    const permissionsByCourse: Record<string, SinglePermissionRequest[]> = {};
+    const staff: Record<string, AddPermissionRequest> = {};
+    const permissionsByCourse: Record<string, AddPermissionRequest[]> = {};
     for (const line of lines) {
         const [email, role, courseCode] = line.split(",");
         // Ignore line if any field is empty
