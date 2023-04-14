@@ -1,15 +1,12 @@
 package repository
 
 import (
-	"fmt"
-
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 )
 
 func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) (hadPermission bool, err error) {
-	fmt.Println(req)
 	if req.Permission == models.CourseAdmin || req.Permission == models.CourseStaff {
 		// Get user by email.
 		user, err := fr.GetUserByEmail(req.Email)
@@ -30,7 +27,6 @@ func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) (
 		}
 
 		perm, ok := course.Permissions[user.ID]
-		fmt.Println(course.Permissions)
 		if ok && perm == req.Permission {
 			return true, nil
 		}
