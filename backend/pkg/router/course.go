@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -12,26 +13,27 @@ import (
 
 func CourseRoutes() *chi.Mux {
 	router := chi.NewRouter()
-	// TODO: All course routes require authentication.
-	// router.Use(middleware.AuthCtx())
 
-	// router.With(auth.RequireAdmin()).Post("/", createCourseHandler)
-	router.Post("/", createCourseHandler)
-	router.Post("/bulkUpload", bulkUploadHandler)
+	router.Use(middleware.AuthCtx())
+	router.Use(middleware.CourseCtx())
+	router.With(middleware.RequireAdmin()).Post("/", createCourseHandler)
+	router.With(middleware.RequireAdmin()).Post("/bulkUpload", bulkUploadHandler)
 
 	router.Route("/{courseID}", func(r chi.Router) {
 		r.Get("/", getCourseHandler)
-		r.Delete("/", deleteCourseHandler)
-		r.Patch("/", updateCourseHandler)
-		r.Patch("/info", updateCourseInfoHandler)
 
-		r.Post("/assignSection", assignSectionHandler)
+		// site admin only
+		r.With(middleware.RequireAdmin()).Delete("/", deleteCourseHandler)
+		r.With(middleware.RequireAdmin()).Patch("/info", updateCourseInfoHandler)
+
+		// course admin only
+		r.With(middleware.RequireCourseAdmin()).Patch("/", updateCourseHandler)
+		r.With(middleware.RequireCourseAdmin()).Post("/assignSection", assignSectionHandler)
 
 		r.Mount("/sections", SectionRoutes())
 		r.Mount("/assignments", AssignmentRoutes())
 		r.Mount("/swaps", SwapRoutes())
 		r.Mount("/surveys", SurveyRoutes())
-
 		r.Mount("/permissions", PermissionRoutes())
 	})
 

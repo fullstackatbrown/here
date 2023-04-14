@@ -13,13 +13,13 @@ import (
 
 func GradesRoutes() *chi.Mux {
 	router := chi.NewRouter()
-	// router.Use(middleware.AuthCtx())
 
-	router.Post("/", createGradeHandler)
-	router.Post("/export", exportGradesHandler)
+	router.With(middleware.RequireCourseStaff()).Post("/", createGradeHandler)
+	router.With(middleware.RequireCourseAdmin()).Post("/export", exportGradesHandler)
+
 	router.Route("/{gradeID}", func(router chi.Router) {
-		router.Patch("/", updateGradeHandler)
-		router.Delete("/", deleteGradeHandler)
+		router.With(middleware.RequireCourseStaff()).Patch("/", updateGradeHandler)
+		router.With(middleware.RequireCourseStaff()).Delete("/", deleteGradeHandler)
 	})
 
 	return router

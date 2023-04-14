@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -12,9 +13,8 @@ import (
 func PermissionRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
-	// router.With(auth.RequireCourseAdmin()).Post("/", createPermissionsHandler)
-	router.Patch("/add", addPermissionsHandler)
-	router.Patch("/revoke", revokePermissionHandler)
+	router.With(middleware.RequireCourseOrSiteAdmin()).Patch("/add", addPermissionsHandler)
+	router.With(middleware.RequireCourseOrSiteAdmin()).Patch("/revoke", revokePermissionHandler)
 	return router
 }
 

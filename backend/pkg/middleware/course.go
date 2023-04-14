@@ -2,19 +2,42 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/models"
+	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 )
 
 func CourseCtx() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			queueID := chi.URLParam(r, "courseID")
+			courseID := chi.URLParam(r, "courseID")
 
-			ctx := context.WithValue(r.Context(), "courseID", queueID)
+			ctx := context.WithValue(r.Context(), "courseID", courseID)
 			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func RequireCourseActive() func(handler http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			courseID := r.Context().Value("courseID").(string)
+
+			course, err := repo.Repository.GetCourseByID(courseID)
+			if err != nil {
+				rejectBadRequest(w, err)
+				return
+			}
+
+			if !(course.Status == models.CourseActive) {
+				rejectBadRequest(w, fmt.Errorf("Cannot perform this operation on a non-active course"))
+				return
+			}
+
+			next.ServeHTTP(w, r)
 		})
 	}
 }
@@ -59,28 +82,32 @@ func RequireCourseStaff() func(handler http.Handler) http.Handler {
 	}
 }
 
+func RequireCourseOrSiteAdmin() func(handler http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			user, err := GetUserFromRequest(r)
+			if err != nil {
+				rejectUnauthorizedRequest(w)
+				return
+			}
+
+			courseID := r.Context().Value("courseID").(string)
+			if !hasCourseStaffPermission(user, courseID) || !user.IsAdmin {
+				rejectForbiddenRequest(w)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
 func hasCourseStaffPermission(u *models.User, courseID string) bool {
-	// TODO: admin does not necessarily have staff permissions
-	if u.IsAdmin {
-		return true
-	}
-
-	if _, ok := u.Permissions[courseID]; !ok {
-		return false
-	}
-
-	return true
+	_, ok := u.Permissions[courseID]
+	return ok
 }
 
 func hasCourseAdminPermission(u *models.User, courseID string) bool {
-	if u.IsAdmin {
-		return true
-	}
-
-	var ok bool
-	var p models.CoursePermission
-	if p, ok = u.Permissions[courseID]; !ok {
-		return false
-	}
-	return p == models.CourseAdmin
+	_, ok := u.Permissions[courseID]
+	return ok && u.Permissions[courseID] == models.CourseAdmin
 }

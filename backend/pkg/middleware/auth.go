@@ -81,12 +81,3 @@ func GetUserFromRequest(r *http.Request) (*models.User, error) {
 
 	return nil, qerrors.UserNotFoundError
 }
-
-// Helpers
-func rejectUnauthorizedRequest(w http.ResponseWriter) {
-	http.Error(w, "You must be authenticated to access this resource", http.StatusUnauthorized)
-}
-
-func rejectForbiddenRequest(w http.ResponseWriter) {
-	http.Error(w, "You do not have permission to access this resource", http.StatusForbidden)
-}

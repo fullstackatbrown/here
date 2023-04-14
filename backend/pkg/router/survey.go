@@ -16,15 +16,15 @@ import (
 func SurveyRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
-	// TODO: Authentication
-	router.Post("/", createSurveyHandler)
+	router.With(middleware.RequireCourseAdmin()).Post("/", createSurveyHandler)
+
 	router.Route("/{surveyID}", func(router chi.Router) {
-		router.Get("/", getSurveyHandler)
-		router.Patch("/", updateSurveyHandler)
-		router.Delete("/", deleteSurveyHandler)
-		router.Post("/publish", publishSurveyHandler)
-		router.Post("/results", generateResultsHandler)
-		router.Post("/confirmResults", confirmResultsHandler)
+		router.With(middleware.RequireCourseAdmin()).Get("/", getSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Patch("/", updateSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Delete("/", deleteSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Post("/publish", publishSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Post("/results", generateResultsHandler)
+		router.With(middleware.RequireCourseAdmin()).Post("/confirmResults", confirmResultsHandler)
 		router.Mount("/responses", ResponsesRoutes())
 
 	})
