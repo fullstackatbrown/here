@@ -1,5 +1,5 @@
 import SearchBar from "@components/shared/SearchBar/SearchBar";
-import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
+import SelectMenu from "@components/shared/Menu/SelectMenu";
 import { Stack, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import PeopleTable from "./PeopleTable";
 import { Assignment } from "model/assignment";
 import { CoursePermission } from "model/user";
+import MoreMenu from "../../../shared/Menu/MoreMenu";
 
 export interface PeopleViewProps {
   course: Course;
@@ -21,8 +22,7 @@ export interface PeopleViewProps {
   assignmentsMap: Record<string, Assignment>;
 }
 
-export default function PeopleView({ course, sectionsMap, assignmentsMap }: PeopleViewProps) {
-  const sections = Object.values(sectionsMap)
+export default function PeopleView({ course, access, sectionsMap, assignmentsMap }: PeopleViewProps) {
   const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
@@ -53,6 +53,13 @@ export default function PeopleView({ course, sectionsMap, assignmentsMap }: Peop
     return studentIDs.map((studentID) => course.students[studentID])
   }
 
+  const AddStudent = () => {
+
+  }
+
+  const ExportStudentList = () => {
+  }
+
   return (
     <>
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
@@ -67,6 +74,7 @@ export default function PeopleView({ course, sectionsMap, assignmentsMap }: Peop
             onSelect={(val) => setFilterBySection(val)}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student, Export Student List"]} handlers={[AddStudent, ExportStudentList]} />}
         </Stack>
       </Stack >
       {!course.students || Object.keys(course.students).length === 0 ?

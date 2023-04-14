@@ -10,6 +10,7 @@ import AssignmentsTable from "./AssignmentsTable";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
 import { Section } from "model/section";
+import MoreMenu from "@components/shared/Menu/MoreMenu";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -43,6 +44,9 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
     )
   }
 
+  const ExportGrades = () => {
+  }
+
   return (
     <>
       <CreateEditAssignmentDialog
@@ -55,9 +59,12 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
           Assignments
         </Typography>
         {access === CoursePermission.CourseAdmin &&
-          <Button onClick={() => setCreateAssignmentDialog(true)}>
-            + New
-          </Button>
+          <Stack direction="row">
+            <Button onClick={() => setCreateAssignmentDialog(true)}>
+              + New
+            </Button>
+            <MoreMenu keys={["Export Grades"]} handlers={[ExportGrades]} />
+          </Stack>
         }
       </Stack>
       {assignments?.length == 0 &&

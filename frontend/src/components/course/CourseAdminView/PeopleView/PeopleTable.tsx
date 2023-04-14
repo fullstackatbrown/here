@@ -1,5 +1,6 @@
-import { Table, TableBody, TableFooter, TableHead, TablePagination, TableRow } from "@mui/material";
+import { IconButton, Table, TableBody, TableFooter, TableHead, TablePagination, TableRow, Tooltip } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
+import ClearIcon from '@mui/icons-material/Clear';
 import { styled } from "@mui/material/styles";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { sortStudentsByName } from "@util/shared/formatStudentsList";
@@ -35,10 +36,19 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
     const [page, setPage] = useState(0);
     const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
 
-
     useEffect(() => {
         setStudentsSorted(sortStudentsByName(students))
     }, [students])
+
+    const handleRemoveStudent = (student: CourseUserData) => {
+        return (e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation();
+            const confirmed = confirm(`Are you sure you want to remove ${student.displayName} from this course?`);
+            if (confirmed) {
+                // TODO: remove student
+            }
+        }
+    }
 
     return (
         <>
@@ -49,17 +59,17 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                 onClose={() => setSelectedStudent(undefined)} />
             <Table>
                 <colgroup>
-                    <col width="20%" />
-                    <col width="30%" />
-                    <col width="20%" />
-                    <col width="30%" />
+                    <col width="25%" />
+                    <col width="35%" />
+                    <col width="35%" />
+                    <col width="5%" />
                 </colgroup>
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
                         <TableCell>Email</TableCell>
-                        <TableCell>Role</TableCell>
                         <TableCell>Section</TableCell>
+                        <TableCell></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -75,10 +85,14 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                                         {student.email}
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        Student
+                                        {student.defaultSection ? formatSectionInfo(sectionsMap[student.defaultSection], true) : "Unassigned"}
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        {student.defaultSection ? formatSectionInfo(sectionsMap[student.defaultSection], true) : "Unassigned"}
+                                        <Tooltip title="Remove from course" placement="right">
+                                            <IconButton onClick={handleRemoveStudent(student)} size={"small"}>
+                                                <ClearIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
                                     </TableCell>
                                 </TableRow>
                             );
