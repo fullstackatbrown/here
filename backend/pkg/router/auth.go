@@ -17,20 +17,22 @@ import (
 func AuthRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Use(middleware.AuthCtx())
-	router.Post("/", createUserHandler)
-	router.Get("/me", getMeHandler)
+	router.Route("/", func(r chi.Router) {
+		r.Use(middleware.AuthCtx())
+		r.Post("/", createUserHandler)
+		r.Get("/me", getMeHandler)
 
-	router.Patch("/joinCourse", joinCourseHandler)
-	router.Patch("/quitCourse", quitCourseHandler)
+		r.Patch("/joinCourse", joinCourseHandler)
+		r.Patch("/quitCourse", quitCourseHandler)
 
-	router.Route("/{userID}", func(r chi.Router) {
-		r.Get("/", getUserHandler)
-		// r.Patch("/", updateUserHandler)
+		r.Route("/{userID}", func(r chi.Router) {
+			r.Get("/", getUserHandler)
+			// r.Patch("/", updateUserHandler)
+		})
+
+		// Edits site wide admin access
+		r.With(middleware.RequireAdmin()).Patch("/editAdminAccess", editAdminAccessHandler)
 	})
-
-	// Edits site wide admin access
-	router.With(middleware.RequireAdmin()).Patch("/editAdminAccess", editAdminAccessHandler)
 
 	// Alter the current session. No auth middlewares required.
 	router.Post("/session", createSessionHandler)
