@@ -57,7 +57,8 @@ const PendingRequest: FC<PendingRequestProps> = ({ request, student, assignment,
                 }
               </Box>
               {/* TODO: handle exceptionally long string */}
-              <Typography sx={{ fontSize: 15 }}>{student.displayName} - {assignment ? "One Time" : "Permanent"}</Typography>
+              {/* TODO: get student name */}
+              <Typography sx={{ fontSize: 15 }}>{student?.displayName} - {assignment ? "One Time" : "Permanent"}</Typography>
             </Stack>
             {!expanded && <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
               {formatSectionInfo(oldSection, true)}
