@@ -8,6 +8,8 @@ import {
     Typography
 } from "@mui/material";
 import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
+import listToMap from "@util/shared/listToMap";
+import { useAssignments } from "api/assignment/hooks";
 import { useSwapsByStudent } from "api/swaps/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -38,11 +40,12 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
 
     return (
         <>
-            <SwapRequestDialog
-                open={swapRequestDialog}
-                onClose={() => { setSwapRequestDialog(false) }}
-                {...{ course, assignments, sectionsMap, student }}
-            />
+            {assignments && sectionsMap &&
+                <SwapRequestDialog
+                    open={swapRequestDialog}
+                    onClose={() => { setSwapRequestDialog(false) }}
+                    {...{ course, assignments, student, sectionsMap }}
+                />}
             <Stack mt={-1}>
                 <Stack direction="row" justifyContent="space-between">
                     <Button
@@ -55,7 +58,7 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                 </Stack>
                 <Collapse in={gradesOpen} timeout="auto" unmountOnExit>
                     {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
-                        <StudentGradesTable assignments={filterAssignmentsByReleaseDate(assignments)} {...{ course, sectionsMap, student }} /> :
+                        <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
                         <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Collapse>
 
@@ -72,8 +75,9 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                     {requestsOpen && <Button size="small" onClick={() => setSwapRequestDialog(true)}> + New Request</Button>}
                 </Stack>
                 <Collapse in={requestsOpen} timeout="auto" unmountOnExit sx={{ ml: -4 }}>
-                    <StudentRequestsList {...{ course, sectionsMap, student, assignmentsMap, requests }} />
-                </Collapse>
+                    {assignments && <StudentRequestsList {...{ course, sectionsMap, student, requests }}
+                        assignmentsMap={listToMap(assignments) as Record<string, Assignment>} />}
+                </Collapse >
 
             </Stack >
         </>

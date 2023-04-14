@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course } from "model/course";
 import { CoursePermission, User } from "model/user";
-import { FC } from "react";
+import { FC, useState } from "react";
 import toast from "react-hot-toast";
 import AddAccessButton from "./AddAccessButton";
 
@@ -69,7 +69,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
                         }
                     })
                 }
-                {editable && <AddAccessButton {...{ course, access }} />}
+                {editable && <AddAccessButton course={course} access={access} />}
             </Box>}
         </Stack>
     )

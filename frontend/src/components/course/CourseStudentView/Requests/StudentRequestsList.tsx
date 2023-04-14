@@ -18,7 +18,6 @@ export interface StudentRequestsListProps {
 }
 
 const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, sectionsMap, assignmentsMap, requests }) => {
-    const assignments = Object.values(assignmentsMap)
     const [swapRequestDialog, setSwapRequestDialog] = useState<Swap | undefined>(undefined)
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -45,8 +44,11 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
             <SwapRequestDialog
                 open={swapRequestDialog !== undefined}
                 onClose={() => { setSwapRequestDialog(undefined) }}
+                course={course}
+                assignments={Object.values(assignmentsMap)}
+                student={student}
+                sectionsMap={sectionsMap}
                 swap={swapRequestDialog}
-                {...{ course, assignments, sectionsMap, student }}
             />
             <Stack direction="column" minHeight={60}>
                 {requests.length === 0 &&

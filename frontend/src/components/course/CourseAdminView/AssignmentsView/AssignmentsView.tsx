@@ -1,15 +1,14 @@
 import { Button, Stack, Typography } from "@mui/material";
+import listToMap from "@util/shared/listToMap";
+import { useAssignments } from "api/assignment/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
-import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
 import { FC, useEffect, useState } from 'react';
 import AssignmentsTable from "./AssignmentsTable";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
-import { useAssignments } from "api/assignment/hooks";
-import listToMap from "@util/shared/listToMap";
 
 export interface AssignmentsViewProps {
   course: Course;

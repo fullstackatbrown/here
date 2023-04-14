@@ -9,16 +9,16 @@ import { arraySubtract, arrayUnion } from '@util/shared/array';
 import formatSectionInfo from '@util/shared/formatSectionInfo';
 import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
 import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
+import listToMap from '@util/shared/listToMap';
 import GradeAPI from 'api/grades/api';
 import { useGradesForAssignment } from 'api/grades/hooks';
+import { useSections } from 'api/section/hooks';
 import { Assignment } from 'model/assignment';
 import { Course, CourseUserData } from 'model/course';
 import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
-import { useSections } from 'api/section/hooks';
-import listToMap from '@util/shared/listToMap';
 
 interface GradingViewProps {
     course: Course;

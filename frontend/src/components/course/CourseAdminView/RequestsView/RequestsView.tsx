@@ -10,7 +10,7 @@ import { useAssignmentsMap } from "api/assignment/hooks";
 import { useSectionsMap } from "api/section/hooks";
 import { usePastSwaps, usePendingSwaps } from "api/swaps/hooks";
 import { Course } from "model/course";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import RequestsList from "./RequestsList";
 
 export interface RequestsViewProps {

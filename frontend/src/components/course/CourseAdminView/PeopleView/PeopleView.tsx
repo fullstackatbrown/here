@@ -4,14 +4,13 @@ import { Stack, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
-import { Assignment } from "model/assignment";
+import listToMap from "@util/shared/listToMap";
+import { useAssignments } from "api/assignment/hooks";
+import { useSections } from "api/section/hooks";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { useEffect, useState } from "react";
 import PeopleTable from "./PeopleTable";
-import { useAssignments } from "api/assignment/hooks";
-import { useSections } from "api/section/hooks";
-import listToMap from "@util/shared/listToMap";
 
 export interface PeopleViewProps {
   course: Course;
