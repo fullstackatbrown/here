@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/fullstackatbrown/here/pkg/utils"
@@ -204,6 +205,11 @@ func confirmResultsHandler(w http.ResponseWriter, r *http.Request) {
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 	surveyID := chi.URLParam(r, "surveyID")
+	user, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
@@ -236,6 +242,7 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.SurveyID = surveyID
+	req.User = user
 
 	// TODO: check if student is in the course
 

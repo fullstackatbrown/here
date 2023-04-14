@@ -39,7 +39,7 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 	// If there exists a swap for the exact same student, assignment, old section, and new section, return an error
 
 	swap := &models.Swap{
-		StudentID:    req.StudentID,
+		StudentID:    req.User.ID,
 		AssignmentID: req.AssignmentID,
 		OldSectionID: req.OldSectionID,
 		NewSectionID: req.NewSectionID,
@@ -171,7 +171,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
 		models.FirestoreSwapsCollection).Doc(req.SwapID), []firestore.Update{
 		{Path: "status", Value: req.Status},
-		{Path: "handledBy", Value: req.HandledBy},
+		{Path: "handledBy", Value: req.HandledBy.ID},
 	})
 
 	_, err = batch.Commit(firebase.Context)

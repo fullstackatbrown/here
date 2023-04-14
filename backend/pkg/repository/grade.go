@@ -19,7 +19,7 @@ func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*mode
 	grade := &models.Grade{
 		StudentID:    req.StudentID,
 		Grade:        req.Grade,
-		GradedBy:     req.GradedBy,
+		GradedBy:     req.GradedBy.ID,
 		TimeUpdated:  time.Now().Format(models.ISO8601TimeFormat),
 		CourseID:     req.CourseID,
 		AssignmentID: req.AssignmentID,
@@ -42,7 +42,7 @@ func (fr *FirebaseRepository) UpdateGrade(req *models.UpdateGradeRequest) error 
 		models.FirestoreAssignmentsCollection).Doc(req.AssignmentID).Collection(
 		models.FirestoreGradesCollection).Doc(req.GradeID).Update(firebase.Context, []firestore.Update{
 		{Path: "grade", Value: req.Grade},
-		{Path: "gradedBy", Value: req.GradedBy},
+		{Path: "gradedBy", Value: req.GradedBy.ID},
 	})
 	return err
 }
