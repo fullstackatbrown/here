@@ -6,26 +6,24 @@ import {
   Collapse,
   Stack
 } from "@mui/material";
+import { useAssignmentsMap } from "api/assignment/hooks";
+import { useSectionsMap } from "api/section/hooks";
 import { usePastSwaps, usePendingSwaps } from "api/swaps/hooks";
-import { Assignment } from "model/assignment";
 import { Course } from "model/course";
-import { Section } from "model/section";
-import { CoursePermission } from "model/user";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import RequestsList from "./RequestsList";
 
 export interface RequestsViewProps {
   course: Course;
-  access: CoursePermission;
-  assignmentsMap: Record<string, Assignment>;
-  sectionsMap: Record<string, Section>;
 }
 
-export default function RequestsView({ course, access, assignmentsMap, sectionsMap }: RequestsViewProps) {
+export default function RequestsView({ course }: RequestsViewProps) {
   const [pendingRequests, pendingRequestsLoading] = usePendingSwaps(course.ID);
   const [pendingRequestsOpen, setPendingRequestsOpen] = useState(!pendingRequestsLoading);
   const [pastRequests, pastRequestsLoading] = usePastSwaps(course.ID);
   const [pastRequestsOpen, setPastRequestsOpen] = useState(false);
+  const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
+  const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
 
   useEffect(() => {
     setPendingRequestsOpen(!pendingRequestsLoading);
@@ -43,7 +41,7 @@ export default function RequestsView({ course, access, assignmentsMap, sectionsM
         </Button>
       </Stack>
       <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
-        <RequestsList {...{ course, assignmentsMap, sectionsMap }} type="pending" requests={pendingRequests} />
+        <RequestsList course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} type="pending" requests={pendingRequests} />
       </Collapse>
 
       <Box height={8} />
@@ -57,7 +55,7 @@ export default function RequestsView({ course, access, assignmentsMap, sectionsM
         </Button>
       </Stack>
       <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
-        <RequestsList {...{ course, assignmentsMap, sectionsMap }} type="past" requests={pastRequests} />
+        <RequestsList course={course} assignmentsMap={assignmentsMap} sectionsMap={sectionsMap} type="past" requests={pastRequests} />
       </Collapse>
     </Stack >
   );

@@ -17,11 +17,11 @@ import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
+import { useSections } from 'api/section/hooks';
 
 interface GradingViewProps {
     course: Course;
     assignment: Assignment;
-    sectionsMap: Record<string, Section>;
     handleNavigateBack: () => void;
 }
 
@@ -37,9 +37,10 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, handleNavigateBack }) => {
-    const sections = Object.values(sectionsMap)
+const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
+    const [sections, sectionsLoading] = useSections(course.ID)
     const [grades, gradesLoading] = useGradesForAssignment(course.ID, assignment.ID)
+    const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
 
@@ -47,6 +48,10 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
     const [page, setPage] = useState(0);
     const [currentStudentsDisplayed, setCurrentStudentsDisplayed] = useState<CourseUserData[]>([])
     const [searchQuery, setSearchQuery] = useState<string>("")
+
+    useEffect(() => {
+        sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
+    }, [sections])
 
     useEffect(() => {
         let studentIDs = []
