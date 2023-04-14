@@ -12,7 +12,7 @@ func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) (
 		user, err := fr.GetUserByEmail(req.Email)
 		if err != nil {
 			// The user doesn't exist; add an invite to the invites collection and then return.
-			hadPermission, err := fr.createCourseInvite(&models.PermissionInvite{
+			hadPermission, err := fr.createCourseInvite(&models.Invite{
 				Email:      req.Email,
 				CourseID:   req.CourseID,
 				Permission: req.Permission,

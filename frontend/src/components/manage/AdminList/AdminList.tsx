@@ -21,16 +21,16 @@ const AdminList: FC<AdminListProps> = ({ }) => {
             </Typography>
             <Box display="flex" flexDirection="row" alignItems="center" flexWrap="wrap" ml={-1}>
                 {admins?.map(admin =>
-                    <Box minWidth="25%" display="flex" mr={3} my={2}>
+                    <Box minWidth="25%" display="flex" mr={3} mb={2}>
                         <AdminChip admin={admin} />
                     </Box>
                 )}
                 {adminInvites && unique(adminInvites).map(invite =>
-                    <Box minWidth="25%" display="flex" mr={3} my={2}>
+                    <Box minWidth="25%" display="flex" mr={3} mb={2}>
                         <AdminChip email={invite} />
                     </Box>
                 )}
-                <Box display="flex" mr={3} my={2}>
+                <Box display="flex" mr={3} mb={2}>
                     < AddAdminButton />
                 </Box>
             </Box>

@@ -14,14 +14,14 @@ const (
 	CourseStudent CoursePermission = "student"
 )
 
-type PermissionInvite struct {
+type Invite struct {
 	Email      string           `firestore:"email"`
 	CourseID   string           `firestore:"courseID,omitempty"`
 	Permission CoursePermission `firestore:"permission,omitempty"`
 	IsAdmin    bool             `firestore:"isAdmin,omitempty"`
 }
 
-func CreateCourseInviteID(invite *PermissionInvite) string {
+func CreateCourseInviteID(invite *Invite) string {
 	return fmt.Sprintf("%s,%s", invite.Email, invite.CourseID)
 }
 

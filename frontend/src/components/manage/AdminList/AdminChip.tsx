@@ -19,9 +19,9 @@ const AdminChip: FC<AdminChipProps> = ({ admin, email }) => {
     const { currentUser } = useAuth();
 
     const handleDeleteAdmin = () => {
-        const confirmed = confirm(`Are you sure you want to remove ${admin.displayName} as a site admin?`);
+        const confirmed = confirm(`Are you sure you want to remove ${admin?.displayName || email} as a site admin?`);
         if (!confirmed) return;
-        toast.promise(AuthAPI.editAdminAccess(admin.email, false), {
+        toast.promise(AuthAPI.editAdminAccess(admin?.email || email, false), {
             loading: "Removing admin...",
             success: "Removed admin!",
             error: (err) => handleBadRequestError(err),
@@ -29,7 +29,7 @@ const AdminChip: FC<AdminChipProps> = ({ admin, email }) => {
             .catch(() => { })
     }
 
-    const deletable = admin && (currentUser?.ID !== admin?.ID);
+    const deletable = email || (currentUser?.ID !== admin?.ID);
 
     return (
         <Box

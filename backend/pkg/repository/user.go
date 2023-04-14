@@ -271,15 +271,16 @@ func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 
 func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest) (wasAdmin bool, err error) {
 	user, err := fr.GetUserByEmail(req.Email)
-	isAdmin := true
 
 	if err != nil {
-		// if user does not exist, add to invites
-		wasAdmin, err = fr.createAdminInvite(&models.PermissionInvite{
-			Email:   req.Email,
-			IsAdmin: isAdmin,
-		})
-		return wasAdmin, err
+		// if user does not exist, add to or remove from invites
+		if req.IsAdmin {
+			wasAdmin, err = fr.createAdminInvite(req)
+			return wasAdmin, err
+		} else {
+			err = fr.removeAdminInvite(req)
+			return false, err
+		}
 	}
 
 	docRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID)
@@ -290,7 +291,7 @@ func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest
 
 	// if user was already admin
 	data := doc.Data()
-	if data["isAdmin"].(bool) {
+	if req.IsAdmin && req.IsAdmin == data["isAdmin"].(bool) {
 		return true, nil
 	}
 
@@ -358,7 +359,7 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 			return err
 		}
 		// Decode this document.
-		var invite models.PermissionInvite
+		var invite models.Invite
 		err = mapstructure.Decode(doc.Data(), &invite)
 		if err != nil {
 			return err
@@ -402,7 +403,7 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 	return nil
 }
 
-func (fr *FirebaseRepository) createCourseInvite(invite *models.PermissionInvite) (hadPermission bool, err error) {
+func (fr *FirebaseRepository) createCourseInvite(invite *models.Invite) (hadPermission bool, err error) {
 	inviteID := models.CreateCourseInviteID(invite)
 	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
 	// Check if invite with the same person and course exists
@@ -430,14 +431,23 @@ func (fr *FirebaseRepository) createCourseInvite(invite *models.PermissionInvite
 	return false, err
 }
 
-func (fr *FirebaseRepository) createAdminInvite(invite *models.PermissionInvite) (wasAdmin bool, err error) {
-	inviteID := models.CreateSiteAdminInviteID(invite.Email)
+func (fr *FirebaseRepository) createAdminInvite(req *models.EditAdminAccessRequest) (wasAdmin bool, err error) {
+	inviteID := models.CreateSiteAdminInviteID(req.Email)
 	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
 	doc, _ := docRef.Get(firebase.Context)
 	if doc.Exists() {
 		// invite already exists
 		return true, nil
 	}
-	_, err = fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Set(firebase.Context, invite)
+	_, err = fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Set(firebase.Context, &models.Invite{
+		Email:   req.Email,
+		IsAdmin: req.IsAdmin,
+	})
 	return false, err
+}
+
+func (fr *FirebaseRepository) removeAdminInvite(req *models.EditAdminAccessRequest) error {
+	inviteID := models.CreateSiteAdminInviteID(req.Email)
+	_, err := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Delete(firebase.Context)
+	return err
 }
