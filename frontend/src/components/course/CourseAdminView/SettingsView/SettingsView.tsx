@@ -22,6 +22,8 @@ export default function SettingsView({ course }: SettingsViewProps) {
     const [adminInvites, adminInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseAdmin);
     const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
 
+    const loading = staffLoading || adminLoading || adminInvitesLoading || staffInvitesLoading;
+
     useEffect(() => {
         if (copyButtonRef.current) {
             new ClipboardJS(copyButtonRef.current, {
@@ -84,7 +86,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
                         Admin & Staff
                     </Typography>
 
-                    {admin && staff && adminInvites && staffInvites &&
+                    {!loading &&
                         <Stack spacing={0.5}>
                             <AccessList access={CoursePermission.CourseAdmin} users={admin} emails={adminInvites} />
                             <AccessList course={course} access={CoursePermission.CourseStaff} users={staff} emails={staffInvites} />
