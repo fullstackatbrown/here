@@ -154,7 +154,11 @@ func editAdminAccessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = repo.Repository.EditAdminAccess(req)
+	wasAdmin, err := repo.Repository.EditAdminAccess(req)
+	if wasAdmin {
+		http.Error(w, "Already an admin", http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

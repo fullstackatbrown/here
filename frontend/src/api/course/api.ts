@@ -64,7 +64,6 @@ async function revokePermission(
 async function bulkUpload(
   requests: createCourseAndPermissionsRequest[],
 ): Promise<string> {
-  console.log(requests)
   return APIClient.post(`/courses/bulkUpload`, { requests });
 }
 

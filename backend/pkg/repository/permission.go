@@ -25,7 +25,7 @@ func (fr *FirebaseRepository) executeSinglePermission(permission *models.SingleP
 	user, err := fr.GetUserByEmail(permission.Email)
 	if err != nil {
 		// The user doesn't exist; add an invite to the invites collection and then return.
-		err = fr.createInvite(&models.PermissionInvite{
+		err = fr.createCourseInvite(&models.PermissionInvite{
 			Email:      permission.Email,
 			CourseID:   courseID,
 			Permission: permission.Permission,

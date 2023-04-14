@@ -116,7 +116,6 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
         }
 
         setPermissionsByCourse(permissions)
-        console.log(permissions)
 
         handleNext()
     }

@@ -269,14 +269,29 @@ func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
 	return nil
 }
 
-func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest) error {
+func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest) (wasAdmin bool, err error) {
 	user, err := fr.GetUserByEmail(req.Email)
+	isAdmin := true
+
 	if err != nil {
-		err = fr.createInvite(&models.PermissionInvite{
+		// if user does not exist, add to invites
+		wasAdmin, err = fr.createAdminInvite(&models.PermissionInvite{
 			Email:   req.Email,
-			IsAdmin: true,
+			IsAdmin: isAdmin,
 		})
-		return err
+		return wasAdmin, err
+	}
+
+	docRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID)
+	doc, err := docRef.Get(firebase.Context)
+	if err != nil {
+		return false, err
+	}
+
+	// if user was already admin
+	data := doc.Data()
+	if data["isAdmin"].(bool) {
+		return true, nil
 	}
 
 	_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID).Update(firebase.Context, []firestore.Update{
@@ -286,7 +301,7 @@ func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest
 		},
 	})
 
-	return err
+	return false, err
 }
 
 // Helpers
@@ -349,37 +364,79 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 			return err
 		}
 
-		if invite.Permission == models.CourseStudent {
-			// Add as student
-			course, _ := fr.GetCourseByID(invite.CourseID)
-			// if course no longer exists, do nothing
-			fr.JoinCourse(user, course)
+		if invite.CourseID != "" {
+			if invite.Permission == models.CourseStudent {
+				// Add as student
+				course, _ := fr.GetCourseByID(invite.CourseID)
+				// if course no longer exists, do nothing
+				fr.JoinCourse(user, course)
 
-		} else {
-			// Add as staff
-			err = fr.AddPermissions(&models.AddPermissionRequest{
-				CourseID: invite.CourseID,
-				Permissions: []*models.SinglePermissionRequest{
-					{
-						Email:      invite.Email,
-						Permission: invite.Permission,
-					}},
+			} else {
+				// Add as staff
+				err = fr.AddPermissions(&models.AddPermissionRequest{
+					CourseID: invite.CourseID,
+					Permissions: []*models.SinglePermissionRequest{
+						{
+							Email:      invite.Email,
+							Permission: invite.Permission,
+						}},
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+		if invite.IsAdmin {
+			_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID).Update(firebase.Context, []firestore.Update{
+				{
+					Path:  "isAdmin",
+					Value: true,
+				},
 			})
 			if err != nil {
 				return err
 			}
 		}
-
 		// Delete the invite doc.
 		_, err = doc.Ref.Delete(firebase.Context)
-		if err != nil {
-			return err
-		}
+		return err
+
 	}
 	return nil
 }
 
-func (fr *FirebaseRepository) createInvite(invite *models.PermissionInvite) error {
-	_, _, err := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Add(firebase.Context, invite)
+func (fr *FirebaseRepository) createCourseInvite(invite *models.PermissionInvite) error {
+	inviteID := models.CreateCourseInviteID(invite)
+	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
+	// Check if invite with the same person and course exists
+	doc, err := docRef.Get(firebase.Context)
+	if doc.Exists() {
+		_, err := docRef.Update(firebase.Context, []firestore.Update{
+			{
+				Path:  "courseID",
+				Value: invite.CourseID,
+			},
+			{
+				Path:  "permissions",
+				Value: invite.Permission,
+			},
+		})
+		return err
+	}
+
+	// create new invite
+	_, err = docRef.Set(firebase.Context, invite)
 	return err
+}
+
+func (fr *FirebaseRepository) createAdminInvite(invite *models.PermissionInvite) (wasAdmin bool, err error) {
+	inviteID := models.CreateSiteAdminInviteID(invite.Email)
+	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
+	doc, _ := docRef.Get(firebase.Context)
+	if doc.Exists() {
+		// invite already exists
+		return true, nil
+	}
+	_, err = fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Set(firebase.Context, invite)
+	return false, err
 }

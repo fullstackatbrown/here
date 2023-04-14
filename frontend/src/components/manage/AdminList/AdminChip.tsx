@@ -17,7 +17,6 @@ export interface AdminChipProps {
 const AdminChip: FC<AdminChipProps> = ({ admin, email }) => {
     const [hover, setHover] = useState(false);
     const { currentUser } = useAuth();
-    console.log(currentUser)
 
     const handleDeleteAdmin = () => {
         const confirmed = confirm(`Are you sure you want to remove ${admin.displayName} as a site admin?`);
