@@ -25,11 +25,11 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
     const editable = course !== undefined;
     const data: UserData[] = users && emails && users.map((user) => ({ user } as UserData)).concat(emails.map((email) => ({ email } as UserData)))
 
-    const handleRevokeUserAccess = (user: User) => {
+    const handleRevokeUserAccess = (user?: User, email?: string) => {
         return () => {
-            const confirmed = confirm(`Are you sure you want to revoke ${user.displayName}'s ${access.toLowerCase()} access?`);
+            const confirmed = confirm(`Are you sure you want to revoke ${user?.displayName || email}'s ${access.toLowerCase()} access?`);
             if (confirmed) {
-                toast.promise(CourseAPI.revokePermission(course.ID, user.ID), {
+                toast.promise(CourseAPI.revokePermission(course.ID, user?.ID, email), {
                     loading: "Revoking access...",
                     success: "Access revoked!",
                     error: (err) => handleBadRequestError(err),
@@ -55,7 +55,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
                                     sx={{ height: 26, marginRight: 0.5 }}
                                     label={data.user.displayName}
                                     size="small"
-                                    onDelete={editable ? handleRevokeUserAccess(data.user) : undefined}
+                                    onDelete={editable ? handleRevokeUserAccess(data.user, undefined) : undefined}
                                 />
                             </Tooltip>
                         } else {
@@ -64,6 +64,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
                                     sx={{ height: 26, marginRight: 0.5 }}
                                     label={data.email}
                                     size="small"
+                                    onDelete={editable ? handleRevokeUserAccess(undefined, data.email) : undefined}
                                 />
                             </Tooltip>
 

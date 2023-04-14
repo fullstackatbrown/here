@@ -59,8 +59,9 @@ async function addPermission(
 async function revokePermission(
   courseID: string,
   userID: string,
+  email: string
 ): Promise<boolean> {
-  return APIClient.patch(`/courses/${courseID}/permissions/revoke`, { userID });
+  return APIClient.patch(`/courses/${courseID}/permissions/revoke`, { userID, email });
 }
 
 async function bulkUpload(

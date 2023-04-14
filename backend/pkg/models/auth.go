@@ -21,8 +21,8 @@ type Invite struct {
 	IsAdmin    bool             `firestore:"isAdmin,omitempty"`
 }
 
-func CreateCourseInviteID(invite *Invite) string {
-	return fmt.Sprintf("%s,%s", invite.Email, invite.CourseID)
+func CreateCourseInviteID(email string, courseID string) string {
+	return fmt.Sprintf("%s,%s", email, courseID)
 }
 
 func CreateSiteAdminInviteID(email string) string {

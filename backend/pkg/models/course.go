@@ -90,7 +90,8 @@ type AddPermissionRequest struct {
 
 type DeletePermissionRequest struct {
 	CourseID string `json:"courseID"`
-	UserID   string `json:"userID"`
+	UserID   string `json:"userID,omitempty"`
+	Email    string `json:"email,omitempty"`
 }
 
 type CreateCourseAndPermissionsRequest struct {

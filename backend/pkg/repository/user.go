@@ -404,7 +404,7 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 }
 
 func (fr *FirebaseRepository) createCourseInvite(invite *models.Invite) (hadPermission bool, err error) {
-	inviteID := models.CreateCourseInviteID(invite)
+	inviteID := models.CreateCourseInviteID(invite.Email, invite.CourseID)
 	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
 	// Check if invite with the same person and course exists
 	doc, _ := docRef.Get(firebase.Context)
@@ -429,6 +429,12 @@ func (fr *FirebaseRepository) createCourseInvite(invite *models.Invite) (hadPerm
 	// create new invite
 	_, err = docRef.Set(firebase.Context, invite)
 	return false, err
+}
+
+func (fr *FirebaseRepository) removeCourseInvite(email string, courseID string) error {
+	inviteID := models.CreateCourseInviteID(email, courseID)
+	_, err := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Delete(firebase.Context)
+	return err
 }
 
 func (fr *FirebaseRepository) createAdminInvite(req *models.EditAdminAccessRequest) (wasAdmin bool, err error) {

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
@@ -60,25 +62,35 @@ func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) (
 }
 
 func (fr *FirebaseRepository) DeletePermission(req *models.DeletePermissionRequest) error {
+	// For existing user
+	if req.UserID != "" {
+		batch := fr.firestoreClient.Batch()
 
-	batch := fr.firestoreClient.Batch()
+		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID), []firestore.Update{
+			{
+				Path:  "permissions." + req.UserID,
+				Value: firestore.Delete,
+			},
+		})
 
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID), []firestore.Update{
-		{
-			Path:  "permissions." + req.UserID,
-			Value: firestore.Delete,
-		},
-	})
+		batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.UserID), []firestore.Update{
+			{
+				Path:  "permissions." + req.CourseID,
+				Value: firestore.Delete,
+			},
+		})
 
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.UserID), []firestore.Update{
-		{
-			Path:  "permissions." + req.CourseID,
-			Value: firestore.Delete,
-		},
-	})
+		// Commit the batch.
+		_, err := batch.Commit(firebase.Context)
 
-	// Commit the batch.
-	_, err := batch.Commit(firebase.Context)
+		return err
+	}
 
-	return err
+	// For invites
+	if req.Email != "" {
+		err := fr.removeCourseInvite(req.Email, req.CourseID)
+		return err
+	}
+
+	return fmt.Errorf("no user or email specified")
 }
