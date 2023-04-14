@@ -22,21 +22,21 @@ import SwapRequestDialog from "./Requests/SwapRequestDialog";
 
 export interface StudentViewListProps {
     course: Course;
-    sectionsMap: Record<string, Section>;
     student: User;
+    sectionsMap: Record<string, Section>;
+    assignmentsMap: Record<string, Assignment>;
 }
 
-export default function StudentViewList({ course, sectionsMap, student }: StudentViewListProps) {
-    const [assignments, assignmentsLoading] = useAssignments(course.ID)
+export default function StudentViewList({ course, student, sectionsMap, assignmentsMap }: StudentViewListProps) {
+    const assignments = filterAssignmentsByReleaseDate(Object.values(assignmentsMap));
     const [requests, requestsLoading] = useSwapsByStudent(course.ID, student.ID);
-    const [requestsOpen, setRequestsOpen] = useState(!requestsLoading && !assignmentsLoading);
-    const [gradesOpen, setGradesOpen] = useState(!assignmentsLoading);
+    const [requestsOpen, setRequestsOpen] = useState(!requestsLoading);
+    const [gradesOpen, setGradesOpen] = useState(true);
     const [swapRequestDialog, setSwapRequestDialog] = useState(false)
 
     useEffect(() => {
-        setGradesOpen(!assignmentsLoading)
-        setRequestsOpen(!requestsLoading && !assignmentsLoading)
-    }, [assignmentsLoading, requestsLoading, assignmentsLoading])
+        setRequestsOpen(!requestsLoading)
+    }, [requestsLoading])
 
     return (
         <>
@@ -57,8 +57,8 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                     </Button>
                 </Stack>
                 <Collapse in={gradesOpen} timeout="auto" unmountOnExit>
-                    {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
-                        <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
+                    {(assignments?.length > 0) ?
+                        <StudentGradesTable {...{ course, student, sectionsMap, assignments }} /> :
                         <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Collapse>
 
@@ -75,8 +75,7 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                     {requestsOpen && <Button size="small" onClick={() => setSwapRequestDialog(true)}> + New Request</Button>}
                 </Stack>
                 <Collapse in={requestsOpen} timeout="auto" unmountOnExit sx={{ ml: -4 }}>
-                    {assignments && <StudentRequestsList {...{ course, sectionsMap, student, requests }}
-                        assignmentsMap={listToMap(assignments) as Record<string, Assignment>} />}
+                    <StudentRequestsList {...{ course, sectionsMap, student, requests, assignmentsMap }} />
                 </Collapse >
 
             </Stack >

@@ -6,15 +6,17 @@ import { FC, useState } from "react";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
+import { Section } from "model/section";
 
 export interface SectionsViewProps {
   course: Course;
   access: CoursePermission;
+  sectionsMap: Record<string, Section>;
 }
 
-const SectionsView: FC<SectionsViewProps> = ({ course, access }) => {
+const SectionsView: FC<SectionsViewProps> = ({ course, access, sectionsMap }) => {
+  const sections = Object.values(sectionsMap);
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
-  const [sections, loading] = useSections(course.ID);
 
   const getEnrollment = (sectionId: string) => {
     // loop through courses.students and count the number of students whose value is section id
@@ -56,7 +58,9 @@ const SectionsView: FC<SectionsViewProps> = ({ course, access }) => {
           <SectionCard key={s.ID} section={s} enrollment={getEnrollment(s.ID)} />)
         }
       </Stack>
-      {access === CoursePermission.CourseAdmin && sections && sections.length > 0 && <AvailabilitySurvey sections={sections} course={course} />}
+      {access === CoursePermission.CourseAdmin && sections && sections.length > 0 &&
+        <AvailabilitySurvey {...{ course, sections }} />
+      }
     </>
   );
 }

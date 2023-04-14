@@ -10,6 +10,8 @@ import PeopleView from "./PeopleView/PeopleView";
 import RequestsView from "./RequestsView/RequestsView";
 import SectionsView from "./SectionsView/SectionsView";
 import SettingsView from "./SettingsView/SettingsView";
+import { useSections, useSectionsMap } from "api/section/hooks";
+import { useAssignmentsMap } from "api/assignment/hooks";
 
 export interface CourseAdminViewProps {
   course: Course;
@@ -19,6 +21,8 @@ export interface CourseAdminViewProps {
 export default function CourseAdminView({ course, access }: CourseAdminViewProps) {
   const router = useRouter();
   const { courseID } = router.query;
+  const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
+  const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
 
   useEffect(() => {
     // Always do navigations after the first render
@@ -33,12 +37,12 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
         <CourseAdminViewNavigation access={access} />
       </Grid>
       <Grid xs>
-        {router.query.view &&
+        {router.query.view && sectionsMap && assignmentsMap &&
           <>
-            {router.query.view === "sections" && <SectionsView course={course} access={access} />}
-            {router.query.view === "assignments" && <AssignmentsView course={course} access={access} />}
-            {router.query.view === "people" && <PeopleView course={course} />}
-            {router.query.view === "requests" && <RequestsView course={course} />}
+            {router.query.view === "sections" && <SectionsView {...{ course, access, sectionsMap }} />}
+            {router.query.view === "assignments" && <AssignmentsView {...{ course, access, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "people" && <PeopleView {...{ course, access, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "requests" && <RequestsView {...{ course, sectionsMap, assignmentsMap }} />}
             {router.query.view === "settings" &&
               (access === CoursePermission.CourseAdmin ?
                 <SettingsView course={course} /> :
@@ -49,6 +53,6 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
         }
       </Grid>
       <Grid xs={router.query.view === "requests" ? 0.5 : 2} />
-    </Grid>
+    </Grid >
   );
 }
