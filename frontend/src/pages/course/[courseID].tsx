@@ -41,7 +41,7 @@ export default function CoursePage() {
           </Grid>
           {access ?
             <CourseAdminView course={course} access={access} /> :
-            <CourseStudentView course={course} assignmentsMap={undefined} sectionsMap={undefined} student={undefined} />}
+            <CourseStudentView course={course} />}
         </Stack>
       }
     </AppLayout>

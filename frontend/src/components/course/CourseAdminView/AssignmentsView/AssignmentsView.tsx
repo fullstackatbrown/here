@@ -8,7 +8,6 @@ import { FC, useEffect, useState } from 'react';
 import AssignmentsTable from "./AssignmentsTable";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
-import { CoursePermission } from "model/user";
 import { useAssignments } from "api/assignment/hooks";
 import listToMap from "@util/shared/listToMap";
 

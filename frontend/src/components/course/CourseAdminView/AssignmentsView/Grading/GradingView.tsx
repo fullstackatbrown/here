@@ -18,6 +18,7 @@ import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
 import { useSections } from 'api/section/hooks';
+import listToMap from '@util/shared/listToMap';
 
 interface GradingViewProps {
     course: Course;

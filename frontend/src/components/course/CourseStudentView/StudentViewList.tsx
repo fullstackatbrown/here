@@ -21,20 +21,20 @@ import SwapRequestDialog from "./Requests/SwapRequestDialog";
 export interface StudentViewListProps {
     course: Course;
     sectionsMap: Record<string, Section>;
-    assignmentsMap: Record<string, Assignment>;
     student: User;
 }
 
-export default function StudentViewList({ course, sectionsMap, assignmentsMap, student }: StudentViewListProps) {
-    const assignments = Object.values(assignmentsMap);
+export default function StudentViewList({ course, sectionsMap, student }: StudentViewListProps) {
+    const [assignments, assignmentsLoading] = useAssignments(course.ID)
     const [requests, requestsLoading] = useSwapsByStudent(course.ID, student.ID);
-    const [requestsOpen, setRequestsOpen] = useState(!requestsLoading);
-    const [gradesOpen, setGradesOpen] = useState(true);
+    const [requestsOpen, setRequestsOpen] = useState(!requestsLoading && !assignmentsLoading);
+    const [gradesOpen, setGradesOpen] = useState(!assignmentsLoading);
     const [swapRequestDialog, setSwapRequestDialog] = useState(false)
 
     useEffect(() => {
-        setRequestsOpen(!requestsLoading)
-    }, [requestsLoading])
+        setGradesOpen(!assignmentsLoading)
+        setRequestsOpen(!requestsLoading && !assignmentsLoading)
+    }, [assignmentsLoading, requestsLoading, assignmentsLoading])
 
     return (
         <>
