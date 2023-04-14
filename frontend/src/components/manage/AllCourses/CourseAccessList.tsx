@@ -13,6 +13,7 @@ import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusCh
 import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
 import toast from "react-hot-toast";
+import { useCourseInvites } from "api/auth/hooks";
 
 interface CourseAccessListProps {
     course: Course;
@@ -22,6 +23,8 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     const [hover, setHover] = useState(false);
     const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
     const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
+    const [adminInvites, adminInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseAdmin);
+    const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
     const [editCourseDialogOpen, setEditCourseDialogOpen] = useState<Course | undefined>(undefined);
     const theme = useTheme();
 
@@ -94,10 +97,10 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
                 </Stack >
             </Box >
             <Collapse in={expanded}>
-                {admin && staff &&
+                {admin && staff && adminInvites && staffInvites &&
                     <Stack ml={4} mt={1} mb={2} spacing={1}>
-                        <CourseAccessListItem course={course} access={CoursePermission.CourseAdmin} users={admin} emails={[]} />
-                        <CourseAccessListItem course={course} access={CoursePermission.CourseStaff} users={staff} emails={[]} />
+                        <CourseAccessListItem course={course} access={CoursePermission.CourseAdmin} users={admin} emails={adminInvites} />
+                        <CourseAccessListItem course={course} access={CoursePermission.CourseStaff} users={staff} emails={staffInvites} />
                     </Stack>}
             </Collapse>
         </>

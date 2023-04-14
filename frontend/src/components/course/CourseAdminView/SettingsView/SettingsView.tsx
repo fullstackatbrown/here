@@ -1,14 +1,15 @@
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import { handleBadRequestError } from "@util/errors";
-import CourseAPI from "api/course/api";
-import { Course } from "model/course";
-import toast from "react-hot-toast";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import ClipboardJS from 'clipboard';
-import { useEffect, useRef } from "react";
 import AccessList from "@components/shared/AccessList/AccessList";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { Button, Stack, Typography } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
+import { useCourseInvites } from "api/auth/hooks";
+import CourseAPI from "api/course/api";
 import { useCourseStaff } from "api/course/hooks";
+import ClipboardJS from 'clipboard';
+import { Course } from "model/course";
 import { CoursePermission } from "model/user";
+import { useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 
 export interface SettingsViewProps {
     course: Course;
@@ -18,6 +19,8 @@ export default function SettingsView({ course }: SettingsViewProps) {
     const copyButtonRef = useRef(null);
     const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
     const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
+    const [adminInvites, adminInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseAdmin);
+    const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
 
     useEffect(() => {
         if (copyButtonRef.current) {
@@ -81,10 +84,10 @@ export default function SettingsView({ course }: SettingsViewProps) {
                         Admin & Staff
                     </Typography>
 
-                    {admin && staff &&
+                    {admin && staff && adminInvites && staffInvites &&
                         <Stack spacing={0.5}>
-                            <AccessList access={CoursePermission.CourseAdmin} users={admin} emails={[]} />
-                            <AccessList course={course} access={CoursePermission.CourseStaff} users={staff} emails={[]} />
+                            <AccessList access={CoursePermission.CourseAdmin} users={admin} emails={adminInvites} />
+                            <AccessList course={course} access={CoursePermission.CourseStaff} users={staff} emails={staffInvites} />
                         </Stack>}
                 </Stack>
             </Stack >

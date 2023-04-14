@@ -1,7 +1,7 @@
-import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
-import { FirestoreProfilesCollection } from "api/firebaseConst";
+import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
+import { FirestoreInvitesCollection, FirestoreProfilesCollection } from "api/firebaseConst";
 import { useAsyncEffect } from "api/hooks/useAsyncEffect";
-import { User } from "model/user";
+import { CoursePermission, User } from "model/user";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import AuthAPI from "./api";
 
@@ -179,4 +179,55 @@ export function useNotifications(
             prevNotifications.current = notifications.length;
         }
     }, [user, cb]);
+}
+
+export function useCourseInvites(courseID: string, permission: CoursePermission): [string[], boolean] {
+    const [loading, setLoading] = useState(true);
+    const [invites, setInvites] = useState<string[]>([]);
+
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(query(collection(db, FirestoreInvitesCollection),
+            where("courseID", "==", courseID),
+            where("permission", "==", permission))
+            , (querySnapshot) => {
+                const res: string[] = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    res.push(data.email);
+                });
+
+                setInvites(res);
+                setLoading(false);
+            });
+
+        return () => unsubscribe();
+    }, [courseID]);
+
+    return [invites, loading];
+}
+
+export function useAdminInvites(): [string[], boolean] {
+    const [loading, setLoading] = useState(true);
+    const [invites, setInvites] = useState<string[]>([]);
+
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(query(collection(db, FirestoreInvitesCollection),
+            where("isAdmin", "==", true))
+            , (querySnapshot) => {
+                const res: string[] = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    res.push(data.email);
+                });
+
+                setInvites(res);
+                setLoading(false);
+            });
+
+        return () => unsubscribe();
+    }, []);
+
+    return [invites, loading];
 }

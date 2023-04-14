@@ -109,7 +109,7 @@ func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	course, err = repo.Repository.JoinCourse(req, course)
+	course, err = repo.Repository.JoinCourse(user, course)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

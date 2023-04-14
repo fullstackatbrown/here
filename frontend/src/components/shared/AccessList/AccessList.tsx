@@ -51,14 +51,15 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
                         if (data.user) {
                             return <Tooltip title={data.user.email} placement="right">
                                 <Chip
+                                    variant="outlined"
                                     sx={{ height: 26, marginRight: 0.5 }}
                                     label={data.user.displayName}
                                     size="small"
-                                    onDelete={editable && handleRevokeUserAccess(data.user)}
+                                    onDelete={editable ? handleRevokeUserAccess(data.user) : undefined}
                                 />
                             </Tooltip>
                         } else {
-                            return <Tooltip title={data.email} placement="right">
+                            return <Tooltip title={"pending"} placement="right">
                                 <Chip
                                     sx={{ height: 26, marginRight: 0.5 }}
                                     label={data.email}

@@ -8,44 +8,53 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 )
 
-func (fr *FirebaseRepository) CreatePermissions(req *models.AddPermissionsRequest) error {
-
+func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) error {
 	for _, permission := range req.Permissions {
-		// Get user by email.
-		user, err := fr.GetUserByEmail(permission.Email)
-		if err != nil {
-			// The user doesn't exist; add an invite to the invites collection and then return.
-			_, _, err = fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Add(firebase.Context, map[string]interface{}{
-				"email":      permission.Email,
-				"courseID":   req.CourseID,
-				"permission": permission.Permission,
-			})
-			return err
+		if permission.Permission == models.CourseAdmin || permission.Permission == models.CourseStaff {
+			err := fr.executeSinglePermission(permission, req.CourseID)
+			if err != nil {
+				return err
+			}
 		}
+	}
+	return nil
+}
 
-		batch := fr.firestoreClient.Batch()
-
-		// Set course-side permissions.
-		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID), []firestore.Update{
-			{
-				Path:  "permissions." + user.ID,
-				Value: permission.Permission,
-			},
+func (fr *FirebaseRepository) executeSinglePermission(permission *models.SinglePermissionRequest, courseID string) error {
+	// Get user by email.
+	user, err := fr.GetUserByEmail(permission.Email)
+	if err != nil {
+		// The user doesn't exist; add an invite to the invites collection and then return.
+		err = fr.createInvite(&models.PermissionInvite{
+			Email:      permission.Email,
+			CourseID:   courseID,
+			Permission: permission.Permission,
 		})
+		return err
+	}
 
-		// Set user-side permissions.
-		batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID), []firestore.Update{
-			{
-				Path:  "permissions." + req.CourseID,
-				Value: permission.Permission,
-			},
-		})
+	batch := fr.firestoreClient.Batch()
 
-		// Commit the batch.
-		_, err = batch.Commit(firebase.Context)
-		if err != nil {
-			return fmt.Errorf("Errored when setting permission for user %s: %v", user.ID, err)
-		}
+	// Set course-side permissions.
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID), []firestore.Update{
+		{
+			Path:  "permissions." + user.ID,
+			Value: permission.Permission,
+		},
+	})
+
+	// Set user-side permissions.
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID), []firestore.Update{
+		{
+			Path:  "permissions." + courseID,
+			Value: permission.Permission,
+		},
+	})
+
+	// Commit the batch.
+	_, err = batch.Commit(firebase.Context)
+	if err != nil {
+		return fmt.Errorf("Errored when setting permission for user %s: %v", user.ID, err)
 	}
 
 	return nil

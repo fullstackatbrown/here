@@ -92,7 +92,7 @@ func RequireCourseOrSiteAdmin() func(handler http.Handler) http.Handler {
 			}
 
 			courseID := r.Context().Value("courseID").(string)
-			if !hasCourseStaffPermission(user, courseID) || !user.IsAdmin {
+			if !hasCourseStaffPermission(user, courseID) && !user.IsAdmin {
 				rejectForbiddenRequest(w)
 				return
 			}

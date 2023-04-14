@@ -7,9 +7,17 @@ const (
 type CoursePermission string
 
 const (
-	CourseAdmin CoursePermission = "admin"
-	CourseStaff CoursePermission = "staff"
+	CourseAdmin   CoursePermission = "admin"
+	CourseStaff   CoursePermission = "staff"
+	CourseStudent CoursePermission = "student"
 )
+
+type PermissionInvite struct {
+	Email      string           `firestore:"email"`
+	CourseID   string           `firestore:"courseID,omitempty"`
+	Permission CoursePermission `firestore:"permission,omitempty"`
+	IsAdmin    bool             `firestore:"isAdmin,omitempty"`
+}
 
 // Profile is a collection of standard profile information for a user.
 // This struct separates client-safe profile information from internal user metadata.

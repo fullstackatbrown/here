@@ -139,26 +139,3 @@ export function useCourseStaff(courseID: string, access: CoursePermission): [Use
 
     return [staff, loading];
 }
-
-export function useInvitations(courseID: string): [string[], boolean] {
-    const [loading, setLoading] = useState(true);
-    const [invites, setInvites] = useState<string[]>([]);
-
-    useEffect(() => {
-        const db = getFirestore();
-        const unsubscribe = onSnapshot(collection(db, "invites"), (querySnapshot) => {
-            const res: string[] = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.courseID === courseID) res.push(data.email);
-            });
-
-            setInvites(res);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [courseID]);
-
-    return [invites, loading];
-}

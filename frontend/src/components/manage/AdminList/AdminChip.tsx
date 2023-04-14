@@ -10,10 +10,11 @@ import AuthAPI from 'api/auth/api';
 import toast from 'react-hot-toast';
 
 export interface AdminChipProps {
-    admin: User;
+    admin?: User;
+    email?: string
 }
 
-const AdminChip: FC<AdminChipProps> = ({ admin }) => {
+const AdminChip: FC<AdminChipProps> = ({ admin, email }) => {
     const [hover, setHover] = useState(false);
     const { currentUser } = useAuth();
     console.log(currentUser)
@@ -29,27 +30,27 @@ const AdminChip: FC<AdminChipProps> = ({ admin }) => {
             .catch(() => { })
     }
 
-    const notMe = currentUser?.ID !== admin.ID;
+    const deletable = admin && (currentUser?.ID !== admin?.ID);
 
     return (
         <Box
-            sx={{ borderRadius: 5, py: 1, pl: 1, pr: notMe ? 0 : 1.5, mr: 1.5, border: "1px solid #e0e0e0" }}
-            key={admin.ID} display="flex" flexDirection="row" alignItems="center"
+            sx={{ borderRadius: 5, py: 1, pl: 1, pr: deletable ? 0 : 1.5, border: "1px solid #e0e0e0" }}
+            key={admin?.ID || email} display="flex" flexDirection="row" alignItems="center"
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
         >
-            <Avatar src={admin.photoUrl}>
-                {getInitials(admin.displayName)}
+            <Avatar src={admin?.photoUrl}>
+                {admin ? getInitials(admin.displayName) : email.charAt(0).toUpperCase()}
             </Avatar>
             <Stack mx={1}>
                 <Typography fontSize={14}>
-                    {admin.displayName}
+                    {admin ? admin.displayName : "Pending"}
                 </Typography>
                 <Typography fontSize={13} color="secondary">
-                    {admin.email}
+                    {admin?.email || email}
                 </Typography>
             </Stack>
-            {notMe &&
+            {deletable &&
                 <Box width={30}>
                     {hover &&
                         <IconButton sx={{ p: 0.5 }} onClick={handleDeleteAdmin}>

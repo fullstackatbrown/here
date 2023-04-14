@@ -82,9 +82,9 @@ type SinglePermissionRequest struct {
 	Email      string           `json:"email"`
 	Permission CoursePermission `json:"permission"`
 }
-type AddPermissionsRequest struct {
-	CourseID    string                    `json:"courseID,omitempty"`
-	Permissions []SinglePermissionRequest `json:"permissions"`
+type AddPermissionRequest struct {
+	CourseID    string                     `json:"courseID,omitempty"`
+	Permissions []*SinglePermissionRequest `json:"permissions"`
 }
 
 type DeletePermissionRequest struct {
@@ -93,10 +93,10 @@ type DeletePermissionRequest struct {
 }
 
 type CreateCourseAndPermissionsRequest struct {
-	Title       string                    `json:"title"`
-	Code        string                    `json:"code"`
-	Term        string                    `json:"term"`
-	Permissions []SinglePermissionRequest `json:"permissions"`
+	Title       string                     `json:"title"`
+	Code        string                     `json:"code"`
+	Term        string                     `json:"term"`
+	Permissions []*SinglePermissionRequest `json:"permissions"`
 }
 
 type BulkUploadRequest struct {

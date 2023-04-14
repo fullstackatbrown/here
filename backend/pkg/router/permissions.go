@@ -19,7 +19,7 @@ func PermissionRoutes() *chi.Mux {
 }
 
 func addPermissionsHandler(w http.ResponseWriter, r *http.Request) {
-	var req *models.AddPermissionsRequest
+	var req *models.AddPermissionRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -28,7 +28,7 @@ func addPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	req.CourseID = chi.URLParam(r, "courseID")
 
-	err = repo.Repository.CreatePermissions(req)
+	err = repo.Repository.AddPermissions(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
