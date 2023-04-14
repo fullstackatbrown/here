@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
@@ -28,13 +29,17 @@ func addPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	req.CourseID = chi.URLParam(r, "courseID")
 
-	err = repo.Repository.AddPermissions(req)
+	hadPermission, err := repo.Repository.AddPermissions(req)
+	if hadPermission {
+		http.Error(w, fmt.Sprintf("Already have %s access", req.Permission), http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Successfully added course permission to " + req.CourseID))
 }
 
@@ -54,6 +59,6 @@ func revokePermissionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Successfully deleted course permission for " + req.CourseID))
 }
