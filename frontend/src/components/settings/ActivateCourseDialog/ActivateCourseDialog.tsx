@@ -41,7 +41,7 @@ const ActivateCourseDialog: FC<ActivateCourseDialogProps> = ({ course, open, onC
     }
 
     const onSubmit = handleSubmit(data => {
-        toast.promise(CourseAPI.updateCourse(course.ID, data.code, data.title, data.term, data.autoApproveRequests, data.status), {
+        toast.promise(CourseAPI.updateCourse(course.ID, data.title, data.autoApproveRequests, data.status), {
             loading: "Activating course on Here...",
             success: "Course activated on Here",
             error: (err) => handleBadRequestError(err)

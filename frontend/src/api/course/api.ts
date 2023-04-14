@@ -32,19 +32,19 @@ async function createCourse(
 async function updateCourse(
   courseID: string,
   title?: string,
-  code?: string,
-  term?: string,
   autoApproveRequests?: boolean,
   status?: string,
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}`, { title, code, term, autoApproveRequests, status });
+  return APIClient.patch(`/courses/${courseID}`, { title, autoApproveRequests, status });
 }
 
-async function updateCourseStatus(
+async function updateCourseInfo(
   courseID: string,
-  status: string,
+  title: string,
+  code: string,
+  term: string,
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}/status`, { status });
+  return APIClient.patch(`/courses/${courseID}/info`, { title, code, term });
 }
 
 async function addPermission(
@@ -73,7 +73,7 @@ const CourseAPI = {
   createCourse,
   deleteCourse,
   updateCourse,
-  updateCourseStatus,
+  updateCourseInfo,
   addPermission,
   revokePermission,
   bulkUpload,

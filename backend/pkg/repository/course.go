@@ -171,10 +171,22 @@ func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) erro
 	return err
 }
 
-func (fr *FirebaseRepository) UpdateCourseStatus(req *models.UpdateCourseStatusRequest) error {
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Update(firebase.Context, []firestore.Update{
-		{Path: "status", Value: req.Status},
-	})
+func (fr *FirebaseRepository) UpdateCourseInfo(req *models.UpdateCourseInfoRequest) error {
+	v := reflect.ValueOf(*req)
+	typeOfS := v.Type()
+
+	var updates []firestore.Update
+
+	for i := 0; i < v.NumField(); i++ {
+		field := typeOfS.Field(i).Name
+		val := v.Field(i).Interface()
+		// Only include the fields that are set
+		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") {
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
+		}
+	}
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Update(firebase.Context, updates)
 	return err
 }
 

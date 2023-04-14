@@ -57,16 +57,17 @@ type DeleteCourseRequest struct {
 }
 
 type UpdateCourseRequest struct {
-	CourseID            *string `json:"courseid,omitempty"`
-	Title               *string `json:"title,omitempty"`
-	Code                *string `json:"code,omitempty"`
-	Term                *string `json:"term,omitempty"`
-	AutoApproveRequests *bool   `json:"autoApproveRequests,omitempty"`
+	CourseID            *string       `json:"courseid,omitempty"`
+	Title               *string       `json:"title,omitempty"`
+	Status              *CourseStatus `json:"status"`
+	AutoApproveRequests *bool         `json:"autoApproveRequests,omitempty"`
 }
 
-type UpdateCourseStatusRequest struct {
-	CourseID string       `json:"courseid,omitempty"`
-	Status   CourseStatus `json:"status"`
+type UpdateCourseInfoRequest struct {
+	CourseID *string `json:"courseid,omitempty"`
+	Title    *string `json:"title,omitempty"`
+	Code     *string `json:"code,omitempty"`
+	Term     *string `json:"term,omitempty"`
 }
 
 type AssignSectionsRequest struct {

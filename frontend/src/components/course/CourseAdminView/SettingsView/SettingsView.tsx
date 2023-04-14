@@ -28,7 +28,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
     }, []);
 
     const changeAutoApproveRequests = () => {
-        toast.promise(CourseAPI.updateCourse(course.ID, undefined, undefined, undefined, !course.autoApproveRequests),
+        toast.promise(CourseAPI.updateCourse(course.ID, undefined, !course.autoApproveRequests),
             {
                 loading: "Updating course...",
                 success: "Course updated!",

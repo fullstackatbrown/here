@@ -43,7 +43,7 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
 
     const onSubmit = handleSubmit(async data => {
         if (course) {
-            toast.promise(CourseAPI.updateCourse(
+            toast.promise(CourseAPI.updateCourseInfo(
                 course.ID, data.title, formatCourseCode(data.code), formatCourseTerm(data.term)),
                 {
                     loading: 'Updating course...',

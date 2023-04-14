@@ -41,7 +41,7 @@ const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
             }
             const confirmed = confirm(confirmString);
             if (confirmed) {
-                toast.promise(CourseAPI.updateCourseStatus(course.ID, status), {
+                toast.promise(CourseAPI.updateCourse(course.ID, undefined, undefined, status), {
                     loading: "Updating course status...",
                     success: "Course status updated!",
                     error: (err) => handleBadRequestError(err)
