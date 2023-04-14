@@ -4,7 +4,7 @@ import { handleBadRequestError } from "@util/errors";
 import { parseCourses, parseStaffData, parseTerm } from "@util/shared/parseBulkUpload";
 import { capitalizeFirstLetter } from "@util/shared/string";
 import CourseAPI from "api/course/api";
-import { SinglePermissionRequest, createCourseAndPermissionsRequest } from "model/course";
+import { AddPermissionRequest, createCourseAndPermissionsRequest } from "model/course";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
 import AddCoursesStep, { AddCoursesData } from "./AddCoursesStep";
@@ -54,7 +54,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
     const [addCoursesData, setAddCoursesData] = useState<AddCoursesData | undefined>({ term: "", data: "" });
     const [term, setTerm] = useState<string | undefined>(undefined);
     const [courses, setCourses] = useState<Record<string, string> | undefined>(undefined);
-    const [permissionsByCourse, setPermissionsByCourse] = useState<Record<string, SinglePermissionRequest[]> | undefined>(undefined);
+    const [permissionsByCourse, setPermissionsByCourse] = useState<Record<string, AddPermissionRequest[]> | undefined>(undefined);
     const [success, setSuccess] = useState<boolean>(false);
 
     const [addStaffData, setAddStaffData] = useState<AddStaffData>({ data: "" });
