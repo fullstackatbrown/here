@@ -1,15 +1,15 @@
 import { ExpandMore } from "@mui/icons-material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, Stack, Typography, useTheme } from "@mui/material";
-import { SinglePermissionRequest } from "model/course";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
 import AccessList from "../../shared/AccessList/AccessList";
+import { AddPermissionRequest } from "model/course";
 
 interface ConfirmUploadListItemProps {
     courseCode: string;
     courseTitle: string;
-    permissions: SinglePermissionRequest[];
+    permissions: AddPermissionRequest[];
 }
 
 const ConfirmUploadListItem: FC<ConfirmUploadListItemProps> = ({ courseCode, courseTitle, permissions }) => {

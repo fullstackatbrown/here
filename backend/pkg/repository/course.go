@@ -319,12 +319,16 @@ func (fr *FirebaseRepository) BulkUpload(req *models.BulkUploadRequest) error {
 		}
 
 		// Add permissions
-		err = fr.AddPermissions(&models.AddPermissionRequest{
-			CourseID:    course.ID,
-			Permissions: r.Permissions,
-		})
-		if err != nil {
-			return err
+
+		for _, perm := range r.Permissions {
+			_, err = fr.AddPermissions(&models.AddPermissionRequest{
+				CourseID:   course.ID,
+				Email:      perm.Email,
+				Permission: perm.Permission,
+			})
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil

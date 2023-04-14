@@ -1,5 +1,6 @@
 import APIClient from "api/APIClient";
-import { Course, SinglePermissionRequest, createCourseAndPermissionsRequest } from "model/course";
+import { AddPermissionRequest, Course, createCourseAndPermissionsRequest } from "model/course";
+import { CoursePermission } from "model/user";
 
 
 async function getCourse(courseID: string): Promise<Course> {
@@ -49,9 +50,10 @@ async function updateCourseInfo(
 
 async function addPermission(
   courseID: string,
-  permissions: SinglePermissionRequest[],
+  email: string,
+  permission: CoursePermission,
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}/permissions/add`, { permissions });
+  return APIClient.patch(`/courses/${courseID}/permissions/add`, { email, permission });
 }
 
 async function revokePermission(

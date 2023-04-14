@@ -8,7 +8,7 @@ import { Course, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
 import CreateEditCourseDialog from "../CreateEditCourseDialog/CreateEditCourseDialog";
-import CourseAccessListItem from "../../shared/AccessList/AccessList";
+import AccessList from "../../shared/AccessList/AccessList";
 import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
 import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
@@ -99,8 +99,8 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
             <Collapse in={expanded}>
                 {admin && staff && adminInvites && staffInvites &&
                     <Stack ml={4} mt={1} mb={2} spacing={1}>
-                        <CourseAccessListItem course={course} access={CoursePermission.CourseAdmin} users={admin} emails={adminInvites} />
-                        <CourseAccessListItem course={course} access={CoursePermission.CourseStaff} users={staff} emails={staffInvites} />
+                        <AccessList course={course} access={CoursePermission.CourseAdmin} users={admin} emails={adminInvites} />
+                        <AccessList course={course} access={CoursePermission.CourseStaff} users={staff} emails={staffInvites} />
                     </Stack>}
             </Collapse>
         </>

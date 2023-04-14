@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { ClickAwayListener, Collapse, IconButton, Input, Stack } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
-import { Course, SinglePermissionRequest } from "model/course";
+import { Course } from "model/course";
 import { CoursePermission } from "model/user";
 import { FC, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -31,8 +31,7 @@ const AddAccessButton: FC<AddAccessButtonProps> = ({ course, access }) => {
     }, [showAddAccessTextfield]);
 
     const onSubmit = handleSubmit(async data => {
-        const permissions: SinglePermissionRequest[] = [{ email: data.email, permission: access }]
-        toast.promise(CourseAPI.addPermission(course.ID, permissions), {
+        toast.promise(CourseAPI.addPermission(course.ID, data.email, access), {
             loading: "Adding permission...",
             success: "Added permission!",
             error: (err) => handleBadRequestError(err),
@@ -42,7 +41,7 @@ const AddAccessButton: FC<AddAccessButtonProps> = ({ course, access }) => {
                 AddAccessButtonRef.current.blur();
                 setShowAddAccessTextfield(false)
             })
-            .catch(() => { })
+            .catch(() => { reset() })
     })
 
     return (

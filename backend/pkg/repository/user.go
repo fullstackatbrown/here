@@ -373,13 +373,10 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 
 			} else {
 				// Add as staff
-				err = fr.AddPermissions(&models.AddPermissionRequest{
-					CourseID: invite.CourseID,
-					Permissions: []*models.SinglePermissionRequest{
-						{
-							Email:      invite.Email,
-							Permission: invite.Permission,
-						}},
+				_, err = fr.AddPermissions(&models.AddPermissionRequest{
+					CourseID:   invite.CourseID,
+					Email:      invite.Email,
+					Permission: invite.Permission,
 				})
 				if err != nil {
 					return err
@@ -405,28 +402,32 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 	return nil
 }
 
-func (fr *FirebaseRepository) createCourseInvite(invite *models.PermissionInvite) error {
+func (fr *FirebaseRepository) createCourseInvite(invite *models.PermissionInvite) (hadPermission bool, err error) {
 	inviteID := models.CreateCourseInviteID(invite)
 	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
 	// Check if invite with the same person and course exists
-	doc, err := docRef.Get(firebase.Context)
+	doc, _ := docRef.Get(firebase.Context)
 	if doc.Exists() {
+		if doc.Data()["permission"].(string) == string(invite.Permission) {
+			// invite already exists
+			return true, nil
+		}
 		_, err := docRef.Update(firebase.Context, []firestore.Update{
 			{
 				Path:  "courseID",
 				Value: invite.CourseID,
 			},
 			{
-				Path:  "permissions",
+				Path:  "permission",
 				Value: invite.Permission,
 			},
 		})
-		return err
+		return false, err
 	}
 
 	// create new invite
 	_, err = docRef.Set(firebase.Context, invite)
-	return err
+	return false, err
 }
 
 func (fr *FirebaseRepository) createAdminInvite(invite *models.PermissionInvite) (wasAdmin bool, err error) {
