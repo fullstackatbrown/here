@@ -38,12 +38,11 @@ export default function StudentViewList({ course, sectionsMap, assignmentsMap, s
 
     return (
         <>
-            {assignments && sectionsMap &&
-                <SwapRequestDialog
-                    open={swapRequestDialog}
-                    onClose={() => { setSwapRequestDialog(false) }}
-                    {...{ course, assignments, sectionsMap, student }}
-                />}
+            <SwapRequestDialog
+                open={swapRequestDialog}
+                onClose={() => { setSwapRequestDialog(false) }}
+                {...{ course, assignments, sectionsMap, student }}
+            />
             <Stack mt={-1}>
                 <Stack direction="row" justifyContent="space-between">
                     <Button
@@ -73,7 +72,7 @@ export default function StudentViewList({ course, sectionsMap, assignmentsMap, s
                     {requestsOpen && <Button size="small" onClick={() => setSwapRequestDialog(true)}> + New Request</Button>}
                 </Stack>
                 <Collapse in={requestsOpen} timeout="auto" unmountOnExit sx={{ ml: -4 }}>
-                    {assignments && <StudentRequestsList {...{ course, sectionsMap, student, assignmentsMap, requests }} />}
+                    <StudentRequestsList {...{ course, sectionsMap, student, assignmentsMap, requests }} />
                 </Collapse>
 
             </Stack >

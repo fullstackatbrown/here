@@ -58,7 +58,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, assignments
           </Button>
         }
       </Stack>
-      {assignments && assignments.length == 0 &&
+      {assignments?.length == 0 &&
         <Typography textAlign="center" mt={3}>
           {access === CoursePermission.CourseAdmin ?
             "Add the first assignment here" :
@@ -66,7 +66,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, assignments
           }
         </Typography>
       }
-      {assignments && assignments.length > 0 && <AssignmentsTable course={course} assignments={assignments} handleNavigate={handleNavigate} />}
+      {assignments?.length > 0 && <AssignmentsTable course={course} assignments={assignments} handleNavigate={handleNavigate} />}
     </>
   );
 }

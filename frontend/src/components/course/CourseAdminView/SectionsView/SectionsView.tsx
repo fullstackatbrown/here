@@ -37,13 +37,14 @@ const SectionsView: FC<SectionsViewProps> = ({ course, access, sectionsMap }) =>
         <Typography variant="h6" fontWeight={600}>
           Sections
         </Typography>
+        {/* Only course admin can add sections */}
         {access === CoursePermission.CourseAdmin &&
           <Button onClick={() => setcreateSectionDialog(true)}>
             + New
           </Button>
         }
       </Stack>
-      {sections && sections.length == 0 &&
+      {sections?.length == 0 &&
         <Typography textAlign="center" mt={3}>
           {access === CoursePermission.CourseAdmin ?
             "Add the first section here" :
@@ -52,11 +53,14 @@ const SectionsView: FC<SectionsViewProps> = ({ course, access, sectionsMap }) =>
         </Typography>
       }
       <Stack direction="column" spacing={2} mb={5}>
-        {sections && sections.map((s) =>
+        {sections?.map((s) =>
           <SectionCard key={s.ID} section={s} enrollment={getEnrollment(s.ID)} />)
         }
       </Stack>
-      {sections && sections.length > 0 && <AvailabilitySurvey {...{ course, sections }} />}
+      {/* Only show survey to course admin */}
+      {access === CoursePermission.CourseAdmin && sections?.length > 0 &&
+        <AvailabilitySurvey {...{ course, sections }} />
+      }
     </>
   );
 }

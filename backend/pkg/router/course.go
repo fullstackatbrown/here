@@ -15,11 +15,11 @@ func CourseRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(middleware.AuthCtx())
-	router.Use(middleware.CourseCtx())
 	router.With(middleware.RequireAdmin()).Post("/", createCourseHandler)
 	router.With(middleware.RequireAdmin()).Post("/bulkUpload", bulkUploadHandler)
 
 	router.Route("/{courseID}", func(r chi.Router) {
+		r.Use(middleware.CourseCtx())
 		r.Get("/", getCourseHandler)
 
 		// site admin only

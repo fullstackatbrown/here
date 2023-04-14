@@ -108,6 +108,6 @@ func hasCourseStaffPermission(u *models.User, courseID string) bool {
 }
 
 func hasCourseAdminPermission(u *models.User, courseID string) bool {
-	_, ok := u.Permissions[courseID]
-	return ok && u.Permissions[courseID] == models.CourseAdmin
+	perm, ok := u.Profile.Permissions[courseID]
+	return ok && perm == models.CourseAdmin
 }
