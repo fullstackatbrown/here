@@ -29,12 +29,7 @@ const StudentDialogDialog: FC<StudentDialogDialogProps> = ({ course, studentID, 
 
     useEffect(() => {
         if (studentID && studentID != "") {
-            toast.promise(AuthAPI.getUserById(studentID),
-                {
-                    loading: "Loading student...",
-                    success: "Loaded student",
-                    error: (err) => handleBadRequestError(err),
-                })
+            AuthAPI.getUserById(studentID)
                 .then(res => {
                     setStudent(res);
                 })
