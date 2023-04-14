@@ -64,7 +64,8 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;
             const oldSection = r.oldSectionID ? sectionsMap[r.oldSectionID] : undefined;
             const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
-            return type === "pending" ?
+            // TODO: mark the request as archived if student is no longer enrolled in the course
+            return student && type === "pending" ?
               <PendingRequest
                 key={`request${r.ID}`}
                 request={r} student={student} assignment={assignment}
