@@ -1,25 +1,24 @@
-import { IconButton, Table, TableBody, TableFooter, TableHead, TablePagination, TableRow, Tooltip } from "@mui/material";
-import MuiTableCell from "@mui/material/TableCell";
 import ClearIcon from '@mui/icons-material/Clear';
+import { IconButton, Table, TableBody, TableHead, TablePagination, TableRow, Tooltip } from "@mui/material";
+import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
+import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { sortStudentsByName } from "@util/shared/formatStudentsList";
-import { useAssignments } from "api/assignment/hooks";
+import CourseAPI from "api/course/api";
 import { Assignment } from "model/assignment";
 import { Course, CourseUserData } from 'model/course';
 import { Section } from "model/section";
 import { FC, useEffect, useState } from "react";
-import StudentDialog from "./StudentDialog";
-import { User } from "model/user";
-import CourseAPI from "api/course/api";
 import toast from "react-hot-toast";
-import { handleBadRequestError } from "@util/errors";
+import StudentDialog from "./StudentDialog";
 
 export interface PeopleTableProps {
     course: Course;
     students: CourseUserData[];
     sectionsMap: Record<string, Section>;
     assignments: Assignment[];
+    invitedStudents: string[];
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -33,7 +32,8 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents }) => {
+    console.log(invitedStudents)
     const rowsPerPage = 10;
     const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortStudentsByName(students));
     const [page, setPage] = useState(0);
@@ -54,6 +54,15 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                     error: (err) => handleBadRequestError(err),
                 })
                     .catch(() => { })
+            }
+        }
+    }
+
+    const handleRemoveInvite = (email: string) => {
+        return (e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation();
+            const confirmed = confirm(`Are you sure you want to remove ${email} from this course?`);
+            if (confirmed) {
             }
         }
     }
@@ -81,6 +90,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                     </TableRow>
                 </TableHead>
                 <TableBody>
+                    {/* TODO: the pagination is no longer right due to invited students */}
                     {studentsSorted
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((student) => {
@@ -105,6 +115,30 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                                 </TableRow>
                             );
                         })}
+                    {invitedStudents?.map((email) => {
+                        return (
+                            <Tooltip title="Waiting for student to log in" placement="right">
+                                <TableRow key={email} hover>
+                                    <TableCell component="th" scope="row">
+                                        Pending
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        {email}
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        /
+                                    </TableCell>
+                                    <TableCell component="th" scope="row">
+                                        <Tooltip title="Remove from course" placement="right">
+                                            <IconButton onClick={handleRemoveInvite(email)} size={"small"}>
+                                                <ClearIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </TableCell>
+                                </TableRow>
+                            </Tooltip>
+                        );
+                    })}
                 </TableBody>
             </Table>
             {students.length > rowsPerPage && <TablePagination

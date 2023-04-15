@@ -15,6 +15,7 @@ import { Assignment } from "model/assignment";
 import { CoursePermission } from "model/user";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AddStudentDialog from "./AddStudentDialog";
+import { useCourseInvites } from "api/auth/hooks";
 
 export interface PeopleViewProps {
   course: Course;
@@ -28,6 +29,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
+  const [invitedStudents, invitedStudentsLoading] = useCourseInvites(course.ID, CoursePermission.CourseStudent)
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
@@ -55,11 +57,15 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     return studentIDs.map((studentID) => course.students[studentID])
   }
 
-  const AddStudent = () => {
+  const addStudent = () => {
     setAddStudentDialogOpen(true)
   }
 
-  const ExportStudentList = () => {
+  const exportStudentList = () => {
+  }
+
+  const hasNoStudent = () => {
+    return (!course.students || Object.keys(course.students).length === 0) && (invitedStudentsLoading || invitedStudents.length === 0)
   }
 
   return (
@@ -77,14 +83,17 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
             onSelect={(val) => setFilterBySection(val)}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[AddStudent, ExportStudentList]} />}
+          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[addStudent, exportStudentList]} />}
         </Stack>
       </Stack >
-      {!course.students || Object.keys(course.students).length === 0 ?
+      {invitedStudents && hasNoStudent() ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&
-          <PeopleTable {...{ course, assignments, sectionsMap }} students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} />)
-
+          <PeopleTable
+            {...{ course, assignments, sectionsMap }}
+            students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+            invitedStudents={invitedStudents}
+          />)
       }
     </>
   );

@@ -40,13 +40,13 @@ const AddStudentDialog: FC<AddStudentDialogProps> = ({ course, open, onClose }) 
         <DialogTitle>Add Student</DialogTitle>
         <DialogContent sx={{ minHeight: 300 }}>
             <Grid container>
-                <Grid xs={6}>
+                <Grid item xs={6}>
                     <AddPermissionButton
                         course={course} access={CoursePermission.CourseStudent}
                         successCallback={addEmail} errorsCallback={addErrors}
                         autoFocus multiline />
                 </Grid>
-                <Grid xs={6}>
+                <Grid item xs={6}>
                     <Stack spacing={1} mt={0.3} ml={3.5}>
                         {emailsAdded.length == 0 && !errors &&
                             <Typography color="text.disabled" sx={{ fontSize: 14 }}>Students added will appear here</Typography>}
