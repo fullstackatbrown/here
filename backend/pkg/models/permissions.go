@@ -28,6 +28,11 @@ type AddStudentRequest struct {
 	Email    string `json:"email"`
 }
 
+type BulkAddStudentRequest struct {
+	CourseID string   `json:"courseID,omitempty"`
+	Emails   []string `json:"emails"`
+}
+
 type DeleteStudentRequest struct {
 	CourseID string `json:"courseID"`
 	UserID   string `json:"userID,omitempty"`

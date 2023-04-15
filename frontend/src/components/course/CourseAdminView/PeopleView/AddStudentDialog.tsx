@@ -1,64 +1,69 @@
+import AddPermissionButton from "@components/shared/AddPermissionButton/AddPermissionButton";
 import {
-    Button,
     Dialog,
     DialogContent,
     DialogTitle,
-    TextField
+    Grid,
+    Stack,
+    Typography
 } from "@mui/material";
-import CourseAPI from "api/course/api";
 import { Course } from "model/course";
-import { FC } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { CoursePermission } from "model/user";
+import { FC, useState } from "react";
 
-export interface AddStudentDialogDialogProps {
+export interface AddStudentDialogProps {
     course: Course;
     open: boolean;
     onClose: () => void;
 }
 
-type FormData = {
-    email: string;
-};
-
-
-const AddStudentDialogDialog: FC<AddStudentDialogDialogProps> = ({ course, open, onClose }) => {
-    const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>()
+const AddStudentDialog: FC<AddStudentDialogProps> = ({ course, open, onClose }) => {
+    const [emailsAdded, setEmailsAdded] = useState<string[]>([])
+    const [errors, setErrors] = useState<Record<string, string> | undefined>(undefined)
 
     const handleOnClose = () => {
-        reset();
         onClose();
+        setEmailsAdded([]);
+        setErrors(undefined);
     };
 
-    const onSubmit = handleSubmit(async data => {
-        toast.promise(CourseAPI.addStudent(course.ID, data.email), {
-            loading: "Adding student...",
-            success: "Student added!",
-            error: (err) => err.message
-        }).then(() => handleOnClose())
-    })
+    const addEmail = (emails: string[]) => {
+        setEmailsAdded([...emailsAdded, ...emails])
+    }
+
+    const addErrors = (errors: Record<string, string>) => {
+        // errors is a map from email to error message
+        setErrors(errors);
+    }
 
     return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>Add Student</DialogTitle>
-        <DialogContent>
-            <form onSubmit={onSubmit}>
-                <TextField
-                    {...register("email")}
-                    placeholder="Student Email"
-                    required
-                    fullWidth
-                    variant="standard"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                />
-                <Button type="submit">Add</Button>
-            </form>
+        <DialogContent sx={{ minHeight: 300 }}>
+            <Grid container>
+                <Grid xs={6}>
+                    <AddPermissionButton
+                        course={course} access={CoursePermission.CourseStudent}
+                        successCallback={addEmail} errorsCallback={addErrors}
+                        autoFocus multiline />
+                </Grid>
+                <Grid xs={6}>
+                    <Stack spacing={1} mt={0.3} ml={3.5}>
+                        {emailsAdded.length == 0 && !errors &&
+                            <Typography color="text.disabled" sx={{ fontSize: 14 }}>Students added will appear here</Typography>}
+                        {emailsAdded.length > 0 && emailsAdded.map((email) =>
+                            <Typography key={email} sx={{ fontSize: 14 }}>{email}</Typography>
+                        )}
+                        {errors && Object.entries(errors).map(([email, error]) =>
+                            <Typography key={email} sx={{ fontSize: 14, color: "error.main" }}>{email}: {error}</Typography>
+                        )}
+                    </Stack>
+                </Grid>
+            </Grid>
         </DialogContent>
 
-    </Dialog>;
+    </Dialog >;
 };
 
-export default AddStudentDialogDialog;
+export default AddStudentDialog;
 
 

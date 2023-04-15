@@ -6,7 +6,7 @@ import { Course } from "model/course";
 import { CoursePermission, User } from "model/user";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
-import AddAccessButton from "./AddAccessButton";
+import AddPermissionButton from "../AddPermissionButton/AddPermissionButton";
 
 interface AccessListProps {
     course?: Course; // if course is passed in, the list is editable
@@ -71,7 +71,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
                         }
                     })
                 }
-                {editable && <AddAccessButton course={course} access={access} />}
+                {editable && <AddPermissionButton course={course} access={access} />}
             </Box>}
         </Stack>
     )

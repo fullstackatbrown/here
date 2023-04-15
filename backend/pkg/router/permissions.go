@@ -19,6 +19,7 @@ func PermissionRoutes() *chi.Mux {
 
 	router.With(middleware.RequireCourseAdmin()).Patch("/addStudent", addStudentHandler)
 	router.With(middleware.RequireCourseAdmin()).Patch("/deleteStudent", deleteStudentHandler)
+	router.With(middleware.RequireCourseAdmin()).Patch("/bulkAddStudent", bulkAddStudentHandler)
 
 	return router
 }
@@ -77,24 +78,29 @@ func addStudentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	req.CourseID = chi.URLParam(r, "courseID")
 
+	errors := make(map[string]string)
 	studentExists, studentIsStaff, err := repo.Repository.AddStudentToCourse(req)
 	if studentExists {
-		http.Error(w, req.Email+"is already enrolled in the course", http.StatusBadRequest)
-		return
+		errors[req.Email] = "already enrolled"
 	}
-
 	if studentIsStaff {
-		http.Error(w, req.Email+" is already a staff member of this course", http.StatusBadRequest)
-		return
+		errors[req.Email] = "staff member"
+	}
+	if err != nil {
+		errors[req.Email] = "unknown error"
 	}
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	response := map[string]interface{}{
+		"errors": errors,
+	}
+	if len(errors) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Successfully added student %v from course %v", req.Email, req.CourseID)))
+	w.Write([]byte(fmt.Sprintf("Successfully added student %v to course %v", req.Email, req.CourseID)))
 }
 
 func deleteStudentHandler(w http.ResponseWriter, r *http.Request) {
@@ -116,4 +122,52 @@ func deleteStudentHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf("Successfully deleted student %v from course %v", req.UserID, req.CourseID)))
 
+}
+
+func bulkAddStudentHandler(w http.ResponseWriter, r *http.Request) {
+	var req *models.BulkAddStudentRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	req.CourseID = chi.URLParam(r, "courseID")
+
+	success := make([]string, 0)
+	errors := make(map[string]string)
+
+	for _, email := range req.Emails {
+		studentExists, studentIsStaff, err := repo.Repository.AddStudentToCourse(&models.AddStudentRequest{
+			CourseID: req.CourseID,
+			Email:    email,
+		})
+		if studentExists {
+			errors[email] = "already enrolled"
+			continue
+		}
+		if studentIsStaff {
+			errors[email] = "staff member"
+			continue
+		}
+		if err != nil {
+			errors[email] = "unknown error"
+			continue
+		}
+		success = append(success, email)
+	}
+
+	response := map[string]interface{}{
+		"success": success,
+		"errors":  errors,
+	}
+
+	if len(errors) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Successfully added students"))
 }
