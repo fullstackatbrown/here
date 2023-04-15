@@ -16,9 +16,10 @@ import { useAssignmentsMap } from "api/assignment/hooks";
 export interface CourseAdminViewProps {
   course: Course;
   access: CoursePermission;
+  headerInView: boolean;
 }
 
-export default function CourseAdminView({ course, access }: CourseAdminViewProps) {
+export default function CourseAdminView({ course, access, headerInView }: CourseAdminViewProps) {
   const router = useRouter();
   const { courseID } = router.query;
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
@@ -29,7 +30,7 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
     if (router.query.view === undefined) {
       router.push(`${courseID}/?view=sections`, undefined, { shallow: true });
     }
-  }, []);
+  }, [router, courseID]);
 
   return (
     <Grid container>
@@ -39,7 +40,7 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
           position: "relative",
         }}
       >
-        <CourseAdminViewNavigation access={access} />
+        <CourseAdminViewNavigation access={access} headerInView={headerInView} courseCode={course.code} />
       </Grid>
       <Grid xs>
         {router.query.view && sectionsMap && assignmentsMap && (

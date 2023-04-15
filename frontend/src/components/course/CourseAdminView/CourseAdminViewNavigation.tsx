@@ -1,20 +1,24 @@
-import { Badge, Box, Button, Divider, Drawer, Stack, Link } from "@mui/material";
-import IconButton from "@components/shared/IconButton";
+import { Badge, Button } from "@mui/material";
 import { capitalizeFirstLetter } from "@util/shared/string";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
-import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
-import Logo from "@components/shared/Logo";
-import NextLink from "next/link";
+import { MobileSidebar } from "./MobileSidebar";
+import { DesktopSidebar } from "./DesktopSidebar";
 
 interface CourseAdminViewNavigationProps {
   access: CoursePermission;
+  headerInView: boolean;
+  courseCode: string;
 }
 
-export default function CourseAdminViewNavigation({ access }: CourseAdminViewNavigationProps) {
+export default function CourseAdminViewNavigation({
+  access,
+  headerInView,
+  courseCode,
+}: CourseAdminViewNavigationProps) {
   const router = useRouter();
   const { query } = router;
   const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
@@ -27,6 +31,7 @@ export default function CourseAdminViewNavigation({ access }: CourseAdminViewNav
   function getNavigationButton(view: View) {
     return (
       <Button
+        key={view}
         sx={{
           flexDirection: "row",
           justifyContent: "flex-start",
@@ -52,6 +57,7 @@ export default function CourseAdminViewNavigation({ access }: CourseAdminViewNav
         {getNavigationButton("people")}
         {pendingRequests && pendingRequests.length > 0 ? (
           <Badge
+            key="request-badge"
             color="primary"
             badgeContent={pendingRequests.length}
             sx={{
@@ -73,62 +79,18 @@ export default function CourseAdminViewNavigation({ access }: CourseAdminViewNav
 
   return (
     <>
-      <IconButton
-        label="Menu"
-        sx={{
-          mr: 2,
-          display: {
-            position: "fixed",
-            xs: "block",
-            md: "none",
-          },
-        }}
-        onClick={() => toggleOpen(true)}
-      >
-        <MenuIcon />
-      </IconButton>
-      <Drawer open={open} onClose={() => toggleOpen(false)}>
-        <Box
-          sx={{
-            width: "max-content",
-          }}
-        >
-          <Stack flexDirection="row" alignItems="center" px={4} py={2}>
-            <NextLink href="/">
-              <Link
-                variant="h6"
-                component="button"
-                color="inherit"
-                underline="hover"
-                sx={{ display: "inline-flex", alignItems: "center" }}
-              >
-                <Box mr={1} width={30} height={30}>
-                  <Logo />
-                </Box>
-                Here
-              </Link>
-            </NextLink>
-          </Stack>
-
-          <Divider />
-
-          <Stack alignItems="start" px={4}>
-            {getSidebarItems()}
-          </Stack>
-        </Box>
-      </Drawer>
-      <Stack
-        alignItems="start"
-        sx={{
-          position: "fixed",
-          display: {
-            xs: "none",
-            md: "flex",
-          },
-        }}
+      <MobileSidebar
+        open={open}
+        openDrawer={() => toggleOpen(true)}
+        closeDrawer={() => toggleOpen(false)}
+        headerInView={headerInView}
+        courseCode={courseCode}
       >
         {getSidebarItems()}
-      </Stack>
+      </MobileSidebar>
+      <DesktopSidebar headerInView={headerInView} courseCode={courseCode}>
+        {getSidebarItems()}
+      </DesktopSidebar>
     </>
   );
 }
