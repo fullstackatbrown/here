@@ -52,7 +52,7 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
     <>
       <CreateEditSectionDialog open={editSectionDialog} onClose={handleCloseEditSectionDialog} section={section} />
       <Card sx={{ ":hover": { boxShadow: 2 } }} variant={"outlined"}>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems={"center"}>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>
             <Typography variant="body2" noWrap>
               {formatSectionTime(section, betweenSmalltoMid)}
