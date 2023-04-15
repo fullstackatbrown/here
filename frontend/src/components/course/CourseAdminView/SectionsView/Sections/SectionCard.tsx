@@ -8,7 +8,7 @@ import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
 import { handleBadRequestError } from "@util/errors";
-import HomeIcon from "@mui/icons-material/Home";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PeopleIcon from "@mui/icons-material/People";
 
 export interface SectionCardProps {
@@ -72,14 +72,14 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
                 fontWeight={400}
                 sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}
               >
-                <HomeIcon /> {section.location || "TBD"}
+                <LocationOnIcon fontSize="small" /> {section.location || "TBD"}
               </Typography>
               <Typography
                 variant="body2"
                 fontWeight={400}
                 sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}
               >
-                <PeopleIcon /> {enrollment} / {section.capacity}
+                <PeopleIcon fontSize="small" /> {enrollment} / {section.capacity}
               </Typography>
             </Stack>
           </Stack>
