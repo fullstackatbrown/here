@@ -36,6 +36,11 @@ const AddStudentDialog: FC<AddStudentDialogProps> = ({ course, open, onClose }) 
         setErrors(errors);
     }
 
+    const placeholder =
+        ["Enter student email\nor emails separated by new lines\nPress enter to submit",
+            "Example:\njenny_yu2@brown.edu\nhammad_izhar@brown.edu"
+        ]
+
     return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>Add Student</DialogTitle>
         <DialogContent sx={{ minHeight: 300 }}>
@@ -44,7 +49,9 @@ const AddStudentDialog: FC<AddStudentDialogProps> = ({ course, open, onClose }) 
                     <AddPermissionButton
                         course={course} access={CoursePermission.CourseStudent}
                         successCallback={addEmail} errorsCallback={addErrors}
-                        autoFocus multiline />
+                        autoFocus multiline
+                        placeholder={placeholder.join("\n\n")}
+                    />
                 </Grid>
                 <Grid item xs={6}>
                     <Stack spacing={1} mt={0.3} ml={3.5}>
