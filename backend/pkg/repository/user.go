@@ -169,7 +169,7 @@ func (fr *FirebaseRepository) GetIDByEmail(email string) (string, error) {
 	return data["id"].(string), nil
 }
 
-func (fr *FirebaseRepository) ValidateJoinCourseRequest(req *models.JoinCourseRequest) (course *models.Course, internalError error, requestError error) {
+func (fr *FirebaseRepository) HandleJoinCourseRequest(req *models.JoinCourseRequest) (course *models.Course, internalError error, requestError error) {
 	// Check if course exists
 	course, err := fr.GetCourseByEntryCode(req.EntryCode)
 	if err != nil {
@@ -181,92 +181,24 @@ func (fr *FirebaseRepository) ValidateJoinCourseRequest(req *models.JoinCourseRe
 		return nil, nil, fmt.Errorf("Cannot join an inactive or archived course")
 	}
 
-	// Check if already enrolled
-	if utils.Contains(req.User.Courses, course.ID) {
+	studentExists, studentIsStaff, err := fr.addStudentToCourse(req.User, course)
+	if studentExists {
 		return nil, nil, fmt.Errorf("Student is already enrolled in course")
 	}
+	if studentIsStaff {
+		return nil, nil, fmt.Errorf("Cannot join course as staff")
+	}
 
-	// Check if it's admin or staff
-	if perm, ok := req.User.Permissions[course.ID]; ok {
-		return nil, nil, fmt.Errorf("Cannot join the course as an %v", perm)
+	if err != nil {
+		return nil, err, nil
 	}
 
 	return course, nil, nil
 }
 
-func (fr *FirebaseRepository) JoinCourse(user *models.User, course *models.Course) (*models.Course, error) {
-	batch := fr.firestoreClient.Batch()
-	// Add course to student
-	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID)
-	batch.Update(userProfileRef, []firestore.Update{
-		{
-			Path:  "courses",
-			Value: firestore.ArrayUnion(course.ID),
-		},
-	})
-
-	// Add student to course
-	newStudentMap := utils.CopyMap(course.Students)
-	newStudentMap[user.ID] = models.CourseUserData{
-		StudentID:   user.ID,
-		Email:       user.Email,
-		DisplayName: user.DisplayName,
-		Pronouns:    user.Pronouns,
-	}
-
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
-	batch.Update(coursesRef, []firestore.Update{
-		{
-			Path:  "students",
-			Value: newStudentMap,
-		},
-	})
-
-	// Commit the batch.
-	_, err := batch.Commit(firebase.Context)
-	if err != nil {
-		return nil, err
-	}
-
-	return course, nil
-}
-
-func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
-	// Check if course exists
-	course, err := fr.GetCourseByID(req.CourseID)
-	if err != nil {
-		return err
-	}
-
-	batch := fr.firestoreClient.Batch()
-	// Remove course for student
-	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.User.ID)
-	batch.Update(userProfileRef, []firestore.Update{
-		{
-			Path:  "courses",
-			Value: firestore.ArrayRemove(course.ID),
-		},
-	})
-
-	// remove student from course
-	newStudentMap := utils.CopyMap(course.Students)
-	delete(newStudentMap, req.User.ID)
-
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
-	batch.Update(coursesRef, []firestore.Update{
-		{
-			Path:  "students",
-			Value: newStudentMap,
-		},
-	})
-
-	// Commit the batch.
-	_, err = batch.Commit(firebase.Context)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (fr *FirebaseRepository) HandleQuitCourseRequest(req *models.QuitCourseRequest) error {
+	err := fr.deleteStudentFromCourse(req.User.ID, req.CourseID)
+	return err
 }
 
 func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest) (wasAdmin bool, err error) {
@@ -370,7 +302,7 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 				// Add as student
 				course, _ := fr.GetCourseByID(invite.CourseID)
 				// if course no longer exists, do nothing
-				fr.JoinCourse(user, course)
+				fr.addStudentToCourse(user, course)
 
 			} else {
 				// Add as staff

@@ -11,6 +11,9 @@ import { Section } from "model/section";
 import { FC, useEffect, useState } from "react";
 import StudentDialog from "./StudentDialog";
 import { User } from "model/user";
+import CourseAPI from "api/course/api";
+import toast from "react-hot-toast";
+import { handleBadRequestError } from "@util/errors";
 
 export interface PeopleTableProps {
     course: Course;
@@ -45,7 +48,12 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
             e.stopPropagation();
             const confirmed = confirm(`Are you sure you want to remove ${student.displayName} from this course?`);
             if (confirmed) {
-                // TODO: remove student
+                toast.promise(CourseAPI.deleteStudent(course.ID, student.studentID), {
+                    loading: "Removing student...",
+                    success: "Student removed",
+                    error: (err) => handleBadRequestError(err),
+                })
+                    .catch(() => { })
             }
         }
     }

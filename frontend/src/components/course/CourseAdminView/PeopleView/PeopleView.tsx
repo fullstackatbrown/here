@@ -14,6 +14,7 @@ import PeopleTable from "./PeopleTable";
 import { Assignment } from "model/assignment";
 import { CoursePermission } from "model/user";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
+import AddStudentDialog from "./AddStudentDialog";
 
 export interface PeopleViewProps {
   course: Course;
@@ -26,6 +27,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
@@ -54,7 +56,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   }
 
   const AddStudent = () => {
-
+    setAddStudentDialogOpen(true)
   }
 
   const ExportStudentList = () => {
@@ -62,6 +64,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
 
   return (
     <>
+      <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
         <Typography variant="h6" fontWeight={600}>
           People
@@ -74,7 +77,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
             onSelect={(val) => setFilterBySection(val)}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student, Export Student List"]} handlers={[AddStudent, ExportStudentList]} />}
+          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[AddStudent, ExportStudentList]} />}
         </Stack>
       </Stack >
       {!course.students || Object.keys(course.students).length === 0 ?

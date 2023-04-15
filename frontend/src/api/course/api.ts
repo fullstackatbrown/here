@@ -58,10 +58,25 @@ async function addPermission(
 
 async function revokePermission(
   courseID: string,
-  userID: string,
-  email: string
+  userID?: string,
+  email?: string
 ): Promise<boolean> {
   return APIClient.patch(`/courses/${courseID}/permissions/revoke`, { userID, email });
+}
+
+async function addStudent(
+  courseID: string,
+  email: string
+): Promise<string> {
+  return APIClient.patch(`/courses/${courseID}/permissions/addStudent`, { email, permission: CoursePermission.CourseStudent });
+}
+
+async function deleteStudent(
+  courseID: string,
+  userID?: string,
+  email?: string
+): Promise<boolean> {
+  return APIClient.patch(`/courses/${courseID}/permissions/deleteStudent`, { userID, email });
 }
 
 async function bulkUpload(
@@ -79,6 +94,8 @@ const CourseAPI = {
   addPermission,
   revokePermission,
   bulkUpload,
+  addStudent,
+  deleteStudent,
 };
 
 export default CourseAPI;
