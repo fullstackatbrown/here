@@ -27,32 +27,39 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
   useEffect(() => {
     // Always do navigations after the first render
     if (router.query.view === undefined) {
-      router.push(`${courseID}/?view=sections`, undefined, { shallow: true })
+      router.push(`${courseID}/?view=sections`, undefined, { shallow: true });
     }
-  }, [])
+  }, []);
 
   return (
     <Grid container>
-      <Grid xs={2}>
+      <Grid
+        xs={2}
+        sx={{
+          position: "relative",
+        }}
+      >
         <CourseAdminViewNavigation access={access} />
       </Grid>
       <Grid xs>
-        {router.query.view && sectionsMap && assignmentsMap &&
+        {router.query.view && sectionsMap && assignmentsMap && (
           <>
             {router.query.view === "sections" && <SectionsView {...{ course, access, sectionsMap }} />}
-            {router.query.view === "assignments" && <AssignmentsView {...{ course, access, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "assignments" && (
+              <AssignmentsView {...{ course, access, sectionsMap, assignmentsMap }} />
+            )}
             {router.query.view === "people" && <PeopleView {...{ course, access, sectionsMap, assignmentsMap }} />}
             {router.query.view === "requests" && <RequestsView {...{ course, sectionsMap, assignmentsMap }} />}
             {router.query.view === "settings" &&
-              (access === CoursePermission.CourseAdmin ?
-                <SettingsView course={course} /> :
-                <Typography>
-                  Oops.. You have no permission to access this page
-                </Typography>)}
+              (access === CoursePermission.CourseAdmin ? (
+                <SettingsView course={course} />
+              ) : (
+                <Typography>Oops.. You have no permission to access this page</Typography>
+              ))}
           </>
-        }
+        )}
       </Grid>
       <Grid xs={router.query.view === "requests" ? 0.5 : 2} />
-    </Grid >
+    </Grid>
   );
 }
