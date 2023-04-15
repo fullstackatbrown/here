@@ -2,17 +2,15 @@ import StudentGradesTable from "@components/course/CourseStudentView/Grades/Stud
 import {
     Dialog,
     DialogContent,
-    DialogTitle, Stack, Typography
+    DialogTitle,
+    Typography
 } from "@mui/material";
-import { handleBadRequestError } from "@util/errors";
-import { useAssignments } from "api/assignment/hooks";
 import AuthAPI from "api/auth/api";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { User } from "model/user";
 import { FC, useEffect, useState } from "react";
-import toast from "react-hot-toast";
 
 export interface StudentDialogDialogProps {
     course: Course;
