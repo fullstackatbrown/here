@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { List } from "@mui/material";
-import { useCourses } from "api/course/hooks";
+import { useCourses, useCoursesByIDs } from "api/course/hooks";
 import { useSession } from "api/auth/hooks";
 import CourseListItem from "../CourseListItem";
 import { CoursePermission } from "model/user";
@@ -15,15 +15,13 @@ export interface YourCoursesSectionProps {
  */
 const YourCoursesSection: FC<YourCoursesSectionProps> = ({ }) => {
     const { currentUser, loading } = useSession();
-    const [courses, loadingCourses] = useCourses();
-    const filteredCourses = courses && courses.filter(course => currentUser?.permissions && (currentUser.permissions[course.ID] === CoursePermission.CourseAdmin));
+    const myCourses = currentUser?.permissions && Object.keys(currentUser.permissions).filter(courseID => currentUser.permissions[courseID] === CoursePermission.CourseAdmin)
+    const [courses, loadingCourses] = myCourses && useCoursesByIDs(myCourses);
 
-
-    // TODO: sort by terms
     return <SettingsSection taOnly title="Manage your courses" loading={loading || loadingCourses}>
-        {filteredCourses &&
+        {courses &&
             <List>
-                {sortCoursesByTerm(filteredCourses).map((course, index) =>
+                {sortCoursesByTerm(courses).map((course, index) =>
                     <CourseListItem key={course.ID} course={course} />)}
             </List>}
     </SettingsSection>;

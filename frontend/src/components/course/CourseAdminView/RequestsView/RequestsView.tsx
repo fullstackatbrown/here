@@ -6,14 +6,12 @@ import {
   Collapse,
   Stack
 } from "@mui/material";
-import { useAssignmentsMap } from "api/assignment/hooks";
-import { useSectionsMap } from "api/section/hooks";
 import { usePastSwaps, usePendingSwaps } from "api/swaps/hooks";
+import { Assignment } from "model/assignment";
 import { Course } from "model/course";
+import { Section } from "model/section";
 import { useEffect, useState } from "react";
 import RequestsList from "./RequestsList";
-import { Assignment } from "model/assignment";
-import { Section } from "model/section";
 
 export interface RequestsViewProps {
   course: Course;

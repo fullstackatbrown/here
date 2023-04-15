@@ -1,11 +1,9 @@
-import CloseIcon from '@mui/icons-material/Close';
-import { Avatar, Box, Grid, IconButton, Stack, Typography } from "@mui/material";
-import getInitials from "@util/shared/getInitials";
-import { useAdminInvites, useAdmins, useAuth, useCourseInvites } from "api/auth/hooks";
+import AddAdminButton from '@components/manage/AdminList/AddAdminButton';
+import { Box, Typography } from "@mui/material";
+import { unique } from '@util/shared/array';
+import { useAdminInvites, useAdmins } from "api/auth/hooks";
 import { FC } from "react";
 import AdminChip from './AdminChip';
-import AddAdminButton from '@components/manage/AdminList/AddAdminButton';
-import { unique } from '@util/shared/array';
 
 export interface AdminListProps {
 }

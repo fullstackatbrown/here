@@ -1,21 +1,18 @@
-import SearchBar from "@components/shared/SearchBar/SearchBar";
 import SelectMenu from "@components/shared/Menu/SelectMenu";
+import SearchBar from "@components/shared/SearchBar/SearchBar";
 import { Stack, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
-import listToMap from "@util/shared/listToMap";
-import { useAssignments } from "api/assignment/hooks";
-import { useSections } from "api/section/hooks";
+import { useCourseInvites } from "api/auth/hooks";
+import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
-import { useEffect, useState } from "react";
-import PeopleTable from "./PeopleTable";
-import { Assignment } from "model/assignment";
 import { CoursePermission } from "model/user";
+import { useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AddStudentDialog from "./AddStudentDialog";
-import { useCourseInvites } from "api/auth/hooks";
+import PeopleTable from "./PeopleTable";
 
 export interface PeopleViewProps {
   course: Course;

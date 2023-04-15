@@ -8,8 +8,6 @@ import {
     Typography
 } from "@mui/material";
 import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
-import listToMap from "@util/shared/listToMap";
-import { useAssignments } from "api/assignment/hooks";
 import { useSwapsByStudent } from "api/swaps/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
