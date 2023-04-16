@@ -139,7 +139,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
                     )} */}
         </Box>
       </Drawer>
-      <Container maxWidth={maxWidth} sx={{ marginY: 10 }}>
+      <Container maxWidth={false} sx={{ marginY: 10 }}>
         {children}
       </Container>
     </div>

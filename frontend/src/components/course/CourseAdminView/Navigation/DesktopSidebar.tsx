@@ -19,10 +19,11 @@ export const DesktopSidebar = ({
           md: "flex",
         },
       }}
+      justifyContent="center"
     >
       <Stack alignItems="start">{children}</Stack>
 
-      {!headerInView ? (
+      {/* {!headerInView ? (
         <>
           <Divider />
           <Button
@@ -37,7 +38,7 @@ export const DesktopSidebar = ({
             {courseCode}
           </Button>
         </>
-      ) : null}
+      ) : null} */}
     </Stack>
   );
 };

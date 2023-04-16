@@ -1,8 +1,9 @@
 import CourseAdminView from "@components/course/CourseAdminView/CourseAdminView";
+import DesktopNavigation from "@components/course/CourseAdminView/Navigation/Desktop/DesktopNavigation";
 import CourseHeader from "@components/course/CourseHeader";
 import CourseStudentView from "@components/course/CourseStudentView/CourseStudentView";
 import AppLayout from "@components/shared/AppLayout";
-import { Grid, Stack } from "@mui/material";
+import { Box, Grid, Stack, useTheme } from "@mui/material";
 import { useAuth } from "api/auth/hooks";
 import { useCourse } from "api/course/hooks";
 import { useRouter } from "next/router";
@@ -18,6 +19,7 @@ export default function CoursePage() {
   const { ref, inView } = useInView({ threshold: 1 });
 
   const access = currentUser && currentUser.permissions?.[courseID as string];
+  const theme = useTheme();
 
   // Redirect user back to home page if no course with given ID is found
   useEffect(() => {
@@ -29,19 +31,31 @@ export default function CoursePage() {
   return (
     <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
       {course && !courseLoading && (
-        <Stack pt={8} gap={4}>
-          <Grid container>
-            <Grid item xs={2} />
-            <Grid item xs={10}>
-              <CourseHeader intersectionRef={ref} course={course} />
-            </Grid>
+        <Grid container>
+          <Grid
+            xs={0.5}
+            sm={1}
+            md={2.2}
+            pl={2}
+            pt={20}
+          >
+            <DesktopNavigation access={access} courseCode={course.code} />
           </Grid>
-          {access ? (
-            <CourseAdminView headerInView={inView} course={course} access={access} />
-          ) : (
-            <CourseStudentView course={course} student={currentUser} />
-          )}
-        </Stack>
+          <Grid xs>
+            <Stack spacing={4} pt={4}>
+              <CourseHeader intersectionRef={ref} course={course} />
+              {access ? <CourseAdminView headerInView={inView} course={course} access={access} /> :
+                <CourseStudentView course={course} student={currentUser} />}
+            </Stack>
+
+          </Grid>
+          <Grid
+            xs={0.5}
+            sm={router.query.view === "requests" ? 0.5 : 1}
+            md={router.query.view === "requests" ? 0.5 : 2.2}
+          />
+        </Grid>
+
       )}
     </AppLayout>
   );

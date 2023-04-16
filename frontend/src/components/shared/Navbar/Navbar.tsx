@@ -52,7 +52,7 @@ const Navbar: FC<NavbarProps> = ({
         <AppBar position={fixed ? "fixed" : "static"} color="transparent" elevation={scrollPosition > 20 ? 2 : 0}>
             {loading && <LinearProgress sx={{ position: "absolute", bottom: 0, width: "100%", height: 2 }} />}
             <Box sx={(theme) => ({ backgroundColor: theme.palette.background.default })}>
-                <Toolbar variant={compact ? "dense" : "regular"}>
+                <Toolbar variant={compact ? "dense" : "regular"} >
                     {showMenuButton && <IconButton
                         onClick={onOpenMenu}
                         label="Main menu"
