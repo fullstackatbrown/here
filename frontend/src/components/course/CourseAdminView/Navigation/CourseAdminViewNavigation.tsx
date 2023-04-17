@@ -27,36 +27,6 @@ export default function CourseAdminViewNavigation({
     return router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true });
   }
 
-  const icons: Record<View, any> = {
-    "sections": <ClassIcon />,
-    "assignments": <AssignmentIcon />,
-    "people": <PeopleAltIcon />,
-    "requests": <EmailIcon />,
-    "settings": < AssignmentIcon />,
-  }
-
-  const getStartIcon = (view: View, requestsLength?: number) => {
-    if (view === "requests" && requestsLength > 0) {
-      return <Badge
-        color="primary"
-        badgeContent={pendingRequests.length}
-        sx={{
-          "& .MuiBadge-badge": {
-            fontSize: 10,
-            minWidth: 15,
-            height: 15,
-            borderRadius: 10,
-          }
-        }}
-      >
-        <EmailIcon />
-      </Badge >
-    }
-    else {
-      return icons[view]
-    }
-  }
-
   function getNavigationButton(view: View, requestsLength?: number) {
     return (
       <Button
@@ -76,7 +46,6 @@ export default function CourseAdminViewNavigation({
           toggleOpen(false);
           navigateTo(view);
         }}
-        startIcon={getStartIcon(view, requestsLength)}
       >
         {capitalizeFirstLetter(view)}
       </Button >
@@ -88,15 +57,14 @@ export default function CourseAdminViewNavigation({
       {getNavigationButton("sections")}
       {getNavigationButton("assignments")}
       {getNavigationButton("people")}
-      {pendingRequests && pendingRequests.length > 0 ? getNavigationButton("requests", pendingRequests.length) : getNavigationButton("requests")}
-      {/* {pendingRequests && pendingRequests.length > 0 ? (
+      {pendingRequests && pendingRequests.length > 0 ? (
         <Badge
           key="request-badge"
           color="primary"
           badgeContent={pendingRequests.length}
           sx={{
             "& .MuiBadge-badge": {
-              right: -5,
+              right: 0,
               top: "50%",
             },
           }}
@@ -105,7 +73,7 @@ export default function CourseAdminViewNavigation({
         </Badge>
       ) : (
         getNavigationButton("requests")
-      )} */}
+      )}
       {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
     </Stack>
   )

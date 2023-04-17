@@ -39,7 +39,7 @@ export default function CoursePage() {
             pl={2}
             pt={20}
           >
-            <DesktopNavigation access={access} courseCode={course.code} />
+            <DesktopNavigation access={access} headerInView={inView} courseCode={course.code} />
           </Grid>
           <Grid xs>
             <Stack spacing={4} pt={4}>
