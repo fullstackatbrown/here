@@ -3,7 +3,8 @@ export enum Errors {
 }
 
 export const handleBadRequestError = (err: any) => {
-    if (err.code === "ERR_BAD_REQUEST") {
+    // Bad request, unauthorized, or forbidden
+    if ([400, 401, 403].includes(err.response?.status)) {
         return err.response.data
     } else {
         return Errors.UNKNOWN

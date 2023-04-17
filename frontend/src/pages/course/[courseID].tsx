@@ -1,8 +1,10 @@
-import CourseAdminView from "@components/course/CourseAdminView";
+
+import CourseAdminView from "@components/course/CourseAdminView/CourseAdminView";
 import CourseHeader from "@components/course/CourseHeader";
 import CourseStudentView from "@components/course/CourseStudentView/CourseStudentView";
 import AppLayout from "@components/shared/AppLayout";
 import { Grid, Stack, useTheme } from "@mui/material";
+import { useAuth } from "api/auth/hooks";
 import { useCourse } from "api/course/hooks";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -10,9 +12,11 @@ import { toast } from "react-hot-toast";
 
 export default function CoursePage() {
   const router = useRouter();
-  const theme = useTheme();
+  const { currentUser, isAuthenticated } = useAuth();
   const { courseID } = router.query;
   const [course, courseLoading] = useCourse(courseID as string);
+
+  const access = currentUser && currentUser.permissions?.[courseID as string];
 
   // Redirect user back to home page if no course with given ID is found
   useEffect(() => {
@@ -35,8 +39,9 @@ export default function CoursePage() {
               <CourseHeader course={course} />
             </Grid>
           </Grid>
-          <CourseAdminView course={course} />
-          {/* <CourseStudentView course={course} /> */}
+          {access ?
+            <CourseAdminView course={course} access={access} /> :
+            <CourseStudentView course={course} student={currentUser} />}
         </Stack>
       }
     </AppLayout>

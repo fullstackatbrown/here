@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -12,13 +13,15 @@ import (
 
 func AssignmentRoutes() *chi.Mux {
 	router := chi.NewRouter()
-	// router.Use(middleware.AuthCtx())
 
-	router.Post("/", createAssignmentHandler)
+	router.With(middleware.RequireCourseAdmin()).Post("/", createAssignmentHandler)
+
 	router.Route("/{assignmentID}", func(router chi.Router) {
-		router.Get("/", getAssignmentHandler)
-		router.Delete("/", deleteAssignmentHandler)
-		router.Patch("/", updateAssignmentHandler)
+
+		router.With(middleware.RequireCourseStaff()).Get("/", getAssignmentHandler)
+		router.With(middleware.RequireCourseAdmin()).Delete("/", deleteAssignmentHandler)
+		router.With(middleware.RequireCourseAdmin()).Patch("/", updateAssignmentHandler)
+
 		router.Mount("/grades", GradesRoutes())
 	})
 

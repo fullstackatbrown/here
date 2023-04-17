@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -12,13 +13,13 @@ import (
 
 func GradesRoutes() *chi.Mux {
 	router := chi.NewRouter()
-	// router.Use(middleware.AuthCtx())
 
-	router.Post("/", createGradeHandler)
-	router.Post("/export", exportGradesHandler)
+	router.With(middleware.RequireCourseStaff()).Post("/", createGradeHandler)
+	router.With(middleware.RequireCourseAdmin()).Post("/export", exportGradesHandler)
+
 	router.Route("/{gradeID}", func(router chi.Router) {
-		router.Patch("/", updateGradeHandler)
-		router.Delete("/", deleteGradeHandler)
+		router.With(middleware.RequireCourseStaff()).Patch("/", updateGradeHandler)
+		router.With(middleware.RequireCourseStaff()).Delete("/", deleteGradeHandler)
 	})
 
 	return router
@@ -27,10 +28,15 @@ func GradesRoutes() *chi.Mux {
 func createGradeHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 	assignmentID := chi.URLParam(r, "assignmentID")
+	gradedBy, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	var req *models.CreateGradeRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -38,6 +44,7 @@ func createGradeHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 	req.AssignmentID = assignmentID
+	req.GradedBy = gradedBy
 
 	c, err := repo.Repository.CreateGrade(req)
 	if err != nil {
@@ -52,9 +59,14 @@ func updateGradeHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 	assignmentID := chi.URLParam(r, "assignmentID")
 	gradeID := chi.URLParam(r, "gradeID")
+	gradedBy, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	var req *models.UpdateGradeRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -63,6 +75,7 @@ func updateGradeHandler(w http.ResponseWriter, r *http.Request) {
 	req.CourseID = courseID
 	req.AssignmentID = assignmentID
 	req.GradeID = gradeID
+	req.GradedBy = gradedBy
 
 	err = repo.Repository.UpdateGrade(req)
 	if err != nil {

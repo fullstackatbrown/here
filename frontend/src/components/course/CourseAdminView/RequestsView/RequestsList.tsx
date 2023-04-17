@@ -64,7 +64,9 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;
             const oldSection = r.oldSectionID ? sectionsMap[r.oldSectionID] : undefined;
             const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
-            return type === "pending" ?
+            // TODO: mark the request as archived if student is no longer enrolled in the course
+            // right now it's just not displayed and the count of requests would be off
+            return student && (type === "pending" ?
               <PendingRequest
                 key={`request${r.ID}`}
                 request={r} student={student} assignment={assignment}
@@ -74,10 +76,10 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
                 key={`request${r.ID}`}
                 request={r} student={student} assignment={assignment}
                 oldSection={oldSection} newSection={newSection}
-                handleSwap={handleSwap} />
+                handleSwap={handleSwap} />)
           })}
 
-      {requests.length > 0 &&
+      {rowsPerPage != -1 && requests.length > rowsPerPage &&
         <TablePagination
           rowsPerPageOptions={[5, 10, 15, { label: 'All', value: -1 }]}
           count={requests.length}

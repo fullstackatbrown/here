@@ -27,7 +27,7 @@ type Swap struct {
 
 type CreateSwapRequest struct {
 	CourseID     string `json:"courseID,omitempty"`
-	StudentID    string `json:"studentID"`
+	User         *User  `json:"user,omitempty"`
 	OldSectionID string `json:"oldSectionID"`
 	NewSectionID string `json:"newSectionID"`
 	AssignmentID string `json:"assignmentID"`
@@ -46,5 +46,5 @@ type HandleSwapRequest struct {
 	CourseID  string        `json:"courseID,omitempty"`
 	SwapID    string        `json:"swapID,omitempty"`
 	Status    RequestStatus `json:"status,omitempty"`
-	HandledBy string        `json:"handledBy,omitempty"`
+	HandledBy *User         `json:"handledBy,omitempty"`
 }

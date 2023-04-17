@@ -1,7 +1,9 @@
-import { createContext, useContext, useEffect, useState, useRef } from "react";
-import AuthAPI, { Notification, User } from "api/auth/api";
-import { collection, doc, getFirestore, onSnapshot } from "@firebase/firestore";
+import { collection, doc, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
+import { FirestoreInvitesCollection, FirestoreProfilesCollection } from "api/firebaseConst";
 import { useAsyncEffect } from "api/hooks/useAsyncEffect";
+import { CoursePermission, User } from "model/user";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import AuthAPI from "./api";
 
 type AuthState = {
     loading: boolean;
@@ -9,27 +11,12 @@ type AuthState = {
     currentUser: User | undefined;
     isTA: (courseID: string) => boolean;
 };
-const actualInitialAuthState: AuthState = {
+
+const initialAuthState: AuthState = {
     loading: true,
     isAuthenticated: false,
     currentUser: undefined,
     isTA: () => false,
-};
-
-const initialAuthState: AuthState = {
-    loading: false,
-    isAuthenticated: true,
-    currentUser: {
-        id: "1",
-        email: "blueno@brown.edu",
-        displayName: "Blueno",
-        photoUrl:
-            "https://www.brown.edu/sites/default/files/styles/wide_xlrg/public/2020-09/20191015_COMM_Bruno010_0.jpg?h=04531eed&itok=06s1nX88",
-        isAdmin: true,
-        coursePermissions: {},
-        notifications: [],
-    },
-    isTA: () => true,
 };
 
 const authContext = createContext(initialAuthState);
@@ -42,43 +29,42 @@ export function useSession(): AuthState {
     const [authState, setAuthState] = useState(initialAuthState);
     let unsubscribe = () => { };
 
-    // useAsyncEffect(
-    //     async (): Promise<void> => {
-    //         try {
-    //             const sessionUser = await AuthAPI.getCurrentUser();
-    //             const db = getFirestore();
-    //             unsubscribe = onSnapshot(
-    //                 doc(db, "user_profiles", sessionUser.id),
-    //                 (doc) => {
-    //                     if (doc.exists()) {
-    //                         const user = doc.data() as User;
-    //                         setAuthState({
-    //                             loading: false,
-    //                             isAuthenticated: true,
-    //                             currentUser: {
-    //                                 ...user,
-    //                                 notifications: user.notifications.reverse(),
-    //                             },
-    //                             isTA: (courseID) =>
-    //                                 user.coursePermissions != null &&
-    //                                 user.coursePermissions[courseID] !=
-    //                                     undefined,
-    //                         });
-    //                     }
-    //                 }
-    //             );
-    //         } catch {
-    //             setAuthState({
-    //                 loading: false,
-    //                 isAuthenticated: false,
-    //                 currentUser: undefined,
-    //                 isTA: () => false,
-    //             });
-    //         }
-    //     },
-    //     [],
-    //     () => unsubscribe()
-    // );
+    useAsyncEffect(
+        async (): Promise<void> => {
+            try {
+                const sessionUser = await AuthAPI.getCurrentUser();
+                const db = getFirestore();
+                unsubscribe = onSnapshot(
+                    doc(db, FirestoreProfilesCollection, sessionUser.ID),
+                    (doc) => {
+                        if (doc.exists()) {
+                            const user = { ID: doc.data().id, ...doc.data() } as User
+                            setAuthState({
+                                loading: false,
+                                isAuthenticated: true,
+                                currentUser: {
+                                    ...user,
+                                    // notifications: user.notifications.reverse(),
+                                },
+                                isTA: (courseID) =>
+                                    user.permissions != null &&
+                                    user.permissions[courseID] != undefined,
+                            });
+                        }
+                    }
+                );
+            } catch (err) {
+                setAuthState({
+                    loading: false,
+                    isAuthenticated: false,
+                    currentUser: undefined,
+                    isTA: () => false,
+                });
+            }
+        },
+        [],
+        () => unsubscribe()
+    );
 
     return authState;
 }
@@ -99,11 +85,11 @@ export function useUser(
         if (userID) {
             const db = getFirestore();
             const unsubscribe = onSnapshot(
-                doc(db, "user_profiles", userID),
+                doc(db, FirestoreProfilesCollection, userID),
                 (doc) => {
                     if (doc.exists()) {
                         const user = doc.data();
-                        setUser({ id: user.id, ...doc.data() } as User);
+                        setUser({ ID: user.id, ...doc.data() } as User);
                         setLoading(false);
                     }
                 }
@@ -124,12 +110,12 @@ export function useAdmins(): [User[] | undefined, boolean] {
     useEffect(() => {
         const db = getFirestore();
         const unsubscribe = onSnapshot(
-            collection(db, "user_profiles"),
+            collection(db, FirestoreProfilesCollection),
             (querySnapshot) => {
                 const res: User[] = [];
                 querySnapshot.forEach((doc) => {
                     if (doc.data().isAdmin)
-                        res.push({ id: doc.id, ...doc.data() } as User);
+                        res.push({ ID: doc.id, ...doc.data() } as User);
                 });
 
                 setUsers(res);
@@ -150,7 +136,8 @@ export function useNotifications(
     const prevNotifications = useRef<number | null>(null);
 
     useEffect(() => {
-        const notifications = user?.notifications ?? undefined;
+        const notifications = undefined;
+        // const notifications = user?.notifications ?? undefined;
 
         // If the queue doesn't exist yet, no need to run any logic.
         if (notifications === undefined) {
@@ -192,4 +179,55 @@ export function useNotifications(
             prevNotifications.current = notifications.length;
         }
     }, [user, cb]);
+}
+
+export function useCourseInvites(courseID: string, permission: CoursePermission): [string[], boolean] {
+    const [loading, setLoading] = useState(true);
+    const [invites, setInvites] = useState<string[]>([]);
+
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(query(collection(db, FirestoreInvitesCollection),
+            where("courseID", "==", courseID),
+            where("permission", "==", permission))
+            , (querySnapshot) => {
+                const res: string[] = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    res.push(data.email);
+                });
+
+                setInvites(res);
+                setLoading(false);
+            });
+
+        return () => unsubscribe();
+    }, [courseID, permission]);
+
+    return [invites, loading];
+}
+
+export function useAdminInvites(): [string[], boolean] {
+    const [loading, setLoading] = useState(true);
+    const [invites, setInvites] = useState<string[]>([]);
+
+    useEffect(() => {
+        const db = getFirestore();
+        const unsubscribe = onSnapshot(query(collection(db, FirestoreInvitesCollection),
+            where("isAdmin", "==", true))
+            , (querySnapshot) => {
+                const res: string[] = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    res.push(data.email);
+                });
+
+                setInvites(res);
+                setLoading(false);
+            });
+
+        return () => unsubscribe();
+    }, []);
+
+    return [invites, loading];
 }

@@ -53,7 +53,7 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
                 />
               }
             </Box>
-            <Typography sx={{ fontSize: 15 }}>{student.displayName} - {assignment ? "One Time" : "Permanent"}</Typography>
+            <Typography sx={{ fontSize: 15 }}>{student?.displayName} - {assignment ? "One Time" : "Permanent"}</Typography>
             <RequestStatusChip
               status={request.status}
               style={{ marginRight: "auto" }}

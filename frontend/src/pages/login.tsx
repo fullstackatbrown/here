@@ -4,13 +4,13 @@ import Button from "@components/shared/Button";
 import GoogleIcon from "@mui/icons-material/Google";
 import AuthAPI from "api/auth/api";
 import { toast } from "react-hot-toast";
-import errors from "@util/errors";
+import { Errors } from "@util/errors";
 
-export default function Home() {
+export default function Login() {
     function handleSignIn() {
         AuthAPI.signInWithGoogle()
             .then(() => (window.location.href = "/"))
-            .catch(() => toast.error(errors.UNKNOWN));
+            .catch(() => toast.error(Errors.UNKNOWN));
     }
 
     return (
@@ -18,7 +18,7 @@ export default function Home() {
             <Paper variant="outlined">
                 <Box p={4} textAlign="center">
                     <Typography variant="h4" fontWeight={500}>
-                        Welcome to Hours!
+                        Welcome to Here
                     </Typography>
                     <Typography variant="h6">
                         Use your Brown email to continue.

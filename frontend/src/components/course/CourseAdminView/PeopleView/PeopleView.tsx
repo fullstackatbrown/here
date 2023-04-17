@@ -1,29 +1,32 @@
+import SelectMenu from "@components/shared/Menu/SelectMenu";
 import SearchBar from "@components/shared/SearchBar/SearchBar";
-import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
 import { Stack, Typography } from "@mui/material";
-import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
+import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
-import listToMap from "@util/shared/listToMap";
-import { useSections } from "api/section/hooks";
+import { useCourseInvites } from "api/auth/hooks";
+import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
-import { useEffect, useState } from "react";
+import { CoursePermission } from "model/user";
+import { useState } from "react";
+import MoreMenu from "../../../shared/Menu/MoreMenu";
+import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable";
 
 export interface PeopleViewProps {
   course: Course;
+  access: CoursePermission;
+  sectionsMap: Record<string, Section>;
+  assignmentsMap: Record<string, Assignment>;
 }
 
-export default function PeopleView({ course }: PeopleViewProps) {
-  const [sections, sectionsLoading] = useSections(course.ID)
-  const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>(undefined)
+export default function PeopleView({ course, access, sectionsMap, assignmentsMap }: PeopleViewProps) {
+  const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
-
-  useEffect(() => {
-    sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
-  }, [sections])
+  const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
+  const [invitedStudents, invitedStudentsLoading] = useCourseInvites(course.ID, CoursePermission.CourseStudent)
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
@@ -51,8 +54,20 @@ export default function PeopleView({ course }: PeopleViewProps) {
     return studentIDs.map((studentID) => course.students[studentID])
   }
 
+  const addStudent = () => {
+    setAddStudentDialogOpen(true)
+  }
+
+  const exportStudentList = () => {
+  }
+
+  const hasNoStudent = () => {
+    return (!course.students || Object.keys(course.students).length === 0) && (invitedStudentsLoading || invitedStudents.length === 0)
+  }
+
   return (
     <>
+      <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
         <Typography variant="h6" fontWeight={600}>
           People
@@ -65,11 +80,17 @@ export default function PeopleView({ course }: PeopleViewProps) {
             onSelect={(val) => setFilterBySection(val)}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[addStudent, exportStudentList]} />}
         </Stack>
       </Stack >
-      {!course.students || Object.keys(course.students).length === 0 ?
-        <Typography variant="body1" ml={1} mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-        (sectionsMap && <PeopleTable students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} sectionsMap={sectionsMap} />)
+      {invitedStudents && hasNoStudent() ?
+        <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
+        (sectionsMap && assignments &&
+          <PeopleTable
+            {...{ course, assignments, sectionsMap }}
+            students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+            invitedStudents={invitedStudents}
+          />)
       }
     </>
   );

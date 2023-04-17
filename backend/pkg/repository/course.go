@@ -112,13 +112,7 @@ func (fr *FirebaseRepository) checkUniqueEntryCode(entryCode string) bool {
 
 func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (course *models.Course, err error) {
 
-	courseID := models.CreateCourseID(req)
-
-	// Check if an assignment with the same name already exists
-	c, err := fr.GetCourseByID(courseID)
-	if err == nil && c != nil {
-		return nil, qerrors.CourseAlreadyExistsError
-	}
+	// TODO: check same course code and term does not exist
 
 	var entryCode string
 	for {
@@ -133,7 +127,10 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 		Code:                req.Code,
 		Term:                req.Term,
 		EntryCode:           entryCode,
-		AutoApproveRequests: req.AutoApproveRequests,
+		AutoApproveRequests: false,
+		Status:              models.CourseInactive,
+		Students:            map[string]models.CourseUserData{},
+		Permissions:         map[string]models.CoursePermission{},
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Add(firebase.Context, course)
@@ -156,6 +153,25 @@ func (fr *FirebaseRepository) DeleteCourse(req *models.DeleteCourseRequest) erro
 }
 
 func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) error {
+	v := reflect.ValueOf(*req)
+	typeOfS := v.Type()
+
+	var updates []firestore.Update
+
+	for i := 0; i < v.NumField(); i++ {
+		field := typeOfS.Field(i).Name
+		val := v.Field(i).Interface()
+		// Only include the fields that are set
+		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") {
+			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
+		}
+	}
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Update(firebase.Context, updates)
+	return err
+}
+
+func (fr *FirebaseRepository) UpdateCourseInfo(req *models.UpdateCourseInfoRequest) error {
 	v := reflect.ValueOf(*req)
 	typeOfS := v.Type()
 
@@ -250,21 +266,22 @@ func (fr *FirebaseRepository) assignPermanentSection(req *models.AssignSectionsR
 
 func (fr *FirebaseRepository) assignTemporarySection(req *models.AssignSectionsRequest) (*firestore.WriteBatch, error) {
 	// In a batch
-	// 1. Update the swappedOutStudents map of the old section
-	// 2. Update the swappedInStudents map of the new section
-	// 3. Update the students's actualSections map
-	//    If the student is moving into its default section, remove the entry from actual sections
-	//    otherwise, update the student's actual section
-	batch := fr.firestoreClient.Batch()
+	// 1. for the old section, add the student to the swappedOutStudents map
+	// 2. for the new section, delete the student from the swappedOutStudents map (regardless of whether the student was in the map or not)
+	// 3. Check if new section is the student's default section
+	//    If it not, add the student to the swappedInStudents map, update the student's actual section
+	//    If it is, remove the entry from student's actual section
 
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
-		models.FirestoreSectionsCollection).Doc(req.NewSectionID), []firestore.Update{
-		{Path: "swappedInStudents." + req.AssignmentID, Value: firestore.ArrayUnion(req.StudentID)},
-	})
+	batch := fr.firestoreClient.Batch()
 
 	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
 		models.FirestoreSectionsCollection).Doc(req.OldSectionID), []firestore.Update{
 		{Path: "swappedOutStudents." + req.AssignmentID, Value: firestore.ArrayUnion(req.StudentID)},
+	})
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSectionsCollection).Doc(req.NewSectionID), []firestore.Update{
+		{Path: "swappedOutStudents." + req.AssignmentID, Value: firestore.ArrayRemove(req.StudentID)},
 	})
 
 	// get the course.students object from the course document
@@ -275,11 +292,17 @@ func (fr *FirebaseRepository) assignTemporarySection(req *models.AssignSectionsR
 
 	defaultSection := course.Students[req.StudentID].DefaultSection
 	if req.NewSectionID == defaultSection {
+		// default section
 		batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.StudentID),
 			[]firestore.Update{
 				{Path: "actualSections." + req.CourseID + "." + req.AssignmentID, Value: firestore.Delete},
 			})
 	} else {
+		// non-default
+		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+			models.FirestoreSectionsCollection).Doc(req.NewSectionID), []firestore.Update{
+			{Path: "swappedInStudents." + req.AssignmentID, Value: firestore.ArrayUnion(req.StudentID)},
+		})
 		batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.StudentID),
 			[]firestore.Update{
 				{Path: "actualSections." + req.CourseID + "." + req.AssignmentID, Value: req.NewSectionID},
@@ -287,4 +310,33 @@ func (fr *FirebaseRepository) assignTemporarySection(req *models.AssignSectionsR
 	}
 
 	return batch, nil
+}
+
+func (fr *FirebaseRepository) BulkUpload(req *models.BulkUploadRequest) error {
+	for _, r := range req.Requests {
+		// Create the course
+		course, err := fr.CreateCourse(&models.CreateCourseRequest{
+			Title: r.Title,
+			Code:  r.Code,
+			Term:  r.Term,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		// Add permissions
+
+		for _, perm := range r.Permissions {
+			_, err = fr.AddPermissions(&models.AddPermissionRequest{
+				CourseID:   course.ID,
+				Email:      perm.Email,
+				Permission: perm.Permission,
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

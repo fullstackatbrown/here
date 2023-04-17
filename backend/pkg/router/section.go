@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -12,15 +13,13 @@ import (
 
 func SectionRoutes() *chi.Mux {
 	router := chi.NewRouter()
-	// All course routes require authentication.
-	// router.Use(middleware.AuthCtx())
 
-	router.Post("/", createSectionHandler)
+	router.With(middleware.RequireCourseAdmin()).Post("/", createSectionHandler)
+
 	router.Route("/{sectionID}", func(router chi.Router) {
-		router.Get("/", getSectionHandler)
-		router.Delete("/", deleteSectionHandler)
-		router.Patch("/", updateSectionHandler)
-
+		router.With(middleware.RequireCourseStaff()).Get("/", getSectionHandler)
+		router.With(middleware.RequireCourseAdmin()).Delete("/", deleteSectionHandler)
+		router.With(middleware.RequireCourseAdmin()).Patch("/", updateSectionHandler)
 	})
 
 	return router

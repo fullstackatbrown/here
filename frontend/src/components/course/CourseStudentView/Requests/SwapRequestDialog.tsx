@@ -1,3 +1,4 @@
+import { DisabledTextField } from "@components/shared/DisabledTextField/DisabledTextField";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
@@ -31,39 +32,13 @@ type FormData = {
     newSectionID: string,
 };
 
-const DisabledTextField = styled(TextField)({
-    '& .MuiInput-underline:before': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '&:hover .MuiInput-underline:before': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '&.Mui-focused .MuiInput-underline:before': {
-        borderBottomColor: 'rgba(0, 0, 0, 0.42)',
-        borderBottomWidth: 1,
-    },
-    '& .MuiInputLabel-root': {
-        color: 'rgba(0, 0, 0, 0.54)',
-        fontSize: '1rem',
-    },
-    '& .MuiInputLabel-root.Mui-focused': {
-        color: 'rgba(0, 0, 0, 0.54)',
-    },
-});
-
 const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap, swap }) => {
     const defaultValues: FormData = {
         courseID: course.ID,
         isPermanent: swap ? swap.assignmentID === "" : true,
         reason: swap ? swap.reason : "",
         assignmentID: swap ? swap.assignmentID : "",
-        oldSectionID: student.defaultSection[course.ID],
+        oldSectionID: student.defaultSection?.[course.ID] ? student.defaultSection[course.ID] : "",
         newSectionID: swap ? swap.newSectionID : "",
     }
 
@@ -135,10 +110,10 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     })
 
     const getCurrentSectionID = (assignmentID): string => {
-        if ((assignmentID) && (student.actualSection[assignmentID])) {
-            return student.actualSection[course.ID][assignmentID]
+        if ((assignmentID) && (student.actualSection?.[assignmentID])) {
+            return student.actualSection?.[course.ID][assignmentID]
         } else {
-            return student.defaultSection[course.ID]
+            return student.defaultSection?.[course.ID]
         }
     }
 

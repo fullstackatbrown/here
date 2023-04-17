@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/fullstackatbrown/here/pkg/utils"
@@ -15,15 +16,15 @@ import (
 func SurveyRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
-	// TODO: Authentication
-	router.Post("/", createSurveyHandler)
+	router.With(middleware.RequireCourseAdmin()).Post("/", createSurveyHandler)
+
 	router.Route("/{surveyID}", func(router chi.Router) {
-		router.Get("/", getSurveyHandler)
-		router.Patch("/", updateSurveyHandler)
-		router.Delete("/", deleteSurveyHandler)
-		router.Post("/publish", publishSurveyHandler)
-		router.Post("/results", generateResultsHandler)
-		router.Post("/confirmResults", confirmResultsHandler)
+		router.With(middleware.RequireCourseAdmin()).Get("/", getSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Patch("/", updateSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Delete("/", deleteSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Post("/publish", publishSurveyHandler)
+		router.With(middleware.RequireCourseAdmin()).Post("/results", generateResultsHandler)
+		router.With(middleware.RequireCourseAdmin()).Post("/confirmResults", confirmResultsHandler)
 		router.Mount("/responses", ResponsesRoutes())
 
 	})
@@ -204,6 +205,11 @@ func confirmResultsHandler(w http.ResponseWriter, r *http.Request) {
 func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 	surveyID := chi.URLParam(r, "surveyID")
+	user, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
@@ -236,6 +242,7 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.SurveyID = surveyID
+	req.User = user
 
 	// TODO: check if student is in the course
 

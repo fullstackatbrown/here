@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"cloud.google.com/go/firestore"
+	"github.com/fullstackatbrown/here/pkg/config"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/mitchellh/mapstructure"
+	"google.golang.org/api/iterator"
 
 	firebaseAuth "firebase.google.com/go/auth"
 )
@@ -54,7 +57,6 @@ func (fr *FirebaseRepository) initializeProfilesListener() {
 
 // VerifySessionCookie verifies that the given session cookie is valid and returns the associated User if valid.
 func (fr *FirebaseRepository) VerifySessionCookie(sessionCookie *http.Cookie) (*models.User, error) {
-	fmt.Printf("sessioncookie %s", sessionCookie)
 	decoded, err := fr.authClient.VerifySessionCookieAndCheckRevoked(firebase.Context, sessionCookie.Value)
 
 	if err != nil {
@@ -69,45 +71,66 @@ func (fr *FirebaseRepository) VerifySessionCookie(sessionCookie *http.Cookie) (*
 	return user, nil
 }
 
-func (fr *FirebaseRepository) CreateUserProfile(req *models.CreateUserProfileRequest) (*models.Profile, error) {
+func (fr *FirebaseRepository) CreateUser(req *models.CreateUserRequest) (*models.User, error) {
+	if err := utils.ValidateCreateUserRequest(req); err != nil {
+		return nil, err
+	}
+
+	// Create a user in Firebase Auth.
+	u := (&firebaseAuth.UserToCreate{}).Email(req.Email).Password(req.Password)
+	fbUser, err := fr.authClient.CreateUser(firebase.Context, u)
+	if err != nil {
+		return nil, fmt.Errorf("error creating user: %v\n", err)
+	}
+
 	profile := &models.Profile{
+		ID:              fbUser.UID,
 		DisplayName:     req.DisplayName,
 		Email:           req.Email,
-		Access:          make(map[string]string),
 		Courses:         make([]string, 0),
 		DefaultSections: make(map[string]string),
 		ActualSections:  make(map[string]map[string]string),
+		Permissions:     map[string]models.CoursePermission{},
 	}
 
-	// TESTING ONLY
-	profile.Access["rE3HqlVQ8dT1e1hwkN8I"] = "admin"
-
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Add(firebase.Context, profile)
+	_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(profile.ID).Set(firebase.Context, profile)
 	if err != nil {
 		return nil, fmt.Errorf("error creating user profile: %v\n", err)
 	}
-	profile.ID = ref.ID
 
-	return profile, nil
-
+	return fbUserToUserRecord(fbUser, profile), nil
 }
 
 func (fr *FirebaseRepository) GetUserByID(id string) (*models.User, error) {
-	// if err := utils.ValidateID(id); err != nil {
-	// 	return nil, err
-	// }
+	if err := utils.ValidateID(id); err != nil {
+		return nil, err
+	}
 
 	fbUser, err := fr.authClient.GetUser(firebase.Context, id)
 	if err != nil {
 		return nil, qerrors.UserNotFoundError
 	}
 
-	// TODO: email verification
+	// Check the Firebase user's email against the list of allowed domains.
+	if len(config.Config.AllowedEmailDomains) > 0 {
+		domain := strings.Split(fbUser.Email, "@")[1]
+		if !utils.Contains(config.Config.AllowedEmailDomains, domain) {
+			// invalid email domain, delete the user from Firebase Auth
+			_ = fr.authClient.DeleteUser(firebase.Context, fbUser.UID)
+			return nil, qerrors.InvalidEmailError
+		}
+	}
 
 	profile, err := fr.GetProfileById(fbUser.UID)
 	if err != nil {
-		// TODO: no profile for the user found, create one.
-		// fr.CreateUserProfile()
+		profile, err = fr.createProfileFromFbUser(fbUser)
+		if err != nil {
+			return nil, err
+		}
+		err = fr.executeInviteForUser(fbUserToUserRecord(fbUser, profile))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return fbUserToUserRecord(fbUser, profile), nil
@@ -124,99 +147,94 @@ func (fr *FirebaseRepository) GetProfileById(id string) (*models.Profile, error)
 	}
 }
 
-// getUserProfile gets the Profile from the userProfiles map corresponding to the provided user ID.
-
-func (fr *FirebaseRepository) QuitCourse(req *models.QuitCourseRequest) error {
-	// Check if course exists
-	course, err := fr.GetCourseByID(req.CourseID)
+// GetUserByEmail retrieves the User associated with the given email.
+func (fr *FirebaseRepository) GetUserByEmail(email string) (*models.User, error) {
+	userID, err := fr.GetIDByEmail(email)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	batch := fr.firestoreClient.Batch()
-	// Remove course for student
-	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.UserID)
-	batch.Update(userProfileRef, []firestore.Update{
-		{
-			Path:  "courses",
-			Value: firestore.ArrayRemove(course.ID),
-		},
-	})
-
-	// remove student from course
-	newStudentMap := utils.CopyMap(course.Students)
-	delete(newStudentMap, req.UserID)
-
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
-	batch.Update(coursesRef, []firestore.Update{
-		{
-			Path:  "students",
-			Value: newStudentMap,
-		},
-	})
-
-	// Commit the batch.
-	_, err = batch.Commit(firebase.Context)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return fr.GetUserByID(userID)
 }
 
-func (fr *FirebaseRepository) JoinCourse(req *models.JoinCourseRequest) (*models.Course, error) {
+func (fr *FirebaseRepository) GetIDByEmail(email string) (string, error) {
+	// Get user by email.
+	iter := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Where("email", "==", email).Documents(firebase.Context)
+	doc, err := iter.Next()
+	if err != nil {
+		return "", err
+	}
+	// Cast.
+	data := doc.Data()
+	return data["id"].(string), nil
+}
+
+func (fr *FirebaseRepository) HandleJoinCourseRequest(req *models.JoinCourseRequest) (course *models.Course, internalError error, requestError error) {
 	// Check if course exists
 	course, err := fr.GetCourseByEntryCode(req.EntryCode)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	fmt.Println(req.User.ID)
-	// Check if already enrolled
-	profile, err := fr.GetProfileById(req.User.ID)
+	// Check if course is active
+	if course.Status != models.CourseActive {
+		return nil, nil, fmt.Errorf("Cannot join an inactive or archived course")
+	}
+
+	studentExists, studentIsStaff, err := fr.addStudentToCourse(req.User, course)
+	if studentExists {
+		return nil, nil, fmt.Errorf("Student is already enrolled in course")
+	}
+	if studentIsStaff {
+		return nil, nil, fmt.Errorf("Cannot join course as staff")
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, err, nil
 	}
 
-	if utils.Contains(profile.Courses, course.ID) {
-		return nil, fmt.Errorf("Student is already enrolled in course")
+	return course, nil, nil
+}
+
+func (fr *FirebaseRepository) HandleQuitCourseRequest(req *models.QuitCourseRequest) error {
+	err := fr.deleteStudentFromCourse(req.User.ID, req.CourseID)
+	return err
+}
+
+func (fr *FirebaseRepository) EditAdminAccess(req *models.EditAdminAccessRequest) (wasAdmin bool, err error) {
+	user, err := fr.GetUserByEmail(req.Email)
+
+	if err != nil {
+		// if user does not exist, add to or remove from invites
+		if req.IsAdmin {
+			wasAdmin, err = fr.createAdminInvite(req)
+			return wasAdmin, err
+		} else {
+			err = fr.removeAdminInvite(req)
+			return false, err
+		}
 	}
 
-	batch := fr.firestoreClient.Batch()
-	// Add course to student
-	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.User.ID)
-	batch.Update(userProfileRef, []firestore.Update{
+	docRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID)
+	doc, err := docRef.Get(firebase.Context)
+	if err != nil {
+		return false, err
+	}
+
+	// if user was already admin
+	data := doc.Data()
+	if req.IsAdmin && req.IsAdmin == data["isAdmin"].(bool) {
+		return true, nil
+	}
+
+	_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID).Update(firebase.Context, []firestore.Update{
 		{
-			Path:  "courses",
-			Value: firestore.ArrayUnion(course.ID),
+			Path:  "isAdmin",
+			Value: req.IsAdmin,
 		},
 	})
 
-	// Add student to course
-	newStudentMap := utils.CopyMap(course.Students)
-	newStudentMap[req.User.ID] = models.CourseUserData{
-		StudentID:   req.User.ID,
-		Email:       req.User.Email,
-		DisplayName: req.User.DisplayName,
-		Pronouns:    req.User.Pronouns,
-	}
-
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
-	batch.Update(coursesRef, []firestore.Update{
-		{
-			Path:  "students",
-			Value: newStudentMap,
-		},
-	})
-
-	// Commit the batch.
-	_, err = batch.Commit(firebase.Context)
-	if err != nil {
-		return nil, err
-	}
-
-	return course, nil
-
+	return false, err
 }
 
 // Helpers
@@ -231,4 +249,143 @@ func fbUserToUserRecord(fbUser *firebaseAuth.UserRecord, profile *models.Profile
 		CreationTimestamp:  fbUser.UserMetadata.CreationTimestamp,
 		LastLogInTimestamp: fbUser.UserMetadata.LastLogInTimestamp,
 	}
+}
+
+// getUserCount returns the number of user profiles.
+func (fr *FirebaseRepository) getUserCount() int {
+	fr.profilesLock.RLock()
+	defer fr.profilesLock.RUnlock()
+	return len(fr.profiles)
+}
+
+func (fr *FirebaseRepository) createProfileFromFbUser(fbUser *firebaseAuth.UserRecord) (*models.Profile, error) {
+
+	profile := &models.Profile{
+		DisplayName:     fbUser.DisplayName,
+		Email:           fbUser.Email,
+		PhotoURL:        fbUser.PhotoURL,
+		IsAdmin:         fr.getUserCount() == 0,
+		Courses:         make([]string, 0),
+		DefaultSections: make(map[string]string),
+		ActualSections:  make(map[string]map[string]string),
+		Permissions:     map[string]models.CoursePermission{},
+	}
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(fbUser.UID).Set(firebase.Context, profile)
+	if err != nil {
+		return nil, fmt.Errorf("error creating user profile: %v\n", err)
+	}
+
+	return profile, nil
+}
+
+func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
+	iter := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Where("email", "==", user.Email).Documents(firebase.Context)
+	for {
+		// Get this document.
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		// Decode this document.
+		var invite models.Invite
+		err = mapstructure.Decode(doc.Data(), &invite)
+		if err != nil {
+			return err
+		}
+
+		if invite.CourseID != "" {
+			if invite.Permission == models.CourseStudent {
+				// Add as student
+				course, _ := fr.GetCourseByID(invite.CourseID)
+				// if course no longer exists, do nothing
+				fr.addStudentToCourse(user, course)
+
+			} else {
+				// Add as staff
+				_, err = fr.AddPermissions(&models.AddPermissionRequest{
+					CourseID:   invite.CourseID,
+					Email:      invite.Email,
+					Permission: invite.Permission,
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+		if invite.IsAdmin {
+			_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID).Update(firebase.Context, []firestore.Update{
+				{
+					Path:  "isAdmin",
+					Value: true,
+				},
+			})
+			if err != nil {
+				return err
+			}
+		}
+		// Delete the invite doc.
+		_, err = doc.Ref.Delete(firebase.Context)
+		return err
+
+	}
+	return nil
+}
+
+func (fr *FirebaseRepository) createCourseInvite(invite *models.Invite) (hadPermission bool, err error) {
+	inviteID := models.CreateCourseInviteID(invite.Email, invite.CourseID)
+	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
+	// Check if invite with the same person and course exists
+	doc, _ := docRef.Get(firebase.Context)
+	if doc.Exists() {
+		if doc.Data()["permission"].(string) == string(invite.Permission) {
+			// invite already exists
+			return true, nil
+		}
+		_, err := docRef.Update(firebase.Context, []firestore.Update{
+			{
+				Path:  "courseID",
+				Value: invite.CourseID,
+			},
+			{
+				Path:  "permission",
+				Value: invite.Permission,
+			},
+		})
+		return false, err
+	}
+
+	// create new invite
+	_, err = docRef.Set(firebase.Context, invite)
+	return false, err
+}
+
+func (fr *FirebaseRepository) removeCourseInvite(email string, courseID string) error {
+	inviteID := models.CreateCourseInviteID(email, courseID)
+	_, err := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Delete(firebase.Context)
+	return err
+}
+
+func (fr *FirebaseRepository) createAdminInvite(req *models.EditAdminAccessRequest) (wasAdmin bool, err error) {
+	inviteID := models.CreateSiteAdminInviteID(req.Email)
+	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
+	doc, _ := docRef.Get(firebase.Context)
+	if doc.Exists() {
+		// invite already exists
+		return true, nil
+	}
+	_, err = fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Set(firebase.Context, &models.Invite{
+		Email:   req.Email,
+		IsAdmin: req.IsAdmin,
+	})
+	return false, err
+}
+
+func (fr *FirebaseRepository) removeAdminInvite(req *models.EditAdminAccessRequest) error {
+	inviteID := models.CreateSiteAdminInviteID(req.Email)
+	_, err := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID).Delete(firebase.Context)
+	return err
 }

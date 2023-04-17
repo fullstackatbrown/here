@@ -7,21 +7,32 @@ import (
 
 const (
 	FirestoreCoursesCollection = "courses"
+	FirestoreInvitesCollection = "invites"
 )
 
 type Course struct {
-	ID                  string                    `firestore:"id,omitempty"`
-	Title               string                    `firestore:"title"`
-	Code                string                    `firestore:"code"`
-	Term                string                    `firestore:"term"`
-	EntryCode           string                    `firestore:"entryCode"`
-	AutoApproveRequests bool                      `firestore:"autoApproveRequests"`
-	Students            map[string]CourseUserData `firestore:"students,omitempty"`
-	SectionsLock        sync.RWMutex              `firestore:"-"`
-	Sections            map[string]*Section       `firestore:"-"`
-	AssignmentsLock     sync.RWMutex              `firestore:"-"`
-	Assignments         map[string]*Assignment    `firestore:"-"`
+	ID                  string                      `firestore:"id,omitempty"`
+	Title               string                      `firestore:"title"`
+	Code                string                      `firestore:"code"`
+	Term                string                      `firestore:"term"`
+	EntryCode           string                      `firestore:"entryCode"`
+	Status              CourseStatus                `firestore:"status"`
+	AutoApproveRequests bool                        `firestore:"autoApproveRequests"`
+	Students            map[string]CourseUserData   `firestore:"students,omitempty"`
+	Permissions         map[string]CoursePermission `firestore:"permissions,omitempty"` // map from userID to permission
+	SectionsLock        sync.RWMutex                `firestore:"-"`
+	Sections            map[string]*Section         `firestore:"-"`
+	AssignmentsLock     sync.RWMutex                `firestore:"-"`
+	Assignments         map[string]*Assignment      `firestore:"-"`
 }
+
+type CourseStatus string
+
+const (
+	CourseArchived CourseStatus = "archived"
+	CourseInactive CourseStatus = "inactive"
+	CourseActive   CourseStatus = "active"
+)
 
 type CourseUserData struct {
 	StudentID      string `firestore:"studentID"`
@@ -36,10 +47,9 @@ type GetCourseRequest struct {
 }
 
 type CreateCourseRequest struct {
-	Title               string `json:"title"`
-	Code                string `json:"code"`
-	Term                string `json:"term"`
-	AutoApproveRequests bool   `json:"autoApproveRequests,omitempty"`
+	Title string `json:"title"`
+	Code  string `json:"code"`
+	Term  string `json:"term"`
 }
 
 type DeleteCourseRequest struct {
@@ -47,11 +57,17 @@ type DeleteCourseRequest struct {
 }
 
 type UpdateCourseRequest struct {
-	CourseID            *string `json:"courseid,omitempty"`
-	Title               *string `json:"title,omitempty"`
-	Code                *string `json:"code,omitempty"`
-	Term                *string `json:"term,omitempty"`
-	AutoApproveRequests *bool   `json:"autoApproveRequests,omitempty"`
+	CourseID            *string       `json:"courseid,omitempty"`
+	Title               *string       `json:"title,omitempty"`
+	Status              *CourseStatus `json:"status"`
+	AutoApproveRequests *bool         `json:"autoApproveRequests,omitempty"`
+}
+
+type UpdateCourseInfoRequest struct {
+	CourseID *string `json:"courseid,omitempty"`
+	Title    *string `json:"title,omitempty"`
+	Code     *string `json:"code,omitempty"`
+	Term     *string `json:"term,omitempty"`
 }
 
 type AssignSectionsRequest struct {

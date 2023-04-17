@@ -1,9 +1,15 @@
 import { Badge, Button, Stack } from "@mui/material";
+import { capitalizeFirstLetter } from "@util/shared/string";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
+import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
 
-export default function CourseAdminViewNavigation() {
+interface CourseAdminViewNavigationProps {
+    access: CoursePermission;
+}
+
+export default function CourseAdminViewNavigation({ access }: CourseAdminViewNavigationProps) {
     const router = useRouter();
     const { query } = router;
     const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
@@ -12,10 +18,6 @@ export default function CourseAdminViewNavigation() {
         return () => {
             router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true })
         }
-    }
-
-    function capitalizeFirstLetter(str: string): string {
-        return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
     function getNavigationButton(view: View) {
@@ -53,8 +55,7 @@ export default function CourseAdminViewNavigation() {
                     {getNavigationButton("requests")}
                 </Badge> : getNavigationButton("requests")
             }
-            {/* TODO: make settings only visible to admin, add a divider here?,  */}
-            {getNavigationButton("settings")}
+            {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
         </Stack>
     )
 }

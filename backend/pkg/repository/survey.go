@@ -196,7 +196,7 @@ func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyRespo
 		survey.Responses = make(map[string][]string)
 	}
 	// override previous response
-	survey.Responses[req.UserID] = req.Availability
+	survey.Responses[req.User.ID] = req.Availability
 
 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
 		models.FirestoreSurveysCollection).Doc(req.SurveyID).Update(firebase.Context, []firestore.Update{

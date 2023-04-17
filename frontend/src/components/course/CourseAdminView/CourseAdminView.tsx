@@ -1,24 +1,28 @@
-import { Box, Stack } from "@mui/material";
-import { View } from "model/general";
-import { useEffect, useState } from "react";
-import CourseHeader from "../CourseHeader";
-import CourseAdminViewNavigation from "./CourseAdminViewNavigation";
-import SectionsView from "./SectionsView/SectionsView";
+import { Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import RequestsView from "./RequestsView/RequestsView";
+import { useAssignmentsMap } from "api/assignment/hooks";
+import { useSectionsMap } from "api/section/hooks";
 import { Course } from "model/course";
-import AssignmentsView from "./AssignmentsView/AssignmentsView";
-import PeopleView from "./PeopleView/PeopleView";
+import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
+import AssignmentsView from "./AssignmentsView/AssignmentsView";
+import CourseAdminViewNavigation from "./CourseAdminViewNavigation";
+import PeopleView from "./PeopleView/PeopleView";
+import RequestsView from "./RequestsView/RequestsView";
+import SectionsView from "./SectionsView/SectionsView";
 import SettingsView from "./SettingsView/SettingsView";
 
 export interface CourseAdminViewProps {
   course: Course;
+  access: CoursePermission;
 }
 
-export function CourseAdminView({ course }: CourseAdminViewProps) {
+export default function CourseAdminView({ course, access }: CourseAdminViewProps) {
   const router = useRouter();
   const { courseID } = router.query;
+  const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
+  const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
 
   useEffect(() => {
     // Always do navigations after the first render
@@ -30,21 +34,25 @@ export function CourseAdminView({ course }: CourseAdminViewProps) {
   return (
     <Grid container>
       <Grid xs={2}>
-        <CourseAdminViewNavigation />
+        <CourseAdminViewNavigation access={access} />
       </Grid>
       <Grid xs>
-        {router.query.view &&
+        {router.query.view && sectionsMap && assignmentsMap &&
           <>
-            {router.query.view === "sections" && <SectionsView course={course} />}
-            {router.query.view === "assignments" && <AssignmentsView course={course} />}
-            {router.query.view === "people" && <PeopleView course={course} />}
-            {router.query.view === "requests" && <RequestsView course={course} />}
-            {/* TODO: protect the settings view route to be only accessible by admin */}
-            {router.query.view === "settings" && <SettingsView course={course} />}
+            {router.query.view === "sections" && <SectionsView {...{ course, access, sectionsMap }} />}
+            {router.query.view === "assignments" && <AssignmentsView {...{ course, access, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "people" && <PeopleView {...{ course, access, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "requests" && <RequestsView {...{ course, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "settings" &&
+              (access === CoursePermission.CourseAdmin ?
+                <SettingsView course={course} /> :
+                <Typography>
+                  Oops.. You have no permission to access this page
+                </Typography>)}
           </>
         }
       </Grid>
       <Grid xs={router.query.view === "requests" ? 0.5 : 2} />
-    </Grid>
+    </Grid >
   );
 }

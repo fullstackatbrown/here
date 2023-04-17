@@ -1,34 +1,26 @@
+import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+} from "firebase/auth";
 import APIClient from "api/APIClient";
 import { User } from "model/user";
 
 const enum Endpoint {
+    ME = '/users/me',
     USER = '/users',
+    GET_SESSION = '/users/session',
+    EDIT_ADMIN_ACCESS = '/users/editAdminAccess',
 }
 
-export const enum CoursePermission {
-    CourseAdmin = "ADMIN",
-    CourseStaff = "STAFF"
-}
-
-export const enum ChangeCourseAction {
-    Join = "JOIN",
-    Quit = "QUIT"
-}
-
-/**
- * Fetches profile information corresponding to the currently logged in user.
- */
 async function getCurrentUser(): Promise<User> {
     try {
-        return await APIClient.get(Endpoint.USER);
+        return await APIClient.get(Endpoint.ME);
     } catch (e) {
         throw e;
     }
 }
 
-/**
- * Fetches profile information corresponding to the currently logged in user.
- */
 async function getUserById(id: string): Promise<User> {
     try {
         return await APIClient.get(`${Endpoint.USER}/${id}`);
@@ -37,15 +29,51 @@ async function getUserById(id: string): Promise<User> {
     }
 }
 
-/**
- * 
- * @param id 
- * @returns 
- */
-
-async function joinOrQuitCourse(userId: string, entryCode: string, action: ChangeCourseAction): Promise<string> {
+async function joinCourse(entryCode: string): Promise<string> {
     try {
-        return await APIClient.patch(`${Endpoint.USER}/${userId}/courses`, { userId, entryCode, action });
+        return await APIClient.patch(`${Endpoint.USER}/joinCourse`, { entryCode });
+    } catch (e) {
+        throw e;
+    }
+}
+
+async function quitCourse(courseID: string): Promise<string> {
+    try {
+        return await APIClient.patch(`${Endpoint.USER}/quitCourse`, { courseID });
+    } catch (e) {
+        throw e;
+    }
+}
+
+/**
+ * Redirects the user to a Google sign in page, then creates a session with the SMU API.
+ */
+async function signInWithGoogle() {
+    const auth = getAuth();
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+        'hd': 'brown.edu'
+    });
+
+    return signInWithPopup(auth, provider)
+        .then((userCredential) => {
+            // Signed in
+            return userCredential.user.getIdToken(true)
+                .then((idToken) => {
+                    // Session login endpoint is queried and the session cookie is set.
+                    // TODO: CSRF protection should be taken into account.
+                    return APIClient.post(Endpoint.GET_SESSION, { token: idToken.toString() });
+                });
+        })
+        .catch(() => {
+            throw Error("Invalid credentials");
+        });
+}
+
+async function editAdminAccess(email: string, isAdmin: boolean): Promise<string> {
+    try {
+        return await APIClient.patch(`${Endpoint.EDIT_ADMIN_ACCESS}`, { email, isAdmin });
     } catch (e) {
         throw e;
     }
@@ -54,7 +82,10 @@ async function joinOrQuitCourse(userId: string, entryCode: string, action: Chang
 const AuthAPI = {
     getCurrentUser,
     getUserById,
-    joinOrQuitCourse,
+    joinCourse,
+    quitCourse,
+    signInWithGoogle,
+    editAdminAccess,
 };
 
 export default AuthAPI;

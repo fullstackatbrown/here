@@ -8,8 +8,6 @@ import {
     Typography
 } from "@mui/material";
 import { filterAssignmentsByReleaseDate } from "@util/shared/assignments";
-import listToMap from "@util/shared/listToMap";
-import { useAssignments } from "api/assignment/hooks";
 import { useSwapsByStudent } from "api/swaps/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -22,32 +20,30 @@ import SwapRequestDialog from "./Requests/SwapRequestDialog";
 
 export interface StudentViewListProps {
     course: Course;
-    sectionsMap: Record<string, Section>;
     student: User;
+    sectionsMap: Record<string, Section>;
+    assignmentsMap: Record<string, Assignment>;
 }
 
-export default function StudentViewList({ course, sectionsMap, student }: StudentViewListProps) {
-    const [assignments, assignmentsLoading] = useAssignments(course.ID)
+export default function StudentViewList({ course, student, sectionsMap, assignmentsMap }: StudentViewListProps) {
+    const assignments = filterAssignmentsByReleaseDate(Object.values(assignmentsMap));
     const [requests, requestsLoading] = useSwapsByStudent(course.ID, student.ID);
-    const [requestsOpen, setRequestsOpen] = useState(!requestsLoading && !assignmentsLoading);
-    const [gradesOpen, setGradesOpen] = useState(!assignmentsLoading);
+    const [requestsOpen, setRequestsOpen] = useState(!requestsLoading);
+    const [gradesOpen, setGradesOpen] = useState(true);
     const [swapRequestDialog, setSwapRequestDialog] = useState(false)
 
     useEffect(() => {
-        setGradesOpen(!assignmentsLoading)
-        setRequestsOpen(!requestsLoading && !assignmentsLoading)
-    }, [assignmentsLoading, requestsLoading, assignmentsLoading])
+        setRequestsOpen(!requestsLoading)
+    }, [requestsLoading])
 
     return (
         <>
-            <SwapRequestDialog
-                open={swapRequestDialog}
-                onClose={() => { setSwapRequestDialog(false) }}
-                course={course}
-                assignments={assignments}
-                student={student}
-                sectionsMap={sectionsMap}
-            />
+            {assignments && sectionsMap &&
+                <SwapRequestDialog
+                    open={swapRequestDialog}
+                    onClose={() => { setSwapRequestDialog(false) }}
+                    {...{ course, assignments, student, sectionsMap }}
+                />}
             <Stack mt={-1}>
                 <Stack direction="row" justifyContent="space-between">
                     <Button
@@ -59,9 +55,9 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                     </Button>
                 </Stack>
                 <Collapse in={gradesOpen} timeout="auto" unmountOnExit>
-                    {(assignments && filterAssignmentsByReleaseDate(assignments).length > 0) ?
-                        <StudentGradesTable course={course} assignments={filterAssignmentsByReleaseDate(assignments)} student={student} sectionsMap={sectionsMap} /> :
-                        <Typography>Your instructor has not released any assignments yet</Typography>}
+                    {(assignments?.length > 0) ?
+                        <StudentGradesTable {...{ course, student, sectionsMap, assignments }} /> :
+                        <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Collapse>
 
                 <Box height={40} />
@@ -77,9 +73,8 @@ export default function StudentViewList({ course, sectionsMap, student }: Studen
                     {requestsOpen && <Button size="small" onClick={() => setSwapRequestDialog(true)}> + New Request</Button>}
                 </Stack>
                 <Collapse in={requestsOpen} timeout="auto" unmountOnExit sx={{ ml: -4 }}>
-                    {assignments && <StudentRequestsList course={course} student={student} requests={requests} sectionsMap={sectionsMap}
-                        assignmentsMap={listToMap(assignments) as Record<string, Assignment>} />}
-                </Collapse>
+                    <StudentRequestsList {...{ course, sectionsMap, student, requests, assignmentsMap }} />
+                </Collapse >
 
             </Stack >
         </>

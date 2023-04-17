@@ -7,22 +7,21 @@ import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import formatSectionInfo from '@util/shared/formatSectionInfo';
+import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
 import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
-import listToMap from '@util/shared/listToMap';
 import GradeAPI from 'api/grades/api';
-import { useGradesForStudent, useGradesForAssignment } from 'api/grades/hooks';
-import { useSections } from 'api/section/hooks';
+import { useGradesForAssignment } from 'api/grades/hooks';
 import { Assignment } from 'model/assignment';
 import { Course, CourseUserData } from 'model/course';
 import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
-import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
+import SelectMenu from '../../../../shared/Menu/SelectMenu';
 
 interface GradingViewProps {
     course: Course;
     assignment: Assignment;
+    sectionsMap: Record<string, Section>;
     handleNavigateBack: () => void;
 }
 
@@ -38,10 +37,9 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateBack }) => {
-    const [sections, sectionsLoading] = useSections(course.ID)
+const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, handleNavigateBack }) => {
+    const sections = Object.values(sectionsMap)
     const [grades, gradesLoading] = useGradesForAssignment(course.ID, assignment.ID)
-    const [sectionsMap, setSectionsMap] = useState<Record<string, Section>>({})
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
 
@@ -49,10 +47,6 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, handleNavigateB
     const [page, setPage] = useState(0);
     const [currentStudentsDisplayed, setCurrentStudentsDisplayed] = useState<CourseUserData[]>([])
     const [searchQuery, setSearchQuery] = useState<string>("")
-
-    useEffect(() => {
-        sections && setSectionsMap(listToMap(sections) as Record<string, Section>)
-    }, [sections])
 
     useEffect(() => {
         let studentIDs = []

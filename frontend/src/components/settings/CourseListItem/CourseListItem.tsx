@@ -1,60 +1,95 @@
-import React, { FC, useState } from "react";
-import EditCourseDialog from "@components/settings/EditCourseDialog";
-import { Box, Divider, ListItem, ListItemText } from "@mui/material";
 import IconButton from "@components/shared/IconButton";
-import ConfirmButton from "@components/shared/ConfirmButton";
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import CourseAPI, { Course } from "api/course/api";
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import DoDisturbOnOutlinedIcon from '@mui/icons-material/DoDisturbOnOutlined';
+import { Button, Stack, Typography } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
+import { capitalizeFirstLetter } from "@util/shared/string";
+import CourseAPI from "api/course/api";
+import { Course, CourseStatus } from "model/course";
+import React, { FC, useState } from "react";
+import toast from "react-hot-toast";
+import ActivateCourseDialog from "../ActivateCourseDialog/ActivateCourseDialog";
+import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
 
 export interface CourseListItemProps {
     course: Course;
-    isLastChild?: boolean;
 }
 
-const CourseListItem: FC<CourseListItemProps> = ({ course, isLastChild }) => {
-    const [openConfirm, setOpenConfirm] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-    const handleCloseEdit = () => setOpenEdit(false);
+const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
+    const [activateCourseDialogOpen, setActivateCourseDialogOpen] = useState(false);
 
-    return (<>
-        <EditCourseDialog course={course} open={openEdit} onClose={handleCloseEdit} />
-        <ListItem
-            disableGutters
-            secondaryAction={
-                <>
-                    <Box display="inline" mr={2}>
-                        <IconButton label="Edit course" edge="end" aria-label="delete"
-                            onClick={() => setOpenEdit(true)}>
-                            <EditIcon />
-                        </IconButton>
-                    </Box>
-                    <ConfirmButton
-                        message={`Delete course ${course.title}?`}
-                        open={openConfirm}
-                        confirmButtonText="Delete course"
-                        onClose={() => setOpenConfirm(false)}
-                        onConfirm={() => CourseAPI.deleteCourse(course.id)}>
-                        <IconButton label="Delete course" edge="end" aria-label="delete"
-                            onClick={() => setOpenConfirm(true)}>
-                            <CloseIcon />
-                        </IconButton>
-                    </ConfirmButton>
-                </>
-            }>
-            <ListItemText
-                primary={`${course.code}: ${course.title}`}
-                secondary={course.term}
-                primaryTypographyProps={{
-                    noWrap: true,
-                    sx: {
-                        marginRight: 3
+    const handleChangeCourseStatus = (status: CourseStatus) => {
+        return (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+
+            if (course.students && Object.keys(course.students).length > 0 && course.status === CourseStatus.CourseInactive) {
+                alert("Cannot deactivate a course when students have enrolled. Consider archiving it to prevent future changes.")
+                return;
+            }
+
+            let confirmString = "";
+            switch (status) {
+                case CourseStatus.CourseInactive:
+                    confirmString = `Are you sure you want to deactivate ${course.title}? All past data will be kept, but students will not be able to see or join the course.`;
+                    break;
+                case CourseStatus.CourseArchived:
+                    confirmString = `Are you sure you want to archive ${course.title} on Here? Students and TAs can still see the course but cannot make any modifications.`;
+                    break;
+                case CourseStatus.CourseActive:
+                    confirmString = `Are you sure you want to re-activate ${course.title}? Students will be able to access the course.`;
+                    break;
+            }
+            const confirmed = confirm(confirmString);
+            if (confirmed) {
+                toast.promise(CourseAPI.updateCourse(course.ID, undefined, undefined, status), {
+                    loading: "Updating course status...",
+                    success: "Course status updated!",
+                    error: (err) => handleBadRequestError(err)
+                })
+                    .catch(() => { })
+            }
+        }
+    }
+
+    return (
+        <>
+            <ActivateCourseDialog course={course} open={activateCourseDialogOpen} onClose={() => { setActivateCourseDialogOpen(false) }} />
+            <Stack direction="row" display="flex" justifyContent="space-between" alignItems="center">
+                <Stack>
+                    <Stack direction="row" display="flex" alignItems="center" spacing={1}>
+                        <Typography>{course.code}: {course.title}</Typography>
+                        <CourseStatusChip status={course.status} />
+                    </Stack>
+                    <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(course.term)}</Typography>
+                </Stack>
+                <Stack>
+                    {course.status === CourseStatus.CourseInactive &&
+                        <Button onClick={() => { setActivateCourseDialogOpen(true) }}>
+                            Activate
+                        </Button>
                     }
-                }}
-            />
-        </ListItem>
-        {!isLastChild && <Divider />}
-    </>);
+                    {course.status === CourseStatus.CourseActive &&
+                        <Stack direction="row" spacing={0.5}>
+                            <IconButton label="Deactivate" size="small"
+                                onClick={handleChangeCourseStatus(CourseStatus.CourseInactive)}>
+                                <DoDisturbOnOutlinedIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                            <IconButton label="Archive" size="small"
+                                onClick={handleChangeCourseStatus(CourseStatus.CourseArchived)} >
+                                <ArchiveOutlinedIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                        </Stack>
+                    }
+                    {course.status === CourseStatus.CourseArchived &&
+                        <Button onClick={handleChangeCourseStatus(CourseStatus.CourseActive)} >
+                            Reactivate
+                        </Button>
+                    }
+                </Stack>
+            </Stack>
+        </>
+
+    );
 };
 
 export default CourseListItem;

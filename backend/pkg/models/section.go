@@ -2,9 +2,6 @@ package models
 
 import (
 	"fmt"
-	"strings"
-
-	"github.com/fullstackatbrown/here/pkg/utils"
 )
 
 const (
@@ -64,19 +61,6 @@ type UpdateSectionRequest struct {
 type DeleteSectionRequest struct {
 	CourseID  string
 	SectionID string
-}
-
-func CreateSectionID(req *CreateSectionRequest) (string, error) {
-	startTime, err := utils.ParseIsoTimeToReadableUTC(req.StartTime)
-	if err != nil {
-		return "", fmt.Errorf("Error parsing time: %s", req.StartTime)
-	}
-	endTime, err := utils.ParseIsoTimeToReadableUTC(req.EndTime)
-	if err != nil {
-		return "", fmt.Errorf("Error parsing time: %s", req.EndTime)
-	}
-	location := strings.ToLower(strings.ReplaceAll(req.Location, " ", ""))
-	return fmt.Sprintf("%s,%s,%s,%s", req.Day, startTime, endTime, location), nil
 }
 
 func (section *Section) TimeAsString() (string, error) {

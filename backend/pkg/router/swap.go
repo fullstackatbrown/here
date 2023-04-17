@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
@@ -26,16 +27,22 @@ func SwapRoutes() *chi.Mux {
 
 func createSwapHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
+	user, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	var req *models.CreateSwapRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	req.CourseID = courseID
+	req.User = user
 
 	// Whether if student is already in the section is checked in frontend
 
@@ -77,9 +84,15 @@ func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
 func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 	swapID := chi.URLParam(r, "swapID")
+	handledBy, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
 	var req *models.HandleSwapRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -87,6 +100,7 @@ func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 	req.SwapID = swapID
+	req.HandledBy = handledBy
 
 	err = repo.Repository.HandleSwap(req)
 	if err != nil {

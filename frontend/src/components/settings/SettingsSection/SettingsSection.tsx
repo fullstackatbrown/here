@@ -2,8 +2,8 @@ import React, { FC } from "react";
 import { Box, CircularProgress, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import Button from "@components/shared/Button";
 import { useAuth } from "api/auth/hooks";
-import { CoursePermission } from "api/auth/api";
 import GppGoodIcon from '@mui/icons-material/GppGood';
+import { CoursePermission } from "model/user";
 
 export interface SettingsSectionProps {
     title: string;
@@ -11,14 +11,7 @@ export interface SettingsSectionProps {
     loading?: boolean;
     adminOnly?: boolean;
     taOnly?: boolean;
-    primaryActionButton?: {
-        label: string;
-        onClick: () => void;
-    };
-    secondaryActionButton?: {
-        label: string;
-        onClick: () => void;
-    };
+    children: React.ReactNode;
 }
 
 const SettingsSection: FC<SettingsSectionProps> = ({
@@ -27,13 +20,11 @@ const SettingsSection: FC<SettingsSectionProps> = ({
     loading,
     adminOnly,
     taOnly,
-    primaryActionButton,
-    secondaryActionButton,
     children
 }) => {
     const { currentUser } = useAuth();
-    const isTA = currentUser && Object.values(currentUser.coursePermissions).filter(perm => perm === CoursePermission.CourseAdmin).length > 0;
-    const display = ((adminOnly && currentUser?.isAdmin) || !adminOnly) && (!taOnly || (taOnly && isTA));
+    const isAdmin = currentUser && Object.values(currentUser.permissions).filter(perm => perm === CoursePermission.CourseAdmin).length > 0;
+    const display = ((adminOnly && currentUser?.isAdmin) || !adminOnly) && (!taOnly || (taOnly && isAdmin));
 
     return display ? <Paper variant="outlined">
         <Box p={3}>
@@ -43,22 +34,13 @@ const SettingsSection: FC<SettingsSectionProps> = ({
                         <Typography variant="h6" fontWeight={600}>
                             {title}
                         </Typography>
-                        {adminOnly && <Tooltip title="Only visible to admins">
+                        {adminOnly && <Tooltip title="Only visible to admins" placement="right">
                             <GppGoodIcon sx={{ opacity: 0.36 }} />
                         </Tooltip>}
                     </Stack>
                     <Typography variant="body2" sx={{ opacity: 0.75 }}>
                         {subtitle}
                     </Typography>
-                </Stack>
-                <Stack direction={["row-reverse", null, "row"]} mt={[1, null, 0]}>
-                    {secondaryActionButton && <Button size="small" onClick={secondaryActionButton.onClick}>
-                        {secondaryActionButton.label}
-                    </Button>}
-                    {primaryActionButton &&
-                        <Button size="small" variant="contained" onClick={primaryActionButton.onClick}>
-                            {primaryActionButton.label}
-                        </Button>}
                 </Stack>
             </Stack>
             {loading ? <Box textAlign="center" py={2}>

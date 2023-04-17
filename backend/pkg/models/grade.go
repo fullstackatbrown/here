@@ -22,7 +22,7 @@ type CreateGradeRequest struct {
 	GradeID      string `json:"gradeid,omitempty"`
 	StudentID    string `json:"studentid"`
 	Grade        int    `json:"grade"`
-	GradedBy     string `json:"gradedBy"`
+	GradedBy     *User  `json:"gradedBy,omitempty"`
 }
 
 type UpdateGradeRequest struct {
@@ -30,7 +30,7 @@ type UpdateGradeRequest struct {
 	AssignmentID string `json:"assignmentid,omitempty"`
 	GradeID      string `json:"gradeid,omitempty"`
 	Grade        int    `json:"grade"`
-	GradedBy     string `json:"gradedBy"`
+	GradedBy     *User  `json:"gradedBy,omitempty"`
 }
 
 type DeleteGradeRequest struct {

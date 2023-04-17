@@ -1,7 +1,14 @@
+import AccessList from "@components/shared/AccessList/AccessList";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Button, Stack, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
+import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
+import { useCourseStaff } from "api/course/hooks";
+import ClipboardJS from 'clipboard';
 import { Course } from "model/course";
+import { CoursePermission } from "model/user";
+import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 
 export interface SettingsViewProps {
@@ -9,9 +16,24 @@ export interface SettingsViewProps {
 }
 
 export default function SettingsView({ course }: SettingsViewProps) {
+    const copyButtonRef = useRef(null);
+    const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
+    const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
+    const [adminInvites, adminInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseAdmin);
+    const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
+
+    const loading = staffLoading || adminLoading || adminInvitesLoading || staffInvitesLoading;
+
+    useEffect(() => {
+        if (copyButtonRef.current) {
+            new ClipboardJS(copyButtonRef.current, {
+                text: () => course.entryCode,
+            });
+        }
+    }, []);
 
     const changeAutoApproveRequests = () => {
-        toast.promise(CourseAPI.updateCourse(course.ID, undefined, undefined, undefined, !course.autoApproveRequests),
+        toast.promise(CourseAPI.updateCourse(course.ID, undefined, !course.autoApproveRequests),
             {
                 loading: "Updating course...",
                 success: "Course updated!",
@@ -27,18 +49,27 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     Settings
                 </Typography>
             </Stack>
-            <Stack direction="column" spacing={3} my={2}>
-                <Stack direction="column" maxWidth="70%">
-                    <Typography fontSize={16} fontWeight={500}>
-                        Course Entry Code: {course.entryCode}
-                    </Typography>
+            <Stack direction="column" spacing={4} my={2}>
+
+                <Stack direction="column">
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography fontWeight={500}>
+                            Course Entry Code:
+                        </Typography>
+                        <Button color="inherit" sx={{ paddingTop: 0, paddingBottom: 0, fontSize: 16 }} ref={copyButtonRef}>
+                            {course.entryCode}
+                            <ContentCopyIcon
+                                style={{ fontSize: 13, marginLeft: 5 }} />
+                        </Button>
+                    </Stack>
                     <Typography>
                         Students can join this course on Here using this code.
                     </Typography>
                 </Stack>
+
                 <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} mb={2}>
                     <Stack direction="column" maxWidth="70%">
-                        <Typography fontSize={16} fontWeight={500}>
+                        <Typography fontWeight={500}>
                             Auto-Approve Swap Requests: {course.autoApproveRequests ? "On" : "Off"}
                         </Typography>
                         <Typography>
@@ -49,7 +80,19 @@ export default function SettingsView({ course }: SettingsViewProps) {
                         Turn {course.autoApproveRequests ? "Off" : "On"}
                     </Button>
                 </Stack>
-            </Stack>
+
+                <Stack direction="column" spacing={1.5}>
+                    <Typography fontWeight={500}>
+                        Admin & Staff
+                    </Typography>
+
+                    {!loading &&
+                        <Stack spacing={0.5}>
+                            <AccessList access={CoursePermission.CourseAdmin} users={admin} emails={adminInvites} />
+                            <AccessList course={course} access={CoursePermission.CourseStaff} users={staff} emails={staffInvites} />
+                        </Stack>}
+                </Stack>
+            </Stack >
         </>
 
     )

@@ -14,28 +14,21 @@ import { User } from "model/user";
 import { useState } from "react";
 import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
 import StudentViewList from "./StudentViewList";
+import { useAssignmentsMap } from "api/assignment/hooks";
 
 export interface CourseStudentViewProps {
   course: Course;
+  student: User;
 }
 
-const student: User = {
-  ID: "2V5CjjV6Z7fbOAFwO2TI",
-  displayName: "Student Name",
-  email: "",
-  access: {},
-  courses: ["2dIFx5URWkWZjfL4D6Ta"],
-  defaultSection: { "2dIFx5URWkWZjfL4D6Ta": "Sunday,4:00AM,6:00PM,cit244" },
-  actualSection: { "2dIFx5URWkWZjfL4D6Ta": {} },
-}
-
-function CourseStudentView({ course }: CourseStudentViewProps) {
+function CourseStudentView({ course, student }: CourseStudentViewProps) {
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID)
+  const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID)
   const [survey, surveyLoading] = useSurvey(course.ID);
   const [surveyDialog, setSurveyDialog] = useState(false)
 
   const getAssignedSection = () => {
-    const defaultSection = student.defaultSection[course.ID]
+    const defaultSection = student.defaultSection?.[course.ID]
     if (defaultSection && defaultSection !== "" && sectionsMap) {
       const section = sectionsMap[defaultSection] as Section
       return formatSectionInfo(section)
@@ -85,7 +78,7 @@ function CourseStudentView({ course }: CourseStudentViewProps) {
             }
           </Stack>
           <Box height={40} />
-          <StudentViewList course={course} student={student} sectionsMap={sectionsMap} />
+          <StudentViewList {...{ course, student, sectionsMap, assignmentsMap }} />
         </Grid>
         <Grid xs={2} />
       </Grid>

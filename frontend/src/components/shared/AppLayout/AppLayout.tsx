@@ -1,27 +1,22 @@
-import React, { FC, ReactNode, useEffect, useState } from "react";
+import AccountMenu from "@components/shared/AccountMenu";
+import Button from "@components/shared/Button";
+import IconButton from "@components/shared/IconButton";
 import Navbar from "@components/shared/Navbar";
+import CloseIcon from "@mui/icons-material/Close";
 import {
-    Badge,
     Box,
     Container,
     Divider,
     Drawer,
-    Paper,
     Stack,
     Toolbar,
-    Typography,
+    Typography
 } from "@mui/material";
-import { Router } from "next/router";
-import AccountMenu from "@components/shared/AccountMenu";
-import CloseIcon from "@mui/icons-material/Close";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import AuthAPI, { Notification } from "api/auth/api";
 import { useAuth, useNotifications } from "api/auth/hooks";
-import Button from "@components/shared/Button";
-import IconButton from "@components/shared/IconButton";
-import NotificationItem from "../NotificationItem";
-import toast from "react-hot-toast";
 import Head from "next/head";
+import { Router } from "next/router";
+import { FC, ReactNode, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export interface AppLayoutProps {
     title?: string;
@@ -46,9 +41,9 @@ const AppLayout: FC<AppLayoutProps> = ({
     const { currentUser, isAuthenticated } = useAuth();
     const [notificationMenu, setNotificationMenu] = useState(false);
 
-    useNotifications(currentUser, (a: Notification) => {
-        toast.success(a.Title, { duration: 5000 });
-    });
+    // useNotifications(currentUser, (a: Notification) => {
+    //     toast.success(a.Title, { duration: 5000 });
+    // });
 
     // Bind page load events to pageLoading state so loading bar is displayed on navigation.
     useEffect(() => {
@@ -63,17 +58,17 @@ const AppLayout: FC<AppLayoutProps> = ({
         return <></>;
     }
 
-    const badgedNotificationIcon: JSX.Element =
-        currentUser?.notifications.length === 0 ? (
-            <NotificationsIcon />
-        ) : (
-            <Badge
-                badgeContent={currentUser?.notifications.length}
-                color="primary"
-            >
-                <NotificationsIcon />
-            </Badge>
-        );
+    // const badgedNotificationIcon: JSX.Element =
+    //     currentUser?.notifications.length === 0 ? (
+    //         <NotificationsIcon />
+    //     ) : (
+    //         <Badge
+    //             badgeContent={currentUser?.notifications.length}
+    //             color="primary"
+    //         >
+    //             <NotificationsIcon />
+    //         </Badge>
+    //     );
 
     const endItems = [
         <IconButton
@@ -81,7 +76,7 @@ const AppLayout: FC<AppLayoutProps> = ({
             label="Notifications"
             onClick={() => setNotificationMenu(true)}
         >
-            {badgedNotificationIcon}
+            {/* {badgedNotificationIcon} */}
         </IconButton>,
         <AccountMenu key="account" user={currentUser!} />,
     ];
@@ -100,8 +95,8 @@ const AppLayout: FC<AppLayoutProps> = ({
         endItems.reverse();
     }
 
-    const hasNotifications =
-        currentUser?.notifications && currentUser.notifications.length > 0;
+    // const hasNotifications =
+    //     currentUser?.notifications && currentUser.notifications.length > 0;
 
     return (
         <div>
@@ -141,7 +136,7 @@ const AppLayout: FC<AppLayoutProps> = ({
                         </Stack>
                     </Toolbar>
                     <Divider />
-                    <Box maxHeight="100%" overflow="auto" pb={16}>
+                    {/* <Box maxHeight="100%" overflow="auto" pb={16}>
                         {hasNotifications ? (
                             <Stack p={2} spacing={2}>
                                 {currentUser?.notifications &&
@@ -166,8 +161,8 @@ const AppLayout: FC<AppLayoutProps> = ({
                                 </Typography>
                             </div>
                         )}
-                    </Box>
-                    {hasNotifications && (
+                    </Box> */}
+                    {/* {hasNotifications && (
                         <Box position="absolute" width="100%" bottom={0}>
                             <Paper square>
                                 <Stack
@@ -187,7 +182,7 @@ const AppLayout: FC<AppLayoutProps> = ({
                                 </Stack>
                             </Paper>
                         </Box>
-                    )}
+                    )} */}
                 </Box>
             </Drawer>
             <Container maxWidth={maxWidth} sx={{ marginY: 10 }}>
