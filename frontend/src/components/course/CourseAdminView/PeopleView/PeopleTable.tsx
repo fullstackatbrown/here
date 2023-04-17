@@ -63,6 +63,12 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
             e.stopPropagation();
             const confirmed = confirm(`Are you sure you want to remove ${email} from this course?`);
             if (confirmed) {
+                toast.promise(CourseAPI.deleteStudent(course.ID, undefined, email), {
+                    loading: "Removing student...",
+                    success: "Student removed",
+                    error: (err) => handleBadRequestError(err),
+                })
+                    .catch(() => { })
             }
         }
     }
@@ -117,8 +123,8 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                         })}
                     {invitedStudents?.map((email) => {
                         return (
-                            <Tooltip title="Waiting for student to log in" placement="right">
-                                <TableRow key={email} hover>
+                            <Tooltip key={email} title="Waiting for student to log in" placement="right">
+                                <TableRow hover>
                                     <TableCell component="th" scope="row">
                                         Pending
                                     </TableCell>
