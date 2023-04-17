@@ -13,15 +13,28 @@ import ClassIcon from '@mui/icons-material/Class';
 
 interface CourseAdminViewNavigationProps {
   access: CoursePermission;
+  headerInView: boolean;
 }
 
 export default function CourseAdminViewNavigation({
-  access,
+  access, headerInView
 }: CourseAdminViewNavigationProps) {
   const router = useRouter();
   const { query } = router;
   const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
-  const [open, toggleOpen] = useState(false);
+  const [open, setOpen] = useState(true);
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
+
+  // useEffect(() => {
+  //     if (!headerInView) {
+  //         setOpen(false)
+  //     } else {
+  //         setOpen(true)
+  //     }
+  // }, [headerInView])
+
 
   function navigateTo(view: View) {
     return router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true });
@@ -43,7 +56,6 @@ export default function CourseAdminViewNavigation({
         color={query.view === view ? "inherit" : "secondary"}
         variant="text"
         onClick={() => {
-          toggleOpen(false);
           navigateTo(view);
         }}
       >
@@ -57,12 +69,37 @@ export default function CourseAdminViewNavigation({
   }
 
   return (
-    <Stack direction="column" spacing={1}>
-      {getNavigationButton("sections")}
-      {getNavigationButton("assignments")}
-      {getNavigationButton("people")}
-      {pendingRequests && getNavigationButton("requests", pendingRequests.length)}
-      {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
+    <Stack
+      sx={{
+        position: "fixed",
+        display: {
+          xs: "none",
+          md: "flex",
+        },
+        transform: open ? "translate3d(0, 0, 0)" : "translate3d(-130px, 0, 0)",
+        transition: "transform 0.5s ease-in-out",
+      }}
+      flexDirection="row"
+      alignItems="start"
+    >
+      <Stack direction="column" spacing={1}>
+        {getNavigationButton("sections")}
+        {getNavigationButton("assignments")}
+        {getNavigationButton("people")}
+        {pendingRequests && getNavigationButton("requests", pendingRequests.length)}
+        {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
+      </Stack>
+      {/* {open ?
+                    <Tooltip title="Hide Menu" placement="right">
+                        <IconButton onClick={toggleDrawer} sx={{ p: 0.5, ml: 2.5 }}>
+                            <KeyboardArrowLeftIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                    </Tooltip> :
+                    <Tooltip title="Show Menu" placement="right">
+                        <IconButton onClick={toggleDrawer} sx={{ p: 0.5, ml: 2.5 }}>
+                            <KeyboardArrowRightIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                    </Tooltip>} */}
     </Stack>
   )
 

@@ -60,7 +60,7 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
             <Stack
               spacing={{
                 xs: 0,
-                md: 2,
+                md: 2.5,
               }}
               direction={{ xs: "column", md: "row" }}
               sx={{
@@ -72,19 +72,19 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
                 fontWeight={400}
                 sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}
               >
-                <LocationOnIcon fontSize="small" /> {section.location || "TBD"}
+                Location: {section.location || "TBD"}
               </Typography>
               <Typography
                 variant="body2"
                 fontWeight={400}
                 sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}
               >
-                <PeopleIcon fontSize="small" /> {enrollment} / {section.capacity}
+                Enrollment: {enrollment} / {section.capacity}
               </Typography>
             </Stack>
           </Stack>
 
-          <Stack direction={{ xs: "column", md: "row" }} alignItems="center" justifyContent="center">
+          <Stack direction="row" alignItems="center" justifyContent="center">
             <IconButton onClick={handleEditSection} size={"small"}>
               <CreateIcon fontSize="small" />
             </IconButton>

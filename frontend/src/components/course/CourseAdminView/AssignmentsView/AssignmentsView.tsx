@@ -1,16 +1,13 @@
 import { Button, Stack, Typography } from "@mui/material";
-import listToMap from "@util/shared/listToMap";
-import { useAssignments } from "api/assignment/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
+import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
-import { FC, useEffect, useState } from "react";
-import AssignmentsTable from "./AssignmentsTable";
+import { FC, useState } from "react";
+import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
-import { Section } from "model/section";
-import AssignmentCard from "./AssignmentCard";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -53,7 +50,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
         }}
         course={course}
       />
-      <Stack direction="row" justifyContent="space-between" mb={1}>
+      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
         <Typography variant="h6" fontWeight={600}>
           Assignments
         </Typography>

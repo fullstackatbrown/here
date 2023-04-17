@@ -4,7 +4,8 @@ import {
   Box,
   Button,
   Collapse,
-  Stack
+  Stack,
+  Typography
 } from "@mui/material";
 import { useAssignmentsMap } from "api/assignment/hooks";
 import { useSectionsMap } from "api/section/hooks";
@@ -32,33 +33,40 @@ export default function RequestsView({ course, sectionsMap, assignmentsMap }: Re
   }, [pendingRequestsLoading]);
 
   return (
-    <Stack ml={-1} mt={-1}>
-      <Stack direction="row" justifyContent="space-between">
-        <Button
-          color="inherit" variant="text" sx={{ fontSize: 17 }}
-          startIcon={pendingRequestsOpen ? <ExpandMore /> : <KeyboardArrowRightIcon />}
-          onClick={() => setPendingRequestsOpen(!pendingRequestsOpen)}
-        >
-          Pending Requests
-        </Button>
+    <>
+      <Stack direction="row" justifyContent="space-between" mb={1}>
+        <Typography variant="h6" fontWeight={600}>
+          Requests
+        </Typography>
       </Stack>
-      <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
-        <RequestsList {...{ course, assignmentsMap, sectionsMap }} type="pending" requests={pendingRequests} />
-      </Collapse>
+      <Stack ml={-1}>
+        <Stack direction="row" justifyContent="space-between">
+          <Button
+            color="inherit" variant="text" sx={{ fontSize: 17 }}
+            startIcon={pendingRequestsOpen ? <ExpandMore /> : <KeyboardArrowRightIcon />}
+            onClick={() => setPendingRequestsOpen(!pendingRequestsOpen)}
+          >
+            Pending Requests
+          </Button>
+        </Stack>
+        <Collapse in={pendingRequestsOpen} timeout="auto" unmountOnExit>
+          <RequestsList {...{ course, assignmentsMap, sectionsMap }} type="pending" requests={pendingRequests} />
+        </Collapse>
 
-      <Box height={8} />
-      <Stack direction="row" justifyContent="space-between">
-        <Button
-          color="inherit" variant="text" sx={{ fontSize: 17 }}
-          startIcon={pastRequestsOpen ? <ExpandMore /> : <KeyboardArrowRightIcon />}
-          onClick={() => setPastRequestsOpen(!pastRequestsOpen)}
-        >
-          Past Requests
-        </Button>
-      </Stack>
-      <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
-        <RequestsList {...{ course, assignmentsMap, sectionsMap }} type="past" requests={pastRequests} />
-      </Collapse>
-    </Stack >
+        <Box height={8} />
+        <Stack direction="row" justifyContent="space-between">
+          <Button
+            color="inherit" variant="text" sx={{ fontSize: 17 }}
+            startIcon={pastRequestsOpen ? <ExpandMore /> : <KeyboardArrowRightIcon />}
+            onClick={() => setPastRequestsOpen(!pastRequestsOpen)}
+          >
+            Past Requests
+          </Button>
+        </Stack>
+        <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
+          <RequestsList {...{ course, assignmentsMap, sectionsMap }} type="past" requests={pastRequests} />
+        </Collapse>
+      </Stack >
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import CourseAdminView from "@components/course/CourseAdminView/CourseAdminView";
-import DesktopNavigation from "@components/course/CourseAdminView/Navigation/Desktop/DesktopNavigation";
 import CourseHeader from "@components/course/CourseHeader";
 import CourseStudentView from "@components/course/CourseStudentView/CourseStudentView";
 import AppLayout from "@components/shared/AppLayout";
@@ -31,31 +30,20 @@ export default function CoursePage() {
   return (
     <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
       {course && !courseLoading && (
-        <Grid container>
-          <Grid
-            xs={0.5}
-            sm={1}
-            md={2.2}
-            pl={2}
-            pt={20}
-          >
-            <DesktopNavigation access={access} headerInView={inView} courseCode={course.code} />
-          </Grid>
-          <Grid xs>
-            <Stack spacing={4} pt={4}>
+        <Stack pt={6} gap={4}>
+          <Grid container>
+            <Grid item xs={0.5} md={2.2} />
+            <Grid item xs={11.5} md={9.8}>
               <CourseHeader intersectionRef={ref} course={course} />
-              {access ? <CourseAdminView headerInView={inView} course={course} access={access} /> :
-                <CourseStudentView course={course} student={currentUser} />}
-            </Stack>
+            </Grid>
           </Grid>
-          <Grid
-            xs={0.5}
-            sm={router.query.view === "requests" ? 0.5 : 1}
-            md={router.query.view === "requests" ? 0.5 : 2.2}
-          />
-        </Grid>
-
+          {access ? (
+            <CourseAdminView headerInView={inView} course={course} access={access} />
+          ) : (
+            <CourseStudentView course={course} student={currentUser} />
+          )}
+        </Stack>
       )}
     </AppLayout>
-  );
+  )
 }

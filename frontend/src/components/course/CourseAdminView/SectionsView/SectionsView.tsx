@@ -7,6 +7,7 @@ import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
 import { Section } from "model/section";
+import ViewHeader from "../ViewHeader/ViewHeader";
 
 export interface SectionsViewProps {
   course: Course;
@@ -42,9 +43,10 @@ const SectionsView: FC<SectionsViewProps> = ({
         courseID={course.ID}
       />
       <Stack direction="row" justifyContent="space-between" mb={1}>
-        <Typography variant="h6" fontWeight={600}>
+        <ViewHeader view="sections" views={["sections", "assignments"]} expandable />
+        {/* <Typography variant="h6" fontWeight={600}>
           Sections
-        </Typography>
+        </Typography> */}
         {/* Only course admin can add sections */}
         {access === CoursePermission.CourseAdmin && (
           <Button onClick={() => setcreateSectionDialog(true)}>+ New</Button>
