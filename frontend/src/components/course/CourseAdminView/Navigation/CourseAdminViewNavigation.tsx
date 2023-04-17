@@ -1,4 +1,4 @@
-import { Badge, Button, Stack, buttonClasses } from "@mui/material";
+import { Badge, Box, Button, Stack, Typography, buttonClasses } from "@mui/material";
 import { capitalizeFirstLetter } from "@util/shared/string";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
@@ -48,6 +48,10 @@ export default function CourseAdminViewNavigation({
         }}
       >
         {capitalizeFirstLetter(view)}
+        {requestsLength && requestsLength > 0 &&
+          <Typography color="primary" sx={{ fontSize: 14, fontWeight: query.view === view ? 800 : 500 }}>
+            &nbsp;&nbsp;({requestsLength})
+          </Typography>}
       </Button >
     );
   }
@@ -57,23 +61,7 @@ export default function CourseAdminViewNavigation({
       {getNavigationButton("sections")}
       {getNavigationButton("assignments")}
       {getNavigationButton("people")}
-      {pendingRequests && pendingRequests.length > 0 ? (
-        <Badge
-          key="request-badge"
-          color="primary"
-          badgeContent={pendingRequests.length}
-          sx={{
-            "& .MuiBadge-badge": {
-              right: 0,
-              top: "50%",
-            },
-          }}
-        >
-          {getNavigationButton("requests")}
-        </Badge>
-      ) : (
-        getNavigationButton("requests")
-      )}
+      {pendingRequests && getNavigationButton("requests", pendingRequests.length)}
       {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
     </Stack>
   )

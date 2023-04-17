@@ -47,7 +47,6 @@ export default function CoursePage() {
               {access ? <CourseAdminView headerInView={inView} course={course} access={access} /> :
                 <CourseStudentView course={course} student={currentUser} />}
             </Stack>
-
           </Grid>
           <Grid
             xs={0.5}
