@@ -48,13 +48,20 @@ export function parseCourses(data: string): [Record<string, string> | undefined,
 }
 
 export function parseTerm(term: string): [string | undefined, string | undefined] {
-    const [season, year] = term.split(" ");
+    const formatRe = new RegExp(/\b(fall|winter|spring|summer)\s?(\d{4})\b/, "gmi");
+    if(!term.match(formatRe)) {
+        return [undefined, "Invalid term format"]
+    }
+
+    // Convert the iterator from finding groups to an array and assign season/year
+    let foundGroups = Array.from(formatRe.exec(term));
+    const [season, year] = [foundGroups[1], foundGroups[2]];
     if (!season || !year) {
         return [undefined, "Invalid term format"];
     }
 
     // Validate season using regex
-    if (!/^(fall|winter|spring|summer)$/.test(season)) {
+    if (!/^(fall|winter|spring|summer)$/.test(season.toLowerCase())) {
         return [undefined, "Invalid season"];
     }
 
@@ -64,7 +71,7 @@ export function parseTerm(term: string): [string | undefined, string | undefined
         return [undefined, `Year must be at least ${currentYear}`];
     }
 
-    const formattedTerm = `${season} ${year}`;
+    const formattedTerm = `${season.toLowerCase()} ${year}`;
     return [formattedTerm, undefined];
 }
 
