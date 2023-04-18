@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import PeopleTable from "./PeopleTable";
 import { Assignment } from "model/assignment";
 import { CoursePermission } from "model/user";
+import ViewHeader from "../ViewHeader/ViewHeader";
 
 export interface PeopleViewProps {
   course: Course;
@@ -21,7 +22,7 @@ export interface PeopleViewProps {
   assignmentsMap: Record<string, Assignment>;
 }
 
-export default function PeopleView({ course, sectionsMap, assignmentsMap }: PeopleViewProps) {
+export default function PeopleView({ course, access, sectionsMap, assignmentsMap }: PeopleViewProps) {
   const sections = Object.values(sectionsMap)
   const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
@@ -56,9 +57,10 @@ export default function PeopleView({ course, sectionsMap, assignmentsMap }: Peop
   return (
     <>
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
-        <Typography variant="h6" fontWeight={600}>
+        <ViewHeader view="people" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+        {/* <Typography variant="h6" fontWeight={600}>
           People
-        </Typography>
+        </Typography> */}
         <Stack direction="row" alignItems="center">
           <SelectMenu
             value={filterBySection}

@@ -8,6 +8,7 @@ import { FC, useState } from "react";
 import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
+import ViewHeader from "../ViewHeader/ViewHeader";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -51,9 +52,10 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
         course={course}
       />
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
-        <Typography variant="h6" fontWeight={600}>
+        <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+        {/* <Typography variant="h6" fontWeight={600}>
           Assignments
-        </Typography>
+        </Typography> */}
         {access === CoursePermission.CourseAdmin && (
           <Button onClick={() => setCreateAssignmentDialog(true)}>+ New</Button>
         )}

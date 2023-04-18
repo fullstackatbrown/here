@@ -10,6 +10,7 @@ import { Course } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
+import ViewHeader from "../ViewHeader/ViewHeader";
 
 export interface SettingsViewProps {
     course: Course;
@@ -45,9 +46,10 @@ export default function SettingsView({ course }: SettingsViewProps) {
     return (
         <>
             <Stack direction="row" justifyContent="space-between" mb={1}>
-                <Typography variant="h6" fontWeight={600}>
+                <ViewHeader view="settings" views={["sections", "assignments", "people", "requests", "settings"]} access={CoursePermission.CourseAdmin} />
+                {/* <Typography variant="h6" fontWeight={600}>
                     Settings
-                </Typography>
+                </Typography> */}
             </Stack>
             <Stack direction="column" spacing={4} my={2}>
 

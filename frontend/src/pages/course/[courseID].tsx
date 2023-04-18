@@ -32,8 +32,8 @@ export default function CoursePage() {
       {course && !courseLoading && (
         <Stack pt={6} gap={4}>
           <Grid container>
-            <Grid item xs={0.5} md={2.2} />
-            <Grid item xs={11.5} md={9.8}>
+            <Grid item xs={0.5} md={2.5} />
+            <Grid item xs={11.5} md={9.5}>
               <CourseHeader intersectionRef={ref} course={course} />
             </Grid>
           </Grid>

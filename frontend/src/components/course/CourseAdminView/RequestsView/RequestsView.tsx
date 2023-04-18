@@ -4,25 +4,25 @@ import {
   Box,
   Button,
   Collapse,
-  Stack,
-  Typography
+  Stack
 } from "@mui/material";
-import { useAssignmentsMap } from "api/assignment/hooks";
-import { useSectionsMap } from "api/section/hooks";
 import { usePastSwaps, usePendingSwaps } from "api/swaps/hooks";
-import { Course } from "model/course";
-import { useEffect, useState } from "react";
-import RequestsList from "./RequestsList";
 import { Assignment } from "model/assignment";
+import { Course } from "model/course";
 import { Section } from "model/section";
+import { useEffect, useState } from "react";
+import ViewHeader from "../ViewHeader/ViewHeader";
+import RequestsList from "./RequestsList";
+import { CoursePermission } from "model/user";
 
 export interface RequestsViewProps {
   course: Course;
+  access: CoursePermission;
   sectionsMap: Record<string, Section>;
   assignmentsMap: Record<string, Assignment>;
 }
 
-export default function RequestsView({ course, sectionsMap, assignmentsMap }: RequestsViewProps) {
+export default function RequestsView({ course, access, sectionsMap, assignmentsMap }: RequestsViewProps) {
   const [pendingRequests, pendingRequestsLoading] = usePendingSwaps(course.ID);
   const [pendingRequestsOpen, setPendingRequestsOpen] = useState(!pendingRequestsLoading);
   const [pastRequests, pastRequestsLoading] = usePastSwaps(course.ID);
@@ -35,9 +35,10 @@ export default function RequestsView({ course, sectionsMap, assignmentsMap }: Re
   return (
     <>
       <Stack direction="row" justifyContent="space-between" mb={1}>
-        <Typography variant="h6" fontWeight={600}>
+        <ViewHeader view="requests" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+        {/* <Typography variant="h6" fontWeight={600}>
           Requests
-        </Typography>
+        </Typography> */}
       </Stack>
       <Stack ml={-1}>
         <Stack direction="row" justifyContent="space-between">

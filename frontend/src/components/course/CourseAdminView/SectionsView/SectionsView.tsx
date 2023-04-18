@@ -43,7 +43,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         courseID={course.ID}
       />
       <Stack direction="row" justifyContent="space-between" mb={1}>
-        <ViewHeader view="sections" views={["sections", "assignments"]} expandable />
+        <ViewHeader view="sections" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {/* <Typography variant="h6" fontWeight={600}>
           Sections
         </Typography> */}

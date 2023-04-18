@@ -5,10 +5,12 @@ import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
 import { capitalizeFirstLetter } from "@util/shared/string";
+import { useRouter } from "next/router";
 
 interface ViewHeaderProps {
     view: View;
     views: View[];
+    access: CoursePermission;
 }
 
 const StyledMenu = styled((props: MenuProps) => (
@@ -34,9 +36,10 @@ const StyledMenu = styled((props: MenuProps) => (
     },
 }));
 
-const ViewHeader: FC<ViewHeaderProps> = ({ view, views }) => {
+const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const router = useRouter();
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -44,8 +47,8 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views }) => {
         setAnchorEl(null);
     };
 
-    function navigate(view: View) {
-
+    function navigateTo(view: View) {
+        return router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true });
     }
 
     return (
@@ -67,7 +70,8 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views }) => {
                 sx={{ display: { md: "none" } }}
             >
                 {views.map((view) => {
-                    return <MenuItem sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigate(view)} >
+                    if (view === "settings" && access !== CoursePermission.CourseAdmin) return <></>;
+                    return <MenuItem sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigateTo(view)} >
                         {capitalizeFirstLetter(view)}
                     </MenuItem>
                 })}

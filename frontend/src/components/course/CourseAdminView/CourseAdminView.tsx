@@ -34,7 +34,7 @@ export default function CourseAdminView({ course, access, headerInView }: Course
 
   return (
     <Grid container>
-      <Grid item xs={0.5} md={2.2} pt={1} sx={{
+      <Grid item xs={0.5} md={2.5} pt={1} sx={{
         [theme.breakpoints.up('md')]: {
           paddingLeft: 10,
         },
@@ -49,7 +49,7 @@ export default function CourseAdminView({ course, access, headerInView }: Course
               <AssignmentsView {...{ course, access, sectionsMap, assignmentsMap }} />
             )}
             {router.query.view === "people" && <PeopleView {...{ course, access, sectionsMap, assignmentsMap }} />}
-            {router.query.view === "requests" && <RequestsView {...{ course, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "requests" && <RequestsView {...{ course, access, sectionsMap, assignmentsMap }} />}
             {router.query.view === "settings" &&
               (access === CoursePermission.CourseAdmin ? (
                 <SettingsView course={course} />
