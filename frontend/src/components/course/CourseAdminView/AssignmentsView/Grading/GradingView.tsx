@@ -1,18 +1,15 @@
 import GradeChip from '@components/shared/GradeChip/GradeChip';
 import SearchBar from '@components/shared/SearchBar/SearchBar';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { IconButton, Stack, Table, TableBody, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { Stack, Table, TableBody, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import formatSectionInfo from '@util/shared/formatSectionInfo';
 import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
 import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
-import listToMap from '@util/shared/listToMap';
 import GradeAPI from 'api/grades/api';
 import { useGradesForAssignment } from 'api/grades/hooks';
-import { useSections } from 'api/section/hooks';
 import { Assignment } from 'model/assignment';
 import { Course, CourseUserData } from 'model/course';
 import { Section } from 'model/section';
@@ -132,6 +129,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
             <Stack
                 direction={{ xs: "column", md: "row" }}
                 alignItems={{ xs: "start", md: "center" }}
+                spacing={{ xs: 1, md: 0 }}
                 justifyContent="space-between"
                 mb={1}
             >
@@ -140,59 +138,62 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
                         {assignment.name}
                     </Typography>
                 </Stack>
-                <Stack direction="row" alignItems="center">
+                <Stack direction="row" alignItems="center" spacing={1}>
                     <SelectMenu
                         value={filterBySection}
                         formatOption={formatOptions}
                         options={sectionOptions()}
                         onSelect={(val) => setFilterBySection(val)}
+                        defaultValue={ALL_STUDENTS}
                     />
                     <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                 </Stack>
             </Stack >
-            <Table>
-                <colgroup>
-                    <col width="40%" />
-                    <col width="30%" />
-                    <col width="30%" />
-                </colgroup>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Student</TableCell>
-                        <TableCell>Grade</TableCell>
-                        <TableCell>Graded by</TableCell>
-                    </TableRow>
-                </TableHead>
-                <ClickAwayListener onClickAway={() => setEditGrade(null)}>
-                    <TableBody>
-                        {currentStudentsDisplayed
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((student) => {
-                                const userID = student.studentID
-                                const grade = grades && userID in grades ? grades[userID] : undefined
-                                return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
-                                    <TableCell component="th" scope="row">
-                                        {course.students && course.students[userID] && course.students[userID].displayName}
-                                    </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        <GradeChip
-                                            score={grade ? grade.grade : undefined}
-                                            maxScore={assignment.maxScore}
-                                            editable={editGrade && editGrade === userID}
-                                            handleCreateGrade={handleSubmitGrade(userID)}
-                                            handleUpdateGrade={grade ? handleUpdateGrade(grade.ID, userID) : undefined}
-                                            handleDeleteGrade={grade ? handleDeleteGrade(grade.ID) : undefined}
-                                        />
-                                    </TableCell>
-                                    <TableCell component="th" scope="row">
-                                        {grade ? grade.gradedBy : "/"}
-                                    </TableCell>
-                                </TableRow>
-                            }
-                            )}
-                    </TableBody>
-                </ClickAwayListener>
-            </Table>
+            {currentStudentsDisplayed.length === 0 ?
+                <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
+                (<Table>
+                    <colgroup>
+                        <col width="40%" />
+                        <col width="30%" />
+                        <col width="30%" />
+                    </colgroup>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Student</TableCell>
+                            <TableCell>Grade</TableCell>
+                            <TableCell>Graded by</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <ClickAwayListener onClickAway={() => setEditGrade(null)}>
+                        <TableBody>
+                            {currentStudentsDisplayed
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((student) => {
+                                    const userID = student.studentID
+                                    const grade = grades && userID in grades ? grades[userID] : undefined
+                                    return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
+                                        <TableCell component="th" scope="row">
+                                            {course.students && course.students[userID] && course.students[userID].displayName}
+                                        </TableCell>
+                                        <TableCell component="th" scope="row">
+                                            <GradeChip
+                                                score={grade ? grade.grade : undefined}
+                                                maxScore={assignment.maxScore}
+                                                editable={editGrade && editGrade === userID}
+                                                handleCreateGrade={handleSubmitGrade(userID)}
+                                                handleUpdateGrade={grade ? handleUpdateGrade(grade.ID, userID) : undefined}
+                                                handleDeleteGrade={grade ? handleDeleteGrade(grade.ID) : undefined}
+                                            />
+                                        </TableCell>
+                                        <TableCell component="th" scope="row">
+                                            {grade ? grade.gradedBy : "/"}
+                                        </TableCell>
+                                    </TableRow>
+                                }
+                                )}
+                        </TableBody>
+                    </ClickAwayListener>
+                </Table>)}
             {
                 currentStudentsDisplayed.length > rowsPerPage && <TablePagination
                     rowsPerPageOptions={[]}

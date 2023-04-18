@@ -1,29 +1,45 @@
-import { Button, MenuItem, Divider, styled, MenuProps, Menu, alpha, Typography } from "@mui/material";
-import { FC, useState } from "react";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Button, Menu, MenuItem, MenuProps, PopoverOrigin, Theme, buttonClasses, styled, useMediaQuery, useTheme } from "@mui/material";
+import { FC, useState } from "react";
 
 interface SelectMenuProps {
     value: string;
     options: string[];
     onSelect: (value: string) => void;
     formatOption: (value: string) => string;
+    defaultValue?: string;
 }
 
-const StyledMenu = styled((props: MenuProps) => (
-    <Menu
-        elevation={0}
-        anchorOrigin={{
+const StyledMenu = styled((props: MenuProps) => {
+    const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+    const anchorOrigin: PopoverOrigin = isXsScreen
+        ? {
+            vertical: 'bottom',
+            horizontal: 'left',
+        }
+        : {
             vertical: 'bottom',
             horizontal: 'right',
-        }}
-        transformOrigin={{
+        };
+    const transformOrigin: PopoverOrigin = isXsScreen
+        ? {
+            vertical: 'top',
+            horizontal: 'left',
+        }
+        : {
             vertical: 'top',
             horizontal: 'right',
-        }}
+        };
+
+    return <Menu
+        elevation={0}
+        anchorOrigin={anchorOrigin}
+        transformOrigin={transformOrigin}
         {...props}
     />
-))(({ theme }) => ({
+})(({ theme }) => ({
     '& .MuiPaper-root': {
+        marginTop: 8,
         borderRadius: 6,
         minWidth: 180,
         boxShadow:
@@ -31,9 +47,10 @@ const StyledMenu = styled((props: MenuProps) => (
     },
 }));
 
-const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOption }) => {
+const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOption, defaultValue }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const theme = useTheme();
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -46,8 +63,20 @@ const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOptio
             variant="text"
             disableElevation
             onClick={handleClick}
-            endIcon={<KeyboardArrowDownIcon />}
-            sx={{ py: 0.3 }}
+            endIcon={<KeyboardArrowDownIcon sx={{ ml: -.5 }} />}
+            color={defaultValue !== undefined && value === defaultValue ? "secondary" : "primary"}
+            sx={{
+                py: 0.2,
+                px: 1.2,
+                border: { xs: ".5px solid", md: "none" },
+                borderRadius: 4,
+                fontSize: 14,
+                fontWeight: 500,
+                [`& .${buttonClasses.endIcon} > *:nth-of-type(1)`]: {
+                    fontSize: "15px"
+                },
+            }}
+            disableRipple
         >
             {formatOption(value)}
         </Button>
@@ -55,7 +84,6 @@ const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOptio
             anchorEl={anchorEl}
             open={open}
             onClose={handleClose}
-
         >
             {options.map((val) => {
                 return <MenuItem sx={{ fontSize: 14 }} value={val} key={val} onClick={() => onSelect(val)} >

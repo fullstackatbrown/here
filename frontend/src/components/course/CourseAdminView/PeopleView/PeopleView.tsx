@@ -4,16 +4,13 @@ import { Stack, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
-import listToMap from "@util/shared/listToMap";
-import { useAssignments } from "api/assignment/hooks";
-import { useSections } from "api/section/hooks";
+import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
-import { useEffect, useState } from "react";
-import PeopleTable from "./PeopleTable";
-import { Assignment } from "model/assignment";
 import { CoursePermission } from "model/user";
+import { useState } from "react";
 import ViewHeader from "../ViewHeader/ViewHeader";
+import PeopleTable from "./PeopleTable";
 
 export interface PeopleViewProps {
   course: Course;
@@ -61,12 +58,13 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         {/* <Typography variant="h6" fontWeight={600}>
           People
         </Typography> */}
-        <Stack direction="row" alignItems="center">
+        <Stack direction="row" alignItems="center" spacing={1}>
           <SelectMenu
             value={filterBySection}
             formatOption={formatOptions}
             options={sectionOptions()}
             onSelect={(val) => setFilterBySection(val)}
+            defaultValue={ALL_STUDENTS}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </Stack>
