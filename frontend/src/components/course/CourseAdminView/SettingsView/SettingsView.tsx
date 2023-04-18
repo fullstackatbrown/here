@@ -69,8 +69,13 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     </Typography>
                 </Stack>
 
-                <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} mb={2}>
-                    <Stack direction="column" maxWidth="70%">
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    alignItems={{ xs: "start", md: "center" }}
+                    justifyContent="space-between"
+                    spacing={2} mb={2}
+                >
+                    <Stack direction="column" maxWidth={{ md: "70%" }}>
                         <Typography fontWeight={500}>
                             Auto-Approve Swap Requests: {course.autoApproveRequests ? "On" : "Off"}
                         </Typography>
