@@ -19,7 +19,6 @@ export interface AssignmentCardProps {
 const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardProps) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
   const theme = useTheme();
-  const betweenSmalltoMid = useMediaQuery(theme.breakpoints.between("xs", "md"));
 
   const handleEditAssignment = (assignment: Assignment) => {
     return (e: React.MouseEvent<HTMLElement>) => {
@@ -52,7 +51,7 @@ const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardPr
         course={course}
         assignment={editAssignmentDialog}
       />
-      <Card sx={{ ":hover": { boxShadow: 2 } }} variant={"outlined"}>
+      <Card sx={{ ":hover": { boxShadow: 2 } }} variant={"outlined"} onClick={() => { handleNavigate(assignment.ID) }}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>
             <Typography variant="body2" noWrap>

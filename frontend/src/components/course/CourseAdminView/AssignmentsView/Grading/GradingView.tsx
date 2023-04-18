@@ -129,11 +129,13 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
 
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" mb={1} ml={-4.5} alignItems="center">
-                <Stack direction="row" spacing={1} alignItems="center">
-                    <IconButton size="small" sx={{ p: 0.5 }} onClick={handleNavigateBack}>
-                        <ArrowBackIcon sx={{ fontSize: 18 }} />
-                    </IconButton>
+            <Stack
+                direction={{ xs: "column", md: "row" }}
+                alignItems={{ xs: "start", md: "center" }}
+                justifyContent="space-between"
+                mb={1}
+            >
+                <Stack direction="row">
                     <Typography variant="h6" fontWeight={600}>
                         {assignment.name}
                     </Typography>
