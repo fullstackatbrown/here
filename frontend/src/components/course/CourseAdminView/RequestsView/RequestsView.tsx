@@ -36,9 +36,6 @@ export default function RequestsView({ course, access, sectionsMap, assignmentsM
     <>
       <Stack direction="row" justifyContent="space-between" mb={1}>
         <ViewHeader view="requests" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
-        {/* <Typography variant="h6" fontWeight={600}>
-          Requests
-        </Typography> */}
       </Stack>
       <Stack ml={-1}>
         <Stack direction="row" justifyContent="space-between">

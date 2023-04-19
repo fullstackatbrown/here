@@ -3,7 +3,7 @@ export interface Grade {
   studentID: string;
   grade: number;
   gradedBy: string;
-  timeUpdated: Date;
+  timeUpdated: string;
   assignmentID: string;
   courseID: string;
 }

@@ -35,7 +35,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
     // Display specific assignment page
     return (
       <GradingView
-        {...{ course, sectionsMap }}
+        {...{ course, sectionsMap, access }}
         assignment={assignmentsMap[query.id as string]}
         handleNavigateBack={handleNavigateBack}
       />
@@ -53,9 +53,6 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
       />
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
         <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
-        {/* <Typography variant="h6" fontWeight={600}>
-          Assignments
-        </Typography> */}
         {access === CoursePermission.CourseAdmin && (
           <Button onClick={() => setCreateAssignmentDialog(true)}>+ New</Button>
         )}

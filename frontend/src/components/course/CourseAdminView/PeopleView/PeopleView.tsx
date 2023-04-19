@@ -1,6 +1,6 @@
 import SearchBar from "@components/shared/SearchBar/SearchBar";
 import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
@@ -55,9 +55,6 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     <>
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
         <ViewHeader view="people" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
-        {/* <Typography variant="h6" fontWeight={600}>
-          People
-        </Typography> */}
         <Stack direction="row" alignItems="center" spacing={1}>
           <SelectMenu
             value={filterBySection}
@@ -72,7 +69,9 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
       {!course.students || Object.keys(course.students).length === 0 ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&
-          <PeopleTable {...{ course, assignments, sectionsMap }} students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} />)
+          <Box overflow="scroll">
+            <PeopleTable {...{ course, assignments, sectionsMap }} students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} />
+          </Box>)
 
       }
     </>

@@ -1,9 +1,9 @@
 import GradeChip from '@components/shared/GradeChip/GradeChip';
 import SearchBar from '@components/shared/SearchBar/SearchBar';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import { Stack, Table, TableBody, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { Stack, Table, TableBody, TableHead, TablePagination, TableRow, Typography, useMediaQuery } from '@mui/material';
 import MuiTableCell from "@mui/material/TableCell";
-import { styled } from "@mui/material/styles";
+import { Theme, styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import formatSectionInfo from '@util/shared/formatSectionInfo';
 import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
@@ -16,9 +16,12 @@ import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
+import ViewHeader from '../../ViewHeader/ViewHeader';
+import { CoursePermission } from 'model/user';
 
 interface GradingViewProps {
     course: Course;
+    access: CoursePermission;
     assignment: Assignment;
     sectionsMap: Record<string, Section>;
     handleNavigateBack: () => void;
@@ -36,8 +39,9 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, handleNavigateBack }) => {
+const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, access, handleNavigateBack }) => {
     const sections = Object.values(sectionsMap)
+    const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const [grades, gradesLoading] = useGradesForAssignment(course.ID, assignment.ID)
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
@@ -126,6 +130,9 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
 
     return (
         <>
+            <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" display={{ xs: "block", md: "none" }}>
+                <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+            </Stack>
             <Stack
                 direction={{ xs: "column", md: "row" }}
                 alignItems={{ xs: "start", md: "center" }}
@@ -134,9 +141,11 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
                 mb={1}
             >
                 <Stack direction="row">
-                    <Typography variant="h6" fontWeight={600}>
-                        {assignment.name}
-                    </Typography>
+                    <Typography
+                        variant="h6"
+                        fontWeight={600}
+                        fontSize={isXsScreen && 15}
+                    >{assignment.name}</Typography>
                 </Stack>
                 <Stack direction="row" alignItems="center" spacing={1}>
                     <SelectMenu
@@ -152,16 +161,17 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
             {currentStudentsDisplayed.length === 0 ?
                 <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
                 (<Table>
-                    <colgroup>
-                        <col width="40%" />
-                        <col width="30%" />
-                        <col width="30%" />
-                    </colgroup>
+                    {!isXsScreen &&
+                        <colgroup>
+                            <col width="40%" />
+                            <col width="30%" />
+                            <col width="30%" />
+                        </colgroup>}
                     <TableHead>
                         <TableRow>
                             <TableCell>Student</TableCell>
                             <TableCell>Grade</TableCell>
-                            <TableCell>Graded by</TableCell>
+                            {!isXsScreen && <TableCell>Graded on</TableCell>}
                         </TableRow>
                     </TableHead>
                     <ClickAwayListener onClickAway={() => setEditGrade(null)}>
@@ -185,9 +195,9 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ha
                                                 handleDeleteGrade={grade ? handleDeleteGrade(grade.ID) : undefined}
                                             />
                                         </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {grade ? grade.gradedBy : "/"}
-                                        </TableCell>
+                                        {!isXsScreen && <TableCell component="th" scope="row">
+                                            {grade ? new Date(grade.timeUpdated).toLocaleDateString() : "/"}
+                                        </TableCell>}
                                     </TableRow>
                                 }
                                 )}

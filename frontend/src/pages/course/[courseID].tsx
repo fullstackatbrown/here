@@ -30,7 +30,7 @@ export default function CoursePage() {
   return (
     <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
       {course && !courseLoading && (
-        <Stack pt={6} gap={4}>
+        <Stack pt={{ xs: 3, md: 6 }} gap={4}>
           <Grid container>
             <Grid item xs={0.5} md={2.5} />
             <Grid item xs={11.5} md={9.5}>

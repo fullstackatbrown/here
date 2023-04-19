@@ -41,7 +41,7 @@ export default function CourseAdminView({ course, access, headerInView }: Course
       }}>
         <CourseAdminViewNavigation access={access} headerInView={headerInView} />
       </Grid>
-      <Grid xs>
+      <Grid xs={11} md={7.3}>
         {router.query.view && sectionsMap && assignmentsMap && (
           <>
             {router.query.view === "sections" && <SectionsView {...{ course, access, sectionsMap }} />}

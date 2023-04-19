@@ -47,9 +47,6 @@ export default function SettingsView({ course }: SettingsViewProps) {
         <>
             <Stack direction="row" justifyContent="space-between" mb={1}>
                 <ViewHeader view="settings" views={["sections", "assignments", "people", "requests", "settings"]} access={CoursePermission.CourseAdmin} />
-                {/* <Typography variant="h6" fontWeight={600}>
-                    Settings
-                </Typography> */}
             </Stack>
             <Stack direction="column" spacing={4} my={2}>
 
