@@ -1,6 +1,6 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import CreateIcon from "@mui/icons-material/Create";
-import { Box, Chip, IconButton, Stack, Table, TableBody, TableHead, TableRow, useMediaQuery } from "@mui/material";
+import { Box, Chip, IconButton, Stack, Table, TableBody, TableHead, TableRow } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
 import { styled, useTheme } from "@mui/material/styles";
 import { sortAssignments } from "@util/shared/assignments";
@@ -33,7 +33,6 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 const AssignmentsTable: FC<AssignmentsTableProps> = ({ course, assignments, handleNavigate }) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
   const theme = useTheme();
-  const betweenSmalltoMid = useMediaQuery(theme.breakpoints.between("xs", "md"));
 
   const handleEditAssignment = (assignment: Assignment) => {
     return (e: React.MouseEvent<HTMLElement>) => {

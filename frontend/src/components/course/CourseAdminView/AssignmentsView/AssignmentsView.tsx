@@ -9,6 +9,7 @@ import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
 import ViewHeader from "../ViewHeader/ViewHeader";
+import AssignmentsTable from "./AssignmentsTable";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -51,7 +52,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
         }}
         course={course}
       />
-      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
+      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
         <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {access === CoursePermission.CourseAdmin && (
           <Button onClick={() => setCreateAssignmentDialog(true)}>+ New</Button>
@@ -64,6 +65,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
             : "No assignment has been added yet."}
         </Typography>
       )}
+      {/* {assignments?.length > 0 && <AssignmentsTable {...{ course, assignments }} handleNavigate={handleNavigate} />} */}
       {assignments &&
         assignments.map((assignment) => (
           <AssignmentCard key={assignment.ID} course={course} assignment={assignment} handleNavigate={handleNavigate} />

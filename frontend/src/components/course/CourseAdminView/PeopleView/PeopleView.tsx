@@ -53,7 +53,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
 
   return (
     <>
-      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
+      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
         <ViewHeader view="people" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         <Stack direction="row" alignItems="center" spacing={1}>
           <SelectMenu
