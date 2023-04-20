@@ -1,3 +1,4 @@
+import MoreMenu from "@components/shared/Menu/MoreMenu";
 import { Button, Stack, Typography } from "@mui/material";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -5,11 +6,10 @@ import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
 import { FC, useState } from "react";
+import ViewHeader from "../ViewHeader/ViewHeader";
 import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
-import ViewHeader from "../ViewHeader/ViewHeader";
-import AssignmentsTable from "./AssignmentsTable";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -43,6 +43,9 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
     );
   }
 
+  const ExportGrades = () => {
+  }
+
   return (
     <>
       <CreateEditAssignmentDialog
@@ -55,7 +58,12 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
         <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {access === CoursePermission.CourseAdmin && (
-          <Button onClick={() => setCreateAssignmentDialog(true)}>+ New</Button>
+          <Stack direction="row">
+            <Button onClick={() => setCreateAssignmentDialog(true)}>
+              + New
+            </Button>
+            <MoreMenu keys={["Export Grades"]} handlers={[ExportGrades]} />
+          </Stack>
         )}
       </Stack>
       {assignments?.length == 0 && (

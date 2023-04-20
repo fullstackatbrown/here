@@ -15,7 +15,7 @@ import { Course, CourseUserData } from 'model/course';
 import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import SelectMenu from '../../../../shared/SelectMenu/SelectMenu';
+import SelectMenu from '../../../../shared/Menu/SelectMenu';
 import ViewHeader from '../../ViewHeader/ViewHeader';
 import { CoursePermission } from 'model/user';
 

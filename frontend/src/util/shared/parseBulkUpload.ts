@@ -1,4 +1,4 @@
-import { SinglePermissionRequest } from "model/course";
+import { AddPermissionRequest } from "model/course";
 import { formatCourseCode, formatCourseName, validateCourseCode, validateEmail } from "./string";
 import { CoursePermission } from "model/user";
 
@@ -48,13 +48,21 @@ export function parseCourses(data: string): [Record<string, string> | undefined,
 }
 
 export function parseTerm(term: string): [string | undefined, string | undefined] {
-    const [season, year] = term.split(" ");
+    const formatRe = new RegExp(/\b(fall|winter|spring|summer)\s?(\d{4})\b/, "gmi");
+    if (!term.match(formatRe)) {
+        return [undefined, "Invalid term format"]
+    }
+
+    // Convert the iterator from finding groups to an array and assign season/year
+    let foundGroups = Array.from(formatRe.exec(term));
+    const [season, year] = [foundGroups[1], foundGroups[2]];
     if (!season || !year) {
         return [undefined, "Invalid term format"];
     }
 
+    const seasonLowered = season.toLowerCase()
     // Validate season using regex
-    if (!/^(fall|winter|spring|summer)$/.test(season)) {
+    if (!/^(fall|winter|spring|summer)$/.test(seasonLowered)) {
         return [undefined, "Invalid season"];
     }
 
@@ -64,7 +72,7 @@ export function parseTerm(term: string): [string | undefined, string | undefined
         return [undefined, `Year must be at least ${currentYear}`];
     }
 
-    const formattedTerm = `${season} ${year}`;
+    const formattedTerm = `${seasonLowered} ${year}`;
     return [formattedTerm, undefined];
 }
 
@@ -77,12 +85,12 @@ export function parseTerm(term: string): [string | undefined, string | undefined
 // 4. course code must be a valid course code, i.e. can be found in the courses Record
 // 5. one email cannot have two roles for the same course
 
-// Returns a map from coursecode to a list of SinglePermissionRequest, or an error message if any
-export function parseStaffData(data: string, courses: Record<string, string>): [Record<string, SinglePermissionRequest[]> | undefined, string | undefined] {
+// Returns a map from coursecode to a list of AddPermissionRequest, or an error message if any
+export function parseStaffData(data: string, courses: Record<string, string>): [Record<string, AddPermissionRequest[]> | undefined, string | undefined] {
 
     const lines = data.split("\n");
-    const staff: Record<string, SinglePermissionRequest> = {};
-    const permissionsByCourse: Record<string, SinglePermissionRequest[]> = {};
+    const staff: Record<string, AddPermissionRequest> = {};
+    const permissionsByCourse: Record<string, AddPermissionRequest[]> = {};
     for (const line of lines) {
         const [email, role, courseCode] = line.split(",");
         // Ignore line if any field is empty

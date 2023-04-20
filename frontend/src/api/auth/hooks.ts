@@ -202,7 +202,7 @@ export function useCourseInvites(courseID: string, permission: CoursePermission)
             });
 
         return () => unsubscribe();
-    }, [courseID]);
+    }, [courseID, permission]);
 
     return [invites, loading];
 }

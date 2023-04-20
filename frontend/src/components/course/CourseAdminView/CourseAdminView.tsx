@@ -1,4 +1,6 @@
 import { Grid, Typography, useTheme } from "@mui/material";
+import { useAssignmentsMap } from "api/assignment/hooks";
+import { useSectionsMap } from "api/section/hooks";
 import { Course } from "model/course";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
@@ -9,8 +11,6 @@ import PeopleView from "./PeopleView/PeopleView";
 import RequestsView from "./RequestsView/RequestsView";
 import SectionsView from "./SectionsView/SectionsView";
 import SettingsView from "./SettingsView/SettingsView";
-import { useSections, useSectionsMap } from "api/section/hooks";
-import { useAssignmentsMap } from "api/assignment/hooks";
 
 export interface CourseAdminViewProps {
   course: Course;

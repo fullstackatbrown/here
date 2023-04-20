@@ -38,7 +38,7 @@ const AddAdminButton: FC<AddAdminButtonProps> = ({ }) => {
                 AddAdminButtonRef.current.blur();
                 setShowAddAccessTextfield(false)
             })
-            .catch(() => { })
+            .catch(() => { reset() })
     })
 
     return (

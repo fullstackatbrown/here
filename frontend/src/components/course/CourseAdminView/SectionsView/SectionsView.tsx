@@ -1,13 +1,12 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { useSections } from "api/section/hooks";
 import { Course } from "model/course";
+import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
+import ViewHeader from "../ViewHeader/ViewHeader";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
-import { Section } from "model/section";
-import ViewHeader from "../ViewHeader/ViewHeader";
 
 export interface SectionsViewProps {
   course: Course;

@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 const (
 	FirestoreProfilesCollection = "user_profiles"
 )
@@ -12,11 +14,19 @@ const (
 	CourseStudent CoursePermission = "student"
 )
 
-type PermissionInvite struct {
+type Invite struct {
 	Email      string           `firestore:"email"`
 	CourseID   string           `firestore:"courseID,omitempty"`
 	Permission CoursePermission `firestore:"permission,omitempty"`
 	IsAdmin    bool             `firestore:"isAdmin,omitempty"`
+}
+
+func CreateCourseInviteID(email string, courseID string) string {
+	return fmt.Sprintf("%s,%s", email, courseID)
+}
+
+func CreateSiteAdminInviteID(email string) string {
+	return fmt.Sprintf("%s,siteadmin", email)
 }
 
 // Profile is a collection of standard profile information for a user.

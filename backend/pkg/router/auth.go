@@ -99,7 +99,7 @@ func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	req.User = user
 
-	course, internalError, requestError := repo.Repository.ValidateJoinCourseRequest(req)
+	course, internalError, requestError := repo.Repository.HandleJoinCourseRequest(req)
 	if internalError != nil {
 		http.Error(w, internalError.Error(), http.StatusInternalServerError)
 		return
@@ -109,14 +109,8 @@ func joinCourseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	course, err = repo.Repository.JoinCourse(user, course)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	w.WriteHeader(200)
-	w.Write([]byte("Successfully joined course " + course.ID))
+	w.Write([]byte("Successfully joined course " + course.Code))
 }
 
 func quitCourseHandler(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +129,7 @@ func quitCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.User = user
 
-	err = repo.Repository.QuitCourse(req)
+	err = repo.Repository.HandleQuitCourseRequest(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -154,7 +148,11 @@ func editAdminAccessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = repo.Repository.EditAdminAccess(req)
+	wasAdmin, err := repo.Repository.EditAdminAccess(req)
+	if wasAdmin {
+		http.Error(w, "Already an admin", http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

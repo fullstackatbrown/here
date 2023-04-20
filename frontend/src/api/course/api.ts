@@ -1,5 +1,6 @@
 import APIClient from "api/APIClient";
-import { Course, SinglePermissionRequest, createCourseAndPermissionsRequest } from "model/course";
+import { AddPermissionRequest, Course, createCourseAndPermissionsRequest } from "model/course";
+import { CoursePermission } from "model/user";
 
 
 async function getCourse(courseID: string): Promise<Course> {
@@ -49,22 +50,45 @@ async function updateCourseInfo(
 
 async function addPermission(
   courseID: string,
-  permissions: SinglePermissionRequest[],
+  email: string,
+  permission: CoursePermission,
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}/permissions/add`, { permissions });
+  return APIClient.patch(`/courses/${courseID}/permissions/add`, { email, permission });
 }
 
 async function revokePermission(
   courseID: string,
-  userID: string,
+  userID?: string,
+  email?: string
 ): Promise<boolean> {
-  return APIClient.patch(`/courses/${courseID}/permissions/revoke`, { userID });
+  return APIClient.patch(`/courses/${courseID}/permissions/revoke`, { userID, email });
+}
+
+async function addStudent(
+  courseID: string,
+  email: string
+): Promise<string> {
+  return APIClient.patch(`/courses/${courseID}/permissions/addStudent`, { email });
+}
+
+async function bulkAddStudent(
+  courseID: string,
+  emails: string[]
+): Promise<string> {
+  return APIClient.patch(`/courses/${courseID}/permissions/bulkAddStudent`, { emails });
+}
+
+async function deleteStudent(
+  courseID: string,
+  userID?: string,
+  email?: string
+): Promise<boolean> {
+  return APIClient.patch(`/courses/${courseID}/permissions/deleteStudent`, { userID, email });
 }
 
 async function bulkUpload(
   requests: createCourseAndPermissionsRequest[],
 ): Promise<string> {
-  console.log(requests)
   return APIClient.post(`/courses/bulkUpload`, { requests });
 }
 
@@ -77,6 +101,9 @@ const CourseAPI = {
   addPermission,
   revokePermission,
   bulkUpload,
+  addStudent,
+  bulkAddStudent,
+  deleteStudent,
 };
 
 export default CourseAPI;

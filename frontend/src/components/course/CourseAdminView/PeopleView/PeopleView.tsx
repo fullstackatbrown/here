@@ -1,16 +1,19 @@
+import SelectMenu from "@components/shared/Menu/SelectMenu";
 import SearchBar from "@components/shared/SearchBar/SearchBar";
-import SelectMenu from "@components/shared/SelectMenu/SelectMenu";
 import { Box, Stack, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
+import { useCourseInvites } from "api/auth/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useState } from "react";
+import MoreMenu from "../../../shared/Menu/MoreMenu";
 import ViewHeader from "../ViewHeader/ViewHeader";
 import PeopleTable from "./PeopleTable";
+import AddStudentDialog from "./AddStudentDialog";
 
 export interface PeopleViewProps {
   course: Course;
@@ -24,6 +27,8 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
+  const [invitedStudents, invitedStudentsLoading] = useCourseInvites(course.ID, CoursePermission.CourseStudent)
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
@@ -51,8 +56,20 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     return studentIDs.map((studentID) => course.students[studentID])
   }
 
+  const addStudent = () => {
+    setAddStudentDialogOpen(true)
+  }
+
+  const exportStudentList = () => {
+  }
+
+  const hasNoStudent = () => {
+    return (!course.students || Object.keys(course.students).length === 0) && (invitedStudentsLoading || invitedStudents.length === 0)
+  }
+
   return (
     <>
+      <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
       <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
         <ViewHeader view="people" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         <Stack direction="row" alignItems="center" spacing={1}>
@@ -64,15 +81,19 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
             defaultValue={ALL_STUDENTS}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[addStudent, exportStudentList]} />}
         </Stack>
       </Stack >
-      {!course.students || Object.keys(course.students).length === 0 ?
+      {invitedStudents && hasNoStudent() ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&
           <Box overflow="scroll">
-            <PeopleTable {...{ course, assignments, sectionsMap }} students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)} />
+            <PeopleTable
+              {...{ course, assignments, sectionsMap }}
+              students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+              invitedStudents={invitedStudents}
+            />
           </Box>)
-
       }
     </>
   );
