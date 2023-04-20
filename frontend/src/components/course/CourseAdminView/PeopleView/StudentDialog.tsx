@@ -1,8 +1,9 @@
 import StudentGradesTable from "@components/course/CourseStudentView/Grades/StudentGradesTable";
 import {
+    Box,
     Dialog,
     DialogContent,
-    DialogTitle, Stack, Typography
+    DialogTitle, Grid, Stack, Typography
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { useAssignments } from "api/assignment/hooks";
@@ -40,14 +41,16 @@ const StudentDialogDialog: FC<StudentDialogDialogProps> = ({ course, studentID, 
         onClose();
     };
 
-    return student && <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
-        <DialogTitle>{student.displayName} </DialogTitle>
+    return student && <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="md" keepMounted={false}>
+        <DialogTitle>{student.displayName} ({student.email})</DialogTitle>
         <DialogContent>
-            <Typography>{student.email}</Typography>
-            <Typography>Regular Section: {student.defaultSection?.[course.ID] || "Unassigned"}</Typography>
+            <Typography fontSize={15}>
+                <Box component="span" fontWeight={500}>Regular Section:</Box>&nbsp;
+                {student.defaultSection?.[course.ID] || "Unassigned"}
+            </Typography>
             <StudentGradesTable course={course} student={student} assignments={assignments} sectionsMap={sectionsMap} />
         </DialogContent>
-    </Dialog>;
+    </Dialog >;
 };
 
 export default StudentDialogDialog;
