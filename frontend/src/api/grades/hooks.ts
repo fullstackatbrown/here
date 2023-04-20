@@ -1,4 +1,4 @@
-import { collection, collectionGroup, doc, documentId, endAt, getFirestore, onSnapshot, orderBy, query, startAt, where } from "@firebase/firestore";
+import { collection, collectionGroup, doc, documentId, endAt, getFirestore, onSnapshot, orderBy, query, startAt, where, getDocs } from "@firebase/firestore";
 import { FirestoreCoursesCollection, FirestoreGradesCollection, FirestoreAssignmentsCollection } from "api/firebaseConst";
 import { Grade } from "model/grades";
 import { useEffect, useState } from "react";
@@ -56,3 +56,34 @@ export function useGradesForAssignment(courseID: string, assignmentID: string): 
 
     return [grades, loading];
 }
+
+export function getGradesForAssignment(courseID: string, assignmentID: string): Record<string, Grade> {
+    const db = getFirestore();
+    const res: Record<string, Grade> = {};
+    getDocs(collection(db, FirestoreCoursesCollection, courseID, FirestoreAssignmentsCollection,
+        assignmentID, FirestoreGradesCollection)).then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const g = { ID: doc.id, ...doc.data() } as Grade;
+                res[g.studentID] = g;
+            });
+        });
+    return res;
+}
+
+// var docRef = db.collection("cities").doc("SF");
+
+// // Valid options for source are 'server', 'cache', or
+// // 'default'. See https://firebase.google.com/docs/reference/js/firebase.firestore.GetOptions
+// // for more information.
+// var getOptions = {
+//     source: 'cache'
+// };
+
+// // Get a document, forcing the SDK to fetch from the offline cache.
+// docRef.get(getOptions).then((doc) => {
+//     // Document was found in the cache. If no cached document exists,
+//     // an error will be returned to the 'catch' block below.
+//     console.log("Cached document data:", doc.data());
+// }).catch((error) => {
+//     console.log("Error getting cached document:", error);
+// });

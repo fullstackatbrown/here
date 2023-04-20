@@ -14,6 +14,7 @@ import MoreMenu from "../../../shared/Menu/MoreMenu";
 import ViewHeader from "../ViewHeader/ViewHeader";
 import PeopleTable from "./PeopleTable";
 import AddStudentDialog from "./AddStudentDialog";
+import { exportStudentList } from "@util/shared/export";
 
 export interface PeopleViewProps {
   course: Course;
@@ -56,11 +57,12 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     return studentIDs.map((studentID) => course.students[studentID])
   }
 
-  const addStudent = () => {
+  const handleAddStudent = () => {
     setAddStudentDialogOpen(true)
   }
 
-  const exportStudentList = () => {
+  const handleExportStudentList = () => {
+    exportStudentList(course, invitedStudents)
   }
 
   const hasNoStudent = () => {
@@ -81,7 +83,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
             defaultValue={ALL_STUDENTS}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[addStudent, exportStudentList]} />}
+          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[handleAddStudent, handleExportStudentList]} />}
         </Stack>
       </Stack >
       {invitedStudents && hasNoStudent() ?

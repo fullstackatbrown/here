@@ -10,6 +10,7 @@ import ViewHeader from "../ViewHeader/ViewHeader";
 import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
+import { exportGrades } from "@util/shared/export";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -38,12 +39,8 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
       <GradingView
         {...{ course, sectionsMap, access }}
         assignment={assignmentsMap[query.id as string]}
-        handleNavigateBack={handleNavigateBack}
       />
     );
-  }
-
-  const ExportGrades = () => {
   }
 
   return (
@@ -62,7 +59,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
             <Button onClick={() => setCreateAssignmentDialog(true)}>
               + New
             </Button>
-            <MoreMenu keys={["Export Grades"]} handlers={[ExportGrades]} />
+            <MoreMenu keys={["Export Grades"]} handlers={[() => { exportGrades(course, assignments) }]} />
           </Stack>
         )}
       </Stack>

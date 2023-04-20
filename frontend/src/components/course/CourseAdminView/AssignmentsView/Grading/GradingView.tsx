@@ -24,7 +24,6 @@ interface GradingViewProps {
     access: CoursePermission;
     assignment: Assignment;
     sectionsMap: Record<string, Section>;
-    handleNavigateBack: () => void;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -39,8 +38,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, access, handleNavigateBack }) => {
-    const sections = Object.values(sectionsMap)
+const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, access }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const [grades, gradesLoading] = useGradesForAssignment(course.ID, assignment.ID)
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
