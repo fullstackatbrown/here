@@ -40,6 +40,7 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 
 	swap := &models.Swap{
 		StudentID:    req.User.ID,
+		StudentName:  req.User.DisplayName,
 		AssignmentID: req.AssignmentID,
 		OldSectionID: req.OldSectionID,
 		NewSectionID: req.NewSectionID,

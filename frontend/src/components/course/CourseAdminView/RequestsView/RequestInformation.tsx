@@ -1,4 +1,4 @@
-import { Box, Table, TableBody, TableCell, TableRow, styled, useTheme } from "@mui/material";
+import { Box, Stack, Table, TableBody, TableCell, TableRow, Typography, styled, useTheme } from "@mui/material";
 import formatSectionInfo, { formatSectionCapacity } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
@@ -34,28 +34,38 @@ const RequestInformation: FC<RequestInformationProps> = ({ request, oldSection, 
     }
 
     return <Table>
-        <colgroup>
-            <col width="15%" />
-            <col width="85%" />
-        </colgroup>
-        <TableBody>
+        <Stack direction="column" spacing={1}>
             {Object.keys(information).map((key) => {
                 const [availableSeats, availableSeatsString] = formatSectionCapacity(newSection, assignment?.ID)
-                return <TableRow key={key}>
-                    <StyledTableCell component="th" scope="row">
-                        {key}
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
+                return <Stack direction="row" key={key}>
+                    <Box minWidth={100}>
+                        <Typography color="secondary" fontSize={14}>{key}</Typography>
+                    </Box>
+                    <Typography color="secondary" fontSize={14}>
                         {information[key]}
                         {key === "New Section" &&
                             <Box component="span" color={availableSeats <= 0 ? theme.palette.error.main : "inherit"}>
                                 &nbsp;({availableSeatsString})
                             </Box>
                         }
-                    </StyledTableCell>
-                </TableRow>
+                    </Typography>
+                </Stack>
+
+                // <TableRow key={key}>
+                //     <StyledTableCell component="th" scope="row">
+                //         {key}
+                //     </StyledTableCell>
+                //     <StyledTableCell component="th" scope="row">
+                //         {information[key]}
+                //         {key === "New Section" &&
+                //             <Box component="span" color={availableSeats <= 0 ? theme.palette.error.main : "inherit"}>
+                //                 &nbsp;({availableSeatsString})
+                //             </Box>
+                //         }
+                //     </StyledTableCell>
+                // </TableRow>
             })}
-        </TableBody>
+        </Stack>
     </Table>
 }
 

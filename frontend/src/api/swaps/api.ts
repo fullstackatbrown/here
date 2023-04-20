@@ -31,10 +31,9 @@ async function updateSwap(
 async function handleSwap(
   courseID: string,
   swapID: string,
-  status: string,
-  handledBy: string
+  status: string
 ): Promise<Swap> {
-  return APIClient.patch(`/courses/${courseID}/swaps/${swapID}/handle`, { status, handledBy });
+  return APIClient.patch(`/courses/${courseID}/swaps/${swapID}/handle`, { status });
 }
 
 async function cancelSwap(courseID: string, swapID: string): Promise<boolean> {

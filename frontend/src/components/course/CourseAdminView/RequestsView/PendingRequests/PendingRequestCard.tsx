@@ -3,7 +3,7 @@ import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Collapse, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
@@ -33,6 +33,7 @@ const PendingRequest: FC<PendingRequestProps> = ({
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const theme = useTheme();
+  const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,12 +49,12 @@ const PendingRequest: FC<PendingRequestProps> = ({
         px={1}
         py={0.5}
         onClick={() => setExpanded(!expanded)}
-        onMouseEnter={() => setHover(true)}
+        onMouseEnter={() => !isXsScreen && setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
         <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-          <Stack direction="row" spacing={4} alignItems="center" py={0.5}>
-            <Stack direction="row" spacing={1} width={320} alignItems="center">
+          <Stack direction="row" spacing={4} alignItems="center" py={{ xs: 1, md: 0.5 }}>
+            <Stack direction="row" spacing={1} width={{ md: 280 }} alignItems="center">
               <Box width={17} display="flex" alignItems="center">
                 {expanded ? (
                   <ExpandMore sx={{ fontSize: 16 }} />
@@ -62,15 +63,14 @@ const PendingRequest: FC<PendingRequestProps> = ({
                 )}
               </Box>
               {/* TODO: handle exceptionally long string */}
-              {/* TODO: get student name */}
               <Typography sx={{ fontSize: 15 }}>
-                {student?.displayName} - {assignment ? "One Time" : "Permanent"}
+                {request.studentName} - {assignment ? "One Time" : "Permanent"}
               </Typography>
             </Stack>
-            {!expanded && (
+            {!expanded && !isXsScreen && (
               <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
                 {formatSectionInfo(oldSection, true)}
-                &nbsp;&nbsp;{"➙"}&nbsp;&nbsp;
+                &nbsp;&nbsp;{"→"}&nbsp;&nbsp;
                 {formatSectionInfo(newSection, true)}&nbsp;
                 {getSectionAvailableSeats(newSection, assignment?.ID) <= 0 && (
                   <Box component="span" color={theme.palette.error.main}>
@@ -80,37 +80,39 @@ const PendingRequest: FC<PendingRequestProps> = ({
               </Typography>
             )}
           </Stack>
-          {hover ? (
-            <Stack direction="row" display="flex" alignItems="center">
-              <Tooltip title="approve">
-                <IconButton
-                  sx={{ fontSize: "small", p: 0.5, color: "inherit" }}
-                  onClick={onClickHandleSwap("approved")}
-                >
-                  <CheckIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="deny">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={onClickHandleSwap("denied")}>
-                  <CloseIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="archive">
-                <IconButton
-                  sx={{ fontSize: "small", p: 0.5, color: "inherit" }}
-                  onClick={onClickHandleSwap("archived")}
-                >
-                  <ArchiveOutlinedIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          ) : (
-            <Typography color="secondary" fontSize={14}>
-              {formatRequestTime(request)}
-            </Typography>
-          )}
+          <Box display="flex" width={80} justifyContent="flex-end">
+            {hover || expanded ? (
+              <Stack direction="row" display="flex" alignItems="center" spacing={{ xs: 0.5, md: 0 }}>
+                <Tooltip title="approve" disableTouchListener>
+                  <IconButton
+                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
+                    onClick={onClickHandleSwap("approved")}
+                  >
+                    <CheckIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="deny" disableTouchListener>
+                  <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickHandleSwap("denied")}>
+                    <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="archive" disableTouchListener>
+                  <IconButton
+                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
+                    onClick={onClickHandleSwap("archived")}
+                  >
+                    <ArchiveOutlinedIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            ) : (
+              <Typography color="secondary" fontSize={14}>
+                {formatRequestTime(request)}
+              </Typography>
+            )}
+          </Box>
         </Stack>
-      </Box>
+      </Box >
       <Collapse in={expanded}>
         <Box ml={4} mt={1} mb={2}>
           <RequestInformation {...{ request, student, assignment, oldSection, newSection }} />

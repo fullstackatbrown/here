@@ -25,12 +25,12 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
 
   const handleSwap = (request: Swap, status: SwapStatus) => {
     toast
-      .promise(SwapAPI.handleSwap(course.ID, request.ID, status, "test_TA"), {
+      .promise(SwapAPI.handleSwap(course.ID, request.ID, status), {
         loading: "Updating request...",
         success: "Request updated!",
         error: (err) => handleBadRequestError(err),
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -88,7 +88,7 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             );
           })}
 
-        {requests.length > 0 && (
+        {rowsPerPage != -1 && requests.length > rowsPerPage && (
           <TablePagination
             rowsPerPageOptions={[5, 10, 15, { label: "All", value: -1 }]}
             count={requests.length}

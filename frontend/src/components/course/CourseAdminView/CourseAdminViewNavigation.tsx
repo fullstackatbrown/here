@@ -41,6 +41,7 @@ export default function CourseAdminViewNavigation({
   }
 
   function getNavigationButton(view: View, requestsLength?: number) {
+    console.log(requestsLength)
     return (
       <Button
         key={view}
@@ -60,10 +61,11 @@ export default function CourseAdminViewNavigation({
         }}
       >
         {capitalizeFirstLetter(view)}
-        {requestsLength && requestsLength > 0 &&
+        {requestsLength !== undefined && requestsLength > 0 &&
           <Typography color="primary" sx={{ fontSize: 14, fontWeight: query.view === view ? 800 : 500 }}>
             &nbsp;&nbsp;({requestsLength})
-          </Typography>}
+          </Typography>
+        }
       </Button >
     );
   }
