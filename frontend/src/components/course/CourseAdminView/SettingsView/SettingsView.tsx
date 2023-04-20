@@ -10,6 +10,7 @@ import { Course } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
+import ViewHeader from "../ViewHeader/ViewHeader";
 
 export interface SettingsViewProps {
     course: Course;
@@ -44,10 +45,8 @@ export default function SettingsView({ course }: SettingsViewProps) {
 
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" mb={1}>
-                <Typography variant="h6" fontWeight={600}>
-                    Settings
-                </Typography>
+            <Stack direction="row" justifyContent="space-between" mb={1} height={40}>
+                <ViewHeader view="settings" views={["sections", "assignments", "people", "requests", "settings"]} access={CoursePermission.CourseAdmin} />
             </Stack>
             <Stack direction="column" spacing={4} my={2}>
 
@@ -67,8 +66,13 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     </Typography>
                 </Stack>
 
-                <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} mb={2}>
-                    <Stack direction="column" maxWidth="70%">
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    alignItems={{ xs: "start", md: "center" }}
+                    justifyContent="space-between"
+                    spacing={2} mb={2}
+                >
+                    <Stack direction="column" maxWidth={{ md: "70%" }}>
                         <Typography fontWeight={500}>
                             Auto-Approve Swap Requests: {course.autoApproveRequests ? "On" : "Off"}
                         </Typography>

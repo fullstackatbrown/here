@@ -30,7 +30,7 @@ type ServerConfig struct {
 
 func DefaultDevelopmentConfig() *ServerConfig {
 	return &ServerConfig{
-		AllowedOrigins:          []string{"http://localhost:3000"},
+		AllowedOrigins:          []string{"http://localhost:3000", "http://jennyyu.local:3000"},
 		AllowedEmailDomains:     []string{"brown.edu", "gmail.com"},
 		IsHTTPS:                 false,
 		SessionCookieName:       "here-session",

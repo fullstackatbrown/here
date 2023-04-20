@@ -1,6 +1,6 @@
 import SelectMenu from "@components/shared/Menu/SelectMenu";
 import SearchBar from "@components/shared/SearchBar/SearchBar";
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
@@ -11,8 +11,9 @@ import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
-import AddStudentDialog from "./AddStudentDialog";
+import ViewHeader from "../ViewHeader/ViewHeader";
 import PeopleTable from "./PeopleTable";
+import AddStudentDialog from "./AddStudentDialog";
 
 export interface PeopleViewProps {
   course: Course;
@@ -22,6 +23,7 @@ export interface PeopleViewProps {
 }
 
 export default function PeopleView({ course, access, sectionsMap, assignmentsMap }: PeopleViewProps) {
+  const sections = Object.values(sectionsMap)
   const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
@@ -68,16 +70,15 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   return (
     <>
       <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
-      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center">
-        <Typography variant="h6" fontWeight={600}>
-          People
-        </Typography>
-        <Stack direction="row" alignItems="center">
+      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
+        <ViewHeader view="people" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+        <Stack direction="row" alignItems="center" spacing={1}>
           <SelectMenu
             value={filterBySection}
             formatOption={formatOptions}
             options={sectionOptions()}
             onSelect={(val) => setFilterBySection(val)}
+            defaultValue={ALL_STUDENTS}
           />
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[addStudent, exportStudentList]} />}
@@ -86,11 +87,13 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
       {invitedStudents && hasNoStudent() ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&
-          <PeopleTable
-            {...{ course, assignments, sectionsMap }}
-            students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
-            invitedStudents={invitedStudents}
-          />)
+          <Box overflow="scroll">
+            <PeopleTable
+              {...{ course, assignments, sectionsMap }}
+              students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+              invitedStudents={invitedStudents}
+            />
+          </Box>)
       }
     </>
   );

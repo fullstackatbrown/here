@@ -3,6 +3,7 @@ import { Course } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
+import ViewHeader from "../ViewHeader/ViewHeader";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
@@ -13,7 +14,11 @@ export interface SectionsViewProps {
   sectionsMap: Record<string, Section>;
 }
 
-const SectionsView: FC<SectionsViewProps> = ({ course, access, sectionsMap }) => {
+const SectionsView: FC<SectionsViewProps> = ({
+  course,
+  access,
+  sectionsMap,
+}) => {
   const sections = Object.values(sectionsMap);
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
 
@@ -27,42 +32,43 @@ const SectionsView: FC<SectionsViewProps> = ({ course, access, sectionsMap }) =>
       }
     });
     return count;
-  }
+  };
 
   return (
     <>
-      <CreateEditSectionDialog open={createSectionDialog} onClose={() => setcreateSectionDialog(false)} courseID={course.ID}
+      <CreateEditSectionDialog
+        open={createSectionDialog}
+        onClose={() => setcreateSectionDialog(false)}
+        courseID={course.ID}
       />
-      <Stack direction="row" justifyContent="space-between" mb={1}>
-        <Typography variant="h6" fontWeight={600}>
-          Sections
-        </Typography>
+      <Stack direction="row" justifyContent="space-between" mb={1} height={40}>
+        <ViewHeader view="sections" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {/* Only course admin can add sections */}
-        {access === CoursePermission.CourseAdmin &&
-          <Button onClick={() => setcreateSectionDialog(true)}>
-            + New
-          </Button>
-        }
+        {access === CoursePermission.CourseAdmin && (
+          <Button onClick={() => setcreateSectionDialog(true)}>+ New</Button>
+        )}
       </Stack>
-      {sections?.length == 0 &&
+      {sections?.length == 0 && (
         <Typography textAlign="center" mt={3}>
-          {access === CoursePermission.CourseAdmin ?
-            "Add the first section here" :
-            "No section has been added yet."
-          }
+          {access === CoursePermission.CourseAdmin
+            ? "Add the first section here"
+            : "No section has been added yet."}
         </Typography>
-      }
+      )}
       <Stack direction="column" spacing={2} mb={5}>
-        {sections?.map((s) =>
-          <SectionCard key={s.ID} section={s} enrollment={getEnrollment(s.ID)} />)
-        }
+        {sections?.map((s) => (
+          <SectionCard
+            key={s.ID}
+            section={s}
+            enrollment={getEnrollment(s.ID)}
+          />
+        ))}
       </Stack>
-      {access === CoursePermission.CourseAdmin && sections && sections.length > 0 &&
-        <AvailabilitySurvey {...{ course, sections }} />
-      }
+      {access === CoursePermission.CourseAdmin &&
+        sections &&
+        sections.length > 0 && <AvailabilitySurvey {...{ course, sections }} />}
     </>
   );
-}
-
+};
 
 export default SectionsView;

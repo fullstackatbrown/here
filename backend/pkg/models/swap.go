@@ -16,6 +16,7 @@ const (
 type Swap struct {
 	ID           string        `firestore:"id,omitempty"`
 	StudentID    string        `firestore:"studentID"`
+	StudentName  string        `firestore:"studentName"`
 	OldSectionID string        `firestore:"oldSectionID"`
 	NewSectionID string        `firestore:"newSectionID"`
 	AssignmentID string        `firestore:"assignmentID"`

@@ -20,23 +20,20 @@ export interface RequestsListProps {
 }
 
 const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsMap, type, requests }) => {
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(type === "pending" ? -1 : 5);
 
   const handleSwap = (request: Swap, status: SwapStatus) => {
-    toast.promise(SwapAPI.handleSwap(course.ID, request.ID, status, "test_TA"),
-      {
+    toast
+      .promise(SwapAPI.handleSwap(course.ID, request.ID, status), {
         loading: "Updating request...",
         success: "Request updated!",
         error: (err) => handleBadRequestError(err),
       })
-      .catch(() => { })
-  }
+      .catch(() => { });
+  };
 
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
-  ) => {
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
@@ -45,52 +42,67 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
     setPage(0);
   };
 
-
   return (
-    requests &&
-    <Stack direction="column">
-      {requests.length === 0 &&
-        (type === "pending" ?
-          <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You've handled all requests in your inbox!</Typography> :
-          <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">You have no past requests</Typography>)
-      }
-      {assignmentsMap && sectionsMap &&
-        (rowsPerPage > 0
-          ? sortRequestsByTime(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          : sortRequestsByTime(requests)
-        )
-          .map((r) => {
+    requests && (
+      <Stack direction="column">
+        {requests.length === 0 &&
+          (type === "pending" ? (
+            <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">
+              You&apos;ve handled all requests in your inbox!
+            </Typography>
+          ) : (
+            <Typography variant="body1" ml={1} mr={4} mt={2} textAlign="center">
+              You have no past requests
+            </Typography>
+          ))}
+        {assignmentsMap &&
+          sectionsMap &&
+          (rowsPerPage > 0
+            ? sortRequestsByTime(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : sortRequestsByTime(requests)
+          ).map((r) => {
             const student = course.students[r.studentID];
             const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;
             const oldSection = r.oldSectionID ? sectionsMap[r.oldSectionID] : undefined;
             const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
             // TODO: mark the request as archived if student is no longer enrolled in the course
             // right now it's just not displayed and the count of requests would be off
-            return student && (type === "pending" ?
+            return type === "pending" ? (
               <PendingRequest
                 key={`request${r.ID}`}
-                request={r} student={student} assignment={assignment}
-                oldSection={oldSection} newSection={newSection}
-                handleSwap={handleSwap} /> :
+                request={r}
+                student={student}
+                assignment={assignment}
+                oldSection={oldSection}
+                newSection={newSection}
+                handleSwap={handleSwap}
+              />
+            ) : (
               <PastRequest
                 key={`request${r.ID}`}
-                request={r} student={student} assignment={assignment}
-                oldSection={oldSection} newSection={newSection}
-                handleSwap={handleSwap} />)
+                request={r}
+                student={student}
+                assignment={assignment}
+                oldSection={oldSection}
+                newSection={newSection}
+                handleSwap={handleSwap}
+              />
+            );
           })}
 
-      {rowsPerPage != -1 && requests.length > rowsPerPage &&
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 15, { label: 'All', value: -1 }]}
-          count={requests.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          sx={{ border: "none", padding: 0 }}
-        />
-      }
-    </Stack>
+        {rowsPerPage != -1 && requests.length > rowsPerPage && (
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 15, { label: "All", value: -1 }]}
+            count={requests.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{ border: "none", padding: 0 }}
+          />
+        )}
+      </Stack>
+    )
   );
 };
 

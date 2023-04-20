@@ -8,6 +8,7 @@ export type SwapStatus =
 export interface Swap {
   ID: string;
   studentID: string;
+  studentName: string;
   oldSectionID: string;
   newSectionID: string;
   requestTime: Date;

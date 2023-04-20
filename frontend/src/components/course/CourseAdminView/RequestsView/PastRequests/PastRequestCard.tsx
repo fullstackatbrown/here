@@ -1,4 +1,4 @@
-import { Box, Collapse, IconButton, ListItemButton, Stack, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Collapse, IconButton, ListItemButton, Stack, TableRow, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
 import RequestStatusChip from "../RequestStatusChip";
@@ -24,6 +24,7 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
   const [hover, setHover] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const theme = useTheme();
+  const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -40,11 +41,11 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
         px={1}
         py={0.5}
         onClick={() => setExpanded(!expanded)}
-        onMouseEnter={() => setHover(true)}
+        onMouseEnter={() => !isXsScreen && setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
         <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-          <Stack direction="row" spacing={1} alignItems="center" py={0.5}>
+          <Stack direction="row" spacing={1} alignItems="center" py={{ xs: 1, md: 0.5 }}>
             <Box width={17} display="flex" alignItems="center">
               {expanded ?
                 <ExpandMore sx={{ fontSize: 16 }} /> :
@@ -53,23 +54,25 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
                 />
               }
             </Box>
-            <Typography sx={{ fontSize: 15 }}>{student?.displayName} - {assignment ? "One Time" : "Permanent"}</Typography>
+            <Typography sx={{ fontSize: 15 }}>{request.studentName} - {assignment ? "One Time" : "Permanent"}</Typography>
             <RequestStatusChip
               status={request.status}
               style={{ marginRight: "auto" }}
             />
           </Stack>
 
-          {hover ?
-            <Stack direction="row" display="flex" alignItems="center">
-              <Tooltip title="mark as pending">
-                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={onClickHandleSwap("pending")}>
-                  <UndoIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
-            </Stack> :
-            <Typography color="secondary" fontSize={14}>{formatRequestTime(request)}</Typography>
-          }
+          <Box display="flex" width={70} justifyContent="flex-end">
+            {hover || expanded ?
+              <Stack direction="row" display="flex" alignItems="center">
+                <Tooltip title="mark as pending" disableTouchListener>
+                  <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickHandleSwap("pending")}>
+                    <UndoIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
+                  </IconButton>
+                </Tooltip>
+              </Stack> :
+              <Typography color="secondary" fontSize={14}>{formatRequestTime(request)}</Typography>
+            }
+          </Box>
         </Stack>
       </Box >
       <Collapse in={expanded}>
