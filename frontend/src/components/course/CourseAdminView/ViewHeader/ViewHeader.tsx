@@ -53,9 +53,11 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
 
     return (
         <>
+            {/* only show for md screen */}
             <Typography variant="h6" fontWeight={600} sx={{ fontSize: 20, fontWeight: 600, display: { xs: "none", md: "block" } }}>
                 {capitalizeFirstLetter(view)}
             </Typography>
+            {/* only show for xs screen */}
             <Button
                 color="inherit" variant="text" sx={{ fontSize: 18, fontWeight: 600, ml: -1, display: { md: "none" } }}
                 endIcon={<MenuIcon />}
