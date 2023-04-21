@@ -33,7 +33,6 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 }))
 
 const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents }) => {
-    console.log(invitedStudents)
     const rowsPerPage = 10;
     const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortStudentsByName(students));
     const [page, setPage] = useState(0);

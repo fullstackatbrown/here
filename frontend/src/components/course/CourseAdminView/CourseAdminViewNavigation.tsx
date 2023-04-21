@@ -41,7 +41,6 @@ export default function CourseAdminViewNavigation({
   }
 
   function getNavigationButton(view: View, requestsLength?: number) {
-    console.log(requestsLength)
     return (
       <Button
         key={view}
