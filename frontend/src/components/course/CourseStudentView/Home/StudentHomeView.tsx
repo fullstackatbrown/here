@@ -49,7 +49,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                     studentID={student.ID}
                 />}
             <Dialog
-                open={tooltip && isXsScreen}
+                open={tooltip}
                 onClose={() => { setTooltip(false) }}
                 maxWidth="sm" fullWidth
             >
@@ -77,13 +77,13 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                         <Tooltip
                             title="This is the default section you will attend if you have not requested a swap for a particular assignment."
                             placement="right"
-                            open={!isXsScreen && tooltip}
+                            disableTouchListener={isXsScreen}
+                            disableHoverListener={isXsScreen}
+                            disableFocusListener={isXsScreen}
                         >
                             <IconButton
                                 sx={{ p: 0.5 }}
                                 onClick={() => { isXsScreen && setTooltip(true) }}
-                                onMouseEnter={() => { setTooltip(true) }}
-                                onMouseLeave={() => { setTooltip(false) }}
                             >
                                 <HelpOutlineIcon fontSize="small" color="secondary" />
                             </IconButton>

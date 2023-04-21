@@ -1,10 +1,10 @@
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Theme, Tooltip, useMediaQuery } from "@mui/material";
 import { Assignment } from "model/assignment";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Swap } from "model/swap";
 import { User } from "model/user";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import StudentViewHeader from "../StudentViewHeader";
 import StudentRequestsList from "./StudentRequestsList";
 import SwapRequestDialog from "./SwapRequestDialog";
@@ -19,6 +19,8 @@ export interface StudentsRequestsViewProps {
 
 const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, requests, sectionsMap, assignmentsMap }) => {
     const [swapRequestDialog, setSwapRequestDialog] = useState(false)
+    const allowRequests = course.status === CourseStatus.CourseActive && student.defaultSection?.[course.ID] !== undefined
+    const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     return (
         <>
@@ -30,12 +32,26 @@ const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, 
                 />}
             <StudentViewHeader
                 view="my requests"
-                endElement={
-                    <Button size="small" onClick={() => setSwapRequestDialog(true)}>
-                        + New Request
-                    </Button>}
+                // button doesnt show on mobile if requests are not allowed
+                endElement={!(isXsScreen && !allowRequests) &&
+                    <Tooltip
+                        title="Enabled after regular section is assigned"
+                        disableHoverListener={allowRequests}
+                        disableFocusListener={allowRequests}
+                        placement="right">
+                        <span>
+                            <Button
+                                size="small"
+                                onClick={() => setSwapRequestDialog(true)}
+                                disabled={!allowRequests}
+                            >
+                                + New Request
+                            </Button>
+                        </span>
+                    </Tooltip >
+                }
             />
-            <StudentRequestsList {...{ course, sectionsMap, student, requests, assignmentsMap }} />
+            < StudentRequestsList {...{ course, sectionsMap, student, requests, assignmentsMap }} />
         </>
     );
 };
