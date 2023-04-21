@@ -17,19 +17,22 @@ export default function CoursePage() {
   const [course, courseLoading] = useCourse(courseID as string);
   const { ref, inView } = useInView({ threshold: 1 });
 
-  const access = currentUser && currentUser.permissions?.[courseID as string];
-  const theme = useTheme();
+  const access = currentUser?.permissions?.[courseID as string];
+  const isStudent = currentUser?.courses?.includes(courseID as string);
 
-  // Redirect user back to home page if no course with given ID is found
   useEffect(() => {
-    if (router.isReady && !courseLoading && !course) {
-      router.push("/").then(() => toast.error("We couldn't find the course you were looking for."));
+    if (router.isReady && !courseLoading && isAuthenticated) {
+      if (!course) {
+        router.push("/").then(() => toast.error("We couldn't find the course you were looking for."));
+      } else if (!access && !isStudent) {
+        router.push("/").then(() => toast.error("You are not enrolled in this course."));
+      }
     }
-  }, [router, course, courseLoading]);
+  }, [router, course, courseLoading, isAuthenticated, currentUser]);
 
   return (
     <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
-      {course && !courseLoading && (
+      {course && !courseLoading && isAuthenticated && (
         <Stack pt={{ xs: 3, md: 6 }} gap={4}>
           <Grid container>
             <Grid item xs={0.5} md={2.5} />
@@ -38,11 +41,8 @@ export default function CoursePage() {
             </Grid>
             <Grid item xs={0.5} md={2.2} />
           </Grid>
-          {access ? (
-            <CourseAdminView headerInView={inView} course={course} access={access} />
-          ) : (
-            <CourseStudentView course={course} student={currentUser} />
-          )}
+          {access && <CourseAdminView headerInView={inView} course={course} access={access} />}
+          {isStudent && <CourseStudentView course={course} student={currentUser} />}
         </Stack>
       )}
     </AppLayout>
