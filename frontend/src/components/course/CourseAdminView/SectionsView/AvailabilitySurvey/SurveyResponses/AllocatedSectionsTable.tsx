@@ -7,8 +7,8 @@ import {
 import { Section } from 'model/section';
 import { FC } from "react";
 import { red } from '@mui/material/colors';
-import formatSectionTime from "@util/shared/formatTime";
 import { sortSections } from "@util/shared/sortSectionTime";
+import { formatSectionTime } from "@util/shared/formatTime";
 
 export interface AllocatedSectionsTableProps {
     results: Record<string, string[]>;
@@ -20,24 +20,26 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
         <TableHead>
             <TableRow>
                 <TableCell>Section Time</TableCell>
-                <TableCell align="right">Location</TableCell>
-                <TableCell align="right">Students/Capacity</TableCell>
+                <TableCell>Location</TableCell>
+                <TableCell>Students/Capacity</TableCell>
             </TableRow>
         </TableHead>
         <TableBody>
             {sortSections(sections).map((section) => {
-                const numStudents = results[section.ID].length
+                // TODO: some sections may not be in the survey
+                const numStudents = results[section.ID]?.length || 0
+                const time = formatSectionTime(section)
                 return <TableRow
-                    key={formatSectionTime(section)}
+                    key={time}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                     <TableCell>
-                        {formatSectionTime(section)}
+                        {time}
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell>
                         {section.location ? section.location : "TBD"}
                     </TableCell>
-                    <TableCell align="right" sx={{ color: numStudents > section.capacity ? red[500] : "default" }}>
+                    <TableCell sx={{ color: numStudents > section.capacity ? red[500] : "default" }}>
                         {numStudents} / {section.capacity}
                     </TableCell>
                 </TableRow>
