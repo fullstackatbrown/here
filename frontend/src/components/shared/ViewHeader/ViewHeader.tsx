@@ -68,7 +68,8 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
                 sx={{ display: { md: "none" } }}
             >
                 {views.map((view) => {
-                    if (view === "settings" && access !== CoursePermission.CourseAdmin) return null;
+                    // TODO: make more extensible
+                    if (view === "settings" && access === CoursePermission.CourseStaff) return null;
                     return <MenuItem key={view} sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigateTo(view)} >
                         {capitalizeWords(view)}
                     </MenuItem>

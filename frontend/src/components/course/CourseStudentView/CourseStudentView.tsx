@@ -34,7 +34,6 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
     }
   }, [router, course]);
 
-
   return (
     !sectionsMapLoading && !assignmentsMapLoading && !surveyLoading &&
     <Grid container>

@@ -57,9 +57,16 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                     This is the default section you will attend if you have not requested a swap for a particular assignment.
                 </DialogContent>
             </Dialog>
+
             <StudentViewHeader view="home" display={isXsScreen ? "block" : "none"} />
             <Stack direction="column" spacing={5}>
-                <Stack direction="row" alignItems="center" spacing={1} justifyContent="space-between" mt={{ xs: 0, md: 1.5 }}>
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    spacing={1}
+                    justifyContent="space-between"
+                    mt={{ xs: 0, md: 1.5 }}
+                >
                     <Stack direction="row" flexWrap="wrap" alignItems="center" spacing={1}>
                         <Typography fontSize={17}>
                             Regular Section:
@@ -83,7 +90,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                         </Tooltip>
                     </Stack>
                     {courseHasSurvey() &&
-                        <Button startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}>
+                        <Button variant={isXsScreen ? "outlined" : "text"} startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}>
                             {studentHasFilledOutSurvey() ? "Update Survey Response" : "Fill Out Survey"}
                         </Button>
                     }

@@ -63,8 +63,8 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
                         const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
                         return <StudentRequestCard
                             key={`request${r.ID}`}
-                            request={r} courseID={course.ID} student={student} assignment={assignment}
-                            oldSection={oldSection} newSection={newSection} pending={r.status === "pending"}
+                            request={r} course={course} student={student} assignment={assignment}
+                            oldSection={oldSection} newSection={newSection}
                             handleOpenSwapRequestDialog={handleOpenSwapRequestDialog}
                         />
                     })}
