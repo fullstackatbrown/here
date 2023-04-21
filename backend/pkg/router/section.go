@@ -14,12 +14,14 @@ import (
 func SectionRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.With(middleware.RequireCourseAdmin()).Post("/", createSectionHandler)
+	router.Use(middleware.RequireCourseAdmin())
+	router.Use(middleware.RequireCourseActive())
+
+	router.Post("/", createSectionHandler)
 
 	router.Route("/{sectionID}", func(router chi.Router) {
-		router.With(middleware.RequireCourseStaff()).Get("/", getSectionHandler)
-		router.With(middleware.RequireCourseAdmin()).Delete("/", deleteSectionHandler)
-		router.With(middleware.RequireCourseAdmin()).Patch("/", updateSectionHandler)
+		router.Delete("/", deleteSectionHandler)
+		router.Patch("/", updateSectionHandler)
 	})
 
 	return router

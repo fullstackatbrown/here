@@ -28,7 +28,7 @@ func CourseRoutes() *chi.Mux {
 
 		// course admin only
 		r.With(middleware.RequireCourseAdmin()).Patch("/", updateCourseHandler)
-		r.With(middleware.RequireCourseAdmin()).Post("/assignSection", assignSectionHandler)
+		r.With(middleware.RequireCourseAdmin()).With(middleware.RequireCourseActive()).Post("/assignSection", assignSectionHandler)
 
 		r.Mount("/sections", SectionRoutes())
 		r.Mount("/assignments", AssignmentRoutes())

@@ -14,12 +14,14 @@ import (
 func GradesRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.With(middleware.RequireCourseStaff()).Post("/", createGradeHandler)
-	router.With(middleware.RequireCourseAdmin()).Post("/export", exportGradesHandler)
+	router.Use(middleware.RequireCourseActive())
+	router.Use(middleware.RequireCourseStaff())
+
+	router.Post("/", createGradeHandler)
 
 	router.Route("/{gradeID}", func(router chi.Router) {
-		router.With(middleware.RequireCourseStaff()).Patch("/", updateGradeHandler)
-		router.With(middleware.RequireCourseStaff()).Delete("/", deleteGradeHandler)
+		router.Patch("/", updateGradeHandler)
+		router.Delete("/", deleteGradeHandler)
 	})
 
 	return router
@@ -107,7 +109,4 @@ func deleteGradeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully deleted grade " + gradeID))
 
-}
-
-func exportGradesHandler(w http.ResponseWriter, r *http.Request) {
 }

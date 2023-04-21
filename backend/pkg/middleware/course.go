@@ -33,7 +33,7 @@ func RequireCourseActive() func(handler http.Handler) http.Handler {
 			}
 
 			if !(course.Status == models.CourseActive) {
-				rejectBadRequest(w, fmt.Errorf("Cannot perform this operation on a non-active course"))
+				rejectBadRequest(w, fmt.Errorf("Cannot perform this operation on a %s course", course.Status))
 				return
 			}
 

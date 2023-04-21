@@ -14,11 +14,10 @@ import (
 func AssignmentRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
+	router.Use(middleware.RequireCourseActive())
 	router.With(middleware.RequireCourseAdmin()).Post("/", createAssignmentHandler)
 
 	router.Route("/{assignmentID}", func(router chi.Router) {
-
-		router.With(middleware.RequireCourseStaff()).Get("/", getAssignmentHandler)
 		router.With(middleware.RequireCourseAdmin()).Delete("/", deleteAssignmentHandler)
 		router.With(middleware.RequireCourseAdmin()).Patch("/", updateAssignmentHandler)
 
@@ -26,19 +25,6 @@ func AssignmentRoutes() *chi.Mux {
 	})
 
 	return router
-}
-
-func getAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
-	assignmentID := chi.URLParam(r, "assignmentID")
-
-	assignment, err := repo.Repository.GetAssignmentByID(courseID, assignmentID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, assignment)
 }
 
 func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {

@@ -16,17 +16,21 @@ import (
 func SurveyRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
+	router.Use(middleware.RequireCourseActive())
 	router.With(middleware.RequireCourseAdmin()).Post("/", createSurveyHandler)
 
 	router.Route("/{surveyID}", func(router chi.Router) {
-		router.With(middleware.RequireCourseAdmin()).Get("/", getSurveyHandler)
-		router.With(middleware.RequireCourseAdmin()).Patch("/", updateSurveyHandler)
-		router.With(middleware.RequireCourseAdmin()).Delete("/", deleteSurveyHandler)
-		router.With(middleware.RequireCourseAdmin()).Post("/publish", publishSurveyHandler)
-		router.With(middleware.RequireCourseAdmin()).Post("/results", generateResultsHandler)
-		router.With(middleware.RequireCourseAdmin()).Post("/confirmResults", confirmResultsHandler)
-		router.Mount("/responses", ResponsesRoutes())
 
+		router.Route("/", func(router chi.Router) {
+			router.Use(middleware.RequireCourseAdmin())
+			router.Patch("/", updateSurveyHandler)
+			router.Delete("/", deleteSurveyHandler)
+			router.Post("/publish", publishSurveyHandler)
+			router.Post("/results", generateResultsHandler)
+			router.Post("/confirmResults", confirmResultsHandler)
+		})
+
+		router.Mount("/responses", ResponsesRoutes())
 	})
 	return router
 }
@@ -37,18 +41,6 @@ func ResponsesRoutes() *chi.Mux {
 	router.Post("/", createSurveyResponseHandler)
 	router.Patch("/", updateSurveyResponseHandler)
 	return router
-}
-
-func getSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
-	surveyID := chi.URLParam(r, "surveyID")
-
-	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	render.JSON(w, r, survey)
 }
 
 func createSurveyHandler(w http.ResponseWriter, r *http.Request) {

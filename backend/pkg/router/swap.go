@@ -15,10 +15,11 @@ func SwapRoutes() *chi.Mux {
 	router := chi.NewRouter()
 	// router.Use(middleware.AuthCtx())
 
+	router.Use(middleware.RequireCourseActive())
 	router.Post("/", createSwapHandler)
 	router.Route("/{swapID}", func(router chi.Router) {
 		router.Patch("/", updateSwapHandler)
-		router.Patch("/handle", handleSwapHandler)
+		router.With(middleware.RequireCourseStaff()).Patch("/handle", handleSwapHandler)
 		router.Patch("/cancel", cancelSwapHandler)
 	})
 

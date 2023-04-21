@@ -45,7 +45,11 @@ const SectionsView: FC<SectionsViewProps> = ({
         <ViewHeader view="sections" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {/* Only course admin can add sections */}
         {access === CoursePermission.CourseAdmin && (
-          <Button disabled={course.status === CourseStatus.CourseArchived} onClick={() => setcreateSectionDialog(true)}>+ New</Button>
+          <Button
+            disabled={course.status === CourseStatus.CourseArchived}
+            onClick={() => setcreateSectionDialog(true)}>
+            + New
+          </Button>
         )}
       </Stack>
       {sections?.length == 0 && (
