@@ -1,4 +1,5 @@
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
+import { indigo, blue, deepPurple, cyan, pink, red, purple, teal, grey } from '@mui/material/colors';
 
 function hashCodeFromString(str: string): number {
     let hash = 0;
@@ -10,19 +11,24 @@ function hashCodeFromString(str: string): number {
     return hash;
 }
 
-export default function getSectionColor(course: Course): string {
+export default function getCourseColor(course: Course): string {
+    if (course.status === CourseStatus.CourseArchived) {
+        return grey[500]
+    }
+
     const colors = [
-        "#3f51b5",
-        "#2196f3",
-        "#673ab7",
-        "#00838f",
-        "#880e4f",
-        "#4a148c",
-        "#b71c1c",
-        "#004d40",
+        indigo[500],
+        blue[500],
+        deepPurple[500],
+        cyan[800],
+        pink[900],
+        purple[900],
+        red[900],
+        teal[900],
     ];
 
     const hash = hashCodeFromString(course.code);
     const colorIndex = Math.abs(hash % (colors.length - 1));
-    return colors[colorIndex];
+    return colors[colorIndex]
 }
+
