@@ -32,16 +32,32 @@ export function sortCoursesByTerm(courses: Course[]): Course[] {
     return courses.sort((a, b) => termComparator(a.term, b.term));
 }
 
-// TODO: current term
-// const currentTerm = "spring 2023"
 export function getTerms(courses: Record<string, Course[]>): string[] {
     let terms = []
     if (courses) {
         terms = sortTerms(Object.keys(courses));
     }
-    // if (terms.length === 0) { return [currentTerm] }
-    // if (terms[0] !== currentTerm) {
-    //     terms.unshift(currentTerm);
-    // }
+    const currentTerm = getCurrentTerm();
+    if (terms.length === 0) { return [currentTerm] }
+    if (terms[0] !== currentTerm) {
+        terms.unshift(currentTerm);
+    }
     return terms
+}
+
+// compute current term based on current month
+function getCurrentTerm(): string {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    if (month >= 0 && month <= 5) {
+        return `spring ${year}`;
+    }
+    if (month >= 6 && month <= 8) {
+        return `summer ${year}`;
+    }
+    if (month >= 9 && month <= 12) {
+        return `fall ${year}`;
+    }
 }
