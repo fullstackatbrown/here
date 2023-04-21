@@ -23,7 +23,7 @@ export interface StudentHomeViewProps {
 
 const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, sectionsMap, assignmentsMap }) => {
     const [surveyDialog, setSurveyDialog] = useState(false)
-    const [tooltipDialog, setTooltipDialog] = useState(false)
+    const [tooltip, setTooltip] = useState(false)
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     const getAssignedSection = () => {
@@ -49,8 +49,8 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                     studentID={student.ID}
                 />}
             <Dialog
-                open={tooltipDialog}
-                onClose={() => { setTooltipDialog(false) }}
+                open={tooltip && isXsScreen}
+                onClose={() => { setTooltip(false) }}
                 maxWidth="sm" fullWidth
             >
                 <DialogContent>
@@ -70,9 +70,14 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                         <Tooltip
                             title="This is the default section you will attend if you have not requested a swap for a particular assignment."
                             placement="right"
-                            open={!isXsScreen}
+                            open={!isXsScreen && tooltip}
                         >
-                            <IconButton sx={{ p: 0.5 }} onClick={() => { isXsScreen && setTooltipDialog(true) }}>
+                            <IconButton
+                                sx={{ p: 0.5 }}
+                                onClick={() => { isXsScreen && setTooltip(true) }}
+                                onMouseEnter={() => { setTooltip(true) }}
+                                onMouseLeave={() => { setTooltip(false) }}
+                            >
                                 <HelpOutlineIcon fontSize="small" color="secondary" />
                             </IconButton>
                         </Tooltip>
