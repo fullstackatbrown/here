@@ -51,7 +51,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
           <Typography mx={0.5} my={0.5} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography> :
           data.map((data) => {
             if (data.user) {
-              return <Tooltip title={data.user.email} placement="right">
+              return <Tooltip key={data.user.ID} title={data.user.email} placement="right">
                 <Chip
                   variant="outlined"
                   sx={{ height: 26, marginRight: 0.5 }}
@@ -61,7 +61,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
                 />
               </Tooltip>
             } else {
-              return <Tooltip title={"pending"} placement="right">
+              return <Tooltip key={data.user.ID} title={"pending"} placement="right">
                 <Chip
                   sx={{ height: 26, marginRight: 0.5 }}
                   label={data.email}
