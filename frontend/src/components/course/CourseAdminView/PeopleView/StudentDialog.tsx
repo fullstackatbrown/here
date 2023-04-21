@@ -1,4 +1,4 @@
-import StudentGradesTable from "@components/course/CourseStudentView/StudentHomeView/StudentGradesTable";
+import StudentGradesTable from "@components/course/CourseStudentView/Home/StudentGradesTable";
 import {
     Box,
     Dialog,

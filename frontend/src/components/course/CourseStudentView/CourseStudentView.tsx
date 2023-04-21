@@ -12,7 +12,8 @@ import { useEffect, useState } from "react";
 import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
 import CourseStudentViewNavigation from "./CourseStudentViewNavigation";
 import StudentRequestsView from "./Requests/StudentRequestsView";
-import StudentHomeView from "./StudentHomeView/StudentHomeView";
+import StudentHomeView from "./Home/StudentHomeView";
+import StudentSettingsView from "./Settings/StudentSettingsView";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -45,6 +46,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
           <>
             {router.query.view === "home" && !surveyLoading && <StudentHomeView {...{ course, student, survey, sectionsMap, assignmentsMap }} />}
             {router.query.view === "my requests" && !requestsLoading && <StudentRequestsView {...{ course, student, requests, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "settings" && <StudentSettingsView course={course} />}
           </>)}
       </Grid>
       <Grid item xs={0.5} md={2.2} />

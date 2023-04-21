@@ -1,5 +1,5 @@
 import SurveyDialog from "@components/course/CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
-import ViewHeader from "@components/course/CourseAdminView/ViewHeader/ViewHeader";
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import { CalendarMonth } from "@mui/icons-material";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Button, Dialog, DialogContent, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery } from "@mui/material";
@@ -11,6 +11,7 @@ import { Survey } from "model/survey";
 import { CoursePermission, User } from "model/user";
 import { FC, useState } from "react";
 import StudentGradesTable from "./StudentGradesTable";
+import StudentViewHeader from "../StudentViewHeader";
 
 export interface StudentHomeViewProps {
     course: Course;
@@ -56,9 +57,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                     This is the default section you will attend if you have not requested a swap for a particular assignment.
                 </DialogContent>
             </Dialog>
-            <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40} display={{ xs: "block", md: "none" }}>
-                <ViewHeader view="home" views={["home", "my requests"]} access={CoursePermission.CourseStudent} />
-            </Stack>
+            <StudentViewHeader view="home" display={isXsScreen ? "block" : "none"} />
             <Stack direction="column" spacing={5}>
                 <Stack direction="row" alignItems="center" spacing={1} justifyContent="space-between" mt={{ xs: 0, md: 1.5 }}>
                     <Stack direction="row" flexWrap="wrap" alignItems="center" spacing={1}>

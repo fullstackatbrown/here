@@ -52,6 +52,7 @@ export default function CourseStudentViewNavigation() {
       <Stack direction="column" spacing={1}>
         {getNavigationButton("home")}
         {getNavigationButton("my requests")}
+        {getNavigationButton("settings")}
       </Stack>
     </Stack>
   )

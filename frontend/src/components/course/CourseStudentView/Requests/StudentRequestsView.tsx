@@ -1,13 +1,12 @@
-import { Stack, Typography } from "@mui/material";
+import { Stack } from "@mui/material";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
-import { useRouter } from "next/router";
-import { FC, useState } from "react";
-import { CoursePermission, User } from "model/user";
-import ViewHeader from "@components/course/CourseAdminView/ViewHeader/ViewHeader";
-import StudentRequestsList from "./StudentRequestsList";
 import { Swap } from "model/swap";
+import { User } from "model/user";
+import { FC } from "react";
+import StudentViewHeader from "../StudentViewHeader";
+import StudentRequestsList from "./StudentRequestsList";
 
 export interface StudentsRequestsViewProps {
     course: Course;
@@ -20,9 +19,7 @@ export interface StudentsRequestsViewProps {
 const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, requests, sectionsMap, assignmentsMap }) => {
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
-                <ViewHeader view="my requests" views={["home", "my requests"]} access={CoursePermission.CourseStudent} />
-            </Stack>
+            <StudentViewHeader view="my requests" />
             <StudentRequestsList {...{ course, sectionsMap, student, requests, assignmentsMap }} />
         </>
     );
