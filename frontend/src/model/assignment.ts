@@ -6,6 +6,5 @@ export interface Assignment {
   optional: boolean;
   releaseDate: string;
   dueDate: string;
-  gradesByStudent: Record<string, string>;
   maxScore: number;
 }

@@ -2,7 +2,7 @@ import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { ExportToCsv } from 'export-to-csv';
 import { Grade } from "model/grades";
-import { getGradesForAssignment } from "api/grades/hooks";
+import { useAllGrades } from "api/grades/hooks";
 
 const options = {
     filename: "",
@@ -16,43 +16,45 @@ const options = {
     useKeysAsHeaders: true,
 };
 
-export function exportGrades(course: Course, assignments: Assignment[], invitedStudents?: string[]) {
+export function exportGrades(course: Course, assignments: Assignment[], invitedStudents?: string[], percentage: boolean = false) {
     options.filename = `${course.code}_grades`
 
-    let grades: Record<string, Record<string, Grade>> = {}; //assignmentID to gradeID to grade
-    for (const assignment of assignments) {
-        grades[assignment.ID] = getGradesForAssignment(course.ID, assignment.ID);
-    }
-
-    let data = [];
-    for (const student of Object.values(course.students)) {
-        let entry = {
-            "name": student.displayName,
-            "email": student.email,
-        }
-        for (const assignment of assignments) {
-            const gradeID = assignment.gradesByStudent?.[student.studentID];
-            const grade = gradeID ? grades[assignment.ID][gradeID] : "N/A";
-            entry[assignment.name.toLowerCase()] = grade ? grade : "N/A";
-        }
-        data.push(entry);
-    }
-
-    if (invitedStudents) {
-        for (const email of invitedStudents) {
+    useAllGrades(course.ID, assignments.map((a) => a.ID)).then((grades) => {
+        let data = [];
+        for (const student of Object.values(course.students)) {
             let entry = {
-                "name": getNameFromEmail(email),
-                "email": email,
+                "name": student.displayName,
+                "email": student.email,
             }
             for (const assignment of assignments) {
-                entry[assignment.name.toLowerCase()] = "N/A";
+                const assignmentGrades = grades[assignment.ID];
+                let grade = student.studentID in assignmentGrades ? assignmentGrades[student.studentID].grade : undefined;
+                if (percentage) {
+                    grade = grade ? grade / assignment.maxScore * 100 : undefined;
+                }
+                entry[assignment.name.toLowerCase()] = grade ? grade : "N/A";
             }
             data.push(entry);
         }
-    }
 
-    const csvExporter = new ExportToCsv(options);
-    csvExporter.generateCsv(data);
+        if (invitedStudents) {
+            for (const email of invitedStudents) {
+                let entry = {
+                    "name": getNameFromEmail(email),
+                    "email": email,
+                }
+                for (const assignment of assignments) {
+                    entry[assignment.name.toLowerCase()] = "N/A";
+                }
+                data.push(entry);
+            }
+        }
+
+        const csvExporter = new ExportToCsv(options);
+        csvExporter.generateCsv(data);
+
+    })
+
 }
 
 export function exportStudentList(course: Course, invitedStudents?: string[]) {

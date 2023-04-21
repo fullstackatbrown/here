@@ -57,18 +57,54 @@ export function useGradesForAssignment(courseID: string, assignmentID: string): 
     return [grades, loading];
 }
 
-export function getGradesForAssignment(courseID: string, assignmentID: string): Record<string, Grade> {
+// returns map from assignmentID to studentID to grade (one time query)
+export function useAllGrades(courseID: string, assignmentIDs: string[]): Promise<Record<string, Record<string, Grade>>> {
     const db = getFirestore();
-    const res: Record<string, Grade> = {};
-    getDocs(collection(db, FirestoreCoursesCollection, courseID, FirestoreAssignmentsCollection,
-        assignmentID, FirestoreGradesCollection)).then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                const g = { ID: doc.id, ...doc.data() } as Grade;
-                res[g.studentID] = g;
+    const courseRef = doc(db, `${FirestoreCoursesCollection}/${courseID}`);
+    const gradesRef = query(collectionGroup(db, FirestoreGradesCollection),
+        orderBy(documentId()),
+        startAt(courseRef.path),
+        endAt(courseRef.path + "\uf8ff")
+    );
+
+    return new Promise<Record<string, Record<string, Grade>>>((resolve, reject) => {
+        getDocs(gradesRef)
+            .then((querySnapshot) => {
+                let res: Record<string, Record<string, Grade>> = {};
+                querySnapshot.forEach((doc) => {
+                    const g = { ID: doc.id, ...doc.data() } as Grade;
+                    if (assignmentIDs.includes(g.assignmentID)) {
+                        if (res[g.assignmentID] === undefined) {
+                            res[g.assignmentID] = {};
+                        }
+                        res[g.assignmentID][g.studentID] = g;
+                    }
+                });
+                console.log(res)
+                resolve(res);
+            })
+            .catch((error) => {
+                reject(error);
             });
-        });
-    return res;
+    });
 }
+
+
+
+
+
+// export function getGradesForAssignment(courseID: string, assignmentID: string): Promise<Record<string, Grade>> {
+//     const db = getFirestore();
+//     const res: Record<string, Grade> = {};
+//     getDocs(collection(db, FirestoreCoursesCollection, courseID, FirestoreAssignmentsCollection,
+//         assignmentID, FirestoreGradesCollection)).then((querySnapshot) => {
+//             querySnapshot.forEach((doc) => {
+//                 const g = { ID: doc.id, ...doc.data() } as Grade;
+//                 res[g.studentID] = g;
+//             });
+//         });
+//     return Promise.resolve(res);
+// }
 
 // var docRef = db.collection("cities").doc("SF");
 
