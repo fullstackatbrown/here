@@ -30,16 +30,8 @@ func SurveyRoutes() *chi.Mux {
 			router.Post("/confirmResults", confirmResultsHandler)
 		})
 
-		router.Mount("/responses", ResponsesRoutes())
+		router.Post("/responses", createSurveyResponseHandler)
 	})
-	return router
-}
-
-func ResponsesRoutes() *chi.Mux {
-	router := chi.NewRouter()
-
-	router.Post("/", createSurveyResponseHandler)
-	router.Patch("/", updateSurveyResponseHandler)
 	return router
 }
 
@@ -236,12 +228,6 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, s)
-}
-
-func updateSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
-	// surveyID := r.Context().Value("surveyID").(string)
-
-	// TODO:
 }
 
 // Helpers
