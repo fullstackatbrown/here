@@ -14,7 +14,7 @@ import { Course } from "model/course";
 import { Section } from "model/section";
 import { User } from "model/user";
 import { useEffect, useState } from "react";
-import StudentGradesTable from "./Grades/StudentGradesTable";
+import StudentGradesTable from "./StudentHomeView/StudentGradesTable";
 import StudentRequestsList from "./Requests/StudentRequestsList";
 import SwapRequestDialog from "./Requests/SwapRequestDialog";
 
@@ -56,7 +56,7 @@ export default function StudentViewList({ course, student, sectionsMap, assignme
                 </Stack>
                 <Collapse in={gradesOpen} timeout="auto" unmountOnExit>
                     {(assignments?.length > 0) ?
-                        <StudentGradesTable {...{ course, student, sectionsMap, assignments }} /> :
+                        <StudentGradesTable {...{ course, student, sectionsMap, assignmentsMap }} /> :
                         <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Collapse>
 

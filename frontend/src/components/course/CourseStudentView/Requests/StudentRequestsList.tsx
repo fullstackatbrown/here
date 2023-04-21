@@ -50,7 +50,7 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
             />
             <Stack direction="column" minHeight={60}>
                 {requests.length === 0 &&
-                    <Typography variant="body1" ml={4} mr={4} mt={1}>You have made no swap requests</Typography>
+                    <Typography variant="body1" mt={1}>You have made no swap requests</Typography>
                 }
                 {(rowsPerPage > 0 ?
                     sortRequestsByTime(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :

@@ -2,7 +2,7 @@ import CourseAdminView from "@components/course/CourseAdminView/CourseAdminView"
 import CourseHeader from "@components/course/CourseHeader";
 import CourseStudentView from "@components/course/CourseStudentView/CourseStudentView";
 import AppLayout from "@components/shared/AppLayout";
-import { Box, Grid, Stack, useTheme } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 import { useAuth } from "api/auth/hooks";
 import { useCourse } from "api/course/hooks";
 import { useRouter } from "next/router";

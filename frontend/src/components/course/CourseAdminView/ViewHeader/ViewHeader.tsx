@@ -50,7 +50,7 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
     return (
         <>
             {/* only show for md screen */}
-            <Typography variant="h6" fontWeight={600} sx={{ fontSize: 20, fontWeight: 600, display: { xs: "none", md: "block" } }}>
+            <Typography variant="h6" fontSize={20} fontWeight={600} sx={{ display: { xs: "none", md: "block" } }}>
                 {capitalizeFirstLetter(view)}
             </Typography>
             {/* only show for xs screen */}
