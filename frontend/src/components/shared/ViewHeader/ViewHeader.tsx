@@ -4,7 +4,7 @@ import { View } from "model/general";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 import { useRouter } from "next/router";
 
 interface ViewHeaderProps {
@@ -50,8 +50,8 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
     return (
         <>
             {/* only show for md screen */}
-            <Typography variant="h6" fontWeight={600} sx={{ fontSize: 20, fontWeight: 600, display: { xs: "none", md: "block" } }}>
-                {capitalizeFirstLetter(view)}
+            <Typography variant="h6" fontSize={20} fontWeight={600} sx={{ display: { xs: "none", md: "block" } }}>
+                {capitalizeWords(view)}
             </Typography>
             {/* only show for xs screen */}
             <Button
@@ -59,7 +59,7 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
                 endIcon={<MenuIcon />}
                 onClick={handleClick}
             >
-                {capitalizeFirstLetter(view)}
+                {capitalizeWords(view)}
             </Button >
             <StyledMenu
                 anchorEl={anchorEl}
@@ -68,9 +68,10 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
                 sx={{ display: { md: "none" } }}
             >
                 {views.map((view) => {
-                    if (view === "settings" && access !== CoursePermission.CourseAdmin) return <></>;
+                    // TODO: make more extensible
+                    if (view === "settings" && access === CoursePermission.CourseStaff) return null;
                     return <MenuItem key={view} sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigateTo(view)} >
-                        {capitalizeFirstLetter(view)}
+                        {capitalizeWords(view)}
                     </MenuItem>
                 })}
             </StyledMenu >

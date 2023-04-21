@@ -4,13 +4,13 @@ import { ExpandMore } from "@mui/icons-material";
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Collapse, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
-import { CourseUserData } from "model/course";
+import { Course, CourseStatus, CourseUserData } from "model/course";
 import { Section } from "model/section";
 import { Swap } from "model/swap";
 import { FC, useState } from "react";
@@ -18,18 +18,19 @@ import toast from "react-hot-toast";
 
 export interface StudentRequestCardProps {
     request: Swap;
-    courseID: string;
+    course: Course;
     student: CourseUserData;
     assignment?: Assignment;
     oldSection: Section;
     newSection: Section;
-    pending: boolean;
     handleOpenSwapRequestDialog: (swap: Swap) => void;
 }
 
-const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, courseID, assignment, oldSection, newSection, pending, handleOpenSwapRequestDialog }) => {
+const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, course, assignment, oldSection, newSection, handleOpenSwapRequestDialog }) => {
     const [expanded, setExpanded] = useState(false);
     const [hover, setHover] = useState(false);
+    const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+    const isCourseActive = course.status === CourseStatus.CourseActive
 
     const theme = useTheme();
 
@@ -37,7 +38,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
         e.stopPropagation();
         const confirmed = confirm("Are you sure you want to cancel this request?");
         if (confirmed) {
-            toast.promise(SwapAPI.cancelSwap(courseID, request.ID),
+            toast.promise(SwapAPI.cancelSwap(course.ID, request.ID),
                 {
                     loading: "Cancelling request...",
                     success: "Request cancelled!",
@@ -58,11 +59,11 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                 px={1}
                 py={0.3}
                 onClick={() => setExpanded(!expanded)}
-                onMouseEnter={() => setHover(true)}
+                onMouseEnter={() => !isXsScreen && setHover(true)}
                 onMouseLeave={() => setHover(false)}
             >
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" alignItems="center" py={0.5}>
+                    <Stack direction="row" alignItems="center" py={{ xs: 1, md: 0.5 }} >
                         <Stack direction="row" spacing={1} alignItems="center" py={0.5} width={280}>
                             <Box width={17} display="flex" alignItems="center">
                                 {expanded ?
@@ -78,25 +79,26 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                                 style={{ marginRight: "auto" }}
                             />
                         </Stack>
-                        {!expanded && <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 14 }}>
-                            {formatSectionInfo(oldSection, true)}
-                            &nbsp;&nbsp;{'->'}&nbsp;&nbsp;
-                            {formatSectionInfo(newSection, true)}&nbsp;
-                            {getSectionAvailableSeats(newSection, assignment?.ID) <= 0 &&
-                                <Box component="span" color={theme.palette.error.main}>(!)</Box>}
-                        </Typography>
+                        {!expanded && !isXsScreen &&
+                            <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 14 }}>
+                                {formatSectionInfo(oldSection, true)}
+                                &nbsp;&nbsp;{'->'}&nbsp;&nbsp;
+                                {formatSectionInfo(newSection, true)}&nbsp;
+                                {getSectionAvailableSeats(newSection, assignment?.ID) <= 0 &&
+                                    <Box component="span" color={theme.palette.error.main}>(!)</Box>}
+                            </Typography>
                         }
                     </Stack>
-                    {hover && pending ?
+                    {(hover || expanded) && isCourseActive ?
                         <Stack direction="row" display="flex" alignItems="center">
                             <Tooltip title="edit">
-                                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={onClickEditSwap}>
-                                    <EditIcon sx={{ fontSize: 18 }} />
+                                <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickEditSwap}>
+                                    <EditIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="cancel">
-                                <IconButton sx={{ fontSize: "small", p: 0.5, color: "inherit" }} onClick={onClickCancelSwap}>
-                                    <CloseIcon sx={{ fontSize: 18 }} />
+                                <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickCancelSwap}>
+                                    <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                                 </IconButton>
                             </Tooltip>
                         </Stack> :

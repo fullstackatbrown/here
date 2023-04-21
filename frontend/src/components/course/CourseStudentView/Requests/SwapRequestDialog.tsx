@@ -17,7 +17,7 @@ export interface SwapRequestDialogProps {
     open: boolean;
     onClose: () => void;
     course: Course;
-    assignments: Assignment[];
+    assignmentsMap: Record<string, Assignment>;
     student: User;
     sectionsMap: Record<string, Section>;
     swap?: Swap;
@@ -32,7 +32,8 @@ type FormData = {
     newSectionID: string,
 };
 
-const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignments, student, sectionsMap, swap }) => {
+const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignmentsMap, student, sectionsMap, swap }) => {
+    const assignments = Object.values(assignmentsMap)
     const defaultValues: FormData = {
         courseID: course.ID,
         isPermanent: swap ? swap.assignmentID === "" : true,

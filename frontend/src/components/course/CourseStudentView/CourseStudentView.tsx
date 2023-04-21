@@ -1,20 +1,19 @@
-import { CalendarMonth } from "@mui/icons-material";
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import {
-  Box,
-  Button, IconButton, Stack, Tooltip, Typography
+  Grid
 } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
+import { useAssignmentsMap } from "api/assignment/hooks";
 import { useSectionsMap } from "api/section/hooks";
 import { useSurvey } from "api/surveys/hooks";
+import { useSwapsByStudent } from "api/swaps/hooks";
 import { Course } from "model/course";
-import { Section } from "model/section";
 import { User } from "model/user";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
-import StudentViewList from "./StudentViewList";
-import { useAssignmentsMap } from "api/assignment/hooks";
+import CourseStudentViewNavigation from "./CourseStudentViewNavigation";
+import StudentRequestsView from "./Requests/StudentRequestsView";
+import StudentHomeView from "./Home/StudentHomeView";
+import StudentSettingsView from "./Settings/StudentSettingsView";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -22,67 +21,35 @@ export interface CourseStudentViewProps {
 }
 
 function CourseStudentView({ course, student }: CourseStudentViewProps) {
+  const router = useRouter();
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID)
   const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID)
+  const [requests, requestsLoading] = useSwapsByStudent(course.ID, student.ID);
   const [survey, surveyLoading] = useSurvey(course.ID);
-  const [surveyDialog, setSurveyDialog] = useState(false)
 
-  const getAssignedSection = () => {
-    const defaultSection = student.defaultSection?.[course.ID]
-    if (defaultSection && defaultSection !== "" && sectionsMap) {
-      const section = sectionsMap[defaultSection] as Section
-      return formatSectionInfo(section)
+  useEffect(() => {
+    // Always do navigations after the first render
+    if (router.query.view === undefined) {
+      router.push(`${course.ID}/?view=home`, undefined, { shallow: true });
     }
-    return undefined
-  }
-
-  const courseHasSurvey = () => !surveyLoading && survey && survey.published && survey.endTime > new Date().toISOString()
-
-  const studentHasFilledOutSurvey = () => survey.responses && survey.responses[student.ID] !== undefined
-
+  }, [router, course]);
 
   return (
-    !sectionsMapLoading && !surveyLoading &&
-    <>
-      {surveyDialog &&
-        <SurveyDialog
-          open={surveyDialog}
-          onClose={() => { setSurveyDialog(false) }}
-          survey={survey}
-          studentID={student.ID}
-        />}
-
-      <Grid container>
-        <Grid xs={2}>
-        </Grid>
-        <Grid xs>
-          <Box height={10} />
-          <Stack direction="row" alignItems="center" spacing={1} justifyContent="space-between">
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="button" fontSize={17}>
-                Regular Section:
-              </Typography>
-              <Typography variant="button" fontSize={17} fontWeight={400}>
-                {getAssignedSection() || "Unassigned"}
-              </Typography>
-              <Tooltip title="This is the default section you will attend if you have not requested a swap for a particular assignment." placement="right">
-                <IconButton sx={{ p: 0.5 }}>
-                  <HelpOutlineIcon fontSize="small" color="secondary" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-            {courseHasSurvey() &&
-              <Button startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}>
-                {studentHasFilledOutSurvey() ? "Update Survey Response" : "Fill Out Survey"}
-              </Button>
-            }
-          </Stack>
-          <Box height={40} />
-          <StudentViewList {...{ course, student, sectionsMap, assignmentsMap }} />
-        </Grid>
-        <Grid xs={2} />
+    !sectionsMapLoading && !assignmentsMapLoading && !surveyLoading &&
+    <Grid container>
+      <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
+        <CourseStudentViewNavigation />
       </Grid>
-    </>
+      <Grid item xs={11} md={7.3}>
+        {router.query.view && sectionsMap && assignmentsMap && (
+          <>
+            {router.query.view === "home" && !surveyLoading && <StudentHomeView {...{ course, student, survey, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "my requests" && !requestsLoading && <StudentRequestsView {...{ course, student, requests, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "settings" && <StudentSettingsView course={course} />}
+          </>)}
+      </Grid>
+      <Grid item xs={0.5} md={2.2} />
+    </Grid>
   );
 }
 

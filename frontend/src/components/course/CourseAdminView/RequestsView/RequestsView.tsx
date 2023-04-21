@@ -11,9 +11,10 @@ import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { useEffect, useState } from "react";
-import ViewHeader from "../ViewHeader/ViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import RequestsList from "./RequestsList";
 import { CoursePermission } from "model/user";
+import AdminViewHeader from "../AdminViewHeader";
 
 export interface RequestsViewProps {
   course: Course;
@@ -34,9 +35,7 @@ export default function RequestsView({ course, access, sectionsMap, assignmentsM
 
   return (
     <>
-      <Stack direction="row" justifyContent="space-between" mb={1} height={40}>
-        <ViewHeader view="requests" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
-      </Stack>
+      <AdminViewHeader view="requests" access={access} />
       <Stack ml={-1}>
         <Stack direction="row" justifyContent="space-between">
           <Button

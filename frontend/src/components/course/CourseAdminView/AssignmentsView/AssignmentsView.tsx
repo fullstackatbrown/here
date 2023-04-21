@@ -6,11 +6,12 @@ import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
 import { FC, useState } from "react";
-import ViewHeader from "../ViewHeader/ViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
 import { exportGrades } from "@util/shared/export";
+import AdminViewHeader from "../AdminViewHeader";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -52,9 +53,10 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
         }}
         course={course}
       />
-      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
-        <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
-        {access === CoursePermission.CourseAdmin && (
+      <AdminViewHeader
+        view="assignments"
+        access={access}
+        endElement={access === CoursePermission.CourseAdmin && (
           <Stack direction="row">
             <Button disabled={course.status === CourseStatus.CourseArchived} onClick={() => setCreateAssignmentDialog(true)}>
               + New
@@ -62,7 +64,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
             <MoreMenu keys={["Export Grades"]} handlers={[() => { exportGrades(course, assignments) }]} />
           </Stack>
         )}
-      </Stack>
+      />
       {assignments?.length == 0 && (
         <Typography textAlign="center" mt={3}>
           {access === CoursePermission.CourseAdmin

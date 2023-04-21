@@ -24,7 +24,9 @@ func AuthCtx() func(http.Handler) http.Handler {
 			// 	return
 			// }
 
-			userID := "3mVvKLpz1SceBaPxcKkYUEsuuy72"
+			// Testing only
+			// userID := "3mVvKLpz1SceBaPxcKkYUEsuuy72"
+			userID := "hDEeDZK7N3g8TFqWjaPgocC0Fxz2"
 
 			// Verify the session cookie. In this case an additional check is added to detect
 			// if the user's Firebase session was revoked, user deleted/disabled, etc.

@@ -2,7 +2,7 @@ import GradeChip from "@components/shared/GradeChip/GradeChip";
 import { Box, Chip, Stack, Table, TableBody, TableHead, TableRow } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
-import { sortAssignments } from "@util/shared/assignments";
+import { filterAssignmentsByReleaseDate, sortAssignments } from "@util/shared/assignments";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { useGradesForStudent } from "api/grades/hooks";
 import dayjs from "dayjs";
@@ -14,9 +14,9 @@ import { FC } from "react";
 
 interface StudentGradesTableProps {
     course: Course;
-    assignments: Assignment[];
     student: User;
     sectionsMap: Record<string, Section>;
+    assignmentsMap: Record<string, Assignment>;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -29,7 +29,8 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, assignments, student, sectionsMap }) => {
+const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignmentsMap, sectionsMap }) => {
+    const assignments = filterAssignmentsByReleaseDate(Object.values(assignmentsMap));
     const [grades, gradesLoading] = useGradesForStudent(course.ID, student.ID)
 
     const getSection = (assignmentID: string): Section => {

@@ -16,7 +16,7 @@ import { Section } from 'model/section';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/Menu/SelectMenu';
-import ViewHeader from '../../ViewHeader/ViewHeader';
+import ViewHeader from '../../../../shared/ViewHeader/ViewHeader';
 import { CoursePermission } from 'model/user';
 
 interface GradingViewProps {

@@ -43,14 +43,14 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
         requests && assignmentsMap && sectionsMap &&
         <>
             <SwapRequestDialog
-                {...{ course, assignments, student, sectionsMap }}
+                {...{ course, assignmentsMap, student, sectionsMap }}
                 open={swapRequestDialog !== undefined}
                 onClose={() => { setSwapRequestDialog(undefined) }}
                 swap={swapRequestDialog}
             />
             <Stack direction="column" minHeight={60}>
                 {requests.length === 0 &&
-                    <Typography variant="body1" ml={4} mr={4} mt={1}>You have made no swap requests</Typography>
+                    <Typography variant="body1" mt={1}>You have made no swap requests</Typography>
                 }
                 {(rowsPerPage > 0 ?
                     sortRequestsByTime(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
@@ -63,8 +63,8 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
                         const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
                         return <StudentRequestCard
                             key={`request${r.ID}`}
-                            request={r} courseID={course.ID} student={student} assignment={assignment}
-                            oldSection={oldSection} newSection={newSection} pending={r.status === "pending"}
+                            request={r} course={course} student={student} assignment={assignment}
+                            oldSection={oldSection} newSection={newSection}
                             handleOpenSwapRequestDialog={handleOpenSwapRequestDialog}
                         />
                     })}

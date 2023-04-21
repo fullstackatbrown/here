@@ -3,10 +3,11 @@ import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
-import ViewHeader from "../ViewHeader/ViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
+import AdminViewHeader from "../AdminViewHeader";
 
 export interface SectionsViewProps {
   course: Course;
@@ -41,17 +42,18 @@ const SectionsView: FC<SectionsViewProps> = ({
         onClose={() => setcreateSectionDialog(false)}
         courseID={course.ID}
       />
-      <Stack direction="row" justifyContent="space-between" mb={1} height={40}>
-        <ViewHeader view="sections" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
-        {/* Only course admin can add sections */}
-        {access === CoursePermission.CourseAdmin && (
-          <Button
-            disabled={course.status === CourseStatus.CourseArchived}
-            onClick={() => setcreateSectionDialog(true)}>
-            + New
-          </Button>
-        )}
-      </Stack>
+      <AdminViewHeader
+        view="sections"
+        access={access}
+        endElement={
+          access === CoursePermission.CourseAdmin && (
+            <Button
+              disabled={course.status === CourseStatus.CourseArchived}
+              onClick={() => setcreateSectionDialog(true)}>
+              + New
+            </Button>
+          )}
+      />
       {sections?.length == 0 && (
         <Typography textAlign="center" mt={3}>
           {access === CoursePermission.CourseAdmin

@@ -23,7 +23,6 @@ export default function CourseAdminView({ course, access, headerInView }: Course
   const { courseID } = router.query;
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
   const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID);
-  const theme = useTheme();
 
   useEffect(() => {
     // Always do navigations after the first render
@@ -34,11 +33,7 @@ export default function CourseAdminView({ course, access, headerInView }: Course
 
   return (
     <Grid container>
-      <Grid item xs={0.5} md={2.5} pt={1} sx={{
-        [theme.breakpoints.up('md')]: {
-          paddingLeft: 10,
-        },
-      }}>
+      <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
         <CourseAdminViewNavigation access={access} headerInView={headerInView} />
       </Grid>
       <Grid item xs={11} md={7.3}>

@@ -11,10 +11,11 @@ import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
-import ViewHeader from "../ViewHeader/ViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import PeopleTable from "./PeopleTable";
 import AddStudentDialog from "./AddStudentDialog";
 import { exportStudentList } from "@util/shared/export";
+import AdminViewHeader from "../AdminViewHeader";
 
 export interface PeopleViewProps {
   course: Course;
@@ -71,20 +72,23 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   return (
     <>
       <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
-      <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
-        <ViewHeader view="people" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <SelectMenu
-            value={filterBySection}
-            formatOption={formatOptions}
-            options={sectionOptions()}
-            onSelect={(val) => setFilterBySection(val)}
-            defaultValue={ALL_STUDENTS}
-          />
-          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[handleAddStudent, handleExportStudentList]} />}
-        </Stack>
-      </Stack >
+      <AdminViewHeader
+        view="people"
+        access={access}
+        endElement={
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <SelectMenu
+              value={filterBySection}
+              formatOption={formatOptions}
+              options={sectionOptions()}
+              onSelect={(val) => setFilterBySection(val)}
+              defaultValue={ALL_STUDENTS}
+            />
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[handleAddStudent, handleExportStudentList]} />}
+          </Stack>
+        }
+      />
       {invitedStudents && hasNoStudent() ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&

@@ -1,2 +1,1 @@
-export type View = "sections" | "assignments" | "people" | "requests" | "settings"
-
+export type View = "sections" | "assignments" | "people" | "requests" | "settings" | "home" | "my requests" 

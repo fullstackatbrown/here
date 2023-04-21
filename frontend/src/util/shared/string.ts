@@ -1,5 +1,8 @@
-export function capitalizeFirstLetter(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+export function capitalizeWords(str: string): string {
+    // capitalize first letter of each word
+    return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+    })
 }
 
 // Formats course code by removing all spaces and lowercasing the string
