@@ -10,18 +10,20 @@ import toast from "react-hot-toast";
 import CreateSurveyDialog from "./CreateEditSurveyDialog";
 import SurveyDialog from "./SurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
+import { CourseStatus } from "model/course";
 
 export interface SurveyCardProps {
   survey: Survey;
   numStudents: number;
   sections: Section[];
+  archived: boolean;
 }
 
 /**
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections }) => {
+const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, archived }) => {
   const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const [surveyResponsesDialog, setSUrveyResponsesDialog] = useState(false);
@@ -48,7 +50,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections }) => {
           success: "Survey deleted!",
           error: (err) => handleBadRequestError(err),
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   };
 
@@ -87,10 +89,10 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections }) => {
           </Stack>
 
           <Stack direction={{ xs: "column", md: "row" }}>
-            <IconButton onClick={handleUpdateSurvey} size={"small"}>
+            <IconButton onClick={handleUpdateSurvey} size={"small"} disabled={archived}>
               <CreateIcon fontSize="small" />
             </IconButton>
-            <IconButton onClick={handleDeleteSurvey} size={"small"}>
+            <IconButton onClick={handleDeleteSurvey} size={"small"} disabled={archived}>
               <ClearIcon fontSize="small" />
             </IconButton>
           </Stack>

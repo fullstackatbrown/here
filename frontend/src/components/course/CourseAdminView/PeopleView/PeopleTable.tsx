@@ -7,7 +7,7 @@ import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { sortStudentsByName } from "@util/shared/formatStudentsList";
 import CourseAPI from "api/course/api";
 import { Assignment } from "model/assignment";
-import { Course, CourseUserData } from 'model/course';
+import { Course, CourseStatus, CourseUserData } from 'model/course';
 import { Section } from "model/section";
 import { FC, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -37,6 +37,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
     const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortStudentsByName(students));
     const [page, setPage] = useState(0);
     const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
+    const isCourseArchived = course.status === CourseStatus.CourseArchived;
 
     useEffect(() => {
         setStudentsSorted(sortStudentsByName(students))
@@ -112,7 +113,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <Tooltip title="Remove from course" placement="right">
-                                            <IconButton onClick={handleRemoveStudent(student)} size={"small"}>
+                                            <IconButton onClick={handleRemoveStudent(student)} size={"small"} disabled={isCourseArchived}>
                                                 <ClearIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
@@ -135,7 +136,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <Tooltip title="Remove from course" placement="right">
-                                            <IconButton onClick={handleRemoveInvite(email)} size={"small"}>
+                                            <IconButton onClick={handleRemoveInvite(email)} size={"small"} disabled={isCourseArchived}>
                                                 <ClearIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>

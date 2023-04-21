@@ -1,17 +1,17 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import CreateIcon from "@mui/icons-material/Create";
 import { Box, Card, IconButton, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import { formatSectionTime } from "@util/shared/formatTime";
 import SectionAPI from "api/section/api";
+import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
-import { handleBadRequestError } from "@util/errors";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import PeopleIcon from "@mui/icons-material/People";
 
 export interface SectionCardProps {
+  archived: boolean;
   enrollment: number;
   section: Section;
 }
@@ -20,7 +20,7 @@ export interface SectionCardProps {
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
+const SectionCard: FC<SectionCardProps> = ({ section, enrollment, archived }) => {
   const [editSectionDialog, setEditSectionDialog] = useState(false);
   const theme = useTheme();
   const betweenSmalltoMid = useMediaQuery(theme.breakpoints.between("xs", "md"));
@@ -35,7 +35,7 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
           success: "Section deleted!",
           error: (err) => handleBadRequestError(err),
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   };
 
@@ -85,10 +85,10 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment }) => {
           </Stack>
 
           <Stack direction="row" alignItems="center" justifyContent="center">
-            <IconButton onClick={handleEditSection} size={"small"}>
+            <IconButton onClick={handleEditSection} size={"small"} disabled={archived}>
               <CreateIcon fontSize="small" />
             </IconButton>
-            <IconButton onClick={handleDeleteSection} size={"small"}>
+            <IconButton onClick={handleDeleteSection} size={"small"} disabled={archived}>
               <ClearIcon fontSize="small" />
             </IconButton>
           </Stack>

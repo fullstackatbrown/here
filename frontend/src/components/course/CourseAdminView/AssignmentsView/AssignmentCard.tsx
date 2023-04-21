@@ -4,7 +4,7 @@ import { Box, Card, IconButton, Stack, Typography, useMediaQuery } from "@mui/ma
 import { useTheme } from "@mui/material/styles";
 import AssignmentAPI from "api/assignment/api";
 import { Assignment } from "model/assignment";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
@@ -18,7 +18,7 @@ export interface AssignmentCardProps {
 
 const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardProps) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
-  const theme = useTheme();
+  const isCourseArchived = course.status === CourseStatus.CourseArchived;
 
   const handleEditAssignment = (assignment: Assignment) => {
     return (e: React.MouseEvent<HTMLElement>) => {
@@ -92,10 +92,10 @@ const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardPr
           </Stack>
 
           <Stack direction={{ xs: "column", md: "row" }} alignItems="center" justifyContent="center">
-            <IconButton onClick={handleEditAssignment(assignment)} size={"small"}>
+            <IconButton onClick={handleEditAssignment(assignment)} size={"small"} disabled={isCourseArchived}>
               <CreateIcon fontSize="small" />
             </IconButton>
-            <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"}>
+            <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"} disabled={isCourseArchived}>
               <ClearIcon fontSize="small" />
             </IconButton>
           </Stack>

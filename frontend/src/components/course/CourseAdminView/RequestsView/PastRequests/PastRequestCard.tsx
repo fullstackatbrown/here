@@ -12,6 +12,7 @@ import { Section } from "model/section";
 import UndoIcon from '@mui/icons-material/Undo';
 
 export interface PastRequestProps {
+  archived: boolean,
   request: Swap;
   student: CourseUserData;
   assignment?: Assignment;
@@ -20,7 +21,7 @@ export interface PastRequestProps {
   handleSwap: (request: Swap, status: SwapStatus) => void;
 }
 
-const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSection, newSection, handleSwap }) => {
+const PastRequest: FC<PastRequestProps> = ({ archived, request, student, assignment, oldSection, newSection, handleSwap }) => {
   const [hover, setHover] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const theme = useTheme();
@@ -62,10 +63,13 @@ const PastRequest: FC<PastRequestProps> = ({ request, student, assignment, oldSe
           </Stack>
 
           <Box display="flex" width={70} justifyContent="flex-end">
-            {hover || expanded ?
+            {(hover || expanded) && !archived ?
               <Stack direction="row" display="flex" alignItems="center">
                 <Tooltip title="mark as pending" disableTouchListener>
-                  <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickHandleSwap("pending")}>
+                  <IconButton
+                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
+                    onClick={onClickHandleSwap("pending")}
+                  >
                     <UndoIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>
                 </Tooltip>

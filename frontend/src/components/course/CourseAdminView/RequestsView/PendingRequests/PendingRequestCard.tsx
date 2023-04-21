@@ -14,6 +14,7 @@ import { FC, useState } from "react";
 import RequestInformation from "../RequestInformation";
 
 export interface PendingRequestProps {
+  archived: boolean;
   request: Swap;
   student: CourseUserData;
   assignment?: Assignment;
@@ -23,6 +24,7 @@ export interface PendingRequestProps {
 }
 
 const PendingRequest: FC<PendingRequestProps> = ({
+  archived,
   request,
   student,
   assignment,
@@ -81,7 +83,7 @@ const PendingRequest: FC<PendingRequestProps> = ({
             )}
           </Stack>
           <Box display="flex" width={80} justifyContent="flex-end">
-            {hover || expanded ? (
+            {(hover || expanded) && !archived ? (
               <Stack direction="row" display="flex" alignItems="center" spacing={{ xs: 0.5, md: 0 }}>
                 <Tooltip title="approve" disableTouchListener>
                   <IconButton
@@ -92,7 +94,9 @@ const PendingRequest: FC<PendingRequestProps> = ({
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="deny" disableTouchListener>
-                  <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickHandleSwap("denied")}>
+                  <IconButton
+                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
+                    onClick={onClickHandleSwap("denied")}>
                     <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>
                 </Tooltip>

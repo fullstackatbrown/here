@@ -3,7 +3,7 @@ import { handleBadRequestError } from "@util/errors";
 import { sortRequestsByTime } from "@util/shared/requestTime";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
@@ -22,6 +22,7 @@ export interface RequestsListProps {
 const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsMap, type, requests }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(type === "pending" ? -1 : 5);
+  const isCourseArchived = course.status === CourseStatus.CourseArchived
 
   const handleSwap = (request: Swap, status: SwapStatus) => {
     toast
@@ -70,6 +71,7 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             return type === "pending" ? (
               <PendingRequest
                 key={`request${r.ID}`}
+                archived={isCourseArchived}
                 request={r}
                 student={student}
                 assignment={assignment}
@@ -80,6 +82,7 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             ) : (
               <PastRequest
                 key={`request${r.ID}`}
+                archived={isCourseArchived}
                 request={r}
                 student={student}
                 assignment={assignment}

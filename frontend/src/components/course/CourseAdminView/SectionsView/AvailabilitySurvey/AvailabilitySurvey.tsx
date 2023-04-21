@@ -1,6 +1,6 @@
 import { Box, Button, Card, Paper, Stack, Typography } from "@mui/material";
 import { useSurvey } from "api/surveys/hooks";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ export default function AvailabilitySurvey({ course, sections }: AvailabilitySur
   const [createSurveyDialog, setCreateSurveyDialog] = useState(false);
   const [survey, loading] = useSurvey(course.ID || undefined);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
+  const isCourseArchived = course.status === CourseStatus.CourseArchived;
 
   const numStudents = () => {
     if (!course.students) return 0;
@@ -42,11 +43,11 @@ export default function AvailabilitySurvey({ course, sections }: AvailabilitySur
         <Typography variant="h6" fontWeight={600}>
           Availability Survey
         </Typography>
-        {!survey && <Button onClick={() => setCreateSurveyDialog(true)}>+ Create Survey</Button>}
+        {!survey && <Button disabled={isCourseArchived} onClick={() => setCreateSurveyDialog(true)}>+ Create Survey</Button>}
       </Stack>
       <Box height={100}>
         {survey && (
-          <SurveyCard survey={survey} numStudents={numStudents()} sections={sections} />
+          <SurveyCard survey={survey} numStudents={numStudents()} sections={sections} archived={isCourseArchived} />
         )}
       </Box>
     </>

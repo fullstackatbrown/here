@@ -33,9 +33,10 @@ export default function CoursePage() {
         <Stack pt={{ xs: 3, md: 6 }} gap={4}>
           <Grid container>
             <Grid item xs={0.5} md={2.5} />
-            <Grid item xs={11.5} md={9.5}>
-              <CourseHeader intersectionRef={ref} course={course} />
+            <Grid item xs={11} md={7.3}>
+              <CourseHeader intersectionRef={ref} course={course} access={access} />
             </Grid>
+            <Grid item xs={0.5} md={2.2} />
           </Grid>
           {access ? (
             <CourseAdminView headerInView={inView} course={course} access={access} />

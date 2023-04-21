@@ -1,5 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
@@ -45,7 +45,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         <ViewHeader view="sections" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {/* Only course admin can add sections */}
         {access === CoursePermission.CourseAdmin && (
-          <Button onClick={() => setcreateSectionDialog(true)}>+ New</Button>
+          <Button disabled={course.status === CourseStatus.CourseArchived} onClick={() => setcreateSectionDialog(true)}>+ New</Button>
         )}
       </Stack>
       {sections?.length == 0 && (
@@ -59,6 +59,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         {sections?.map((s) => (
           <SectionCard
             key={s.ID}
+            archived={course.status === CourseStatus.CourseArchived}
             section={s}
             enrollment={getEnrollment(s.ID)}
           />

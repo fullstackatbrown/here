@@ -1,7 +1,7 @@
 import MoreMenu from "@components/shared/Menu/MoreMenu";
 import { Button, Stack, Typography } from "@mui/material";
 import { Assignment } from "model/assignment";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
@@ -56,7 +56,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
         <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {access === CoursePermission.CourseAdmin && (
           <Stack direction="row">
-            <Button onClick={() => setCreateAssignmentDialog(true)}>
+            <Button disabled={course.status === CourseStatus.CourseArchived} onClick={() => setCreateAssignmentDialog(true)}>
               + New
             </Button>
             <MoreMenu keys={["Export Grades"]} handlers={[() => { exportGrades(course, assignments) }]} />
