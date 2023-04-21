@@ -43,7 +43,7 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
         requests && assignmentsMap && sectionsMap &&
         <>
             <SwapRequestDialog
-                {...{ course, assignments, student, sectionsMap }}
+                {...{ course, assignmentsMap, student, sectionsMap }}
                 open={swapRequestDialog !== undefined}
                 onClose={() => { setSwapRequestDialog(undefined) }}
                 swap={swapRequestDialog}
