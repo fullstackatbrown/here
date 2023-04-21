@@ -161,13 +161,8 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 	res = utils.GetAssignedSections(res, survey.Capacity)
 	repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
 
-	readableResults, err := generateReadableResults(courseID, res)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, readableResults)
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully generated results for survey " + surveyID))
 }
 
 func confirmResultsHandler(w http.ResponseWriter, r *http.Request) {
@@ -228,29 +223,4 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, s)
-}
-
-// Helpers
-func generateReadableResults(courseID string, results map[string][]string) (readableResults []models.GenerateResultsResponseItem, err error) {
-	readableResults = make([]models.GenerateResultsResponseItem, 0)
-
-	for sectionID, studentIDs := range results {
-		section, err := repo.Repository.GetSectionByID(courseID, sectionID)
-		if err != nil {
-			return nil, err
-		}
-
-		var students []string
-		for _, studentID := range studentIDs {
-			student, err := repo.Repository.GetUserByID(studentID)
-			if err != nil {
-				return nil, err
-			}
-			students = append(students, student.DisplayName)
-		}
-
-		readableResults = append(readableResults, models.GenerateResultsResponseItem{Section: *section, Students: students})
-	}
-
-	return
 }

@@ -147,12 +147,49 @@ func (fr *FirebaseRepository) DeleteSurvey(courseID string, surveyID string) err
 }
 
 func (fr *FirebaseRepository) UpdateSurveyResults(courseID string, surveyID string, results map[string][]string) error {
+	resultsReadable, err := fr.generateReadableResults(courseID, results)
+	if err != nil {
+		return err
+	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+	batch := fr.firestoreClient.Batch()
+
+	// update Results with studentIDs
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
 		{Path: "results", Value: results},
 	})
+
+	// update ResultsReadable with student names
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
+		{Path: "resultsReadable", Value: resultsReadable},
+	})
+
+	_, err = batch.Commit(firebase.Context)
+
 	return err
+}
+
+// Helpers
+func (fr *FirebaseRepository) generateReadableResults(courseID string, results map[string][]string) (readableResults map[string][]string, err error) {
+	readableResults = make(map[string][]string)
+
+	for sectionID, studentIDs := range results {
+		students := make([]string, 0)
+		for _, studentID := range studentIDs {
+			student, err := fr.GetProfileById(studentID)
+			if err != nil {
+				// TODO: handle error, maybe remove from results if user profile not found? (e.g. user deleted account)
+				return nil, err
+			}
+			students = append(students, student.DisplayName)
+		}
+
+		readableResults[sectionID] = students
+	}
+
+	return
 }
 
 func (fr *FirebaseRepository) ConfirmSurveyResults(courseID string, surveyID string) error {

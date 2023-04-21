@@ -10,6 +10,7 @@ export interface Survey {
   responses: Record<string, string[]>;
   published: boolean;
   results: Record<string, string[]>;
+  resultsReadable: Record<string, string[]>;
 }
 
 export interface GenerateResultsResponse {
