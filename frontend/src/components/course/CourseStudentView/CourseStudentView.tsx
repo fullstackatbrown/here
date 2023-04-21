@@ -28,8 +28,8 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
   const [survey, surveyLoading] = useSurvey(course.ID);
 
   useEffect(() => {
-    // Always do navigations after the first render
-    if (router.query.view === undefined) {
+    const view = router.query.view;
+    if (view === undefined || !["home", "my requests", "settings"].includes(view as string)) {
       router.push(`${course.ID}/?view=home`, undefined, { shallow: true });
     }
   }, [router, course]);

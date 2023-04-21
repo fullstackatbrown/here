@@ -26,7 +26,8 @@ export default function CourseAdminView({ course, access, headerInView }: Course
 
   useEffect(() => {
     // Always do navigations after the first render
-    if (router.query.view === undefined) {
+    const view = router.query.view;
+    if (view === undefined || !["sections", "assignments", "people", "requests", "settings"].includes(view as string)) {
       router.push(`${courseID}/?view=sections`, undefined, { shallow: true });
     }
   }, [router, courseID]);
