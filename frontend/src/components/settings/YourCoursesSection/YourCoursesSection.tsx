@@ -16,7 +16,7 @@ export interface YourCoursesSectionProps {
 const YourCoursesSection: FC<YourCoursesSectionProps> = ({ }) => {
     const { currentUser, loading } = useSession();
     const myCourses = currentUser?.permissions && Object.keys(currentUser.permissions).filter(courseID => currentUser.permissions[courseID] === CoursePermission.CourseAdmin)
-    const [courses, loadingCourses] = myCourses && useCoursesByIDs(myCourses);
+    const [courses, loadingCourses] = useCoursesByIDs(myCourses);
 
     return <SettingsSection taOnly title="Manage your courses" loading={loading || loadingCourses}>
         {courses &&

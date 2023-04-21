@@ -32,7 +32,7 @@ export function useCoursesByIDs(ids: string[]): [Course[] | undefined, boolean] 
     const [courses, setCourses] = useState<Course[] | undefined>(undefined);
 
     useEffect(() => {
-        if (ids.length > 0) {
+        if (ids && ids.length > 0) {
             const db = getFirestore();
             const unsubscribe = onSnapshot(
                 query(collection(db, FirestoreCoursesCollection),
