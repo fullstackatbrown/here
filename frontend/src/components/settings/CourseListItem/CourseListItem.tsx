@@ -3,7 +3,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DoDisturbOnOutlinedIcon from '@mui/icons-material/DoDisturbOnOutlined';
 import { Button, Stack, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course, CourseStatus } from "model/course";
 import React, { FC, useState } from "react";
@@ -60,7 +60,7 @@ const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
                         <Typography>{course.code}: {course.title}</Typography>
                         <CourseStatusChip status={course.status} />
                     </Stack>
-                    <Typography color="secondary" fontSize={14}>{capitalizeFirstLetter(course.term)}</Typography>
+                    <Typography color="secondary" fontSize={14}>{capitalizeWords(course.term)}</Typography>
                 </Stack>
                 <Stack>
                     {course.status === CourseStatus.CourseInactive &&

@@ -2,7 +2,7 @@ import { Box, Stack, TextField, Typography } from "@mui/material";
 import { SinglePermissionRequest } from "model/course";
 import { FC } from "react";
 import ConfirmUploadListItem from "./ConfirmUploadListItem";
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 
 interface ConfirmUploadStepProps {
     term: string;
@@ -14,7 +14,7 @@ interface ConfirmUploadStepProps {
 
 const ConfirmUploadStep: FC<ConfirmUploadStepProps> = ({ term, courses, permissionsByCourse, success }) => {
 
-    const displayString = `${Object.keys(permissionsByCourse).length} courses for ${capitalizeFirstLetter(term)}`
+    const displayString = `${Object.keys(permissionsByCourse).length} courses for ${capitalizeWords(term)}`
 
     return <Stack my={1}>
         {

@@ -2,7 +2,7 @@ import Button from "@components/shared/Button";
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { parseCourses, parseStaffData, parseTerm } from "@util/shared/parseBulkUpload";
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { AddPermissionRequest, createCourseAndPermissionsRequest } from "model/course";
 import { FC, useState } from "react";
@@ -191,7 +191,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
                         </Typography>
                 )}
                 {activeStep === 1 &&
-                    <Typography mt={1.5} fontWeight={500}>{capitalizeFirstLetter(term)} Courses: {formatCourseCodes(Object.keys(courses!))}</Typography>
+                    <Typography mt={1.5} fontWeight={500}>{capitalizeWords(term)} Courses: {formatCourseCodes(Object.keys(courses!))}</Typography>
                 }
                 <Box ml={-0.5} my={2}>
                     {

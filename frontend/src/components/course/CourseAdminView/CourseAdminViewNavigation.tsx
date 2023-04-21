@@ -1,5 +1,5 @@
 import { Button, Stack, Typography, buttonClasses } from "@mui/material";
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
 import { CoursePermission } from "model/user";
@@ -50,7 +50,7 @@ export default function CourseAdminViewNavigation({
           navigateTo(view);
         }}
       >
-        {capitalizeFirstLetter(view)}
+        {capitalizeWords(view)}
         {requestsLength !== undefined && requestsLength > 0 &&
           <Typography color="primary" sx={{ fontSize: 14, fontWeight: query.view === view ? 800 : 500 }}>
             &nbsp;&nbsp;({requestsLength})

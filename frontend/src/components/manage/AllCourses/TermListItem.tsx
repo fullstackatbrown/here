@@ -4,7 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 import { Course } from "model/course";
 import { FC, useState } from "react";
 import CreateEditCourseDialog from "../CreateEditCourseDialog/CreateEditCourseDialog";
@@ -47,7 +47,7 @@ const TermListItem: FC<TermListItemProps> = ({ term, courses }) => {
                                     />
                                 }
                             </Box>
-                            <Typography fontSize={17} fontWeight={500}>{capitalizeFirstLetter(term)}</Typography>
+                            <Typography fontSize={17} fontWeight={500}>{capitalizeWords(term)}</Typography>
                             <Typography fontSize={16} color="secondary">{courses.length} course{courses.length > 1 && "s"}</Typography>
                         </Stack>
                     </Stack>

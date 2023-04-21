@@ -1,5 +1,5 @@
 import { Button, Stack } from "@mui/material";
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 import { View } from "model/general";
 import { useRouter } from "next/router";
 
@@ -30,7 +30,7 @@ export default function CourseStudentViewNavigation() {
           navigateTo(view);
         }}
       >
-        {capitalizeFirstLetter(view)}
+        {capitalizeWords(view)}
       </Button >
     );
   }

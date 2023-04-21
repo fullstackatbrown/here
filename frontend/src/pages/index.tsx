@@ -2,7 +2,7 @@ import CourseCard from "@components/home/CourseCard";
 import AddCourseCard from "@components/home/CourseCard/AddCourseCard";
 import JoinCourseDialog from "@components/home/JoinCourseDialog/JoinCourseDialog";
 import { Box, Grid, Typography } from "@mui/material";
-import { capitalizeFirstLetter } from "@util/shared/string";
+import { capitalizeWords } from "@util/shared/string";
 import { getTerms } from "@util/shared/terms";
 import { useAuth } from "api/auth/hooks";
 import { useCoursesByIDsTerm } from "api/course/hooks";
@@ -23,7 +23,7 @@ export default function Home() {
                     {!loading && getTerms(courses).map((term, index) => (
                         <Box key={term} my={4}>
                             <Typography variant="body1" my={1} ml={0.5} sx={{ fontWeight: 500 }}>
-                                {capitalizeFirstLetter(term)}
+                                {capitalizeWords(term)}
                             </Typography>
                             <Grid
                                 spacing={3}
