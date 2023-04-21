@@ -2,7 +2,7 @@ import { Box, Chip, Stack, Tooltip, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { capitalizeFirstLetter } from "@util/shared/string";
 import CourseAPI from "api/course/api";
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { CoursePermission, User } from "model/user";
 import { FC } from "react";
 import toast from "react-hot-toast";
@@ -21,7 +21,7 @@ interface UserData {
 }
 
 const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
-  const editable = course !== undefined;
+  const editable = course !== undefined && course.status !== CourseStatus.CourseArchived;
   const data: UserData[] =
     users &&
     emails &&

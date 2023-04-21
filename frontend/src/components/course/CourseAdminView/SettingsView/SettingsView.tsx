@@ -6,7 +6,7 @@ import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
 import { useCourseStaff } from "api/course/hooks";
 import ClipboardJS from 'clipboard';
-import { Course } from "model/course";
+import { Course, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
@@ -24,6 +24,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
     const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
 
     const loading = staffLoading || adminLoading || adminInvitesLoading || staffInvitesLoading;
+    const isCourseArchived = course.status === CourseStatus.CourseArchived;
 
     useEffect(() => {
         if (copyButtonRef.current) {
@@ -80,7 +81,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
                             If this feature is turned on, swap requests will be automatically approved if the capacity is not reached.
                         </Typography>
                     </Stack>
-                    <Button variant="outlined" onClick={() => changeAutoApproveRequests()}>
+                    <Button disabled={isCourseArchived} variant="outlined" onClick={() => changeAutoApproveRequests()}>
                         Turn {course.autoApproveRequests ? "Off" : "On"}
                     </Button>
                 </Stack>
