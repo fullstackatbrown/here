@@ -38,8 +38,8 @@ type UpdateSurveyRequest struct {
 
 type CreateSurveyResponseRequest struct {
 	User         *User    `json:"user,omitempty"`
-	CourseID     string   `json:"courseID"`
-	SurveyID     string   `json:"surveyid,omitempty"`
+	CourseID     string   `json:"courseid,omitempty"`
+	Survey       *Survey  `json:"survey,omitempty"`
 	Availability []string `json:"availability"`
 }
 

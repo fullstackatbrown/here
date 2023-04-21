@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -185,13 +186,33 @@ func (fr *FirebaseRepository) ConfirmSurveyResults(courseID string, surveyID str
 	return nil
 }
 
-func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyResponseRequest) (survey *models.Survey, err error) {
-
-	survey, err = fr.GetSurveyByID(req.CourseID, req.SurveyID)
+// Returns the survey if active
+func (fr *FirebaseRepository) ValidateSurveyActive(courseID string, surveyID string) (survey *models.Survey, badRequestErr error, internalErr error) {
+	survey, err := fr.GetSurveyByID(courseID, surveyID)
 	if err != nil {
-		return nil, fmt.Errorf("error getting survey: %v\n", err)
+		return nil, nil, fmt.Errorf("error getting survey: %v\n", err)
 	}
 
+	// check if survey is published
+	if survey.Published == false {
+		return nil, fmt.Errorf("survey is not published"), nil
+	}
+
+	// check if survey ended
+	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error parsing survey end time: %v\n", err)
+	}
+	if surveyEndTime.Before(time.Now()) {
+		return nil, fmt.Errorf("survey has ended"), nil
+	}
+
+	return survey, nil, nil
+}
+
+func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyResponseRequest) (survey *models.Survey, err error) {
+
+	survey = req.Survey
 	if survey.Responses == nil {
 		survey.Responses = make(map[string][]string)
 	}
@@ -199,7 +220,7 @@ func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyRespo
 	survey.Responses[req.User.ID] = req.Availability
 
 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
-		models.FirestoreSurveysCollection).Doc(req.SurveyID).Update(firebase.Context, []firestore.Update{
+		models.FirestoreSurveysCollection).Doc(req.Survey.ID).Update(firebase.Context, []firestore.Update{
 		{
 			Path:  "responses",
 			Value: survey.Responses,

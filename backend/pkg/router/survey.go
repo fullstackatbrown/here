@@ -203,26 +203,18 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if !utils.Contains(user.Courses, courseID) {
+		http.Error(w, "You have to be enrolled in the course to submit a survey response", http.StatusUnauthorized)
 		return
 	}
 
-	// check if survey is published
-	if survey.Published == false {
-		http.Error(w, "Survey is not published", http.StatusBadRequest)
+	survey, requestErr, internalErr := repo.Repository.ValidateSurveyActive(courseID, surveyID)
+	if internalErr != nil {
+		http.Error(w, internalErr.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// check if survey ended
-	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if surveyEndTime.Before(time.Now()) {
-		http.Error(w, "Survey already ended\n", http.StatusBadRequest)
+	if requestErr != nil {
+		http.Error(w, requestErr.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -233,10 +225,9 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.SurveyID = surveyID
+	req.CourseID = courseID
+	req.Survey = survey
 	req.User = user
-
-	// TODO: check if student is in the course
 
 	s, err := repo.Repository.CreateSurveyResponse(req)
 	if err != nil {

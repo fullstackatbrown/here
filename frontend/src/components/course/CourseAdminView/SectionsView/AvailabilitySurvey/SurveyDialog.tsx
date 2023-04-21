@@ -6,6 +6,7 @@ import {
     DialogContent,
     DialogTitle, FormControlLabel, Stack, Typography
 } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
 import { sortSurveyTimes } from "@util/shared/sortSectionTime";
 import SurveyAPI from "api/surveys/api";
@@ -63,7 +64,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
             toast.promise(SurveyAPI.createSurveyResponse(survey.courseID, survey.ID, availability), {
                 loading: "Submitting response...",
                 success: "Response submitted!",
-                error: "Failed to submit response"
+                error: (err) => handleBadRequestError(err),
             })
                 .then(() => onClose())
                 .catch(() => onClose())
