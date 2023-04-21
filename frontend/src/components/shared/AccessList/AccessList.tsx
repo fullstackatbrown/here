@@ -61,7 +61,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
                 />
               </Tooltip>
             } else {
-              return <Tooltip key={data.user.ID} title={"pending"} placement="right">
+              return <Tooltip key={data.email} title={"pending"} placement="right">
                 <Chip
                   sx={{ height: 26, marginRight: 0.5 }}
                   label={data.email}
