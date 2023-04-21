@@ -16,10 +16,6 @@ interface ViewHeaderProps {
 const StyledMenu = styled((props: MenuProps) => (
     <Menu
         elevation={0}
-        // anchorOrigin={{
-        //     vertical: 'bottom',
-        //     horizontal: 'left',
-        // }}
         transformOrigin={{
             vertical: 0,
             horizontal: -5,
@@ -73,7 +69,7 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
             >
                 {views.map((view) => {
                     if (view === "settings" && access !== CoursePermission.CourseAdmin) return <></>;
-                    return <MenuItem sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigateTo(view)} >
+                    return <MenuItem key={view} sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigateTo(view)} >
                         {capitalizeFirstLetter(view)}
                     </MenuItem>
                 })}
