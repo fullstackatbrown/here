@@ -37,7 +37,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
     const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortStudentsByName(students));
     const [page, setPage] = useState(0);
     const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
-    const isCourseArchived = course.status === CourseStatus.CourseArchived;
+    const isCourseActive = course.status === CourseStatus.CourseActive;
 
     useEffect(() => {
         setStudentsSorted(sortStudentsByName(students))
@@ -113,7 +113,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <Tooltip title="Remove from course" placement="right">
-                                            <IconButton onClick={handleRemoveStudent(student)} size={"small"} disabled={isCourseArchived}>
+                                            <IconButton onClick={handleRemoveStudent(student)} size={"small"} disabled={!isCourseActive}>
                                                 <ClearIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
@@ -136,7 +136,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <Tooltip title="Remove from course" placement="right">
-                                            <IconButton onClick={handleRemoveInvite(email)} size={"small"} disabled={isCourseArchived}>
+                                            <IconButton onClick={handleRemoveInvite(email)} size={"small"} disabled={!isCourseActive}>
                                                 <ClearIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>

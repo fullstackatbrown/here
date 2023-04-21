@@ -59,7 +59,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         {sections?.map((s) => (
           <SectionCard
             key={s.ID}
-            archived={course.status === CourseStatus.CourseArchived}
+            active={course.status === CourseStatus.CourseActive}
             section={s}
             enrollment={getEnrollment(s.ID)}
           />

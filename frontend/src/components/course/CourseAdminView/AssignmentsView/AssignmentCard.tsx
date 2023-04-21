@@ -18,7 +18,7 @@ export interface AssignmentCardProps {
 
 const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardProps) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
-  const isCourseArchived = course.status === CourseStatus.CourseArchived;
+  const isCourseActive = course.status === CourseStatus.CourseActive;
 
   const handleEditAssignment = (assignment: Assignment) => {
     return (e: React.MouseEvent<HTMLElement>) => {
@@ -92,10 +92,10 @@ const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardPr
           </Stack>
 
           <Stack direction={{ xs: "column", md: "row" }} alignItems="center" justifyContent="center">
-            <IconButton onClick={handleEditAssignment(assignment)} size={"small"} disabled={isCourseArchived}>
+            <IconButton onClick={handleEditAssignment(assignment)} size={"small"} disabled={!isCourseActive}>
               <CreateIcon fontSize="small" />
             </IconButton>
-            <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"} disabled={isCourseArchived}>
+            <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"} disabled={!isCourseActive}>
               <ClearIcon fontSize="small" />
             </IconButton>
           </Stack>

@@ -24,7 +24,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
     const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
 
     const loading = staffLoading || adminLoading || adminInvitesLoading || staffInvitesLoading;
-    const isCourseArchived = course.status === CourseStatus.CourseArchived;
+    const isCourseActive = course.status === CourseStatus.CourseActive;
 
     useEffect(() => {
         if (copyButtonRef.current) {
@@ -81,7 +81,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
                             If this feature is turned on, swap requests will be automatically approved if the capacity is not reached.
                         </Typography>
                     </Stack>
-                    <Button disabled={isCourseArchived} variant="outlined" onClick={() => changeAutoApproveRequests()}>
+                    <Button disabled={!isCourseActive} variant="outlined" onClick={() => changeAutoApproveRequests()}>
                         Turn {course.autoApproveRequests ? "Off" : "On"}
                     </Button>
                 </Stack>

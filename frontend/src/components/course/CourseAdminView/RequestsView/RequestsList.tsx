@@ -22,7 +22,7 @@ export interface RequestsListProps {
 const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsMap, type, requests }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(type === "pending" ? -1 : 5);
-  const isCourseArchived = course.status === CourseStatus.CourseArchived
+  const isCourseActive = course.status === CourseStatus.CourseActive
 
   const handleSwap = (request: Swap, status: SwapStatus) => {
     toast
@@ -71,7 +71,7 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             return type === "pending" ? (
               <PendingRequest
                 key={`request${r.ID}`}
-                archived={isCourseArchived}
+                active={isCourseActive}
                 request={r}
                 student={student}
                 assignment={assignment}
@@ -82,7 +82,7 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             ) : (
               <PastRequest
                 key={`request${r.ID}`}
-                archived={isCourseArchived}
+                active={isCourseActive}
                 request={r}
                 student={student}
                 assignment={assignment}

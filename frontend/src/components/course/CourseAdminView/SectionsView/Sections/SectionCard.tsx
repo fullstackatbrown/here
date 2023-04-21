@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
 
 export interface SectionCardProps {
-  archived: boolean;
+  active: boolean;
   enrollment: number;
   section: Section;
 }
@@ -20,7 +20,7 @@ export interface SectionCardProps {
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SectionCard: FC<SectionCardProps> = ({ section, enrollment, archived }) => {
+const SectionCard: FC<SectionCardProps> = ({ section, enrollment, active }) => {
   const [editSectionDialog, setEditSectionDialog] = useState(false);
   const theme = useTheme();
   const betweenSmalltoMid = useMediaQuery(theme.breakpoints.between("xs", "md"));
@@ -85,10 +85,10 @@ const SectionCard: FC<SectionCardProps> = ({ section, enrollment, archived }) =>
           </Stack>
 
           <Stack direction="row" alignItems="center" justifyContent="center">
-            <IconButton onClick={handleEditSection} size={"small"} disabled={archived}>
+            <IconButton onClick={handleEditSection} size={"small"} disabled={!active}>
               <CreateIcon fontSize="small" />
             </IconButton>
-            <IconButton onClick={handleDeleteSection} size={"small"} disabled={archived}>
+            <IconButton onClick={handleDeleteSection} size={"small"} disabled={!active}>
               <ClearIcon fontSize="small" />
             </IconButton>
           </Stack>
