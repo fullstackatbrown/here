@@ -1,4 +1,4 @@
-import { Box, Stack, Table, TableBody, TableCell, TableRow, Typography, styled, useTheme } from "@mui/material";
+import { Box, Stack, Typography, useTheme } from "@mui/material";
 import formatSectionInfo, { formatSectionCapacity } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
@@ -19,11 +19,6 @@ export interface RequestInformationProps {
 
 const RequestInformation: FC<RequestInformationProps> = ({ request, oldSection, newSection, assignment }) => {
     const theme = useTheme();
-    const StyledTableCell = styled(TableCell)({
-        borderBottom: 'none',
-        color: theme.palette.secondary.main,
-        padding: '3px 0 3px 0'
-    });
 
     const information = {
         "Type": assignment ? `One Time - ${assignment.name}` : "Permanent",
@@ -33,40 +28,24 @@ const RequestInformation: FC<RequestInformationProps> = ({ request, oldSection, 
         "Reason": request.reason,
     }
 
-    return <Table>
-        <Stack direction="column" spacing={1}>
-            {Object.keys(information).map((key) => {
-                const [availableSeats, availableSeatsString] = formatSectionCapacity(newSection, assignment?.ID)
-                return <Stack direction="row" key={key}>
-                    <Box minWidth={100}>
-                        <Typography color="secondary" fontSize={14}>{key}</Typography>
-                    </Box>
-                    <Typography color="secondary" fontSize={14}>
-                        {information[key]}
-                        {key === "New Section" &&
-                            <Box component="span" color={availableSeats <= 0 ? theme.palette.error.main : "inherit"}>
-                                &nbsp;({availableSeatsString})
-                            </Box>
-                        }
-                    </Typography>
-                </Stack>
-
-                // <TableRow key={key}>
-                //     <StyledTableCell component="th" scope="row">
-                //         {key}
-                //     </StyledTableCell>
-                //     <StyledTableCell component="th" scope="row">
-                //         {information[key]}
-                //         {key === "New Section" &&
-                //             <Box component="span" color={availableSeats <= 0 ? theme.palette.error.main : "inherit"}>
-                //                 &nbsp;({availableSeatsString})
-                //             </Box>
-                //         }
-                //     </StyledTableCell>
-                // </TableRow>
-            })}
-        </Stack>
-    </Table>
+    return <Stack direction="column" spacing={1}>
+        {Object.keys(information).map((key) => {
+            const [availableSeats, availableSeatsString] = formatSectionCapacity(newSection, assignment?.ID)
+            return <Stack direction="row" key={key}>
+                <Box minWidth={100}>
+                    <Typography color="secondary" fontSize={14}>{key}</Typography>
+                </Box>
+                <Typography color="secondary" fontSize={14}>
+                    {information[key]}
+                    {key === "New Section" &&
+                        <Box component="span" color={availableSeats <= 0 ? theme.palette.error.main : "inherit"}>
+                            &nbsp;({availableSeatsString})
+                        </Box>
+                    }
+                </Typography>
+            </Stack>
+        })}
+    </Stack>
 }
 
 export default RequestInformation
