@@ -17,12 +17,13 @@ async function updateGrade(
   courseID: string,
   assignmentID: string,
   gradeID: string,
+  studentID: string,
   grade: number,
   gradedByID: string
 ): Promise<boolean> {
   return APIClient.patch(
     `/courses/${courseID}/assignments/${assignmentID}/grades/${gradeID}`,
-    { grade, gradedByID }
+    { grade, gradedByID, studentID }
   );
 }
 

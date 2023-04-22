@@ -7,6 +7,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/golang/glog"
 )
 
 func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*models.Grade, error) {
@@ -34,6 +35,9 @@ func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*mode
 
 	grade.ID = gradeID
 
+	// Send a notification to the student
+	fr.sendUpdateGradeNotification(req.CourseID, req.StudentID)
+
 	return grade, nil
 }
 
@@ -44,7 +48,15 @@ func (fr *FirebaseRepository) UpdateGrade(req *models.UpdateGradeRequest) error 
 		{Path: "grade", Value: req.Grade},
 		{Path: "gradedBy", Value: req.GradedBy.ID},
 	})
-	return err
+
+	if err != nil {
+		return fmt.Errorf("error updating grade: %v\n", err)
+	}
+
+	// Send a notification to the student
+	fr.sendUpdateGradeNotification(req.CourseID, req.StudentID)
+
+	return nil
 }
 
 func (fr *FirebaseRepository) DeleteGrade(req *models.DeleteGradeRequest) error {
@@ -54,5 +66,27 @@ func (fr *FirebaseRepository) DeleteGrade(req *models.DeleteGradeRequest) error 
 	if err != nil {
 		return fmt.Errorf("error deleting grade: %v\n", err)
 	}
+
+	return nil
+}
+
+func (fr *FirebaseRepository) sendUpdateGradeNotification(courseID string, studentID string) error {
+	course, err := fr.GetCourseByID(courseID)
+	if err != nil {
+		return err
+	}
+
+	notification := models.Notification{
+		Title:     "Your grade has been updated",
+		Body:      course.Code,
+		Timestamp: time.Now(),
+		Type:      models.NotificationGradeUpdated,
+	}
+
+	err = fr.AddNotification(studentID, notification)
+	if err != nil {
+		glog.Warningf("error sending claim notification: %v\n", err)
+	}
+
 	return nil
 }

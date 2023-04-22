@@ -5,7 +5,7 @@ import "time"
 type NotificationType string
 
 const (
-	NotificationReleaseGrades  NotificationType = "RELEASE_GRADES"
+	NotificationGradeUpdated   NotificationType = "RELEASE_GRADES"
 	NotificationRequestUpdated NotificationType = "REQUEST_UPDATED"
 	NotificationAnnouncement   NotificationType = "ANNOUNCEMENT"
 )

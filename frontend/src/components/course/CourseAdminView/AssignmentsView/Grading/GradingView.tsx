@@ -89,7 +89,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
 
     const handleUpdateGrade = (gradeID: string, userID: string) => {
         return (grade: number) => {
-            toast.promise(GradeAPI.updateGrade(course.ID, assignment.ID, gradeID, grade, "temp_ta_id"),
+            toast.promise(GradeAPI.updateGrade(course.ID, assignment.ID, gradeID, userID, grade, "temp_ta_id"),
                 {
                     loading: "Updating grade...",
                     success: "Grade updated!",

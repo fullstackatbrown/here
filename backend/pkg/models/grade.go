@@ -29,6 +29,7 @@ type UpdateGradeRequest struct {
 	CourseID     string `json:"courseid,omitempty"`
 	AssignmentID string `json:"assignmentid,omitempty"`
 	GradeID      string `json:"gradeid,omitempty"`
+	StudentID    string `json:"studentid"`
 	Grade        int    `json:"grade"`
 	GradedBy     *User  `json:"gradedBy,omitempty"`
 }
