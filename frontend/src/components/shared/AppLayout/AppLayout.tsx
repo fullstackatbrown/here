@@ -48,8 +48,9 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
     return <></>;
   }
 
-  const badgedNotificationIcon: JSX.Element = currentUser?.notifications.length === 0 ? <NotificationsIcon /> :
-    <Badge badgeContent={currentUser?.notifications.length} color="primary"><NotificationsIcon /></Badge>;
+  const badgedNotificationIcon: JSX.Element = currentUser?.notifications?.length > 0 ?
+    <Badge badgeContent={currentUser?.notifications.length} color="primary"><NotificationsIcon /></Badge> :
+    <NotificationsIcon />
 
   const endItems = [
     <IconButton key="notifications" label="Notifications" onClick={() => setNotificationMenu(true)}>
