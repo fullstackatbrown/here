@@ -1,4 +1,3 @@
-import Callout from "@components/shared/Callout";
 import { Feedback, Info, Logout, School, Settings, WbSunny } from "@mui/icons-material";
 import {
     Avatar,
@@ -14,9 +13,9 @@ import getInitials from "@util/shared/getInitials";
 import AuthAPI from "api/auth/api";
 import FocusTrap from "focus-trap-react";
 import { useRouter } from "next/router";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useRef, useState } from "react";
 import AboutDialog from "../AboutDialog";
-import { User } from "firebase/auth";
+import { User } from "model/user";
 
 export interface AccountMenuProps {
     /** The current user. */
@@ -70,7 +69,7 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
         <Tooltip title={`Signed in as ${user.displayName}`}>
             <ButtonBase aria-label="account menu" sx={{ borderRadius: '100%' }} ref={buttonRef}
                 onClick={() => setOpen(!open)} focusRipple>
-                <Avatar src={user.photoURL}
+                <Avatar src={user.photoUrl}
                     imgProps={{ referrerPolicy: "no-referrer" }}
                     sx={{
                         width: 40,
@@ -92,7 +91,7 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                             <div>
                                 <Stack sx={{ p: 4 }} alignItems="center">
                                     <Avatar
-                                        src={user.photoURL}
+                                        src={user.photoUrl}
                                         imgProps={{ referrerPolicy: "no-referrer" }}
                                         sx={{
                                             width: 96,

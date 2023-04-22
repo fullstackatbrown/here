@@ -31,7 +31,7 @@ export default function CoursePage() {
   }, [router, course, courseLoading, isAuthenticated, currentUser]);
 
   return (
-    <AppLayout title={course?.title} maxWidth="lg" loading={courseLoading}>
+    <AppLayout title={course?.title} maxWidth={false} loading={courseLoading}>
       {course && !courseLoading && isAuthenticated && (
         <Stack pt={{ xs: 3, md: 6 }} gap={4}>
           <Grid container>
