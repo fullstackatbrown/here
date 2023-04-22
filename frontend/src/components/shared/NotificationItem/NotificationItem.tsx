@@ -8,7 +8,8 @@ import {
 import IconButton from "@components/shared/IconButton";
 import ClearIcon from '@mui/icons-material/Clear';
 import { toast } from "react-hot-toast";
-import AuthAPI, { Notification } from "api/auth/api";
+import AuthAPI from "api/auth/api";
+import { Notification } from "model/user";
 import { formatDistance } from "date-fns";
 
 export interface NotificationItemProps {
@@ -21,7 +22,7 @@ const NotificationItem: FC<NotificationItemProps> = ({ notification }) => {
             <ListItem
                 secondaryAction={
                     <IconButton edge="end" label="Clear notification" onClick={() => {
-                        AuthAPI.clearNotification(notification)
+                        AuthAPI.clearNotification(notification.ID)
                             .catch(() => toast.error("Error clearing notification."));
                     }}>
                         <ClearIcon />

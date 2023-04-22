@@ -248,22 +248,13 @@ func signOutHandler(w http.ResponseWriter, r *http.Request) {
 
 // POST: notification clear
 func clearNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	var req *models.ClearNotificationRequest
-
+	notificationID := chi.URLParam(r, "notificationID")
 	user, err := middleware.GetUserFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	req.UserID = user.ID
-
-	err = repo.Repository.ClearNotification(req)
+	err = repo.Repository.ClearNotification(user.ID, notificationID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -280,9 +271,7 @@ func clearAllNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	req := models.ClearAllNotificationsRequest{UserID: user.ID}
-
-	err = repo.Repository.ClearAllNotifications(&req)
+	err = repo.Repository.ClearAllNotifications(user.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

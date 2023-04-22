@@ -19,19 +19,19 @@ func (fr *FirebaseRepository) AddNotification(userID string, notification models
 	return err
 }
 
-func (fr *FirebaseRepository) ClearNotification(c *models.ClearNotificationRequest) error {
-	user, err := fr.GetUserByID(c.UserID)
+func (fr *FirebaseRepository) ClearNotification(userID string, notificationID string) error {
+	user, err := fr.GetUserByID(userID)
 	if err != nil {
 		return err
 	}
 
 	newNotifications := make([]models.Notification, 0)
 	for _, v := range user.Notifications {
-		if v.ID != c.NotificationID {
+		if v.ID != notificationID {
 			newNotifications = append(newNotifications, v)
 		}
 	}
-	_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(c.UserID).Update(firebase.Context, []firestore.Update{
+	_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(userID).Update(firebase.Context, []firestore.Update{
 		{
 			Path:  "notifications",
 			Value: newNotifications,
@@ -40,8 +40,8 @@ func (fr *FirebaseRepository) ClearNotification(c *models.ClearNotificationReque
 	return err
 }
 
-func (fr *FirebaseRepository) ClearAllNotifications(c *models.ClearAllNotificationsRequest) error {
-	_, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(c.UserID).Update(firebase.Context, []firestore.Update{
+func (fr *FirebaseRepository) ClearAllNotifications(userID string) error {
+	_, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(userID).Update(firebase.Context, []firestore.Update{
 		{
 			Path:  "notifications",
 			Value: make([]models.Notification, 0),
