@@ -79,6 +79,22 @@ async function editAdminAccess(email: string, isAdmin: boolean): Promise<string>
     }
 }
 
+async function clearNotification(notificationID: string): Promise<string> {
+    try {
+        return await APIClient.delete(`${Endpoint.USER}/notifications/${notificationID}`);
+    } catch (e) {
+        throw e;
+    }
+}
+
+async function clearAllNotifications(): Promise<string> {
+    try {
+        return await APIClient.delete(`${Endpoint.USER}/notifications`);
+    } catch (e) {
+        throw e;
+    }
+}
+
 async function signOut() {
     try {
         return await APIClient.post(`${Endpoint.USER}/signout`);
@@ -94,6 +110,8 @@ const AuthAPI = {
     quitCourse,
     signInWithGoogle,
     editAdminAccess,
+    clearNotification,
+    clearAllNotifications,
     signOut,
 };
 
