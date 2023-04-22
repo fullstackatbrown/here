@@ -9,7 +9,6 @@ import formatSectionInfo from '@util/shared/formatSectionInfo';
 import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
 import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
 import GradeAPI from 'api/grades/api';
-import { useGradesForAssignment } from 'api/grades/hooks';
 import { Assignment } from 'model/assignment';
 import { Course, CourseUserData } from 'model/course';
 import { Section } from 'model/section';
@@ -40,7 +39,6 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 
 const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, access }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
-    const [grades, gradesLoading] = useGradesForAssignment(course.ID, assignment.ID)
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
 
@@ -76,7 +74,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
 
     const handleSubmitGrade = (userID: string) => {
         return (grade: number) => {
-            toast.promise(GradeAPI.createGrade(course.ID, assignment.ID, userID, grade, "temp_ta_id"),
+            toast.promise(GradeAPI.createGrade(course.ID, assignment.ID, userID, grade),
                 {
                     loading: "Submitting grade...",
                     success: "Grade submitted!",
@@ -87,22 +85,9 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
         }
     }
 
-    const handleUpdateGrade = (gradeID: string, userID: string) => {
-        return (grade: number) => {
-            toast.promise(GradeAPI.updateGrade(course.ID, assignment.ID, gradeID, userID, grade, "temp_ta_id"),
-                {
-                    loading: "Updating grade...",
-                    success: "Grade updated!",
-                    error: "Error updating grade"
-                })
-                .then(() => setEditGrade(null))
-                .catch(() => setEditGrade(null))
-        }
-    }
-
-    const handleDeleteGrade = (gradeID: string) => {
+    const handleDeleteGrade = (userID: string) => {
         return () => {
-            toast.promise(GradeAPI.deleteGrade(course.ID, assignment.ID, gradeID),
+            toast.promise(GradeAPI.deleteGrade(course.ID, assignment.ID, userID),
                 {
                     loading: "Deleting grade...",
                     success: "Grade deleted",
@@ -181,7 +166,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((student) => {
                                         const userID = student.studentID
-                                        const grade = grades && userID in grades ? grades[userID] : undefined
+                                        const grade = userID in assignment.grades ? assignment.grades[userID] : undefined
                                         return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
                                             <TableCell component="th" scope="row">
                                                 {course.students && course.students[userID] && course.students[userID].displayName}
@@ -192,8 +177,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                                                     maxScore={assignment.maxScore}
                                                     editable={editGrade && editGrade === userID}
                                                     handleCreateGrade={handleSubmitGrade(userID)}
-                                                    handleUpdateGrade={grade ? handleUpdateGrade(grade.ID, userID) : undefined}
-                                                    handleDeleteGrade={grade ? handleDeleteGrade(grade.ID) : undefined}
+                                                    handleDeleteGrade={grade ? handleDeleteGrade(userID) : undefined}
                                                 />
                                             </TableCell>
                                             {!isXsScreen && <TableCell component="th" scope="row">

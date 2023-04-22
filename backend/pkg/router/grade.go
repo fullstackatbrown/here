@@ -20,7 +20,6 @@ func GradesRoutes() *chi.Mux {
 	router.Post("/", createGradeHandler)
 
 	router.Route("/{gradeID}", func(router chi.Router) {
-		router.Patch("/", updateGradeHandler)
 		router.Delete("/", deleteGradeHandler)
 	})
 
@@ -55,38 +54,6 @@ func createGradeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, c)
-}
-
-func updateGradeHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
-	assignmentID := chi.URLParam(r, "assignmentID")
-	gradeID := chi.URLParam(r, "gradeID")
-	gradedBy, err := middleware.GetUserFromRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	var req *models.UpdateGradeRequest
-	err = json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	req.CourseID = courseID
-	req.AssignmentID = assignmentID
-	req.GradeID = gradeID
-	req.GradedBy = gradedBy
-
-	err = repo.Repository.UpdateGrade(req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(200)
-	w.Write([]byte("Successfully updated grade " + gradeID))
 }
 
 func deleteGradeHandler(w http.ResponseWriter, r *http.Request) {
