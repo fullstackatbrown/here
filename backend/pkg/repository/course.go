@@ -14,10 +14,9 @@ import (
 )
 
 func (fr *FirebaseRepository) initializeCoursesListener() {
-	firstTime := true
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newCourses := make(map[string]*models.Course)
-		newCoursesEntryCodes := make(map[string]string)
+		newCoursesEntryCodes := make(map[string]*models.Course)
 		for _, doc := range docs {
 			if !doc.Exists() {
 				continue
@@ -32,32 +31,34 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 
 			c.ID = doc.Ref.ID
 			newCourses[doc.Ref.ID] = &c
-			// TODO: do not add to map if term is over
-			newCoursesEntryCodes[c.EntryCode] = doc.Ref.ID
+			newCoursesEntryCodes[c.EntryCode] = &c
 		}
 
 		fr.coursesLock.Lock()
 		fr.coursesEntryCodesLock.Lock()
 
+		oldCourses := fr.courses
+
 		fr.courses = newCourses
 		fr.coursesEntryCodes = newCoursesEntryCodes
 
-		fr.coursesEntryCodesLock.Unlock()
-		fr.coursesLock.Unlock()
-
-		if firstTime {
-			for courseID := range fr.courses {
+		// If a course is newly added to the list (e.g. just set to active), initialize the sections and assignments listeners
+		for courseID := range fr.courses {
+			if _, ok := oldCourses[courseID]; !ok {
+				// TODO: remove the sections and assignments listener if a course is no longer active
 				fr.initializeSectionsListener(courseID)
 				fr.initializeAssignmentsListener(courseID)
 			}
-			firstTime = false
 		}
+
+		fr.coursesEntryCodesLock.Unlock()
+		fr.coursesLock.Unlock()
 
 		return nil
 	}
 
 	done := make(chan bool)
-	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Query
+	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Query.Where("status", "==", models.CourseActive)
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)
 		if err != nil {
@@ -67,15 +68,44 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 	<-done
 }
 
-// GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
+// GetCourseByID gets the Course corresponding to the provided course ID.
+// If the course is not in the cache, it will be fetched from Firestore.
 func (fr *FirebaseRepository) GetCourseByID(ID string) (*models.Course, error) {
+	fr.coursesLock.RLock()
+	defer fr.coursesLock.RUnlock()
+
+	if val, ok := fr.courses[ID]; ok {
+		// first look in cache
+		return val, nil
+	} else {
+		// if not in cache, look in firestore
+		doc, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(ID).Get(firebase.Context)
+		if !doc.Exists() {
+			return nil, qerrors.CourseNotFoundError
+		} else if err != nil {
+			return nil, err
+		}
+
+		var c models.Course
+		err = mapstructure.Decode(doc.Data(), &c)
+		if err != nil {
+			log.Panicf("Error destructuring document: %v", err)
+			return nil, err
+		}
+		c.ID = doc.Ref.ID
+		return &c, nil
+	}
+}
+
+// GetActiveCourseByID gets the Course from the courses map corresponding to the provided course ID.
+func (fr *FirebaseRepository) GetActiveCourseByID(ID string) (*models.Course, error) {
 	fr.coursesLock.RLock()
 	defer fr.coursesLock.RUnlock()
 
 	if val, ok := fr.courses[ID]; ok {
 		return val, nil
 	} else {
-		return nil, qerrors.CourseNotFoundError
+		return nil, qerrors.CourseNotFoundOrNonactiveError
 	}
 }
 
@@ -91,12 +121,13 @@ func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models
 	return nil, qerrors.CourseNotFoundError
 }
 
+// will only return active courses
 func (fr *FirebaseRepository) GetCourseByEntryCode(entryCode string) (*models.Course, error) {
 	fr.coursesEntryCodesLock.RLock()
 	defer fr.coursesEntryCodesLock.RUnlock()
 
-	if val, ok := fr.coursesEntryCodes[entryCode]; ok {
-		return fr.GetCourseByID(val)
+	if course, ok := fr.coursesEntryCodes[entryCode]; ok {
+		return course, nil
 	} else {
 		return nil, qerrors.InvalidEntryCodeError
 	}
@@ -232,7 +263,7 @@ func (fr *FirebaseRepository) assignPermanentSection(req *models.AssignSectionsR
 	batch := fr.firestoreClient.Batch()
 
 	// get the course.students object from the course document
-	course, err := fr.GetCourseByID(req.CourseID)
+	course, err := fr.GetActiveCourseByID(req.CourseID)
 	if err != nil {
 		return nil, err
 	}

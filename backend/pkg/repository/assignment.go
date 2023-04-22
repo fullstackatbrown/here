@@ -75,7 +75,6 @@ func (fr *FirebaseRepository) GetAssignmentByID(courseID string, assignmentID st
 }
 
 func (fr *FirebaseRepository) GetAssignmentByName(courseID string, name string) (assignment *models.Assignment, err error) {
-
 	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err
