@@ -5,24 +5,10 @@ async function createGrade(
   assignmentID: string,
   studentID: string,
   grade: number,
-  gradedByID: string
 ): Promise<string> {
   return APIClient.post(
     `/courses/${courseID}/assignments/${assignmentID}/grades`,
-    { studentID, grade, gradedByID }
-  );
-}
-
-async function updateGrade(
-  courseID: string,
-  assignmentID: string,
-  gradeID: string,
-  grade: number,
-  gradedByID: string
-): Promise<boolean> {
-  return APIClient.patch(
-    `/courses/${courseID}/assignments/${assignmentID}/grades/${gradeID}`,
-    { grade, gradedByID }
+    { studentID, grade }
   );
 }
 
@@ -36,13 +22,8 @@ async function deleteGrade(
   );
 }
 
-async function exportGrades(courseID: string): Promise<string> {
-  return APIClient.post(`/courses/${courseID}/exportGrades`);
-}
-
 const GradeAPI = {
   createGrade,
-  updateGrade,
   deleteGrade,
 };
 

@@ -1,4 +1,3 @@
-import { useAllGrades } from "api/grades/hooks";
 import { ExportToCsv } from 'export-to-csv';
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -21,43 +20,37 @@ const options = {
 
 export function exportGrades(course: Course, assignments: Assignment[], invitedStudents?: string[], percentage: boolean = false) {
     options.filename = `${course.code}_grades`
+    let data = [];
+    for (const student of Object.values(course.students)) {
+        let entry = {
+            "name": student.displayName,
+            "email": student.email,
+        }
+        for (const assignment of assignments) {
+            let grade = assignment.grades[student.studentID]?.grade
+            if (percentage) {
+                grade = grade ? grade / assignment.maxScore * 100 : undefined;
+            }
+            entry[assignment.name.toLowerCase().replace(/\s+/g, '_')] = grade ? grade : "N/A";
+        }
+        data.push(entry);
+    }
 
-    useAllGrades(course.ID, assignments.map((a) => a.ID)).then((grades) => {
-        let data = [];
-        for (const student of Object.values(course.students)) {
+    if (invitedStudents) {
+        for (const email of invitedStudents) {
             let entry = {
-                "name": student.displayName,
-                "email": student.email,
+                "name": getNameFromEmail(email),
+                "email": email,
             }
             for (const assignment of assignments) {
-                const assignmentGrades = grades[assignment.ID];
-                let grade = student.studentID in assignmentGrades ? assignmentGrades[student.studentID].grade : undefined;
-                if (percentage) {
-                    grade = grade ? grade / assignment.maxScore * 100 : undefined;
-                }
-                entry[assignment.name.toLowerCase()] = grade ? grade : "N/A";
+                entry[assignment.name.toLowerCase()] = "N/A";
             }
             data.push(entry);
         }
+    }
 
-        if (invitedStudents) {
-            for (const email of invitedStudents) {
-                let entry = {
-                    "name": getNameFromEmail(email),
-                    "email": email,
-                }
-                for (const assignment of assignments) {
-                    entry[assignment.name.toLowerCase()] = "N/A";
-                }
-                data.push(entry);
-            }
-        }
-
-        const csvExporter = new ExportToCsv(options);
-        csvExporter.generateCsv(data);
-
-    })
-
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
 }
 
 export function exportStudentList(course: Course, invitedStudents?: string[]) {

@@ -1,3 +1,4 @@
+import { Grade } from "./grades";
 
 export interface Assignment {
   ID: string;
@@ -7,4 +8,5 @@ export interface Assignment {
   releaseDate: string;
   dueDate: string;
   maxScore: number;
+  grades: Record<string, Grade>
 }

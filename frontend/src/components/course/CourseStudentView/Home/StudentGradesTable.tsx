@@ -4,7 +4,6 @@ import MuiTableCell from "@mui/material/TableCell";
 import { styled } from "@mui/material/styles";
 import { filterAssignmentsByReleaseDate, sortAssignments } from "@util/shared/assignments";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
-import { useGradesForStudent } from "api/grades/hooks";
 import dayjs from "dayjs";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -31,7 +30,6 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 
 const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap }) => {
     const assignmentsFiltered = filterAssignmentsByReleaseDate(assignments);
-    const [grades, gradesLoading] = useGradesForStudent(course.ID, student.ID)
 
     const getSection = (assignmentID: string): Section => {
         let sectionID = student.actualSections?.[course.ID]?.[assignmentID]
@@ -76,7 +74,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
                     </TableCell>
                     <TableCell component="th" scope="row" >
                         <GradeChip
-                            score={grades && grades[assignment.ID]?.grade}
+                            score={assignment.grades?.[student.ID]?.grade}
                             maxScore={assignment.maxScore}
                             instructor={false}
                         />

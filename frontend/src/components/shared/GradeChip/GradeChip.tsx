@@ -10,7 +10,6 @@ interface GradeChipProps {
   instructor?: boolean;
   editable?: boolean;
   handleCreateGrade?: (grade: number) => void;
-  handleUpdateGrade?: (grade: number) => void;
   handleDeleteGrade?: () => void;
 }
 
@@ -18,7 +17,7 @@ type FormData = {
   grade: string
 };
 
-const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, editable = false, handleCreateGrade, handleUpdateGrade, handleDeleteGrade }) => {
+const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, editable = false, handleCreateGrade, handleDeleteGrade }) => {
   const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
     defaultValues: { grade: score ? score.toString() : "" }
   });
@@ -47,7 +46,7 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, edi
         const confirmed = confirm("Are you sure you want to delete this grade?")
         confirmed && handleDeleteGrade && handleDeleteGrade()
       } else {
-        handleUpdateGrade && handleUpdateGrade(grade)
+        handleCreateGrade && handleCreateGrade(grade)
       }
       return
     }
