@@ -3,6 +3,7 @@ import { FirestoreInvitesCollection, FirestoreProfilesCollection } from "api/fir
 import { useAsyncEffect } from "api/hooks/useAsyncEffect";
 import { CoursePermission, User } from "model/user";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { Notification } from "model/user";
 import AuthAPI from "./api";
 
 type AuthState = {

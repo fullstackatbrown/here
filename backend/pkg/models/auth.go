@@ -42,6 +42,7 @@ type Profile struct {
 	ActualSections  map[string]map[string]string `json:"actualSections" firestore:"actualSections"`
 	IsAdmin         bool                         `json:"isAdmin" firestore:"isAdmin"`
 	Permissions     map[string]CoursePermission  `json:"permissions" firestore:"permissions"` // map from courseID to permission
+	Notifications   []Notification               `json:"notifications" firestore:"notifications"`
 }
 
 type User struct {

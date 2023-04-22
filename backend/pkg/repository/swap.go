@@ -9,6 +9,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/utils"
+	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -176,7 +177,29 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 	})
 
 	_, err = batch.Commit(firebase.Context)
-	return err
+
+	if err != nil {
+		return err
+	}
+
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return err
+	}
+
+	notification := models.Notification{
+		Title:     "Your swap request status has been updated",
+		Body:      course.Code,
+		Timestamp: time.Now(),
+		Type:      models.NotificationRequestUpdated,
+	}
+	err = fr.AddNotification(swap.StudentID, notification)
+	if err != nil {
+		glog.Warningf("error sending claim notification: %v\n", err)
+	}
+
+	return nil
+
 }
 
 func (fr *FirebaseRepository) CancelSwap(courseID string, swapID string) error {

@@ -3,13 +3,16 @@ import Button from "@components/shared/Button";
 import IconButton from "@components/shared/IconButton";
 import Navbar from "@components/shared/Navbar";
 import CloseIcon from "@mui/icons-material/Close";
-import { Badge, Box, Container, Divider, Drawer, Stack, Toolbar, Typography } from "@mui/material";
+import { Badge, Box, Container, Divider, Drawer, Paper, Stack, Toolbar, Typography } from "@mui/material";
 import { useAuth, useNotifications } from "api/auth/hooks";
 import Head from "next/head";
 import { Router } from "next/router";
 import { FC, ReactNode, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Notification } from "model/user";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import AuthAPI from "api/auth/api";
+import NotificationItem from "../NotificationItem";
 
 export interface AppLayoutProps {
   title?: string;
@@ -28,9 +31,9 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
   const { currentUser, isAuthenticated } = useAuth();
   const [notificationMenu, setNotificationMenu] = useState(false);
 
-  // useNotifications(currentUser, (a: Notification) => {
-  //     toast.success(a.Title, { duration: 5000 });
-  // });
+  useNotifications(currentUser, (a: Notification) => {
+    toast.success(a.Title, { duration: 5000 });
+  });
 
   // Bind page load events to pageLoading state so loading bar is displayed on navigation.
   useEffect(() => {
@@ -45,14 +48,9 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
     return <></>;
   }
 
-  const badgedNotificationIcon: JSX.Element = <NotificationsIcon />;
-  // currentUser?.notifications.length === 0 ? (
-  //   <NotificationsIcon />
-  // ) : (
-  //   <Badge badgeContent={currentUser?.notifications.length} color="primary">
-  //     <NotificationsIcon />
-  //   </Badge>
-  // );
+  const badgedNotificationIcon: JSX.Element = currentUser?.notifications?.length > 0 ?
+    <Badge badgeContent={currentUser?.notifications.length} color="primary"><NotificationsIcon /></Badge> :
+    <NotificationsIcon />
 
   const endItems = [
     <IconButton key="notifications" label="Notifications" onClick={() => setNotificationMenu(true)}>
@@ -70,8 +68,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
     endItems.reverse();
   }
 
-  // const hasNotifications =
-  //     currentUser?.notifications && currentUser.notifications.length > 0;
+  const hasNotifications = currentUser?.notifications && currentUser.notifications.length > 0;
 
   return (
     <div>
@@ -90,53 +87,53 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
             </Stack>
           </Toolbar>
           <Divider />
-          {/* <Box maxHeight="100%" overflow="auto" pb={16}>
-                        {hasNotifications ? (
-                            <Stack p={2} spacing={2}>
-                                {currentUser?.notifications &&
-                                    currentUser.notifications.map(
-                                        (notification) => (
-                                            <NotificationItem
-                                                key={notification.ID}
-                                                notification={notification}
-                                            />
-                                        )
-                                    )}
-                            </Stack>
-                        ) : (
-                            <div>
-                                <Typography
-                                    textAlign="center"
-                                    maxWidth={250}
-                                    mx="auto"
-                                >
-                                    Notifications and announcements will appear
-                                    here!
-                                </Typography>
-                            </div>
-                        )}
-                    </Box> */}
-          {/* {hasNotifications && (
-                        <Box position="absolute" width="100%" bottom={0}>
-                            <Paper square>
-                                <Stack
-                                    p={2}
-                                    alignSelf="end"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                >
-                                    <Button
-                                        variant="contained"
-                                        onClick={() =>
-                                            AuthAPI.clearAllNotifications()
-                                        }
-                                    >
-                                        Clear all
-                                    </Button>
-                                </Stack>
-                            </Paper>
-                        </Box>
-                    )} */}
+          <Box maxHeight="100%" overflow="auto" pb={16}>
+            {hasNotifications ? (
+              <Stack p={2} spacing={2}>
+                {currentUser?.notifications &&
+                  currentUser.notifications.map(
+                    (notification) => (
+                      <NotificationItem
+                        key={notification.ID}
+                        notification={notification}
+                      />
+                    )
+                  )}
+              </Stack>
+            ) : (
+              <div>
+                <Typography
+                  textAlign="center"
+                  maxWidth={250}
+                  mx="auto"
+                >
+                  Notifications and announcements will appear
+                  here!
+                </Typography>
+              </div>
+            )}
+          </Box>
+          {hasNotifications && (
+            <Box position="absolute" width="100%" bottom={0}>
+              <Paper square>
+                <Stack
+                  p={2}
+                  alignSelf="end"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      AuthAPI.clearAllNotifications()
+                    }
+                  >
+                    Clear all
+                  </Button>
+                </Stack>
+              </Paper>
+            </Box>
+          )}
         </Box>
       </Drawer>
       <Container maxWidth={maxWidth} sx={{ marginY: 10 }}>

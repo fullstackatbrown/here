@@ -12,6 +12,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
+	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
 	"google.golang.org/api/iterator"
 
@@ -123,13 +124,14 @@ func (fr *FirebaseRepository) GetUserByID(id string) (*models.User, error) {
 
 	profile, err := fr.GetProfileById(fbUser.UID)
 	if err != nil {
+		// no profile for the user found, create one.
 		profile, err = fr.createProfileFromFbUser(fbUser)
 		if err != nil {
 			return nil, err
 		}
 		err = fr.executeInviteForUser(fbUserToUserRecord(fbUser, profile))
 		if err != nil {
-			return nil, err
+			glog.Warningf("there was a problem adding course permission to a user: %v\n", err)
 		}
 	}
 
@@ -269,6 +271,7 @@ func (fr *FirebaseRepository) createProfileFromFbUser(fbUser *firebaseAuth.UserR
 		DefaultSections: make(map[string]string),
 		ActualSections:  make(map[string]map[string]string),
 		Permissions:     map[string]models.CoursePermission{},
+		Notifications:   make([]models.Notification, 0),
 	}
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(fbUser.UID).Set(firebase.Context, profile)

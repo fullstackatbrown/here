@@ -30,6 +30,11 @@ func AuthRoutes() *chi.Mux {
 			// r.Patch("/", updateUserHandler)
 		})
 
+		r.Route("/notifications", func(r chi.Router) {
+			r.Delete("/", clearAllNotificationsHandler)
+			r.Delete("/{notificationID}", clearNotificationHandler)
+		})
+
 		// Edits site wide admin access
 		r.With(middleware.RequireAdmin()).Patch("/editAdminAccess", editAdminAccessHandler)
 	})
@@ -239,4 +244,39 @@ func signOutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("success"))
 	return
+}
+
+// POST: notification clear
+func clearNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	notificationID := chi.URLParam(r, "notificationID")
+	user, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
+
+	err = repo.Repository.ClearNotification(user.ID, notificationID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully cleared notification"))
+}
+
+// POST: notification clear all
+func clearAllNotificationsHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
+
+	err = repo.Repository.ClearAllNotifications(user.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully cleared notification"))
 }
