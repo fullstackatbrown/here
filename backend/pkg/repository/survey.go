@@ -268,3 +268,27 @@ func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyRespo
 	}
 	return survey, nil
 }
+
+func (fr *FirebaseRepository) GetSurveyResponses(courseID string, surveyID string) (responses []models.SurveyResponse, err error) {
+	survey, err := fr.GetSurveyByID(courseID, surveyID)
+	if err != nil {
+		return nil, fmt.Errorf("error getting survey: %v\n", err)
+	}
+
+	responses = make([]models.SurveyResponse, 0)
+	for studentID, availability := range survey.Responses {
+		student, err := fr.GetProfileById(studentID)
+		if err != nil {
+			// if a student no longer exist, skip
+			continue
+		}
+
+		responses = append(responses, models.SurveyResponse{
+			Name:         student.DisplayName,
+			Email:        student.Email,
+			Availability: availability,
+		})
+	}
+
+	return responses, nil
+}

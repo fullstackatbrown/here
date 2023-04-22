@@ -13,7 +13,8 @@ export interface Survey {
   resultsReadable: Record<string, string[]>;
 }
 
-export interface GenerateResultsResponse {
-  section: Section;
-  students: string[];
+export interface SurveyResponse {
+  name: string;
+  email: string;
+  availability: string[];
 }

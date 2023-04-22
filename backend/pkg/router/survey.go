@@ -30,7 +30,11 @@ func SurveyRoutes() *chi.Mux {
 			router.Post("/confirmResults", confirmResultsHandler)
 		})
 
-		router.Post("/responses", createSurveyResponseHandler)
+		router.Route("/responses", func(router chi.Router) {
+			router.Post("/", createSurveyResponseHandler)
+			router.With(middleware.RequireCourseAdmin()).Get("/", getSurveyResponseHandler)
+		})
+
 	})
 	return router
 }
@@ -223,4 +227,17 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, s)
+}
+
+func getSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
+
+	responses, err := repo.Repository.GetSurveyResponses(courseID, surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	render.JSON(w, r, responses)
 }

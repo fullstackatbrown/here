@@ -44,7 +44,8 @@ type CreateSurveyResponseRequest struct {
 	Availability []string `json:"availability"`
 }
 
-type GenerateResultsResponseItem struct {
-	Section  Section  `json:"section"`
-	Students []string `json:"students"`
+type SurveyResponse struct {
+	Name         string   `json:"name"`
+	Email        string   `json:"email"`
+	Availability []string `json:"availability"`
 }

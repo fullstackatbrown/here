@@ -9,11 +9,13 @@ import { handleBadRequestError } from '@util/errors';
 import formatSectionResponses, { TimeCount } from "@util/shared/formatSectionResponses";
 import SurveyAPI from 'api/surveys/api';
 import { Section } from 'model/section';
-import { Survey } from "model/survey";
+import { Survey, SurveyResponse } from "model/survey";
 import { FC, useEffect, useState } from "react";
 import toast from 'react-hot-toast';
 import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
+import { exportSurveyResponses, exportSurveyResults } from '@util/shared/export';
+import DownloadIcon from '@mui/icons-material/Download';
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -50,26 +52,38 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         // TODO:
     }
 
-    const handleExport = () => {
-        // TODO:
+    const handleExportResults = () => {
+        exportSurveyResults(survey.resultsReadable, sections)
+    }
+
+    const handleExportResponses = () => {
+        SurveyAPI.getSurveyResponses(survey.courseID, survey.ID)
+            .then((res) => {
+                const responses = res as SurveyResponse[]
+                exportSurveyResponses(responses)
+            })
+            .catch((err) => toast.error(handleBadRequestError(err)))
     }
 
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="md" keepMounted={false}>
         <DialogTitle>{survey.name}</DialogTitle>
 
         <DialogContent >
+            <Stack direction="row" alignItems="start" justifyContent="space-between" spacing={2} mb={2}>
+                <Stack direction="column" maxWidth="70%">
+                    <Typography fontSize={17} fontWeight={500}>
+                        {survey.description}
+                    </Typography>
+                    <Typography mb={3}>
+                        {numResponses} responses
+                    </Typography>
+                </Stack>
+                <Button variant="outlined" startIcon={<DownloadIcon />} disabled={getNumResponses() === 0} onClick={handleExportResponses}>
+                    Export Responses
+                </Button>
+            </Stack>
 
-            <Typography fontSize={17} fontWeight={500}>
-                {survey.description}
-            </Typography>
-            <Typography mb={3}>
-                {numResponses} responses
-            </Typography>
-
-            <Box mb={4} sx={{
-                minHeight: 300,
-            }}
-            >
+            <Box mb={4} sx={{ minHeight: 300 }}>
                 <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} numStudents={numStudents} />
             </Box>
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} mb={2}>
@@ -98,8 +112,8 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
             </Box>
         </DialogContent>
         <DialogActions sx={{ paddingTop: 2 }}>
+            {hasResults() && <Button variant="contained" onClick={handleExportResults}>Export Results</Button>}
             {hasResults() && <Button variant="contained" onClick={handleApplyResults}>Apply Results</Button>}
-            {hasResults() && <Button variant="contained" onClick={handleExport}>Export</Button>}
         </DialogActions>
     </Dialog >
 };
