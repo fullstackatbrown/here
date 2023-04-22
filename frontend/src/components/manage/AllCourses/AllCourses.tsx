@@ -33,7 +33,7 @@ const AllCourses: FC<AllCoursesProps> = ({ }) => {
             </Stack>
             {courses &&
                 getTerms(courses).map((term) => (
-                    <TermListItem term={term} courses={courses[term]} />
+                    <TermListItem key={term} term={term} courses={courses[term]} />
                 ))
             }
         </Box>
