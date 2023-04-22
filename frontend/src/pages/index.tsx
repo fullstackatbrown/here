@@ -3,7 +3,7 @@ import AddCourseCard from "@components/home/CourseCard/AddCourseCard";
 import JoinCourseDialog from "@components/home/JoinCourseDialog/JoinCourseDialog";
 import { Box, Grid, Typography } from "@mui/material";
 import { capitalizeWords } from "@util/shared/string";
-import { getTerms } from "@util/shared/terms";
+import { getCurrentTerm, getTerms } from "@util/shared/terms";
 import { useAuth } from "api/auth/hooks";
 import { useCoursesByIDsTerm } from "api/course/hooks";
 import AppLayout from "components/shared/AppLayout";
@@ -36,7 +36,7 @@ export default function Home() {
                                         <CourseCard course={course} user={currentUser} />
                                     </Grid>
                                 ))}
-                                {index === 0 && <Grid key={"add_course"} item xs={12} md={6} lg={4} xl={3}>
+                                {term === getCurrentTerm() && <Grid key={"add_course"} item xs={12} md={6} lg={4} xl={3}>
                                     <AddCourseCard onClick={() => { setJoinCourseDialog(true) }} />
                                 </Grid>}
                             </Grid>

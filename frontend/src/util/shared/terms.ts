@@ -39,14 +39,21 @@ export function getTerms(courses: Record<string, Course[]>): string[] {
     }
     const currentTerm = getCurrentTerm();
     if (terms.length === 0) { return [currentTerm] }
-    if (terms[0] !== currentTerm) {
-        terms.unshift(currentTerm);
+    if (!terms.includes(currentTerm)) {
+        // loop through terms and add it to the appropriate index
+        for (let i = 0; i < terms.length; i++) {
+            if (termComparator(terms[i], currentTerm) > 0) {
+                terms.splice(i, 0, currentTerm);
+                break;
+            }
+        }
     }
+    console.log(terms)
     return terms
 }
 
 // compute current term based on current month
-function getCurrentTerm(): string {
+export function getCurrentTerm(): string {
     const date = new Date();
     const year = date.getFullYear();
     const month = date.getMonth();
