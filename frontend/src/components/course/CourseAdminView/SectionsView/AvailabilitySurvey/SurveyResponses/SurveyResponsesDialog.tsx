@@ -44,7 +44,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
 
     const getNumResponses = () => survey.responses ? Object.keys(survey.responses).length : 0
 
-    const hasResults = () => survey.results ? Object.keys(survey.results).length > 0 : false
+    const hasResults = () => survey.results && survey.resultsReadable ? Object.keys(survey.results).length > 0 : false
 
     const handleApplyResults = () => {
         // TODO:
@@ -93,7 +93,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 alignItems: 'center',
             }}>
                 <Box sx={{ width: '70%', }}>
-                    {hasResults() && <AllocatedSectionsTable results={survey.results} sections={sections} />}
+                    {hasResults() && <AllocatedSectionsTable results={survey.results} resultsReadable={survey.resultsReadable} sections={sections} />}
                 </Box>
             </Box>
         </DialogContent>
