@@ -79,6 +79,14 @@ async function editAdminAccess(email: string, isAdmin: boolean): Promise<string>
     }
 }
 
+async function signOut() {
+    try {
+        return await APIClient.post(`${Endpoint.USER}/signout`);
+    } catch (e) {
+        throw e;
+    }
+}
+
 const AuthAPI = {
     getCurrentUser,
     getUserById,
@@ -86,6 +94,7 @@ const AuthAPI = {
     quitCourse,
     signInWithGoogle,
     editAdminAccess,
+    signOut,
 };
 
 export default AuthAPI;
