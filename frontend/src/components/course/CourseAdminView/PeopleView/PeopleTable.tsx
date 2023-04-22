@@ -18,6 +18,7 @@ export interface PeopleTableProps {
     students: CourseUserData[];
     sectionsMap: Record<string, Section>;
     assignments: Assignment[];
+    displayInvitedStudents: boolean;
     invitedStudents: string[];
 }
 
@@ -32,7 +33,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, displayInvitedStudents, invitedStudents }) => {
     const rowsPerPage = 10;
     const [studentsSorted, setStudentsSorted] = useState<CourseUserData[]>(sortStudentsByName(students));
     const [page, setPage] = useState(0);
@@ -121,7 +122,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                                 </TableRow>
                             );
                         })}
-                    {invitedStudents?.map((email) => {
+                    {displayInvitedStudents && invitedStudents?.map((email) => {
                         return (
                             <Tooltip key={email} title="Waiting for student to log in" placement="right">
                                 <TableRow hover>

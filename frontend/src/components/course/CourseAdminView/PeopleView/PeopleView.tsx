@@ -22,14 +22,14 @@ export interface PeopleViewProps {
   access: CoursePermission;
   sectionsMap: Record<string, Section>;
   assignmentsMap: Record<string, Assignment>;
+  invitedStudents: string[];
 }
 
-export default function PeopleView({ course, access, sectionsMap, assignmentsMap }: PeopleViewProps) {
+export default function PeopleView({ course, access, sectionsMap, assignmentsMap, invitedStudents }: PeopleViewProps) {
   const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
-  const [invitedStudents, invitedStudentsLoading] = useCourseInvites(course.ID, CoursePermission.CourseStudent)
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
@@ -66,7 +66,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   }
 
   const hasNoStudent = () => {
-    return (!course.students || Object.keys(course.students).length === 0) && (invitedStudentsLoading || invitedStudents.length === 0)
+    return (!course.students || Object.keys(course.students).length === 0) && (invitedStudents.length === 0)
   }
 
   return (
@@ -96,6 +96,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
             <PeopleTable
               {...{ course, assignments, sectionsMap }}
               students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+              displayInvitedStudents={filterBySection === UNASSIGNED || filterBySection === ALL_STUDENTS}
               invitedStudents={invitedStudents}
             />
           </Box>)
