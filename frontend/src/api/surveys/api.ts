@@ -1,13 +1,6 @@
 import APIClient from "api/APIClient";
 import { Survey } from "model/survey";
 
-async function getSurveyByID(
-  courseID: string,
-  surveyID: string
-): Promise<Survey> {
-  return APIClient.get(`/courses/${courseID}/surveys/${surveyID}`);
-}
-
 async function createSurvey(courseID: string, name: string, description: string, endTime: string): Promise<string> {
   return APIClient.post(`/courses/${courseID}/surveys`, {
     name, description, endTime
@@ -40,6 +33,13 @@ async function generateResults(
   return APIClient.post(`/courses/${courseID}/surveys/${surveyID}/results`);
 }
 
+async function applyResults(
+  courseID: string,
+  surveyID: string
+): Promise<boolean> {
+  return APIClient.post(`/courses/${courseID}/surveys/${surveyID}/results/apply`);
+}
+
 async function createSurveyResponse(
   courseID: string,
   surveyID: string,
@@ -59,15 +59,23 @@ async function editSurveyResponse(
   );
 }
 
+async function getSurveyResponses(
+  courseID: string,
+  surveyID: string
+): Promise<any> {
+  return APIClient.get(`/courses/${courseID}/surveys/${surveyID}/responses`);
+}
+
 const SurveyAPI = {
-  getSurveyByID,
   createSurvey,
   updateSurvey,
   publishSurvey,
   deleteSurvey,
   generateResults,
+  applyResults,
   createSurveyResponse,
   editSurveyResponse,
+  getSurveyResponses,
 };
 
 export default SurveyAPI;

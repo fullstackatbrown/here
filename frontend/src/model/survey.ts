@@ -10,9 +10,11 @@ export interface Survey {
   responses: Record<string, string[]>;
   published: boolean;
   results: Record<string, string[]>;
+  resultsReadable: Record<string, string[]>;
 }
 
-export interface GenerateResultsResponse {
-  section: Section;
-  students: string[];
+export interface SurveyResponse {
+  name: string;
+  email: string;
+  availability: string[];
 }

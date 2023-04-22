@@ -27,10 +27,10 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     const getAssignedSection = () => {
-        const defaultSection = student.defaultSection?.[course.ID]
+        const defaultSection = student.defaultSections?.[course.ID]
         if (defaultSection && defaultSection !== "" && sectionsMap) {
             const section = sectionsMap[defaultSection] as Section
-            return formatSectionInfo(section)
+            return formatSectionInfo(section, true)
         }
         return undefined
     }
@@ -101,7 +101,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                         Assignments
                     </Typography>
                     {(Object.keys(assignmentsMap)?.length > 0) ?
-                        <StudentGradesTable {...{ course, student, sectionsMap, assignmentsMap }} /> :
+                        <StudentGradesTable {...{ course, student, sectionsMap }} assignments={Object.values(assignmentsMap)} /> :
                         <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Box>
 

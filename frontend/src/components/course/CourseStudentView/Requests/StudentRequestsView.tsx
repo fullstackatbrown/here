@@ -19,7 +19,7 @@ export interface StudentsRequestsViewProps {
 
 const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, requests, sectionsMap, assignmentsMap }) => {
     const [swapRequestDialog, setSwapRequestDialog] = useState(false)
-    const allowRequests = course.status === CourseStatus.CourseActive && student.defaultSection?.[course.ID] !== undefined
+    const allowRequests = course.status === CourseStatus.CourseActive && student.defaultSections?.[course.ID] !== undefined
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     return (

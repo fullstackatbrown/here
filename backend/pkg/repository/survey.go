@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -146,15 +147,52 @@ func (fr *FirebaseRepository) DeleteSurvey(courseID string, surveyID string) err
 }
 
 func (fr *FirebaseRepository) UpdateSurveyResults(courseID string, surveyID string, results map[string][]string) error {
+	resultsReadable, err := fr.generateReadableResults(courseID, results)
+	if err != nil {
+		return err
+	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+	batch := fr.firestoreClient.Batch()
+
+	// update Results with studentIDs
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
 		{Path: "results", Value: results},
 	})
+
+	// update ResultsReadable with student names
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
+		{Path: "resultsReadable", Value: resultsReadable},
+	})
+
+	_, err = batch.Commit(firebase.Context)
+
 	return err
 }
 
-func (fr *FirebaseRepository) ConfirmSurveyResults(courseID string, surveyID string) error {
+// Helpers
+func (fr *FirebaseRepository) generateReadableResults(courseID string, results map[string][]string) (readableResults map[string][]string, err error) {
+	readableResults = make(map[string][]string)
+
+	for sectionID, studentIDs := range results {
+		students := make([]string, 0)
+		for _, studentID := range studentIDs {
+			student, err := fr.GetProfileById(studentID)
+			if err != nil {
+				// TODO: handle error, maybe remove from results if user profile not found? (e.g. user deleted account)
+				return nil, err
+			}
+			students = append(students, student.DisplayName)
+		}
+
+		readableResults[sectionID] = students
+	}
+
+	return
+}
+
+func (fr *FirebaseRepository) ApplySurveyResults(courseID string, surveyID string) error {
 	survey, err := fr.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		return fmt.Errorf("error getting survey: %v\n", err)
@@ -185,13 +223,33 @@ func (fr *FirebaseRepository) ConfirmSurveyResults(courseID string, surveyID str
 	return nil
 }
 
-func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyResponseRequest) (survey *models.Survey, err error) {
-
-	survey, err = fr.GetSurveyByID(req.CourseID, req.SurveyID)
+// Returns the survey if active
+func (fr *FirebaseRepository) ValidateSurveyActive(courseID string, surveyID string) (survey *models.Survey, badRequestErr error, internalErr error) {
+	survey, err := fr.GetSurveyByID(courseID, surveyID)
 	if err != nil {
-		return nil, fmt.Errorf("error getting survey: %v\n", err)
+		return nil, nil, fmt.Errorf("error getting survey: %v\n", err)
 	}
 
+	// check if survey is published
+	if survey.Published == false {
+		return nil, fmt.Errorf("survey is not published"), nil
+	}
+
+	// check if survey ended
+	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error parsing survey end time: %v\n", err)
+	}
+	if surveyEndTime.Before(time.Now()) {
+		return nil, fmt.Errorf("survey has ended"), nil
+	}
+
+	return survey, nil, nil
+}
+
+func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyResponseRequest) (survey *models.Survey, err error) {
+
+	survey = req.Survey
 	if survey.Responses == nil {
 		survey.Responses = make(map[string][]string)
 	}
@@ -199,7 +257,7 @@ func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyRespo
 	survey.Responses[req.User.ID] = req.Availability
 
 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
-		models.FirestoreSurveysCollection).Doc(req.SurveyID).Update(firebase.Context, []firestore.Update{
+		models.FirestoreSurveysCollection).Doc(req.Survey.ID).Update(firebase.Context, []firestore.Update{
 		{
 			Path:  "responses",
 			Value: survey.Responses,
@@ -209,4 +267,28 @@ func (fr *FirebaseRepository) CreateSurveyResponse(req *models.CreateSurveyRespo
 		return nil, fmt.Errorf("error creating survey response: %v\n", err)
 	}
 	return survey, nil
+}
+
+func (fr *FirebaseRepository) GetSurveyResponses(courseID string, surveyID string) (responses []models.SurveyResponse, err error) {
+	survey, err := fr.GetSurveyByID(courseID, surveyID)
+	if err != nil {
+		return nil, fmt.Errorf("error getting survey: %v\n", err)
+	}
+
+	responses = make([]models.SurveyResponse, 0)
+	for studentID, availability := range survey.Responses {
+		student, err := fr.GetProfileById(studentID)
+		if err != nil {
+			// if a student no longer exist, skip
+			continue
+		}
+
+		responses = append(responses, models.SurveyResponse{
+			Name:         student.DisplayName,
+			Email:        student.Email,
+			Availability: availability,
+		})
+	}
+
+	return responses, nil
 }

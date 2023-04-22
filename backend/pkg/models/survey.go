@@ -5,15 +5,16 @@ const (
 )
 
 type Survey struct {
-	ID          string                    `firestore:"id,omitempty"`
-	CourseID    string                    `firestore:"courseID"`
-	Name        string                    `firestore:"name"`
-	Description string                    `firestore:"description"`
-	Published   bool                      `firestore:"published"`
-	EndTime     string                    `firestore:"endTime"`
-	Capacity    map[string]map[string]int `firestore:"capacity"`
-	Responses   map[string][]string       `firestore:"responses"`
-	Results     map[string][]string       `firestore:"results"`
+	ID              string                    `firestore:"id,omitempty"`
+	CourseID        string                    `firestore:"courseID"`
+	Name            string                    `firestore:"name"`
+	Description     string                    `firestore:"description"`
+	Published       bool                      `firestore:"published"`
+	EndTime         string                    `firestore:"endTime"`
+	Capacity        map[string]map[string]int `firestore:"capacity"`
+	Responses       map[string][]string       `firestore:"responses"`
+	Results         map[string][]string       `firestore:"results"`
+	ResultsReadable map[string][]string       `firestore:"resultsReadable"`
 }
 
 type Times struct {
@@ -38,12 +39,13 @@ type UpdateSurveyRequest struct {
 
 type CreateSurveyResponseRequest struct {
 	User         *User    `json:"user,omitempty"`
-	CourseID     string   `json:"courseID"`
-	SurveyID     string   `json:"surveyid,omitempty"`
+	CourseID     string   `json:"courseid,omitempty"`
+	Survey       *Survey  `json:"survey,omitempty"`
 	Availability []string `json:"availability"`
 }
 
-type GenerateResultsResponseItem struct {
-	Section  Section  `json:"section"`
-	Students []string `json:"students"`
+type SurveyResponse struct {
+	Name         string   `json:"name"`
+	Email        string   `json:"email"`
+	Availability []string `json:"availability"`
 }

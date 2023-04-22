@@ -27,19 +27,15 @@ func SurveyRoutes() *chi.Mux {
 			router.Delete("/", deleteSurveyHandler)
 			router.Post("/publish", publishSurveyHandler)
 			router.Post("/results", generateResultsHandler)
-			router.Post("/confirmResults", confirmResultsHandler)
+			router.Post("/results/apply", applyResultsHandler)
 		})
 
-		router.Mount("/responses", ResponsesRoutes())
+		router.Route("/responses", func(router chi.Router) {
+			router.Post("/", createSurveyResponseHandler)
+			router.With(middleware.RequireCourseAdmin()).Get("/", getSurveyResponseHandler)
+		})
+
 	})
-	return router
-}
-
-func ResponsesRoutes() *chi.Mux {
-	router := chi.NewRouter()
-
-	router.Post("/", createSurveyResponseHandler)
-	router.Patch("/", updateSurveyResponseHandler)
 	return router
 }
 
@@ -169,26 +165,19 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 	res = utils.GetAssignedSections(res, survey.Capacity)
 	repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
 
-	readableResults, err := generateReadableResults(courseID, res)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, readableResults)
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully generated results for survey " + surveyID))
 }
 
-func confirmResultsHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := r.Context().Value("courseID").(string)
-	surveyID := r.Context().Value("surveyID").(string)
+func applyResultsHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
 
-	err := repo.Repository.ConfirmSurveyResults(courseID, surveyID)
+	err := repo.Repository.ApplySurveyResults(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// TODO: send notification to students
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully confirmed survey results " + surveyID))
@@ -203,26 +192,18 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if !utils.Contains(user.Courses, courseID) {
+		http.Error(w, "You have to be enrolled in the course to submit a survey response", http.StatusUnauthorized)
 		return
 	}
 
-	// check if survey is published
-	if survey.Published == false {
-		http.Error(w, "Survey is not published", http.StatusBadRequest)
+	survey, requestErr, internalErr := repo.Repository.ValidateSurveyActive(courseID, surveyID)
+	if internalErr != nil {
+		http.Error(w, internalErr.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// check if survey ended
-	surveyEndTime, err := time.Parse(time.RFC3339, survey.EndTime)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if surveyEndTime.Before(time.Now()) {
-		http.Error(w, "Survey already ended\n", http.StatusBadRequest)
+	if requestErr != nil {
+		http.Error(w, requestErr.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -233,10 +214,9 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.SurveyID = surveyID
+	req.CourseID = courseID
+	req.Survey = survey
 	req.User = user
-
-	// TODO: check if student is in the course
 
 	s, err := repo.Repository.CreateSurveyResponse(req)
 	if err != nil {
@@ -247,33 +227,15 @@ func createSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, s)
 }
 
-func updateSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
-	// surveyID := r.Context().Value("surveyID").(string)
+func getSurveyResponseHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := chi.URLParam(r, "courseID")
+	surveyID := chi.URLParam(r, "surveyID")
 
-	// TODO:
-}
-
-// Helpers
-func generateReadableResults(courseID string, results map[string][]string) (readableResults []models.GenerateResultsResponseItem, err error) {
-	readableResults = make([]models.GenerateResultsResponseItem, 0)
-
-	for sectionID, studentIDs := range results {
-		section, err := repo.Repository.GetSectionByID(courseID, sectionID)
-		if err != nil {
-			return nil, err
-		}
-
-		var students []string
-		for _, studentID := range studentIDs {
-			student, err := repo.Repository.GetUserByID(studentID)
-			if err != nil {
-				return nil, err
-			}
-			students = append(students, student.DisplayName)
-		}
-
-		readableResults = append(readableResults, models.GenerateResultsResponseItem{Section: *section, Students: students})
+	responses, err := repo.Repository.GetSurveyResponses(courseID, surveyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	return
+	render.JSON(w, r, responses)
 }

@@ -1,8 +1,11 @@
+import { useAllGrades } from "api/grades/hooks";
+import { ExportToCsv } from 'export-to-csv';
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
-import { ExportToCsv } from 'export-to-csv';
-import { Grade } from "model/grades";
-import { useAllGrades } from "api/grades/hooks";
+import { Section } from "model/section";
+import { formatSectionTime, formatSurveyTime } from "./formatTime";
+import listToMap from "./listToMap";
+import { SurveyResponse } from "model/survey";
 
 const options = {
     filename: "",
@@ -86,4 +89,36 @@ export function exportStudentList(course: Course, invitedStudents?: string[]) {
 // e.g. jenny_yu2@brown.edu -> Jenny Yu
 const getNameFromEmail = (email: string): string => {
     return email.split("@")[0].split("_").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ").replace(/[0-9]/g, '')
+}
+
+export function exportSurveyResults(results: Record<string, string[]>, sections: Section[]) {
+    const sectionsMap = listToMap(sections) as Record<string, Section>;
+    options.filename = `survey_results`
+    let data = [];
+    for (const sectionID of Object.keys(results)) {
+        const section = sectionsMap[sectionID];
+        data.push({
+            "section": formatSectionTime(section),
+            "location": section.location,
+            "students": results[sectionID].join(",").replace(/\s+/g, ''),
+        });
+    }
+
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
+}
+
+export function exportSurveyResponses(responses: SurveyResponse[]) {
+    options.filename = `survey_responses`
+    let data = [];
+    for (const response of responses) {
+        data.push({
+            "name": response.name,
+            "email": response.email,
+            "availability": response.availability.map((a) => formatSurveyTime(a).replace(/\s+/g, '')).join(",")
+        });
+    }
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
+
 }

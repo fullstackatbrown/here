@@ -6,6 +6,7 @@ import {
     DialogContent,
     DialogTitle, FormControlLabel, Stack, Typography
 } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
 import { sortSurveyTimes } from "@util/shared/sortSectionTime";
 import SurveyAPI from "api/surveys/api";
@@ -21,16 +22,13 @@ export interface SurveyDialogProps {
     studentID?: string;
 }
 
-
 const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID }) => {
     // If student has already responded, show their response
-    const [availability, setAvailability] = useState<string[]>((survey.responses && studentID && survey.responses[studentID]) || []);
+    const [availability, setAvailability] = useState<string[]>((studentID && survey?.responses?.[studentID]) || []);
 
-    const getExistingResponse = (studentID: string) => {
-        if (survey.responses && survey.responses[studentID]) {
-            return survey.responses[studentID];
-        }
-        return [];
+    const handleClose = () => {
+        onClose();
+        setAvailability((studentID && survey?.responses?.[studentID]) || [])
     }
 
     function onSubmit() {
@@ -47,8 +45,8 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
                     success: "Survey published!",
                     error: "Failed to publish survey"
                 })
-                    .then(() => onClose())
-                    .catch(() => onClose())
+                    .then(() => handleClose())
+                    .catch(() => handleClose())
             }
             return;
         } else {
@@ -63,10 +61,10 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
             toast.promise(SurveyAPI.createSurveyResponse(survey.courseID, survey.ID, availability), {
                 loading: "Submitting response...",
                 success: "Response submitted!",
-                error: "Failed to submit response"
+                error: (err) => handleBadRequestError(err),
             })
-                .then(() => onClose())
-                .catch(() => onClose())
+                .then(() => onClose()) // if response successful, do not reset to default values
+                .catch(() => handleClose())
         }
     }
 
@@ -81,7 +79,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
         }
     }
 
-    return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>{survey.name}{preview && " (Preview)"}</DialogTitle>
         <DialogContent>
             <Typography variant="body1" mb={1}> {survey.description} </Typography>
@@ -100,7 +98,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
             </Stack>
         </DialogContent>
         <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={handleClose}>Cancel</Button>
             <Button onClick={onSubmit} variant="contained">{preview ? "Publish" : "Submit"}</Button>
         </DialogActions>
     </Dialog>;
