@@ -33,6 +33,13 @@ async function generateResults(
   return APIClient.post(`/courses/${courseID}/surveys/${surveyID}/results`);
 }
 
+async function applyResults(
+  courseID: string,
+  surveyID: string
+): Promise<boolean> {
+  return APIClient.post(`/courses/${courseID}/surveys/${surveyID}/results/apply`);
+}
+
 async function createSurveyResponse(
   courseID: string,
   surveyID: string,
@@ -65,6 +72,7 @@ const SurveyAPI = {
   publishSurvey,
   deleteSurvey,
   generateResults,
+  applyResults,
   createSurveyResponse,
   editSurveyResponse,
   getSurveyResponses,

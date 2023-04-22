@@ -192,7 +192,7 @@ func (fr *FirebaseRepository) generateReadableResults(courseID string, results m
 	return
 }
 
-func (fr *FirebaseRepository) ConfirmSurveyResults(courseID string, surveyID string) error {
+func (fr *FirebaseRepository) ApplySurveyResults(courseID string, surveyID string) error {
 	survey, err := fr.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		return fmt.Errorf("error getting survey: %v\n", err)

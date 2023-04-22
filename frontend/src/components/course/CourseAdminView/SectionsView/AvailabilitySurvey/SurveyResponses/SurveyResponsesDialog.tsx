@@ -49,7 +49,13 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     const hasResults = () => survey.results && survey.resultsReadable ? Object.keys(survey.results).length > 0 : false
 
     const handleApplyResults = () => {
-        // TODO:
+        toast.promise(SurveyAPI.applyResults(survey.courseID, survey.ID), {
+            loading: "Assigning students to sections",
+            success: "Successfully assigned students to sections!",
+            error: (err) => handleBadRequestError(err)
+        })
+            .then(() => { onClose() })
+            .catch(() => { })
     }
 
     const handleExportResults = () => {
