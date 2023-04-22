@@ -16,7 +16,7 @@ interface StudentGradesTableProps {
     course: Course;
     student: User;
     sectionsMap: Record<string, Section>;
-    assignmentsMap: Record<string, Assignment>;
+    assignments: Assignment[];
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -29,15 +29,15 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignmentsMap, sectionsMap }) => {
-    const assignments = filterAssignmentsByReleaseDate(Object.values(assignmentsMap));
+const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap }) => {
+    const assignmentsFiltered = filterAssignmentsByReleaseDate(assignments);
     const [grades, gradesLoading] = useGradesForStudent(course.ID, student.ID)
 
     const getSection = (assignmentID: string): Section => {
-        let sectionID = student.actualSection?.[course.ID]?.[assignmentID]
+        let sectionID = student.actualSections?.[course.ID]?.[assignmentID]
         if (sectionID) return sectionsMap[sectionID]
 
-        sectionID = student.defaultSection?.[course.ID]
+        sectionID = student.defaultSections?.[course.ID]
         if (sectionID) return sectionsMap[sectionID]
 
         return undefined
@@ -59,7 +59,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
             </TableRow>
         </TableHead>
         <TableBody>
-            {sortAssignments(assignments).map((assignment) => {
+            {sortAssignments(assignmentsFiltered).map((assignment) => {
                 const section = sectionsMap && getSection(assignment.ID)
                 return <TableRow key={assignment.ID}>
                     <TableCell component="th" scope="row">

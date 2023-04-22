@@ -12,8 +12,8 @@ export interface User {
   pronouns: string;
   photoUrl: string;
   courses: string[];
-  defaultSection: Record<string, string>;
-  actualSection: Record<string, Record<string, string>>;
+  defaultSections: Record<string, string>;
+  actualSections: Record<string, Record<string, string>>;
   isAdmin: boolean;
   permissions: Record<string, CoursePermission>;
 }

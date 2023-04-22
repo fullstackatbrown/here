@@ -39,7 +39,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         isPermanent: swap ? swap.assignmentID === "" : true,
         reason: swap ? swap.reason : "",
         assignmentID: swap ? swap.assignmentID : "",
-        oldSectionID: student.defaultSection?.[course.ID] ? student.defaultSection[course.ID] : "",
+        oldSectionID: student.defaultSections?.[course.ID] ? student.defaultSections[course.ID] : "",
         newSectionID: swap ? swap.newSectionID : "",
     }
 
@@ -111,10 +111,10 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     })
 
     const getCurrentSectionID = (assignmentID): string => {
-        if ((assignmentID) && (student.actualSection?.[assignmentID])) {
-            return student.actualSection?.[course.ID][assignmentID]
+        if ((assignmentID) && (student.actualSections?.[assignmentID])) {
+            return student.actualSections?.[course.ID][assignmentID]
         } else {
-            return student.defaultSection?.[course.ID]
+            return student.defaultSections?.[course.ID]
         }
     }
 
