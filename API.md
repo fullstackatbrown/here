@@ -79,7 +79,7 @@
     autoApproveRequests: boolean                   # whether swap requests will be automatically approved
     term: string                                   # semester this course is offered
     students: map[string]string                    # map from studentIDs to sectionIDs
-    swapRequests: []string
+    permissions: map[string]CoursePermission       # map from userID to their permission for the course (admin or staff)
 
     <b>sections (sub-collection)</b>
         id: string                                 # unique id of the section
@@ -101,12 +101,10 @@
         maxScore: int                              # maximum points possible
         releaseDate: string                        # when the assignment is released
         dueDate: string                            # when the assignment is due
+        grades: map[string]Grade                   # map from studentID to grade object
 
         <b>grades (sub-collection)</b>
-            id: string                             # unique grade id
             studentID: string                      # the id of the student the grade is for
-            assignmentID: string
-            courseID: string
             grade: int                             # grade
             gradedBy: string                       # id of the TA that graded the assignment
             timeUpdated: string                    # when the time was updated
@@ -140,6 +138,7 @@
     courses: []string                              # list of courseIDs enrolled in as student
     defaultSections: map[string]string             # map from courseID to sectionID
     actualSections: map[string]map[string]string   # map from courseID to map from assignmentID to sectionID
+    notifications: []Notification
 
 </pre>
 
