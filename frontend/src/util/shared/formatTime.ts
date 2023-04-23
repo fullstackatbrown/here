@@ -12,6 +12,9 @@ const days = {
 };
 
 export function formatSectionTime(section: Section, abbreviated = false): string {
+  if (section === undefined) {
+    return "section not found";
+  }
   const startTime = new Date(section.startTime);
   const endTime = new Date(section.endTime);
   const timeZone = "America/New_York";
