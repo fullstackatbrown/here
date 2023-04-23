@@ -54,6 +54,10 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 				if err != nil {
 					return fmt.Errorf("error initializing assignments listener for course %s: %v", courseID, err)
 				}
+				err = fr.initializePendingSwapsListener(course, courseID)
+				if err != nil {
+					return fmt.Errorf("error initializing pending swaps listener for course %s: %v", courseID, err)
+				}
 			}
 		}
 

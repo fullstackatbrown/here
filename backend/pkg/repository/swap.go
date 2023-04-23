@@ -9,10 +9,52 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
 )
+
+func (fr *FirebaseRepository) initializePendingSwapsListener(course *models.Course, courseID string) error {
+	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
+		newSwaps := make(map[string]*models.Swap)
+		for _, doc := range docs {
+			if !doc.Exists() {
+				continue
+			}
+
+			var c models.Swap
+			err := mapstructure.Decode(doc.Data(), &c)
+			if err != nil {
+				log.Panicf("Error destructuring document: %v", err)
+				return err
+			}
+
+			c.ID = doc.Ref.ID
+			newSwaps[doc.Ref.ID] = &c
+		}
+
+		course.PendingSwapsLock.Lock()
+		defer course.PendingSwapsLock.Unlock()
+
+		course.PendingSwaps = newSwaps
+
+		return nil
+	}
+
+	done := make(chan func())
+	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+		courseID).Collection(models.FirestoreSwapsCollection).Query.Where("status", "==", models.STATUS_PENDING)
+	go func() {
+		err := fr.createCollectionInitializer(query, &done, handleDocs)
+		if err != nil {
+			log.Panicf("error creating assignment collection listener: %v\n", err)
+		}
+	}()
+	cancelFunc := <-done
+	course.PendingSwapsListenerCancelFunc = cancelFunc
+	return nil
+}
 
 func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*models.Swap, error) {
 
@@ -35,29 +77,52 @@ func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*mode
 	return &swap, nil
 }
 
+func (fr *FirebaseRepository) GetPendngSwapByInfo(courseID string, studentID string, assignmentID string, oldSectionID string, newSectionID string) (*models.Swap, error) {
+	course, err := fr.GetCourseByID(courseID)
+	if err != nil {
+		return nil, err
+	}
+
+	course.PendingSwapsLock.RLock()
+	defer course.PendingSwapsLock.RUnlock()
+
+	for _, swap := range course.PendingSwaps {
+		if swap.StudentID == studentID && swap.AssignmentID == assignmentID && swap.OldSectionID == oldSectionID && swap.NewSectionID == newSectionID {
+			return swap, nil
+		}
+	}
+
+	return nil, qerrors.SwapNotFoundError
+}
+
 func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *models.Swap, badRequestErr error, internalErr error) {
 
-	// TODO: Check for conflicting swaps
-	// If there exists a swap for the exact same student, assignment, old section, and new section, return an error
+	// Check for conflicting swaps
+	swap, err := fr.GetPendngSwapByInfo(req.CourseID, req.User.ID, req.AssignmentID, req.OldSectionID, req.NewSectionID)
+	if err == nil {
+		return nil, fmt.Errorf("There exists a duplicate pending swap request"), nil
+	}
 
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, err, nil
 	}
 
-	// check assignment due date
-	assignment, err := fr.GetAssignmentByID(req.CourseID, req.AssignmentID)
-	if err != nil {
-		return nil, err, nil
-	}
+	if req.AssignmentID != "" {
+		// check assignment due date
+		assignment, err := fr.GetAssignmentByID(req.CourseID, req.AssignmentID)
+		if err != nil {
+			return nil, err, nil
+		}
 
-	dueDate, err := time.Parse(time.RFC3339, assignment.DueDate)
-	if err != nil {
-		return nil, nil, err
-	}
+		dueDate, err := time.Parse(time.RFC3339, assignment.DueDate)
+		if err != nil {
+			return nil, nil, err
+		}
 
-	if dueDate.Before(time.Now()) {
-		return nil, fmt.Errorf("Cannot swap after the assignment due date"), nil
+		if dueDate.Before(time.Now()) {
+			return nil, fmt.Errorf("Cannot swap after the assignment due date"), nil
+		}
 	}
 
 	swap = &models.Swap{
