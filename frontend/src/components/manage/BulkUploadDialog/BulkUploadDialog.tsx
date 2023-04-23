@@ -142,7 +142,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
                 setSuccess(true)
                 handleClose()
             })
-            .catch((err) => { console.log(err) })
+            .catch(() => { })
     }
 
     const handleClose = () => {

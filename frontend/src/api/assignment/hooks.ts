@@ -14,7 +14,6 @@ export function useAssignmentsMap(courseID: string): [Record<string, Assignment>
             querySnapshot.forEach((doc) => {
                 res[doc.id] = { ID: doc.id, ...doc.data() } as Assignment;
             });
-            console.log(res);
             setAssignments(res);
             setLoading(false);
         });

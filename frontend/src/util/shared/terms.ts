@@ -48,7 +48,6 @@ export function getTerms(courses: Record<string, Course[]>): string[] {
             }
         }
     }
-    console.log(terms)
     return terms
 }
 
