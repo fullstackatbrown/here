@@ -64,20 +64,31 @@ func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 	swapID := chi.URLParam(r, "swapID")
 
+	user, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
 	var req *models.UpdateSwapRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	req.CourseID = &courseID
-	req.SwapID = &swapID
+	req.CourseID = courseID
+	req.SwapID = swapID
+	req.User = user
 
-	err = repo.Repository.UpdateSwap(req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	requestErr, internalErr := repo.Repository.UpdateSwap(req)
+	if requestErr != nil {
+		http.Error(w, requestErr.Error(), http.StatusBadRequest)
+		return
+	}
+	if internalErr != nil {
+		http.Error(w, internalErr.Error(), http.StatusInternalServerError)
 		return
 	}
 

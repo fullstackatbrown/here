@@ -3,14 +3,12 @@ package repository
 import (
 	"fmt"
 	"log"
-	"reflect"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
-	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
 )
@@ -56,8 +54,29 @@ func (fr *FirebaseRepository) initializePendingSwapsListener(course *models.Cour
 	return nil
 }
 
-func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*models.Swap, error) {
+func (fr *FirebaseRepository) GetPendingSwapByID(courseID string, swapID string) (*models.Swap, error) {
+	course, err := fr.GetCourseByID(courseID)
+	if err != nil {
+		return nil, err
+	}
 
+	course.PendingSwapsLock.RLock()
+	defer course.PendingSwapsLock.RUnlock()
+
+	if swap, ok := course.PendingSwaps[swapID]; ok {
+		return swap, nil
+	}
+
+	return nil, qerrors.SwapNotFoundError
+}
+
+func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*models.Swap, error) {
+	// first look in cache
+	if swap, err := fr.GetPendingSwapByID(courseID, swapID); err == nil {
+		return swap, nil
+	}
+
+	// if not in cache, look in firestore
 	doc, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
 		models.FirestoreSwapsCollection).Doc(swapID).Get(firebase.Context)
 
@@ -73,56 +92,68 @@ func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*mode
 	}
 
 	swap.ID = doc.Ref.ID
-
 	return &swap, nil
 }
 
-func (fr *FirebaseRepository) GetPendngSwapByInfo(courseID string, studentID string, assignmentID string, oldSectionID string, newSectionID string) (*models.Swap, error) {
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return nil, err
-	}
-
+func (fr *FirebaseRepository) checkDuplicateSwapRequest(course *models.Course, studentID string, assignmentID string, oldSectionID string, newSectionID string) (requestErr error) {
 	course.PendingSwapsLock.RLock()
 	defer course.PendingSwapsLock.RUnlock()
 
 	for _, swap := range course.PendingSwaps {
-		if swap.StudentID == studentID && swap.AssignmentID == assignmentID && swap.OldSectionID == oldSectionID && swap.NewSectionID == newSectionID {
-			return swap, nil
+		if swap.AssignmentID == assignmentID {
+			if assignmentID == "" {
+				return fmt.Errorf("You already have a pending permanent swap request")
+			}
+			return fmt.Errorf("There exists a pending request for this assignment")
+		}
+		if swap.StudentID == studentID && swap.OldSectionID == oldSectionID && swap.NewSectionID == newSectionID {
+			if swap.AssignmentID == "" {
+				return fmt.Errorf("You have requested a permanent swap for this section")
+			}
+
 		}
 	}
+	return nil
+}
 
-	return nil, qerrors.SwapNotFoundError
+func (fr *FirebaseRepository) checkSwapRequestDueDate(courseID string, assignmentID string) (requestErr error) {
+	if assignmentID != "" {
+		assignment, err := fr.GetAssignmentByID(courseID, assignmentID)
+		if err != nil {
+			return err
+		}
+
+		dueDate, err := time.Parse(time.RFC3339, assignment.DueDate)
+		if err != nil {
+			return err
+		}
+
+		if dueDate.Before(time.Now()) {
+			return fmt.Errorf("Cannot swap after the assignment due date")
+		}
+
+		return nil
+	}
+	return nil
 }
 
 func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *models.Swap, badRequestErr error, internalErr error) {
-
-	// Check for conflicting swaps
-	swap, err := fr.GetPendngSwapByInfo(req.CourseID, req.User.ID, req.AssignmentID, req.OldSectionID, req.NewSectionID)
-	if err == nil {
-		return nil, fmt.Errorf("There exists a duplicate pending swap request"), nil
-	}
 
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return nil, err, nil
 	}
 
-	if req.AssignmentID != "" {
-		// check assignment due date
-		assignment, err := fr.GetAssignmentByID(req.CourseID, req.AssignmentID)
-		if err != nil {
-			return nil, err, nil
-		}
+	// Check for conflicting swaps
+	requestErr := fr.checkDuplicateSwapRequest(course, req.User.ID, req.AssignmentID, req.OldSectionID, req.NewSectionID)
+	if requestErr != nil {
+		return nil, requestErr, nil
+	}
 
-		dueDate, err := time.Parse(time.RFC3339, assignment.DueDate)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		if dueDate.Before(time.Now()) {
-			return nil, fmt.Errorf("Cannot swap after the assignment due date"), nil
-		}
+	// Check if the assignment due date has passed
+	requestErr = fr.checkSwapRequestDueDate(req.CourseID, req.AssignmentID)
+	if requestErr != nil {
+		return nil, requestErr, nil
 	}
 
 	swap = &models.Swap{
@@ -186,27 +217,37 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *m
 	return swap, nil, nil
 }
 
-func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) error {
-	v := reflect.ValueOf(*req)
-	typeOfS := v.Type()
-
-	var updates []firestore.Update
-
-	for i := 0; i < v.NumField(); i++ {
-		field := typeOfS.Field(i).Name
-		val := v.Field(i).Interface()
-
-		// Only include the fields that are set
-		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "SwapID") && (field != "StudentID") {
-			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
-		}
+func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) (badRequestErr error, internalErr error) {
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return err, nil
 	}
 
-	updates = append(updates, firestore.Update{Path: "requestTime", Value: time.Now()})
+	// Find the old swap
+	oldSwap, err := fr.GetPendingSwapByID(req.CourseID, req.SwapID)
+	if err != nil {
+		return fmt.Errorf("No swap with status pending found"), nil
+	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
-		models.FirestoreSwapsCollection).Doc(*req.SwapID).Update(firebase.Context, updates)
-	return err
+	// Check if swap made by same user
+	if oldSwap.StudentID != req.User.ID {
+		return fmt.Errorf("You are not the owner of this swap"), nil
+	}
+
+	// Check for conflicting swaps
+	requestErr := fr.checkDuplicateSwapRequest(course, req.User.ID, req.AssignmentID, oldSwap.OldSectionID, req.NewSectionID)
+	if requestErr != nil {
+		return requestErr, nil
+	}
+
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreSwapsCollection).Doc(req.SwapID).Update(firebase.Context, []firestore.Update{
+		{Path: "newSectionID", Value: req.NewSectionID},
+		{Path: "reason", Value: req.Reason},
+		{Path: "assignmentID", Value: req.AssignmentID},
+	})
+
+	return nil, err
 }
 
 func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
