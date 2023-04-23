@@ -12,6 +12,7 @@ import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
 import { exportGrades } from "@util/shared/export";
 import AdminViewHeader from "../AdminViewHeader";
+import { sortAssignments } from "@util/shared/assignments";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -73,7 +74,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
         </Typography>
       )}
       <Stack direction="column" spacing={2} mb={5}>
-        {assignments?.map((assignment) => (
+        {assignments && sortAssignments(assignments).map((assignment) => (
           <AssignmentCard key={assignment.ID} course={course} assignment={assignment} handleNavigate={handleNavigate} />
         ))}
       </Stack>
