@@ -56,7 +56,7 @@ const PendingRequest: FC<PendingRequestProps> = ({
       >
         <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
           <Stack direction="row" spacing={4} alignItems="center" py={{ xs: 1, md: 0.5 }}>
-            <Stack direction="row" spacing={1} width={{ md: 280 }} alignItems="center">
+            <Stack direction="row" spacing={1} minWidth={{ md: 280 }} alignItems="center">
               <Box width={17} display="flex" alignItems="center">
                 {expanded ? (
                   <ExpandMore sx={{ fontSize: 16 }} />
@@ -66,10 +66,10 @@ const PendingRequest: FC<PendingRequestProps> = ({
               </Box>
               {/* TODO: handle exceptionally long string */}
               <Typography sx={{ fontSize: 15 }}>
-                {request.studentName} - {assignment ? "One Time" : "Permanent"}
+                {request.studentName} - {assignment ? "One Time" : "Permanent"}{!student && " (no longer enrolled)"}
               </Typography>
             </Stack>
-            {!expanded && !isXsScreen && (
+            {!expanded && !isXsScreen && student && (
               <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
                 {formatSectionInfo(oldSection, true)}
                 &nbsp;&nbsp;{"→"}&nbsp;&nbsp;
