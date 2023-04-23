@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/config"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/repository"
@@ -17,33 +18,31 @@ import (
 func AuthCtx() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// tokenCookie, err := r.Cookie(config.Config.SessionCookieName)
-			// if err != nil {
-			// 	// Missing session cookie.
-			// 	rejectUnauthorizedRequest(w)
-			// 	return
-			// }
-
-			// Testing only
-			userID := "3mVvKLpz1SceBaPxcKkYUEsuuy72"
-			// userID := "hDEeDZK7N3g8TFqWjaPgocC0Fxz2"
-
-			// Verify the session cookie. In this case an additional check is added to detect
-			// if the user's Firebase session was revoked, user deleted/disabled, etc.
-			// user, err := repository.Repository.VerifySessionCookie(tokenCookie)
-			// if err != nil {
-			// 	// Missing session cookie.
-			// 	rejectUnauthorizedRequest(w)
-			// 	return
-			// }
-
-			// Testing only
-			user, err := repository.Repository.GetUserByID(userID)
+			tokenCookie, err := r.Cookie(config.Config.SessionCookieName)
 			if err != nil {
 				// Missing session cookie.
 				rejectUnauthorizedRequest(w)
 				return
 			}
+
+			// Verify the session cookie. In this case an additional check is added to detect
+			// if the user's Firebase session was revoked, user deleted/disabled, etc.
+			user, err := repository.Repository.VerifySessionCookie(tokenCookie)
+			if err != nil {
+				// Missing session cookie.
+				rejectUnauthorizedRequest(w)
+				return
+			}
+
+			// Testing only
+			// userID := "3mVvKLpz1SceBaPxcKkYUEsuuy72"
+			// userID := "hDEeDZK7N3g8TFqWjaPgocC0Fxz2"
+			// user, err := repository.Repository.GetUserByID(userID)
+			// if err != nil {
+			// 	// Missing session cookie.
+			// 	rejectUnauthorizedRequest(w)
+			// 	return
+			// }
 
 			// create a new request context containing the authenticated user
 			ctxWithUser := context.WithValue(r.Context(), "currentUser", user)
