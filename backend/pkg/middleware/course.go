@@ -26,17 +26,11 @@ func RequireCourseActive() func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			courseID := r.Context().Value("courseID").(string)
 
-			course, err := repo.Repository.GetCourseByID(courseID)
+			course, err := repo.Repository.GetActiveCourseByID(courseID)
 			if err != nil {
-				rejectBadRequest(w, err)
-				return
-			}
-
-			if !(course.Status == models.CourseActive) {
 				rejectBadRequest(w, fmt.Errorf("Cannot perform this operation on a %s course", course.Status))
 				return
 			}
-
 			next.ServeHTTP(w, r)
 		})
 	}

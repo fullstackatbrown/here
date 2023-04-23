@@ -13,7 +13,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func (fr *FirebaseRepository) initializeAssignmentsListener(courseID string) {
+func (fr *FirebaseRepository) initializeAssignmentsListener(course *models.Course, courseID string) error {
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newAssignments := make(map[string]*models.Assignment)
 		for _, doc := range docs {
@@ -32,11 +32,6 @@ func (fr *FirebaseRepository) initializeAssignmentsListener(courseID string) {
 			newAssignments[doc.Ref.ID] = &c
 		}
 
-		course, err := fr.GetCourseByID(courseID)
-		if err != nil {
-			return err
-		}
-
 		course.AssignmentsLock.Lock()
 		defer course.AssignmentsLock.Unlock()
 
@@ -45,16 +40,18 @@ func (fr *FirebaseRepository) initializeAssignmentsListener(courseID string) {
 		return nil
 	}
 
-	done := make(chan bool)
+	done := make(chan func())
 	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
 		courseID).Collection(models.FirestoreAssignmentsCollection).Query
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)
 		if err != nil {
-			log.Panicf("error creating section collection listener: %v\n", err)
+			log.Panicf("error creating assignment collection listener: %v\n", err)
 		}
 	}()
-	<-done
+	cancelFunc := <-done
+	course.AssignmentsListenerCancelFunc = cancelFunc
+	return nil
 }
 
 func (fr *FirebaseRepository) GetAssignmentByID(courseID string, assignmentID string) (*models.Assignment, error) {
@@ -75,7 +72,6 @@ func (fr *FirebaseRepository) GetAssignmentByID(courseID string, assignmentID st
 }
 
 func (fr *FirebaseRepository) GetAssignmentByName(courseID string, name string) (assignment *models.Assignment, err error) {
-
 	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err

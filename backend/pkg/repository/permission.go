@@ -198,36 +198,27 @@ func (fr *FirebaseRepository) addStudentToCourse(user *models.User, course *mode
 func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, courseID string) error {
 	// TODO: delete other user data
 
-	// Check if course exists
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return err
-	}
-
 	batch := fr.firestoreClient.Batch()
 	// Remove course for student
 	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(userID)
 	batch.Update(userProfileRef, []firestore.Update{
 		{
 			Path:  "courses",
-			Value: firestore.ArrayRemove(course.ID),
+			Value: firestore.ArrayRemove(courseID),
 		},
 	})
 
 	// remove student from course
-	newStudentMap := utils.CopyMap(course.Students)
-	delete(newStudentMap, userID)
-
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
+	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID)
 	batch.Update(coursesRef, []firestore.Update{
 		{
-			Path:  "students",
-			Value: newStudentMap,
+			Path:  "students." + userID,
+			Value: firestore.Delete,
 		},
 	})
 
 	// Commit the batch.
-	_, err = batch.Commit(firebase.Context)
+	_, err := batch.Commit(firebase.Context)
 	if err != nil {
 		return err
 	}

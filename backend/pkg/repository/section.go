@@ -13,7 +13,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func (fr *FirebaseRepository) initializeSectionsListener(courseID string) {
+func (fr *FirebaseRepository) initializeSectionsListener(course *models.Course, courseID string) error {
+
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newSections := make(map[string]*models.Section)
 		for _, doc := range docs {
@@ -32,11 +33,6 @@ func (fr *FirebaseRepository) initializeSectionsListener(courseID string) {
 			newSections[doc.Ref.ID] = &c
 		}
 
-		course, err := fr.GetCourseByID(courseID)
-		if err != nil {
-			return err
-		}
-
 		course.SectionsLock.Lock()
 		defer course.SectionsLock.Unlock()
 
@@ -45,7 +41,7 @@ func (fr *FirebaseRepository) initializeSectionsListener(courseID string) {
 		return nil
 	}
 
-	done := make(chan bool)
+	done := make(chan func())
 	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
 		courseID).Collection(models.FirestoreSectionsCollection).Query
 	go func() {
@@ -54,7 +50,9 @@ func (fr *FirebaseRepository) initializeSectionsListener(courseID string) {
 			log.Panicf("error creating section collection listener: %v\n", err)
 		}
 	}()
-	<-done
+	cancelFunc := <-done
+	course.SectionsListenerCancelFunc = cancelFunc
+	return nil
 }
 
 // GetCourseByID gets the Course from the courses map corresponding to the provided course ID.

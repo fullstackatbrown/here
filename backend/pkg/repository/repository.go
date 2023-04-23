@@ -31,9 +31,9 @@ type FirebaseRepository struct {
 	coursesLock sync.RWMutex
 	courses     map[string]*models.Course
 
-	// map from valid course entry codes to courseID
+	// map from valid course entry codes to course
 	coursesEntryCodesLock sync.RWMutex
-	coursesEntryCodes     map[string]string
+	coursesEntryCodes     map[string]*models.Course
 
 	profilesLock sync.RWMutex
 	profiles     map[string]*models.Profile
@@ -42,7 +42,7 @@ type FirebaseRepository struct {
 func NewFirebaseRepository() (*FirebaseRepository, error) {
 	fr := &FirebaseRepository{
 		courses:           make(map[string]*models.Course),
-		coursesEntryCodes: make(map[string]string),
+		coursesEntryCodes: make(map[string]*models.Course),
 		profiles:          make(map[string]*models.Profile),
 	}
 
