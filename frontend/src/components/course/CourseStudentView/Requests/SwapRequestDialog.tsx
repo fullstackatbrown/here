@@ -1,6 +1,7 @@
 import { DisabledTextField } from "@components/shared/DisabledTextField/DisabledTextField";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
+import { filterAssignmentsByDueDate, filterAssignmentsByReleaseDate } from "@util/shared/assignments";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { sortSections } from "@util/shared/sortSectionTime";
 import SwapAPI from "api/swaps/api";
@@ -159,8 +160,8 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 label="Assignment"
                                 required
                             >
-                                {/* TODO: filter assignment to remove all past assignments */}
-                                {assignments.map((a) => <MenuItem key={`select-assignment-${a.ID}`} value={a.ID}>{a.name}</MenuItem>)}
+                                {filterAssignmentsByReleaseDate(filterAssignmentsByDueDate(assignments))
+                                    .map((a) => <MenuItem key={`select-assignment-${a.ID}`} value={a.ID}>{a.name}</MenuItem>)}
                             </Select>
                         </FormControl>
                     }

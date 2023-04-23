@@ -24,3 +24,12 @@ export function filterAssignmentsByReleaseDate(assignments: Assignment[]): Assig
     });
 
 }
+
+// filter out assignments whose due date is before today
+export function filterAssignmentsByDueDate(assignments: Assignment[]): Assignment[] {
+    const today = new Date();
+    return assignments.filter(assignment => {
+        const dueDate = new Date(assignment.dueDate);
+        return dueDate.getTime() >= today.getTime();
+    });
+}

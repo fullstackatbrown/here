@@ -47,9 +47,13 @@ func createSwapHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Whether if student is already in the section is checked in frontend
 
-	swap, err := repo.Repository.CreateSwap(req)
+	swap, badRequestErr, internalErr := repo.Repository.CreateSwap(req)
+	if badRequestErr != nil {
+		http.Error(w, badRequestErr.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, internalErr.Error(), http.StatusInternalServerError)
 		return
 	}
 

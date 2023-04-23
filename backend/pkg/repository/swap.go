@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 	"time"
@@ -34,12 +35,32 @@ func (fr *FirebaseRepository) GetSwapByID(courseID string, swapID string) (*mode
 	return &swap, nil
 }
 
-func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models.Swap, error) {
+func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *models.Swap, badRequestErr error, internalErr error) {
 
 	// TODO: Check for conflicting swaps
 	// If there exists a swap for the exact same student, assignment, old section, and new section, return an error
 
-	swap := &models.Swap{
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return nil, err, nil
+	}
+
+	// check assignment due date
+	assignment, err := fr.GetAssignmentByID(req.CourseID, req.AssignmentID)
+	if err != nil {
+		return nil, err, nil
+	}
+
+	dueDate, err := time.Parse(time.RFC3339, assignment.DueDate)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if dueDate.Before(time.Now()) {
+		return nil, fmt.Errorf("Cannot swap after the assignment due date"), nil
+	}
+
+	swap = &models.Swap{
 		StudentID:    req.User.ID,
 		StudentName:  req.User.DisplayName,
 		AssignmentID: req.AssignmentID,
@@ -50,16 +71,11 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 		Status:       models.STATUS_PENDING,
 	}
 
-	course, err := fr.GetCourseByID(req.CourseID)
-	if err != nil {
-		return nil, err
-	}
-
 	if course.AutoApproveRequests {
 		// check the availability of the new section
 		section, err := fr.GetSectionByID(course.ID, req.NewSectionID)
 		if err != nil {
-			return nil, err
+			return nil, err, nil
 		}
 
 		enrolled := section.NumEnrolled
@@ -85,7 +101,7 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 	if swap.Status == models.STATUS_APPROVED {
 		batch, err = fr.approveSwap(req.CourseID, swap)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
@@ -97,12 +113,12 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (*models
 	// Commit the batch
 	_, err = batch.Commit(firebase.Context)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	swap.ID = ref.ID
 
-	return swap, nil
+	return swap, nil, nil
 }
 
 func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) error {
