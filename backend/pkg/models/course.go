@@ -11,19 +11,21 @@ const (
 )
 
 type Course struct {
-	ID                  string                      `firestore:"id,omitempty"`
-	Title               string                      `firestore:"title"`
-	Code                string                      `firestore:"code"`
-	Term                string                      `firestore:"term"`
-	EntryCode           string                      `firestore:"entryCode"`
-	Status              CourseStatus                `firestore:"status"`
-	AutoApproveRequests bool                        `firestore:"autoApproveRequests"`
-	Students            map[string]CourseUserData   `firestore:"students,omitempty"`    // map from userID to student data
-	Permissions         map[string]CoursePermission `firestore:"permissions,omitempty"` // map from userID to permission
-	SectionsLock        sync.RWMutex                `firestore:"-"`
-	Sections            map[string]*Section         `firestore:"-"`
-	AssignmentsLock     sync.RWMutex                `firestore:"-"`
-	Assignments         map[string]*Assignment      `firestore:"-"`
+	ID                            string                      `firestore:"id,omitempty"`
+	Title                         string                      `firestore:"title"`
+	Code                          string                      `firestore:"code"`
+	Term                          string                      `firestore:"term"`
+	EntryCode                     string                      `firestore:"entryCode"`
+	Status                        CourseStatus                `firestore:"status"`
+	AutoApproveRequests           bool                        `firestore:"autoApproveRequests"`
+	Students                      map[string]CourseUserData   `firestore:"students,omitempty"`    // map from userID to student data
+	Permissions                   map[string]CoursePermission `firestore:"permissions,omitempty"` // map from userID to permission
+	SectionsLock                  sync.RWMutex                `firestore:"-"`
+	Sections                      map[string]*Section         `firestore:"-"`
+	SectionsListenerCancelFunc    func()                      `firestore:"-"`
+	AssignmentsLock               sync.RWMutex                `firestore:"-"`
+	Assignments                   map[string]*Assignment      `firestore:"-"`
+	AssignmentsListenerCancelFunc func()                      `firestore:"-"`
 }
 
 type CourseStatus string

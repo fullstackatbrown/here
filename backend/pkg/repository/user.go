@@ -45,7 +45,7 @@ func (fr *FirebaseRepository) initializeProfilesListener() {
 		return nil
 	}
 
-	done := make(chan bool)
+	done := make(chan func())
 	query := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Query
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)

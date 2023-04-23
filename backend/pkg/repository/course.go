@@ -42,22 +42,37 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 		fr.courses = newCourses
 		fr.coursesEntryCodes = newCoursesEntryCodes
 
+		fr.coursesEntryCodesLock.Unlock()
+		fr.coursesLock.Unlock()
+
 		// If a course is newly added to the list (e.g. just set to active), initialize the sections and assignments listeners
 		for courseID := range fr.courses {
 			if _, ok := oldCourses[courseID]; !ok {
-				// TODO: remove the sections and assignments listener if a course is no longer active
-				fr.initializeSectionsListener(courseID)
-				fr.initializeAssignmentsListener(courseID)
+				log.Printf("Initializing listeners for course %s", courseID)
+				err := fr.initializeSectionsListener(courseID)
+				if err != nil {
+					return fmt.Errorf("error initializing sections listener for course %s: %v", courseID, err)
+				}
+				err = fr.initializeAssignmentsListener(courseID)
+				if err != nil {
+					return fmt.Errorf("error initializing assignments listener for course %s: %v", courseID, err)
+				}
 			}
 		}
 
-		fr.coursesEntryCodesLock.Unlock()
-		fr.coursesLock.Unlock()
+		// If a course is newly removed from the list (e.g. just set to inactive), cancel the sections and assignments listeners
+		for id, course := range oldCourses {
+			if _, ok := fr.courses[id]; !ok {
+				log.Printf("Cancelling listeners for course %s", id)
+				course.SectionsListenerCancelFunc()
+				course.AssignmentsListenerCancelFunc()
+			}
+		}
 
 		return nil
 	}
 
-	done := make(chan bool)
+	done := make(chan func())
 	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Query.Where("status", "==", models.CourseActive)
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)
