@@ -163,6 +163,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 labelId="assignment-select-label"
                                 {...register("assignmentID")}
                                 label="Assignment"
+                                defaultValue={defaultValues["assignmentID"]}
                                 required
                             >
                                 {filterAssignmentsByReleaseDate(filterAssignmentsByDueDate(assignments))
