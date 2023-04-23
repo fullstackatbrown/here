@@ -88,7 +88,7 @@ const PendingRequest: FC<PendingRequestProps> = ({
                 <Tooltip title="approve" disableTouchListener>
                   <IconButton
                     sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
-                    onClick={onClickHandleSwap("approved")}
+                    onClick={onClickHandleSwap(SwapStatus.Approved)}
                   >
                     <CheckIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>
@@ -96,14 +96,14 @@ const PendingRequest: FC<PendingRequestProps> = ({
                 <Tooltip title="deny" disableTouchListener>
                   <IconButton
                     sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
-                    onClick={onClickHandleSwap("denied")}>
+                    onClick={onClickHandleSwap(SwapStatus.Denied)}>
                     <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="archive" disableTouchListener>
                   <IconButton
                     sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
-                    onClick={onClickHandleSwap("archived")}
+                    onClick={onClickHandleSwap(SwapStatus.Archived)}
                   >
                     <ArchiveOutlinedIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>

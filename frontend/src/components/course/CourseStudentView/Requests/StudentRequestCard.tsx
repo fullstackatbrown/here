@@ -12,7 +12,7 @@ import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus, CourseUserData } from "model/course";
 import { Section } from "model/section";
-import { Swap } from "model/swap";
+import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -89,7 +89,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                             </Typography>
                         }
                     </Stack>
-                    {(hover || expanded) && isCourseActive ?
+                    {(hover || expanded) && isCourseActive && request.status === SwapStatus.Pending ?
                         <Stack direction="row" display="flex" alignItems="center">
                             <Tooltip title="edit">
                                 <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickEditSwap}>

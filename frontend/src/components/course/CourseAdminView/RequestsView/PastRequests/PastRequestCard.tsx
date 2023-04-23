@@ -68,7 +68,7 @@ const PastRequest: FC<PastRequestProps> = ({ active, request, student, assignmen
                 <Tooltip title="mark as pending" disableTouchListener>
                   <IconButton
                     sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
-                    onClick={onClickHandleSwap("pending")}
+                    onClick={onClickHandleSwap(SwapStatus.Pending)}
                   >
                     <UndoIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>

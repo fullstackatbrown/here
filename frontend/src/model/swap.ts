@@ -1,9 +1,10 @@
-export type SwapStatus =
-  | "pending"
-  | "cancelled"
-  | "approved"
-  | "denied"
-  | "archived";
+export const enum SwapStatus {
+  Pending = "pending",
+  Cancelled = "cancelled",
+  Approved = "approved",
+  Denied = "denied",
+  Archived = "archived",
+}
 
 export interface Swap {
   ID: string;
