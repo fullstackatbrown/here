@@ -119,14 +119,19 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         }
     }
 
-    return <Dialog open={open} onClose={handleOnClose}>
+    return <Dialog open={open} onClose={handleOnClose} fullWidth>
         <form onSubmit={onSubmit}>
             <DialogTitle>Request Swap</DialogTitle>
             <DialogContent>
-                <Typography variant="body1" mb={2}>
-                    Swaps are automatically accepted if the requested section has availability,&nbsp;
-                    otherwise an instructor will handle the request manually.
-                </Typography>
+                {course.autoApproveRequests ?
+                    <Typography variant="body1" mb={2}>
+                        Swaps are automatically accepted if the requested section has availability,&nbsp;
+                        otherwise a staff member will handle the request manually.
+                    </Typography> :
+                    <Typography variant="body1" mb={2}>
+                        All swaps requests for the course will be handled manually by a staff member.
+                    </Typography>
+                }
                 <Stack spacing={2} my={1}>
                     <DisabledTextField
                         required
