@@ -72,11 +72,11 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
             : "No assignment has been added yet."}
         </Typography>
       )}
-      {/* {assignments?.length > 0 && <AssignmentsTable {...{ course, assignments }} handleNavigate={handleNavigate} />} */}
-      {assignments &&
-        assignments.map((assignment) => (
+      <Stack direction="column" spacing={2} mb={5}>
+        {assignments?.map((assignment) => (
           <AssignmentCard key={assignment.ID} course={course} assignment={assignment} handleNavigate={handleNavigate} />
         ))}
+      </Stack>
     </>
   );
 };
