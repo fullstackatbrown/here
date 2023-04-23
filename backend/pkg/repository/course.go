@@ -42,18 +42,15 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 		fr.courses = newCourses
 		fr.coursesEntryCodes = newCoursesEntryCodes
 
-		fr.coursesEntryCodesLock.Unlock()
-		fr.coursesLock.Unlock()
-
 		// If a course is newly added to the list (e.g. just set to active), initialize the sections and assignments listeners
-		for courseID := range fr.courses {
+		for courseID, course := range fr.courses {
 			if _, ok := oldCourses[courseID]; !ok {
 				log.Printf("Initializing listeners for course %s", courseID)
-				err := fr.initializeSectionsListener(courseID)
+				err := fr.initializeSectionsListener(course, courseID)
 				if err != nil {
 					return fmt.Errorf("error initializing sections listener for course %s: %v", courseID, err)
 				}
-				err = fr.initializeAssignmentsListener(courseID)
+				err = fr.initializeAssignmentsListener(course, courseID)
 				if err != nil {
 					return fmt.Errorf("error initializing assignments listener for course %s: %v", courseID, err)
 				}
@@ -68,6 +65,9 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 				course.AssignmentsListenerCancelFunc()
 			}
 		}
+
+		fr.coursesEntryCodesLock.Unlock()
+		fr.coursesLock.Unlock()
 
 		return nil
 	}

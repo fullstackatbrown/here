@@ -13,11 +13,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func (fr *FirebaseRepository) initializeSectionsListener(courseID string) error {
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return err
-	}
+func (fr *FirebaseRepository) initializeSectionsListener(course *models.Course, courseID string) error {
 
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newSections := make(map[string]*models.Section)

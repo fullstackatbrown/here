@@ -13,12 +13,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func (fr *FirebaseRepository) initializeAssignmentsListener(courseID string) error {
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return err
-	}
-
+func (fr *FirebaseRepository) initializeAssignmentsListener(course *models.Course, courseID string) error {
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newAssignments := make(map[string]*models.Assignment)
 		for _, doc := range docs {
