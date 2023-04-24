@@ -1,6 +1,5 @@
 import Button from "@components/shared/Button";
 import {
-    Box,
     Dialog,
     DialogActions,
     DialogContent,
@@ -8,9 +7,9 @@ import {
     Stack,
     TextField, Typography
 } from "@mui/material";
-import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Errors, handleBadRequestError } from "@util/errors";
+import { handleBadRequestError } from "@util/errors";
 import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";

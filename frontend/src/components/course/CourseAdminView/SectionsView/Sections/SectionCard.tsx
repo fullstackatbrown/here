@@ -26,7 +26,7 @@ const SectionCard: FC<SectionCardProps> = ({ section, active }) => {
   const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     const confirmed = confirm("Are you sure you want to delete this section?" +
-      (section.numEnrolled > 0 && " This will affect all students who are currently enrolled in the section"))
+      (section.numEnrolled > 0 ? " This will affect all students who are currently enrolled in the section." : ""))
 
     if (confirmed) {
       toast
