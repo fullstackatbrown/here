@@ -3,11 +3,10 @@ import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
-import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
+import AdminViewHeader from "../AdminViewHeader";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
-import AdminViewHeader from "../AdminViewHeader";
 
 export interface SectionsViewProps {
   course: Course;
@@ -22,18 +21,6 @@ const SectionsView: FC<SectionsViewProps> = ({
 }) => {
   const sections = Object.values(sectionsMap);
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
-
-  const getEnrollment = (sectionId: string) => {
-    // loop through courses.students and count the number of students whose value is section id
-    if (!course.students) return 0;
-    let count = 0;
-    Object.keys(course.students).forEach((studentId) => {
-      if (course.students[studentId].defaultSection === sectionId) {
-        count++;
-      }
-    });
-    return count;
-  };
 
   return (
     <>
@@ -67,7 +54,6 @@ const SectionsView: FC<SectionsViewProps> = ({
             key={s.ID}
             active={course.status === CourseStatus.CourseActive}
             section={s}
-            enrollment={getEnrollment(s.ID)}
           />
         ))}
       </Stack>
