@@ -77,7 +77,7 @@ const PastRequest: FC<PastRequestProps> = ({ active, request, student, assignmen
                 >
                   {/* TODO: disable revert if assignment due date has past */}
                   <IconButton
-                    disabled={request.status === "cancelled"}
+                    disabled={request.status === SwapStatus.Cancelled}
                     sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
                     onClick={onClickHandleSwap(SwapStatus.Pending)}
                   >
