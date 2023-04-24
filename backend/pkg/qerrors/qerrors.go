@@ -27,4 +27,7 @@ var (
 
 	// Assignment errors
 	AssignmentAlreadyExistsError = errors.New("an assignment with the same name already exists")
+
+	// Swap errors
+	SwapNotFoundError = errors.New("swap not found")
 )

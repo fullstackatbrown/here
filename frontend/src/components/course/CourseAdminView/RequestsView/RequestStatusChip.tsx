@@ -19,15 +19,15 @@ const MyChip = styled(Chip)({
 
 const RequestStatusChip: FC<RequestStatusChipProps> = ({ status, style }) => {
     switch (status) {
-        case "approved":
+        case SwapStatus.Approved:
             return <MyChip label="approved" variant="outlined" color="success" style={style} />;
-        case "denied":
+        case SwapStatus.Denied:
             return <MyChip label="denied" variant="outlined" color="error" style={style} />;
-        case "archived":
+        case SwapStatus.Archived:
             return <MyChip label="archived" variant="outlined" color="secondary" style={style} />;
-        case "cancelled":
+        case SwapStatus.Cancelled:
             return <MyChip label="cancelled" variant="outlined" color="secondary" style={style} />;
-        case "pending":
+        case SwapStatus.Pending:
             return <MyChip label="pending" variant="outlined" color="primary" style={style} />;
     }
 };
