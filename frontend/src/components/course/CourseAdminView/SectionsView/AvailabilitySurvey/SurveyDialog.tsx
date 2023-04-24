@@ -1,4 +1,5 @@
 import Button from "@components/shared/Button";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import {
     Box,
     Checkbox, Dialog,
@@ -25,20 +26,24 @@ export interface SurveyDialogProps {
 const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID }) => {
     // If student has already responded, show their response
     const [availability, setAvailability] = useState<string[]>((studentID && survey?.responses?.[studentID]) || []);
+    const showDialog = useDialog();
 
     const handleClose = () => {
         onClose();
         setAvailability((studentID && survey?.responses?.[studentID]) || [])
     }
 
-    function onSubmit() {
+    async function onSubmit() {
         if (preview) {
             if (new Date(survey.endTime) < new Date()) {
                 alert("This survey's end time is in the past. Please edit before publishing.");
                 onClose();
                 return;
             }
-            const confirmed = confirm("Are you sure you want to publish this survey?");
+            const confirmed = await showDialog({
+                title: 'Publish Survey',
+                message: `Are you sure you want to publish ${survey.name}?`,
+            });
             if (confirmed) {
                 toast.promise(SurveyAPI.publishSurvey(survey.courseID, survey.ID), {
                     loading: "Publishing survey...",

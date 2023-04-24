@@ -8,6 +8,7 @@ import { Section } from "model/section";
 import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 
 export interface SectionCardProps {
   active: boolean;
@@ -23,18 +24,22 @@ const SectionCard: FC<SectionCardProps> = ({ section, active }) => {
   const theme = useTheme();
   const betweenSmalltoMid = useMediaQuery(theme.breakpoints.between("xs", "md"));
 
-  const handleDeleteSection = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    const confirmed = confirm("Are you sure you want to delete this section?" +
-      (section.numEnrolled > 0 ? " This will affect all students who are currently enrolled in the section." : ""))
+  const showDialog = useDialog();
 
+  const handleDeleteSection = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    const confirmed = await showDialog({
+      title: 'Delete Section',
+      message: "Are you sure you want to delete this section? This action cannot be undone.",
+      warning: section.numEnrolled > 0 && "Deleting this section will affect all students who are currently enrolled in the section."
+    });
     if (confirmed) {
-      toast
-        .promise(SectionAPI.deleteSection(section.courseID, section.ID), {
-          loading: "Deleting section...",
-          success: "Section deleted!",
-          error: (err) => handleBadRequestError(err),
-        })
+      toast.promise(SectionAPI.deleteSection(section.courseID, section.ID), {
+        loading: "Deleting section...",
+        success: "Section deleted!",
+        error: (err) => handleBadRequestError(err),
+      })
         .catch(() => { });
     }
   };

@@ -7,6 +7,7 @@ import { CoursePermission, User } from "model/user";
 import { FC } from "react";
 import toast from "react-hot-toast";
 import AddPermissionButton from "../AddPermissionButton/AddPermissionButton";
+import { useDialog } from "../ConfirmDialog/ConfirmDialogProvider";
 
 interface AccessListProps {
   course?: Course; // if course is passed in, the list is editable
@@ -21,6 +22,7 @@ interface UserData {
 }
 
 const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
+  const showDialog = useDialog();
   const editable = course !== undefined && course.status !== CourseStatus.CourseArchived;
   const data: UserData[] =
     users &&
@@ -28,8 +30,11 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
     users.map((user) => ({ user } as UserData)).concat(emails.map((email) => ({ email } as UserData)));
 
   const handleRevokeUserAccess = (user?: User, email?: string) => {
-    return () => {
-      const confirmed = confirm(`Are you sure you want to revoke ${user?.displayName || email}'s ${access.toLowerCase()} access?`);
+    return async () => {
+      const confirmed = await showDialog({
+        title: `Revoke ${access.toLowerCase()} access`,
+        message: `Are you sure you want to revoke ${user?.displayName || email}'s ${access.toLowerCase()} access?`,
+      });
       if (confirmed) {
         toast.promise(CourseAPI.revokePermission(course.ID, user?.ID, email), {
           loading: "Revoking access...",

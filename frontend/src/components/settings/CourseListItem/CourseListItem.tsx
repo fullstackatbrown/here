@@ -10,6 +10,7 @@ import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
 import ActivateCourseDialog from "../ActivateCourseDialog/ActivateCourseDialog";
 import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 
 export interface CourseListItemProps {
     course: Course;
@@ -17,9 +18,10 @@ export interface CourseListItemProps {
 
 const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
     const [activateCourseDialogOpen, setActivateCourseDialogOpen] = useState(false);
+    const showDialog = useDialog();
 
     const handleChangeCourseStatus = (status: CourseStatus) => {
-        return (e: React.MouseEvent<HTMLButtonElement>) => {
+        return async (e: React.MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();
 
             if (course.students && Object.keys(course.students).length > 0 && course.status === CourseStatus.CourseInactive) {
@@ -39,7 +41,10 @@ const CourseListItem: FC<CourseListItemProps> = ({ course }) => {
                     confirmString = `Are you sure you want to re-activate ${course.title}? Students will be able to access the course.`;
                     break;
             }
-            const confirmed = confirm(confirmString);
+            const confirmed = await showDialog({
+                title: "Confirm Course Status Change",
+                message: confirmString,
+            });
             if (confirmed) {
                 toast.promise(CourseAPI.updateCourse(course.ID, undefined, undefined, status), {
                     loading: "Updating course status...",
