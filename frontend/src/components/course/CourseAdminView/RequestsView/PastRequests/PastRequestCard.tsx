@@ -10,6 +10,7 @@ import { Assignment } from "model/assignment";
 import { CourseUserData } from "model/course";
 import { Section } from "model/section";
 import UndoIcon from '@mui/icons-material/Undo';
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 
 export interface PastRequestProps {
   active: boolean,
@@ -26,11 +27,15 @@ const PastRequest: FC<PastRequestProps> = ({ active, request, student, assignmen
   const [expanded, setExpanded] = useState(false);
   const theme = useTheme();
   const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const showDialog = useDialog();
 
   function onClickHandleSwap(status: SwapStatus) {
-    return (e: React.MouseEvent<HTMLButtonElement>) => {
+    return async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-      const confirmed = confirm(`This request has already been ${request.status}. Are you sure you want to mark this request as pending?`);
+      const confirmed = await showDialog({
+        title: `Mark Request as ${status}`,
+        message: `This request has already been ${request.status}. Are you sure you want to mark this request as pending?`,
+      });
       if (confirmed) handleSwap(request, status);
     };
   }
@@ -65,8 +70,14 @@ const PastRequest: FC<PastRequestProps> = ({ active, request, student, assignmen
           <Box display="flex" width={70} justifyContent="flex-end">
             {(hover || expanded) && active ?
               <Stack direction="row" display="flex" alignItems="center">
-                <Tooltip title="mark as pending" disableTouchListener>
+                <Tooltip
+                  title="mark as pending"
+                  placement="right"
+                  disableTouchListener
+                >
+                  {/* TODO: disable revert if assignment due date has past */}
                   <IconButton
+                    disabled={request.status === "cancelled"}
                     sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
                     onClick={onClickHandleSwap(SwapStatus.Pending)}
                   >

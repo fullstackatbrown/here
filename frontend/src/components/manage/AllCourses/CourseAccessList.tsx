@@ -14,6 +14,7 @@ import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
 import toast from "react-hot-toast";
 import { useCourseInvites } from "api/auth/hooks";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 
 interface CourseAccessListProps {
     course: Course;
@@ -27,6 +28,7 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
     const [editCourseDialogOpen, setEditCourseDialogOpen] = useState<Course | undefined>(undefined);
     const theme = useTheme();
+    const showDialog = useDialog();
 
     const handleOpenEditCourseDialog = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
@@ -34,9 +36,12 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     }
 
     // CourseStatusChip
-    const handleDeleteCourse = (e: React.MouseEvent<HTMLElement>) => {
+    const handleDeleteCourse = async (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
-        const confirmed = confirm("Are you sure you want to delete this course? This action cannot be undone.");
+        const confirmed = await showDialog({
+            title: "Delete Course",
+            message: "Are you sure you want to delete this course? This action cannot be undone.",
+        })
         if (confirmed) {
             toast.promise(CourseAPI.deleteCourse(course.ID), {
                 loading: "Deleting course...",

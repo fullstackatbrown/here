@@ -3,6 +3,7 @@ import { Box, IconButton, Stack, TextField, Tooltip, Typography } from "@mui/mat
 import { FC, Fragment, useEffect } from 'react';
 import EditIcon from "@mui/icons-material/Edit";
 import { useForm } from 'react-hook-form';
+import { useDialog } from '../ConfirmDialog/ConfirmDialogProvider';
 
 interface GradeChipProps {
   score: number | undefined;
@@ -21,6 +22,8 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, edi
   const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
     defaultValues: { grade: score ? score.toString() : "" }
   });
+
+  const showDialog = useDialog();
 
   useEffect(() => { reset({ grade: score ? score.toString() : "" }) }, [score])
 
@@ -43,7 +46,10 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, edi
     if (score !== undefined) {
       // if we are trying to delete it
       if (data.grade === "") {
-        const confirmed = confirm("Are you sure you want to delete this grade?")
+        const confirmed = await showDialog({
+          title: "Delete Grade",
+          message: "Are you sure you want to delete this grade?",
+        })
         confirmed && handleDeleteGrade && handleDeleteGrade()
       } else {
         handleCreateGrade && handleCreateGrade(grade)

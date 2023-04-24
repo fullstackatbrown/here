@@ -11,6 +11,7 @@ import CreateSurveyDialog from "./CreateEditSurveyDialog";
 import SurveyDialog from "./SurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 import { CourseStatus } from "model/course";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 
 export interface SurveyCardProps {
   survey: Survey;
@@ -27,6 +28,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
   const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const [surveyResponsesDialog, setSUrveyResponsesDialog] = useState(false);
+  const showDialog = useDialog();
 
   const handleClick = () => {
     if (survey.published) {
@@ -40,9 +42,13 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
     setSurveyPreviewDialog(false);
   };
 
-  const handleDeleteSurvey = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDeleteSurvey = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    const confirmed = confirm("Are you sure you want to delete this survey?");
+    const confirmed = await showDialog({
+      title: 'Delete Survey',
+      message: `Are you sure you want to delete ${survey.name}? This action cannot be undone.`,
+      warning: survey.published && "This survey is already published. Deleting this survey will delete all student responses."
+    });
     if (confirmed) {
       toast
         .promise(SurveyAPI.deleteSurvey(survey.courseID, survey.ID), {

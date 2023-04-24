@@ -8,6 +8,7 @@ import { FC, useState } from "react";
 import { handleBadRequestError } from '@util/errors';
 import AuthAPI from 'api/auth/api';
 import toast from 'react-hot-toast';
+import { useDialog } from '@components/shared/ConfirmDialog/ConfirmDialogProvider';
 
 export interface AdminChipProps {
     admin?: User;
@@ -17,9 +18,13 @@ export interface AdminChipProps {
 const AdminChip: FC<AdminChipProps> = ({ admin, email }) => {
     const [hover, setHover] = useState(false);
     const { currentUser } = useAuth();
+    const showDialog = useDialog();
 
-    const handleDeleteAdmin = () => {
-        const confirmed = confirm(`Are you sure you want to remove ${admin?.displayName || email} as a site admin?`);
+    const handleDeleteAdmin = async () => {
+        const confirmed = await showDialog({
+            title: "Remove Admin",
+            message: `Are you sure you want to remove ${admin?.displayName || email} as a site admin?`,
+        });
         if (!confirmed) return;
         toast.promise(AuthAPI.editAdminAccess(admin?.email || email, false), {
             loading: "Removing admin...",

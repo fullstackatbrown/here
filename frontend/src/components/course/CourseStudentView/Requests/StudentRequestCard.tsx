@@ -1,5 +1,6 @@
 import RequestInformation from "@components/course/CourseAdminView/RequestsView/RequestInformation";
 import RequestStatusChip from "@components/course/CourseAdminView/RequestsView/RequestStatusChip";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import { ExpandMore } from "@mui/icons-material";
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
@@ -32,11 +33,15 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const isCourseActive = course.status === CourseStatus.CourseActive
 
+    const showDialog = useDialog();
     const theme = useTheme();
 
-    function onClickCancelSwap(e: React.MouseEvent<HTMLButtonElement>) {
+    const onClickCancelSwap = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        const confirmed = confirm("Are you sure you want to cancel this request?");
+        const confirmed = await showDialog({
+            title: "Cancel Swap Request",
+            message: "Are you sure you want to cancel this request? This action cannot be undone.",
+        })
         if (confirmed) {
             toast.promise(SwapAPI.cancelSwap(course.ID, request.ID),
                 {
