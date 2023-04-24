@@ -12,6 +12,7 @@ import { Section } from "model/section";
 import { FC, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import StudentDialog from "./StudentDialog";
+import { useDialog } from '@components/shared/ConfirmDialog/ConfirmDialogProvider';
 
 export interface PeopleTableProps {
     course: Course;
@@ -39,15 +40,19 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
     const [page, setPage] = useState(0);
     const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
     const isCourseActive = course.status === CourseStatus.CourseActive;
+    const showDialog = useDialog();
 
     useEffect(() => {
         setStudentsSorted(sortStudentsByName(students))
     }, [students])
 
     const handleRemoveStudent = (student: CourseUserData) => {
-        return (e: React.MouseEvent<HTMLElement>) => {
+        return async (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation();
-            const confirmed = confirm(`Are you sure you want to remove ${student.displayName} from this course?`);
+            const confirmed = await showDialog({
+                title: 'Remove Student',
+                message: `Are you sure you want to remove ${student.displayName} from this course?`,
+            });
             if (confirmed) {
                 toast.promise(CourseAPI.deleteStudent(course.ID, student.studentID), {
                     loading: "Removing student...",
@@ -60,9 +65,12 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
     }
 
     const handleRemoveInvite = (email: string) => {
-        return (e: React.MouseEvent<HTMLElement>) => {
+        return async (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation();
-            const confirmed = confirm(`Are you sure you want to remove ${email} from this course?`);
+            const confirmed = await showDialog({
+                title: 'Remove Student',
+                message: `Are you sure you want to remove ${email} from this course?`,
+            });
             if (confirmed) {
                 toast.promise(CourseAPI.deleteStudent(course.ID, undefined, email), {
                     loading: "Removing student...",

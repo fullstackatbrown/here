@@ -1,6 +1,6 @@
 import Button from "@components/shared/Button";
 import {
-    Box,
+    Alert,
     Dialog,
     DialogActions,
     DialogContent,
@@ -11,13 +11,12 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { Errors, handleBadRequestError } from "@util/errors";
+import { handleBadRequestError } from "@util/errors";
 import SectionAPI from "api/section/api";
-import dayjs, { Dayjs } from 'dayjs';
+import { Day, Section } from "model/section";
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Day, Section } from "model/section";
 
 export interface CreateEditSectionDialogProps {
     open: boolean;
@@ -88,6 +87,11 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         <form onSubmit={onSubmit}>
             <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
             <DialogContent>
+                {section?.numEnrolled > 0 &&
+                    <Alert severity="warning" sx={{ marginBottom: 2.5 }}>
+                        Editing this section will affect the students who are currently enrolled.
+                    </Alert>
+                }
                 <Stack spacing={2} my={1}>
                     <FormControl fullWidth>
                         <InputLabel id="weekday-select-label">Day</InputLabel>

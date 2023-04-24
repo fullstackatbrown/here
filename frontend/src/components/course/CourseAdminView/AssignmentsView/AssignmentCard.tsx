@@ -9,6 +9,8 @@ import { FC, useState } from "react";
 import toast from "react-hot-toast";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import dayjs from "dayjs";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
+import { handleBadRequestError } from "@util/errors";
 
 export interface AssignmentCardProps {
   course: Course;
@@ -20,24 +22,32 @@ const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardPr
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
   const isCourseActive = course.status === CourseStatus.CourseActive;
 
-  const handleEditAssignment = (assignment: Assignment) => {
-    return (e: React.MouseEvent<HTMLElement>) => {
-      e.stopPropagation();
-      setEditAssignmentDialog(assignment);
-    };
-  };
+  const showDialog = useDialog();
 
   const handleDeleteAssignment = (assignment: Assignment) => {
-    return (e: React.MouseEvent<HTMLElement>) => {
+    return async (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
-      const confirmed = confirm("Are you sure you want to delete this assignment?");
+      const confirmed = await showDialog({
+        title: 'Delete Assignment',
+        message: "Are you sure you want to delete this assignment? This action cannot be undone.",
+        warning: assignment.grades && Object.keys(assignment.grades).length > 0
+          && "Deleting this section will delete all student grades."
+      });
+
       if (confirmed) {
         toast.promise(AssignmentAPI.deleteAssignment(course.ID, assignment.ID), {
           loading: "Deleting assignment...",
           success: "Deleted assignment!",
-          error: "Failed to delete assignment",
+          error: (err) => handleBadRequestError(err),
         });
       }
+    };
+  };
+
+  const handleEditAssignment = (assignment: Assignment) => {
+    return (e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
+      setEditAssignmentDialog(assignment);
     };
   };
 
