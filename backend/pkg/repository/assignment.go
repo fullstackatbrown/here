@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -93,13 +94,23 @@ func (fr *FirebaseRepository) GetAssignmentByName(courseID string, name string) 
 
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
 
+	dueDate, err := time.Parse(time.RFC3339, req.DueDate)
+	if err != nil {
+		return nil, err
+	}
+
+	releaseDate, err := time.Parse(time.RFC3339, req.ReleaseDate)
+	if err != nil {
+		return nil, err
+	}
+
 	assignment = &models.Assignment{
 		CourseID:    req.CourseID,
 		Name:        req.Name,
 		Optional:    req.Optional,
 		MaxScore:    req.MaxScore,
-		ReleaseDate: req.ReleaseDate,
-		DueDate:     req.DueDate,
+		ReleaseDate: releaseDate,
+		DueDate:     dueDate,
 		Grades:      make(map[string]models.Grade),
 	}
 

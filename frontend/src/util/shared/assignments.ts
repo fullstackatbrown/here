@@ -3,14 +3,10 @@ import { Assignment } from "model/assignment";
 // sort assignments by due date first, and then release date
 export function sortAssignments(assignments: Assignment[]): Assignment[] {
     assignments.sort((a, b) => {
-        const aDueDate = new Date(a.dueDate);
-        const bDueDate = new Date(b.dueDate);
-        if (aDueDate.getTime() !== bDueDate.getTime()) {
-            return aDueDate.getTime() - bDueDate.getTime();
+        if (a.dueDate.getTime() !== b.dueDate.getTime()) {
+            return a.dueDate.getTime() - b.dueDate.getTime();
         }
-        const aReleaseDate = new Date(a.releaseDate);
-        const bReleaseDate = new Date(b.releaseDate);
-        return aReleaseDate.getTime() - bReleaseDate.getTime();
+        return a.releaseDate.getTime() - b.releaseDate.getTime();
     });
     return assignments;
 }
@@ -19,8 +15,7 @@ export function sortAssignments(assignments: Assignment[]): Assignment[] {
 export function filterAssignmentsByReleaseDate(assignments: Assignment[]): Assignment[] {
     const today = new Date();
     return assignments.filter(assignment => {
-        const releaseDate = new Date(assignment.releaseDate);
-        return releaseDate.getTime() <= today.getTime();
+        return assignment.releaseDate.getTime() <= today.getTime();
     });
 
 }
@@ -29,7 +24,6 @@ export function filterAssignmentsByReleaseDate(assignments: Assignment[]): Assig
 export function filterAssignmentsByDueDate(assignments: Assignment[]): Assignment[] {
     const today = new Date();
     return assignments.filter(assignment => {
-        const dueDate = new Date(assignment.dueDate);
-        return dueDate.getTime() >= today.getTime();
+        return assignment.dueDate.getTime() >= today.getTime();
     });
 }

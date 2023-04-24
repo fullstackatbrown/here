@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 const (
 	FirestoreAssignmentsCollection = "assignments"
 )
@@ -10,8 +12,8 @@ type Assignment struct {
 	Name        string           `firestore:"name"`
 	Optional    bool             `firestore:"optional"`
 	MaxScore    int              `firestore:"maxScore"`
-	ReleaseDate string           `firestore:"releaseDate"`
-	DueDate     string           `firestore:"dueDate"`
+	ReleaseDate time.Time        `firestore:"releaseDate"`
+	DueDate     time.Time        `firestore:"dueDate"`
 	Grades      map[string]Grade `firestore:"grades"` // map[studentID]Grade
 }
 

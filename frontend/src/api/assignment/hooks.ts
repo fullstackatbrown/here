@@ -12,7 +12,12 @@ export function useAssignmentsMap(courseID: string): [Record<string, Assignment>
         const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection, courseID, FirestoreAssignmentsCollection), (querySnapshot) => {
             const res: Record<string, Assignment> = {};
             querySnapshot.forEach((doc) => {
-                res[doc.id] = { ID: doc.id, ...doc.data() } as Assignment;
+                res[doc.id] = {
+                    ID: doc.id,
+                    ...doc.data(),
+                    dueDate: doc.get("dueDate").toDate(),
+                    releaseDate: doc.get("releaseDate").toDate()
+                } as Assignment;
             });
             setAssignments(res);
             setLoading(false);

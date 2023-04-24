@@ -123,12 +123,7 @@ func (fr *FirebaseRepository) checkSwapRequestDueDate(courseID string, assignmen
 			return err
 		}
 
-		dueDate, err := time.Parse(time.RFC3339, assignment.DueDate)
-		if err != nil {
-			return err
-		}
-
-		if dueDate.Before(time.Now()) {
+		if assignment.DueDate.Before(time.Now()) {
 			return fmt.Errorf("Cannot swap after the assignment due date")
 		}
 
@@ -292,10 +287,17 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		}
 	}
 
+	var handledBy string
+	if req.HandledBy != nil {
+		handledBy = req.HandledBy.ID
+	} else {
+		handledBy = "system"
+	}
+
 	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
 		models.FirestoreSwapsCollection).Doc(req.SwapID), []firestore.Update{
 		{Path: "status", Value: req.Status},
-		{Path: "handledBy", Value: req.HandledBy.ID},
+		{Path: "handledBy", Value: handledBy},
 	})
 
 	_, err = batch.Commit(firebase.Context)

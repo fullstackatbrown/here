@@ -29,8 +29,8 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
     const defaultValues = {
         name: assignment ? assignment.name : undefined,
         optional: assignment ? assignment.optional : false,
-        releaseDate: assignment ? assignment.releaseDate : new Date().toISOString(),
-        dueDate: assignment ? assignment.dueDate : getNextWeekDate().toISOString(),
+        releaseDate: assignment ? assignment.releaseDate.toISOString() : new Date().toISOString(),
+        dueDate: assignment ? assignment.dueDate.toISOString() : getNextWeekDate().toISOString(),
         maxScore: assignment ? assignment.maxScore : 1,
     }
 
