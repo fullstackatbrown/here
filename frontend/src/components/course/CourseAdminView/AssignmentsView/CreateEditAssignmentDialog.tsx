@@ -49,6 +49,10 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
     const onSubmit = handleSubmit(async data => {
         const releaseDate = clearTime(data.releaseDate)
         const dueDate = clearTime(data.dueDate)
+        if (releaseDate > dueDate) {
+            toast.error("Release date must be before due date.")
+            return
+        }
         if (assignment) {
             toast.promise(AssignmentAPI.updateAssignment(
                 assignment.courseID, assignment.ID, data.name, data.optional, releaseDate, dueDate, data.maxScore),
