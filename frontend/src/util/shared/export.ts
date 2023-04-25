@@ -31,7 +31,7 @@ export function exportGrades(course: Course, assignments: Assignment[], invitedS
             if (percentage) {
                 grade = grade ? grade / assignment.maxScore * 100 : undefined;
             }
-            entry[assignment.name.toLowerCase().replace(/\s+/g, '_')] = grade ? grade : "N/A";
+            entry[assignment.name.toLowerCase().replace(/\s+/g, '_')] = grade === undefined ? "N/A" : grade;
         }
         data.push(entry);
     }
