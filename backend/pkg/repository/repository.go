@@ -60,7 +60,7 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 
 	// Execute the listeners sequentially, in case later listeners need to utilize data fetched
 	// by previous listeners
-	initFns := []func(){fr.initializeCoursesListener, fr.initializeProfilesListener}
+	initFns := []func(){fr.initializeCoursesListener, fr.initializeProfilesListener, fr.scheduleExpireSwaps}
 	for _, initFn := range initFns {
 		initFn()
 	}
