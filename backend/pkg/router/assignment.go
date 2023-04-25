@@ -71,8 +71,8 @@ func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = &courseID
-	req.AssignmentID = &assignmentID
+	req.CourseID = courseID
+	req.AssignmentID = assignmentID
 
 	err = repo.Repository.UpdateAssignment(req)
 	if err != nil {

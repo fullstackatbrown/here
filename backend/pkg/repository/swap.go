@@ -123,12 +123,7 @@ func (fr *FirebaseRepository) checkSwapRequestDueDate(courseID string, assignmen
 			return err
 		}
 
-		dueDate, err := time.Parse(time.RFC3339, assignment.DueDate)
-		if err != nil {
-			return err
-		}
-
-		if dueDate.Before(time.Now()) {
+		if assignment.DueDate.Before(time.Now()) {
 			return fmt.Errorf("Cannot swap after the assignment due date")
 		}
 
@@ -292,10 +287,17 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		}
 	}
 
+	var handledBy string
+	if req.HandledBy != nil {
+		handledBy = req.HandledBy.ID
+	} else {
+		handledBy = "system"
+	}
+
 	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
 		models.FirestoreSwapsCollection).Doc(req.SwapID), []firestore.Update{
 		{Path: "status", Value: req.Status},
-		{Path: "handledBy", Value: req.HandledBy.ID},
+		{Path: "handledBy", Value: handledBy},
 	})
 
 	_, err = batch.Commit(firebase.Context)
@@ -309,8 +311,13 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		return err
 	}
 
+	notificationMsg := fmt.Sprintf("Your swap request has been %s", req.Status)
+	if req.HandledBy == nil {
+		notificationMsg += " by the system"
+	}
+
 	notification := models.Notification{
-		Title:     "Your swap request status has been updated",
+		Title:     notificationMsg,
 		Body:      course.Code,
 		Timestamp: time.Now(),
 		Type:      models.NotificationRequestUpdated,
@@ -330,4 +337,68 @@ func (fr *FirebaseRepository) CancelSwap(courseID string, swapID string) error {
 		{Path: "status", Value: models.STATUS_CANCELLED},
 	})
 	return err
+}
+
+// Get all pending swaps from the course and mark the expired ones as archived
+func (fr *FirebaseRepository) scheduleExpireSwaps() {
+	now := time.Now()
+	midnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+	duration := midnight.Sub(now)
+
+	ticker := time.NewTicker(24 * time.Hour)
+
+	go func() {
+		// wait till midnight and run once
+		time.Sleep(duration)
+		fr.expireSwaps()
+
+		for {
+			select {
+			case <-ticker.C:
+				// run every 24 hours
+				fr.expireSwaps()
+			}
+		}
+	}()
+}
+
+func (fr *FirebaseRepository) expireSwaps() {
+	fr.coursesLock.RLock()
+	defer fr.coursesLock.RUnlock()
+	for courseID, course := range fr.courses {
+		course.PendingSwapsLock.RLock()
+		course.AssignmentsLock.RLock()
+
+		for _, swap := range course.PendingSwaps {
+			if swap.AssignmentID == "" {
+				continue
+			}
+			// if assignment no longer exists, archive swap
+			if _, ok := course.Assignments[swap.AssignmentID]; !ok {
+				err := fr.HandleSwap(&models.HandleSwapRequest{
+					CourseID: courseID,
+					SwapID:   swap.ID,
+					Status:   models.STATUS_ARCHIVED,
+				})
+				if err != nil {
+					glog.Warning("error archiving swap: %v\n", err)
+				}
+				continue
+			}
+			// if assignment is expired, archive swap
+			if course.Assignments[swap.AssignmentID].DueDate.Before(time.Now()) {
+				err := fr.HandleSwap(&models.HandleSwapRequest{
+					CourseID: courseID,
+					SwapID:   swap.ID,
+					Status:   models.STATUS_ARCHIVED,
+				})
+				if err != nil {
+					glog.Warning("error archiving swap: %v\n", err)
+				}
+			}
+		}
+
+		course.PendingSwapsLock.RUnlock()
+		course.AssignmentsLock.RUnlock()
+	}
 }

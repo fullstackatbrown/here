@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 	"log"
-	"reflect"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
@@ -93,13 +93,23 @@ func (fr *FirebaseRepository) GetAssignmentByName(courseID string, name string) 
 
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
 
+	dueDate, err := time.Parse(time.RFC3339, req.DueDate)
+	if err != nil {
+		return nil, err
+	}
+
+	releaseDate, err := time.Parse(time.RFC3339, req.ReleaseDate)
+	if err != nil {
+		return nil, err
+	}
+
 	assignment = &models.Assignment{
 		CourseID:    req.CourseID,
 		Name:        req.Name,
 		Optional:    req.Optional,
 		MaxScore:    req.MaxScore,
-		ReleaseDate: req.ReleaseDate,
-		DueDate:     req.DueDate,
+		ReleaseDate: releaseDate,
+		DueDate:     dueDate,
 		Grades:      make(map[string]models.Grade),
 	}
 
@@ -124,22 +134,24 @@ func (fr *FirebaseRepository) DeleteAssignment(req *models.DeleteAssignmentReque
 }
 
 func (fr *FirebaseRepository) UpdateAssignment(req *models.UpdateAssignmentRequest) error {
-	v := reflect.ValueOf(*req)
-	typeOfS := v.Type()
-
-	var updates []firestore.Update
-
-	for i := 0; i < v.NumField(); i++ {
-		field := typeOfS.Field(i).Name
-		val := v.Field(i).Interface()
-
-		// Only include the fields that are set
-		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "AssignmentID") {
-			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
-		}
+	dueDate, err := time.Parse(time.RFC3339, req.DueDate)
+	if err != nil {
+		return err
 	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
-		models.FirestoreAssignmentsCollection).Doc(*req.AssignmentID).Update(firebase.Context, updates)
+	releaseDate, err := time.Parse(time.RFC3339, req.ReleaseDate)
+	if err != nil {
+		return err
+	}
+
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+		models.FirestoreAssignmentsCollection).Doc(req.AssignmentID).Update(firebase.Context, []firestore.Update{
+		{Path: "name", Value: req.Name},
+		{Path: "optional", Value: req.Optional},
+		{Path: "maxScore", Value: req.MaxScore},
+		{Path: "releaseDate", Value: releaseDate},
+		{Path: "dueDate", Value: dueDate},
+	})
+
 	return err
 }

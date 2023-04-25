@@ -263,6 +263,7 @@ func (fr *FirebaseRepository) getUserCount() int {
 func (fr *FirebaseRepository) createProfileFromFbUser(fbUser *firebaseAuth.UserRecord) (*models.Profile, error) {
 
 	profile := &models.Profile{
+		ID:              fbUser.UID,
 		DisplayName:     fbUser.DisplayName,
 		Email:           fbUser.Email,
 		PhotoURL:        fbUser.PhotoURL,
