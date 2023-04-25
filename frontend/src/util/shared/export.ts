@@ -5,6 +5,7 @@ import { Section } from "model/section";
 import { formatSectionTime, formatSurveyTime } from "./formatTime";
 import listToMap from "./listToMap";
 import { SurveyResponse } from "model/survey";
+import formatSectionInfo from './formatSectionInfo';
 
 const options = {
     filename: "",
@@ -53,14 +54,15 @@ export function exportGrades(course: Course, assignments: Assignment[], invitedS
     csvExporter.generateCsv(data);
 }
 
-export function exportStudentList(course: Course, invitedStudents?: string[]) {
+export function exportStudentList(course: Course, sectionsMap: Record<string, Section>, invitedStudents?: string[]) {
     options.filename = `${course.code}_student_list`
     let data = [];
     for (const student of Object.values(course.students)) {
+        const section = student.defaultSection !== "" && sectionsMap[student.defaultSection];
         data.push({
             "name": student.displayName,
             "email": student.email,
-            "section": student.defaultSection !== "" ? student.defaultSection : "N/A",
+            "section": section ? formatSectionInfo(section) : "N/A",
         });
     }
 

@@ -62,7 +62,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   }
 
   const handleExportStudentList = () => {
-    exportStudentList(course, invitedStudents)
+    exportStudentList(course, sectionsMap, invitedStudents)
   }
 
   const hasNoStudent = () => {
