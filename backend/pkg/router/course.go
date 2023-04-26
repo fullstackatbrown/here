@@ -154,6 +154,17 @@ func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.CourseID = courseID
 
+	if req.NewSectionID == "" {
+		err = repo.Repository.RemoveStudentFromSection(req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(200)
+		w.Write([]byte("Successfully removed student from course " + courseID))
+	}
+
 	err = repo.Repository.AssignStudentToSection(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -161,7 +172,7 @@ func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(200)
-	w.Write([]byte("Successfully assigned sections to course " + courseID))
+	w.Write([]byte("Successfully assigned student to course " + courseID))
 
 }
 

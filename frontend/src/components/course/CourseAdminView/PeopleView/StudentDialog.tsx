@@ -35,8 +35,9 @@ export interface StudentDialogProps {
 
 const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments, sectionsMap, open, onClose }) => {
     const [student, setStudent] = useState<User | undefined>(undefined);
-    const defaultSectionID = () => student?.defaultSections?.[course.ID]
-    const [selectedSection, setSelectedSection] = useState<string | undefined>(undefined);
+    const defaultSectionID = () => student?.defaultSections?.[course.ID] || UNASSIGNED
+    console.log(defaultSectionID())
+    const [selectedSection, setSelectedSection] = useState<string | undefined>(undefined); // undefined means not in edit mode
 
     useEffect(() => {
         if (studentID && studentID != "") {
@@ -84,14 +85,16 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
             return
         }
 
-        toast.promise(CourseAPI.assignSection(course.ID, studentID, selectedSection), {
+        const newSectionID = selectedSection === UNASSIGNED ? "" : selectedSection
+
+        toast.promise(CourseAPI.assignSection(course.ID, studentID, newSectionID), {
             loading: "Changing section...",
             success: "Section changed!",
             error: (err) => handleBadRequestError(err)
         })
             .then(() => {
                 closeEditMode()
-                setStudent({ ...student, defaultSections: { ...student?.defaultSections, [course.ID]: selectedSection } })
+                setStudent({ ...student, defaultSections: { ...student?.defaultSections, [course.ID]: newSectionID } })
             })
             .catch()
     }
@@ -112,7 +115,7 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
                         />
                         :
                         <Typography color="secondary" variant="button" fontSize={14} mr={1}>
-                            {formatSectionInfo(sectionsMap[defaultSectionID()], true) || "Unassigned"}
+                            {defaultSectionID() === UNASSIGNED ? UNASSIGNED : formatSectionInfo(sectionsMap[defaultSectionID()], true)}
                         </Typography>
                     }
                     {selectedSection !== undefined ?

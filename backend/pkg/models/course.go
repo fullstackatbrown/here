@@ -82,7 +82,7 @@ type AssignSectionsRequest struct {
 	CourseID     string `json:"courseID,omitempty"`
 	StudentID    string `json:"studentID"`
 	OldSectionID string `json:"oldSectionID,omitempty"`
-	NewSectionID string `json:"newSectionID"`
+	NewSectionID string `json:"newSectionID,omitempty"`
 	AssignmentID string `json:"assignmentID,omitempty"`
 }
 
