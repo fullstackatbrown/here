@@ -11,14 +11,14 @@ async function deleteCourse(courseID: string): Promise<boolean> {
   return APIClient.delete(`/courses/${courseID}`, {});
 }
 
-async function assignSections(
+async function assignSection(
   courseID: string,
-  studentID?: string,
-  sectionID?: string
+  studentID: string,
+  newSectionID: string
 ): Promise<void> {
-  return APIClient.post(`/courses/${courseID}/assignSections`, {
+  return APIClient.post(`/courses/${courseID}/assignSection`, {
     studentID,
-    sectionID,
+    newSectionID,
   });
 }
 
@@ -104,6 +104,7 @@ const CourseAPI = {
   addStudent,
   bulkAddStudent,
   deleteStudent,
+  assignSection,
 };
 
 export default CourseAPI;

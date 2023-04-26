@@ -12,14 +12,17 @@ import {
     Tooltip,
     Typography
 } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import { UNASSIGNED } from "@util/shared/getStudentsInSection";
 import AuthAPI from "api/auth/api";
+import CourseAPI from "api/course/api";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { User } from "model/user";
 import { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export interface StudentDialogProps {
     course: Course;
@@ -67,22 +70,30 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
         return `${formatSectionInfo(section, true)} (${current ? "current" : seatsAvail + " seats available"})`
     }
 
-    const reset = () => {
-        setSelectedSection(undefined)
-    }
-
     const openEditMode = () => {
         setSelectedSection(defaultSectionID())
     }
 
+    const closeEditMode = () => {
+        setSelectedSection(undefined)
+    }
+
     const handleChangeDefaultSection = () => {
         if (selectedSection === defaultSectionID()) {
-            setSelectedSection(undefined)
+            closeEditMode()
             return
         }
 
-
-
+        toast.promise(CourseAPI.assignSection(course.ID, studentID, selectedSection), {
+            loading: "Changing section...",
+            success: "Section changed!",
+            error: (err) => handleBadRequestError(err)
+        })
+            .then(() => {
+                closeEditMode()
+                setStudent({ ...student, defaultSections: { ...student?.defaultSections, [course.ID]: selectedSection } })
+            })
+            .catch()
     }
 
     return student && <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="md" keepMounted={false}>
@@ -112,7 +123,7 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="discard" placement="bottom">
-                                <IconButton sx={{ p: 0.5 }} onClick={reset}>
+                                <IconButton sx={{ p: 0.5 }} onClick={closeEditMode}>
                                     <CloseIcon sx={{ fontSize: 18 }} />
                                 </IconButton>
                             </Tooltip>
