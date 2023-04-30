@@ -1,5 +1,5 @@
 import GradeChip from "@components/shared/GradeChip/GradeChip";
-import { Chip, Divider, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
+import { Box, Chip, Divider, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
 import { Theme, styled } from "@mui/material/styles";
 import { filterAssignmentsByReleaseDate, sortAssignments } from "@util/shared/assignments";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
@@ -67,7 +67,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
         }
         <Divider />
         {assignmentsDisplayed.map((assignment) => (
-            <>
+            <Box key={assignment.ID}>
                 <Grid container my={1}>
                     <GridItem item xs={12} md={4} mb={isXsScreen ? 1 : 0} flexWrap="wrap">
                         <Typography fontSize={14} fontWeight={isXsScreen ? 500 : 400} sx={{ marginRight: 1 }}>
@@ -98,7 +98,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
                     </GridItem>
                 </Grid>
                 <Divider />
-            </>
+            </Box>
         ))}
     </Stack >
 

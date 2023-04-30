@@ -13,7 +13,7 @@ import { useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AdminViewHeader from "../AdminViewHeader";
 import AddStudentDialog from "./AddStudentDialog";
-import PeopleTable from "./PeopleTable";
+import PeopleTable from "./PeopleTable/PeopleTable";
 
 export interface PeopleViewProps {
   course: Course;
@@ -90,14 +90,12 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
       {invitedStudents && hasNoStudent() ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&
-          <Box>
-            <PeopleTable
-              {...{ course, assignments, sectionsMap }}
-              students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
-              displayInvitedStudents={filterBySection === UNASSIGNED || filterBySection === ALL_STUDENTS}
-              invitedStudents={invitedStudents}
-            />
-          </Box>)
+          <PeopleTable
+            {...{ course, assignments, sectionsMap }}
+            students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+            invitedStudents={(filterBySection === UNASSIGNED || filterBySection === ALL_STUDENTS) ? invitedStudents : []}
+          />
+        )
       }
     </>
   );
