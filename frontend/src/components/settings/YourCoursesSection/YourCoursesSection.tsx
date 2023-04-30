@@ -1,10 +1,10 @@
-import React, { FC } from "react";
 import { List } from "@mui/material";
-import { useCourses, useCoursesByIDs } from "api/course/hooks";
-import { useSession } from "api/auth/hooks";
-import CourseListItem from "../CourseListItem";
-import { CoursePermission } from "model/user";
 import { sortCoursesByTerm } from "@util/shared/terms";
+import { useSession } from "api/auth/hooks";
+import { useCoursesByIDs } from "api/course/hooks";
+import { CoursePermission } from "model/user";
+import { FC } from "react";
+import CourseListItem from "../CourseListItem/CourseListItem";
 import SettingsSection from "../SettingsSection/SettingsSection";
 
 export interface YourCoursesSectionProps {
