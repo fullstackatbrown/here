@@ -193,11 +193,22 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 }
 
 func (fr *FirebaseRepository) DeleteCourse(req *models.DeleteCourseRequest) error {
-	_, err := fr.GetCourseByID(req.CourseID)
+	// 1. First delete the course from all students currently registered for the course
+	// 2. Delete the course
+	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return err
 	}
-	// Delete the course.
+
+	for studentID, _ := range course.Students {
+		studentRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(studentID)
+		studentRef.Update(firebase.Context, []firestore.Update{
+			{Path: "courses", Value: firestore.ArrayRemove(req.CourseID)},
+			{Path: "defaultSections." + req.CourseID, Value: firestore.Delete},
+			{Path: "actualSections." + req.CourseID, Value: firestore.Delete},
+		})
+	}
+
 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Delete(firebase.Context)
 	return err
 }

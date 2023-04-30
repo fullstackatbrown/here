@@ -1,6 +1,5 @@
 import React, { FC } from "react";
 import { Chip, styled } from "@mui/material";
-import { SwapStatus } from "model/swap";
 import { CourseStatus } from "model/course";
 
 export interface CourseStatusChipProps {

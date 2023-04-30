@@ -38,9 +38,14 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     // CourseStatusChip
     const handleDeleteCourse = async (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
+        let message = "Are you sure you want to delete this course?";
+        if (course.students && Object.keys(course.students).length > 0) {
+            message += " There are students registered for the course.";
+        }
+        message += " This action cannot be undone.";
         const confirmed = await showDialog({
             title: "Delete Course",
-            message: "Are you sure you want to delete this course? This action cannot be undone.",
+            message: message,
         })
         if (confirmed) {
             toast.promise(CourseAPI.deleteCourse(course.ID), {
