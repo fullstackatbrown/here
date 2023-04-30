@@ -68,10 +68,10 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                     mt={{ xs: 0, md: 1.5 }}
                 >
                     <Stack direction="row" flexWrap="wrap" alignItems="center" spacing={1}>
-                        <Typography fontSize={17}>
+                        <Typography fontSize={17} variant="button" fontWeight={600}>
                             Regular Section:
                         </Typography>
-                        <Typography fontSize={17}>
+                        <Typography fontSize={17} variant="button" fontWeight={400}>
                             {getAssignedSection() || "Unassigned"}
                         </Typography>
                         <Tooltip
