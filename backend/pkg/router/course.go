@@ -162,7 +162,7 @@ func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(200)
-		w.Write([]byte("Successfully removed student from course " + courseID))
+		w.Write([]byte("Successfully unassigned section"))
 	}
 
 	err = repo.Repository.AssignStudentToSection(req)
