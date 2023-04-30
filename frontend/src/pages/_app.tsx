@@ -16,6 +16,7 @@ import { Toaster } from "react-hot-toast";
 import { useSession, AuthProvider } from "api/auth/hooks";
 import { ThemeMode, ThemeModeProvider } from "@util/mui/useThemeMode";
 import DialogProvider from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
+import SnackbarProvider from "@components/shared/Snackbar/SnackbarProvider";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -86,27 +87,29 @@ function MyApp(props: MyAppProps) {
                     </Head>
                     <ThemeProvider theme={muiTheme}>
                         <DialogProvider>
-                            <CssBaseline />
-                            <Toaster
-                                toastOptions={{
-                                    style: {
-                                        padding: "10px",
-                                        backgroundColor:
-                                            currentThemeMode() === "dark"
-                                                ? "#353535"
-                                                : "#fff",
-                                        color:
-                                            currentThemeMode() === "dark"
-                                                ? "#fff"
-                                                : "#212121",
-                                        fontWeight: 500,
-                                    },
-                                }}
-                                containerStyle={{
-                                    top: 9,
-                                }}
-                            />
-                            <Component {...pageProps} />
+                            <SnackbarProvider>
+                                <CssBaseline />
+                                <Toaster
+                                    toastOptions={{
+                                        style: {
+                                            padding: "10px",
+                                            backgroundColor:
+                                                currentThemeMode() === "dark"
+                                                    ? "#353535"
+                                                    : "#fff",
+                                            color:
+                                                currentThemeMode() === "dark"
+                                                    ? "#fff"
+                                                    : "#212121",
+                                            fontWeight: 500,
+                                        },
+                                    }}
+                                    containerStyle={{
+                                        top: 9,
+                                    }}
+                                />
+                                <Component {...pageProps} />
+                            </SnackbarProvider>
                         </DialogProvider>
                     </ThemeProvider>
                 </ThemeModeProvider>

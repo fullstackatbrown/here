@@ -1,4 +1,7 @@
+import CourseActions from "@components/settings/CourseListItem/CourseActions";
 import AccessList from "@components/shared/AccessList/AccessList";
+import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
+import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Button, Stack, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
@@ -10,7 +13,6 @@ import { Course, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
-import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import AdminViewHeader from "../AdminViewHeader";
 
 export interface SettingsViewProps {
@@ -26,6 +28,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
 
     const loading = staffLoading || adminLoading || adminInvitesLoading || staffInvitesLoading;
     const isCourseActive = course.status === CourseStatus.CourseActive;
+    const showSnackbar = useSnackbar();
 
     useEffect(() => {
         if (copyButtonRef.current) {
@@ -45,20 +48,45 @@ export default function SettingsView({ course }: SettingsViewProps) {
             .catch(() => { })
     }
 
+    const showCopyToClipboardSnackbar = () => {
+        showSnackbar({
+            message: "Copied to clipboard",
+            severity: "success",
+        });
+    }
+
     return (
         <>
             <AdminViewHeader view="settings" access={CoursePermission.CourseAdmin} />
             <Stack direction="column" spacing={4} my={2}>
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    alignItems={{ xs: "start", md: "center" }}
+                    justifyContent="space-between"
+                    spacing={2}
+                >
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <Typography fontWeight={500}>
+                            Course Status:
+                        </Typography>
+                        <CourseStatusChip status={course.status} size="medium" />
+                    </Stack>
+                    <CourseActions course={course} />
+                </Stack>
 
                 <Stack direction="column">
                     <Stack direction="row" alignItems="center" spacing={0.5}>
                         <Typography fontWeight={500}>
                             Course Entry Code:
                         </Typography>
-                        <Button color="inherit" sx={{ paddingTop: 0, paddingBottom: 0, fontSize: 16 }} ref={copyButtonRef}>
+                        <Button
+                            color="inherit" sx={{ paddingTop: 0, paddingBottom: 0, fontSize: 16 }}
+                            ref={copyButtonRef} onClick={showCopyToClipboardSnackbar}
+                        >
                             {course.entryCode}
                             <ContentCopyIcon
-                                style={{ fontSize: 13, marginLeft: 5 }} />
+                                style={{ fontSize: 13, marginLeft: 5 }}
+                            />
                         </Button>
                     </Stack>
                     <Typography>
@@ -70,11 +98,11 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     direction={{ xs: "column", md: "row" }}
                     alignItems={{ xs: "start", md: "center" }}
                     justifyContent="space-between"
-                    spacing={2} mb={2}
+                    spacing={2}
                 >
-                    <Stack direction="column" maxWidth={{ md: "70%" }}>
-                        <Typography fontWeight={500}>
-                            Auto-Approve Swap Requests: {course.autoApproveRequests ? "On" : "Off"}
+                    <Stack direction="column" maxWidth={{ md: "70%" }} spacing={0.5}>
+                        <Typography fontWeight={500} whiteSpace="pre">
+                            Auto-Approve Swap Requests:  {course.autoApproveRequests ? "ON" : "OFF"}
                         </Typography>
                         <Typography>
                             If this feature is turned on, swap requests will be automatically approved if the capacity is not reached.

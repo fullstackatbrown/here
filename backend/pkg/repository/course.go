@@ -10,7 +10,9 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
+	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
+	"google.golang.org/api/iterator"
 )
 
 func (fr *FirebaseRepository) initializeCoursesListener() {
@@ -193,13 +195,49 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 }
 
 func (fr *FirebaseRepository) DeleteCourse(req *models.DeleteCourseRequest) error {
-	_, err := fr.GetCourseByID(req.CourseID)
+	// 1. First delete the course from all students currently registered for the course
+	// 2. Delete the course
+	// 3. Delete all relevant invites
+	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return err
 	}
-	// Delete the course.
+
+	for studentID, _ := range course.Students {
+		studentRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(studentID)
+		_, err := studentRef.Update(firebase.Context, []firestore.Update{
+			{Path: "courses", Value: firestore.ArrayRemove(req.CourseID)},
+			{Path: "defaultSections." + req.CourseID, Value: firestore.Delete},
+			{Path: "actualSections." + req.CourseID, Value: firestore.Delete},
+		})
+		if err != nil {
+			glog.Warningf("Error removing course from student %s: %v", studentID, err)
+		}
+	}
+
 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Delete(firebase.Context)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Delete all invites for the course
+	iter := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Where("courseID", "==", req.CourseID).Documents(firebase.Context)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			glog.Warningf("Error iterating over invites for course %s: %v", req.CourseID, err)
+			break
+		}
+		_, err = doc.Ref.Delete(firebase.Context)
+		if err != nil {
+			glog.Warningf("Error deleting invite %s: %v", doc.Ref.ID, err)
+		}
+	}
+
+	return nil
 }
 
 func (fr *FirebaseRepository) UpdateCourse(req *models.UpdateCourseRequest) error {
