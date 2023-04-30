@@ -8,9 +8,7 @@ async function createSwap(
   assignmentID: string,
   reason: string
 ): Promise<string> {
-  const studentID = "omlAafBhRN9Aghvgz8qG" // TODO: get studentID from auth
   return APIClient.post(`/courses/${courseID}/swaps`, {
-    studentID,
     oldSectionID,
     newSectionID,
     assignmentID,

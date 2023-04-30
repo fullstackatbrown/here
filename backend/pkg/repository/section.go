@@ -81,7 +81,7 @@ func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Sec
 
 	course.SectionsLock.RLock()
 	defer course.SectionsLock.RUnlock()
-	// TODO: check this
+	// TODO: lock
 	sections := make([]*models.Section, 0)
 	for _, section := range course.Sections {
 		sections = append(sections, section)

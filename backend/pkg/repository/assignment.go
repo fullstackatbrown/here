@@ -129,7 +129,6 @@ func (fr *FirebaseRepository) DeleteAssignment(req *models.DeleteAssignmentReque
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
 		models.FirestoreAssignmentsCollection).Doc(req.AssignmentID).Delete(firebase.Context)
 
-	// TODO: delete all grades in the assignment
 	return err
 }
 

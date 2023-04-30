@@ -45,8 +45,6 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         newSectionID: swap ? swap.newSectionID : "",
     }
 
-    // TODO: old section may not be default
-
     const { register, handleSubmit, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     })
