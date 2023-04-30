@@ -108,7 +108,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                 onClose={() => setSelectedStudent(undefined)} />
             {!isXsScreen &&
                 <>
-                    <Grid container my={1}>
+                    <Grid container my={2}>
                         <GridItem item xs={10.8} md={11.5}>
                             <Grid container>
                                 <GridItem item xs={12} md={3.5}>
