@@ -47,20 +47,20 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
     return <Stack direction="column">
         {!isXsScreen &&
             <Grid container my={1}>
-                <GridItem item xs={8.8} md={9.8}>
+                <GridItem item xs={12} md={4}>
+                    <TableHeader>Assignment</TableHeader>
+                </GridItem>
+                <GridItem item xs={8.8} md={6}>
                     <Grid container>
-                        <GridItem item xs={12} md={5}>
-                            <TableHeader>Assignment</TableHeader>
-                        </GridItem>
-                        <GridItem item xs={12} md={3}>
+                        <GridItem item xs={12} md={4}>
                             <TableHeader>Due Date</TableHeader>
                         </GridItem>
-                        <GridItem item xs={12} md={4}>
+                        <GridItem item xs={12} md={8}>
                             <TableHeader>Section</TableHeader>
                         </GridItem>
                     </Grid>
                 </GridItem>
-                <GridItem item xs={3.2} md={2.2}>
+                <GridItem item xs={3.2} md={2}>
                     <TableHeader>Grade</TableHeader>
                 </GridItem>
             </Grid>
@@ -69,29 +69,27 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
         {assignmentsDisplayed.map((assignment) => (
             <>
                 <Grid container my={1}>
-                    <GridItem item xs={8.8} md={9.8}>
+                    <GridItem item xs={12} md={4} mb={isXsScreen ? 1 : 0} flexWrap="wrap">
+                        <Typography fontSize={15} fontWeight={isXsScreen ? 500 : 400} sx={{ marginRight: 1 }}>
+                            {assignment.name}
+                        </Typography>
+                        {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
+                    </GridItem>
+                    <GridItem item xs={8.8} md={6}>
                         <Grid container>
-                            <GridItem item xs={12} md={5}>
-                                <Stack display="flex" flexDirection="row" spacing={1} alignItems="center">
-                                    <Typography fontSize={15} fontWeight={isXsScreen ? 500 : 400}>
-                                        {assignment.name}
-                                    </Typography>
-                                    {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
-                                </Stack>
-                            </GridItem>
-                            <GridItem item xs={12} md={3}>
+                            <GridItem item xs={12} md={4}>
                                 <Typography fontSize={isXsScreen ? 13.5 : 15}>
                                     {isXsScreen && "Due: "}{dayjs(assignment.dueDate).format("MMM D, YYYY")}
                                 </Typography>
                             </GridItem>
-                            <GridItem item xs={12} md={4}>
+                            <GridItem item xs={12} md={8}>
                                 <Typography fontSize={isXsScreen ? 13.5 : 15}>
                                     {isXsScreen && "Section: "}{getSectionInfo(assignment.ID)}
                                 </Typography>
                             </GridItem>
                         </Grid>
                     </GridItem>
-                    <GridItem item xs={3.2} md={2.2}>
+                    <GridItem item xs={3.2} md={2}>
                         <GradeChip
                             score={assignment.grades?.[student.ID]?.grade}
                             maxScore={assignment.maxScore}
