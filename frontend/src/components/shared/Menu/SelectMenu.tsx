@@ -7,7 +7,7 @@ interface SelectMenuProps {
     options: string[];
     onSelect: (value: string) => void;
     formatOption: (value: string) => string;
-    defaultValue?: string;
+    defaultValue?: string; // if this is set, the button will be colored differently if the value is the default
 }
 
 const StyledMenu = styled((props: MenuProps) => {

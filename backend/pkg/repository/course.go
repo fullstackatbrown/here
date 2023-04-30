@@ -250,6 +250,16 @@ func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsR
 	return err
 }
 
+func (fr *FirebaseRepository) RemoveStudentFromSection(req *models.AssignSectionsRequest) error {
+	batch, err := fr.removePermanentSection(req)
+	if err != nil {
+		return err
+	}
+
+	_, err = batch.Commit(firebase.Context)
+	return err
+}
+
 // Helpers
 func (fr *FirebaseRepository) approveSwap(courseID string, swap *models.Swap) (batch *firestore.WriteBatch, err error) {
 	if swap.AssignmentID == "" {
@@ -309,6 +319,41 @@ func (fr *FirebaseRepository) assignPermanentSection(req *models.AssignSectionsR
 	batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.StudentID),
 		[]firestore.Update{
 			{Path: "defaultSections." + req.CourseID, Value: req.NewSectionID},
+		})
+
+	return batch, nil
+}
+
+func (fr *FirebaseRepository) removePermanentSection(req *models.AssignSectionsRequest) (*firestore.WriteBatch, error) {
+	// In a batch
+	// 1. Update the course.students map
+	// 2. decrease the enrolled count of the old section, if it exists
+	// 3. update the student's default section
+	batch := fr.firestoreClient.Batch()
+
+	// get the course.students object from the course document
+	course, err := fr.GetActiveCourseByID(req.CourseID)
+	if err != nil {
+		return nil, err
+	}
+
+	oldSectionID := course.Students[req.StudentID].DefaultSection
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID),
+		[]firestore.Update{
+			{Path: "students." + req.StudentID + ".defaultSection", Value: firestore.Delete},
+		})
+
+	if oldSectionID != "" {
+		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+			req.CourseID).Collection(models.FirestoreSectionsCollection).Doc(oldSectionID), []firestore.Update{
+			{Path: "numEnrolled", Value: firestore.Increment(-1)},
+		})
+	}
+
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(req.StudentID),
+		[]firestore.Update{
+			{Path: "defaultSections." + req.CourseID, Value: firestore.Delete},
 		})
 
 	return batch, nil

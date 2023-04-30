@@ -13,6 +13,7 @@ import { User } from "model/user";
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { SwapStatus } from "model/swap";
 
 export interface SwapRequestDialogProps {
     open: boolean;
@@ -43,6 +44,8 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         oldSectionID: student.defaultSections?.[course.ID] ? student.defaultSections[course.ID] : "",
         newSectionID: swap ? swap.newSectionID : "",
     }
+
+    // TODO: old section may not be default
 
     const { register, handleSubmit, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
@@ -103,16 +106,20 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
             toast.promise(SwapAPI.createSwap(data.courseID, data.oldSectionID, data.newSectionID, data.assignmentID, data.reason),
                 {
                     loading: "Submitting request...",
-                    success: "Request requested!",
+                    success: (res) => res === SwapStatus.Approved ? "Request approved!" : "Request submitted",
                     error: (err) => handleBadRequestError(err)
                 })
-                .then(() => handleOnClose())
+                .then((res) => {
+                    console.log(res)
+                    handleOnClose()
+                }
+                )
                 .catch(() => handleOnClose())
         }
     })
 
     const getCurrentSectionID = (assignmentID): string => {
-        if ((assignmentID) && (student.actualSections?.[assignmentID])) {
+        if ((assignmentID) && (student.actualSections?.[course.ID]?.[assignmentID])) {
             return student.actualSections?.[course.ID][assignmentID]
         } else {
             return student.defaultSections?.[course.ID]

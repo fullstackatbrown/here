@@ -16,6 +16,7 @@ interface StudentGradesTableProps {
     student: User;
     sectionsMap: Record<string, Section>;
     assignments: Assignment[];
+    instructor?: boolean;
 }
 
 const TableCell = styled(MuiTableCell)(({ theme }) => ({
@@ -28,37 +29,36 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
     },
 }))
 
-const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap }) => {
-    const assignmentsFiltered = filterAssignmentsByReleaseDate(assignments);
+const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap, instructor = false }) => {
+    const assignmentsDisplayed = instructor ? sortAssignments(assignments) : sortAssignments(filterAssignmentsByReleaseDate(assignments))
 
-    const getSection = (assignmentID: string): Section => {
+    const getSectionInfo = (assignmentID: string): string => {
         let sectionID = student.actualSections?.[course.ID]?.[assignmentID]
-        if (sectionID) return sectionsMap[sectionID]
+        if (sectionID) return formatSectionInfo(sectionsMap[sectionID], true)
 
         sectionID = student.defaultSections?.[course.ID]
-        if (sectionID) return sectionsMap[sectionID]
+        if (sectionID) return "Regular"
 
-        return undefined
+        return "Unassigned"
     }
 
     return <Table sx={{ marginTop: 1 }}>
         <colgroup>
             <col width="35%" />
-            <col width="20%" />
-            <col width="30%" />
-            <col width="15%" />
+            <col width="18%" />
+            <col width="18%" />
+            <col width="34%" />
         </colgroup>
         <TableHead>
             <TableRow>
                 <TableCell>Assignment</TableCell>
                 <TableCell>Due</TableCell>
-                <TableCell>Section</TableCell>
                 <TableCell>Grade</TableCell>
+                <TableCell>Section</TableCell>
             </TableRow>
         </TableHead>
         <TableBody>
-            {sortAssignments(assignmentsFiltered).map((assignment) => {
-                const section = sectionsMap && getSection(assignment.ID)
+            {assignmentsDisplayed.map((assignment) => {
                 return <TableRow key={assignment.ID}>
                     <TableCell component="th" scope="row">
                         <Stack direction="row" spacing={1} alignItems="center">
@@ -69,15 +69,15 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
                     <TableCell component="th" scope="row">
                         {dayjs(assignment.dueDate).format("MMM D, YYYY")}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                        {section ? formatSectionInfo(section, true) : "Unassigned"}
-                    </TableCell>
                     <TableCell component="th" scope="row" >
                         <GradeChip
                             score={assignment.grades?.[student.ID]?.grade}
                             maxScore={assignment.maxScore}
-                            instructor={false}
+                            readOnly={true}
                         />
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        {getSectionInfo(assignment.ID)}
                     </TableCell>
                 </TableRow>
             })}

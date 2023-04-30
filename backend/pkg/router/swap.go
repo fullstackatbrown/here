@@ -8,7 +8,6 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
 func SwapRoutes() *chi.Mux {
@@ -57,7 +56,7 @@ func createSwapHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, swap)
+	w.Write([]byte(swap.Status))
 }
 
 func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
