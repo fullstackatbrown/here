@@ -9,8 +9,10 @@ import {
     DialogTitle,
     IconButton,
     Stack,
+    Theme,
     Tooltip,
-    Typography
+    Typography,
+    useMediaQuery
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
@@ -37,6 +39,7 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
     const [student, setStudent] = useState<User | undefined>(undefined);
     const defaultSectionID = () => student?.defaultSections?.[course.ID] || UNASSIGNED
     const [selectedSection, setSelectedSection] = useState<string | undefined>(undefined); // undefined means not in edit mode
+    const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     useEffect(() => {
         if (studentID && studentID != "") {
@@ -103,46 +106,56 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
             <>
                 <DialogTitle>{student.displayName} ({student.email})</DialogTitle>
                 <DialogContent>
-                    <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-                        <Typography variant="button" fontSize={15} fontWeight={500}>Regular Section:&nbsp;</Typography>
-                        <Stack direction="row" alignItems="center">
-                            {selectedSection !== undefined ?
-                                <SelectMenu
-                                    value={selectedSection}
-                                    formatOption={formatOptions}
-                                    options={sectionOptions()}
-                                    onSelect={(val) => setSelectedSection(val)}
-                                    defaultValue={defaultSectionID()}
-                                />
-                                :
-                                <Typography color="secondary" variant="button" fontSize={14} mr={1}>
-                                    {defaultSectionID() === UNASSIGNED ? UNASSIGNED : formatSectionInfo(sectionsMap[defaultSectionID()], true)}
-                                </Typography>
-                            }
-                            {selectedSection !== undefined ?
-                                <Stack direction="row" alignItems="center" spacing={0.5}>
-                                    <Tooltip title="confirm" placement="bottom">
-                                        <IconButton sx={{ p: 0.5 }} onClick={handleChangeDefaultSection}>
-                                            <CheckIcon sx={{ fontSize: 18 }} />
+                    <Stack direction="column" spacing={2}>
+                        <Stack
+                            direction={{ xs: "column", md: "row" }}
+                            alignItems={{ xs: "flex-start", md: "center" }}
+                            spacing={{ xs: 0, md: 1 }}
+                            justifyContent="space-between"
+                        >
+                            <Typography variant="button" fontSize={15} fontWeight={500}>Regular Section:&nbsp;</Typography>
+                            <Stack direction="row" alignItems="center">
+                                {selectedSection !== undefined ?
+                                    <SelectMenu
+                                        value={selectedSection}
+                                        formatOption={formatOptions}
+                                        options={sectionOptions()}
+                                        onSelect={(val) => setSelectedSection(val)}
+                                        defaultValue={defaultSectionID()}
+                                    />
+                                    :
+                                    <Typography color="secondary" variant="button" fontSize={14} mr={1}>
+                                        {defaultSectionID() === UNASSIGNED ? UNASSIGNED : formatSectionInfo(sectionsMap[defaultSectionID()], true)}
+                                    </Typography>
+                                }
+                                {selectedSection !== undefined ?
+                                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                                        <Tooltip title="confirm" placement="bottom">
+                                            <IconButton sx={{ p: 0.5 }} onClick={handleChangeDefaultSection}>
+                                                <CheckIcon sx={{ fontSize: 18 }} />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="discard" placement="bottom">
+                                            <IconButton sx={{ p: 0.5 }} onClick={closeEditMode}>
+                                                <CloseIcon sx={{ fontSize: 18 }} />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Stack>
+                                    :
+                                    <Tooltip title={`change section for ${student.displayName}`} placement="bottom">
+                                        <IconButton sx={{ p: 0.5 }} onClick={openEditMode}>
+                                            <EditIcon sx={{ fontSize: 18 }} />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="discard" placement="bottom">
-                                        <IconButton sx={{ p: 0.5 }} onClick={closeEditMode}>
-                                            <CloseIcon sx={{ fontSize: 18 }} />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Stack>
-                                :
-                                <Tooltip title={`change section for ${student.displayName}`} placement="bottom">
-                                    <IconButton sx={{ p: 0.5 }} onClick={openEditMode}>
-                                        <EditIcon sx={{ fontSize: 18 }} />
-                                    </IconButton>
-                                </Tooltip>
 
-                            }
+                                }
+                            </Stack>
+                        </Stack>
+                        <Stack direction="column" spacing={0.5}>
+                            {isXsScreen && <Typography variant="button" fontSize={15} fontWeight={500}>Assignments & Grades</Typography>}
+                            <StudentGradesTable {...{ course, student, sectionsMap, assignments }} instructor />
                         </Stack>
                     </Stack>
-                    <StudentGradesTable {...{ course, student, sectionsMap, assignments }} instructor />
                 </DialogContent>
             </>
         }

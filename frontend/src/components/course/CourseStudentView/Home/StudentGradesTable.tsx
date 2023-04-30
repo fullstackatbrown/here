@@ -1,7 +1,6 @@
 import GradeChip from "@components/shared/GradeChip/GradeChip";
-import { Box, Chip, Stack, Table, TableBody, TableHead, TableRow } from "@mui/material";
-import MuiTableCell from "@mui/material/TableCell";
-import { styled } from "@mui/material/styles";
+import { Box, Chip, Divider, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
+import { Theme, styled } from "@mui/material/styles";
 import { filterAssignmentsByReleaseDate, sortAssignments } from "@util/shared/assignments";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
 import dayjs from "dayjs";
@@ -19,18 +18,21 @@ interface StudentGradesTableProps {
     instructor?: boolean;
 }
 
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-    padding: theme.spacing(1),
-    ":first-of-type": {
-        paddingLeft: 0,
-    },
-    ":last-of-type": {
-        paddingRight: 0,
-    },
+
+const TableHeader = styled(Typography)(({ theme }) => ({
+    fontWeight: 500,
+    fontSize: 14
 }))
+
+const GridItem = styled(Grid)(({ theme }) => ({
+    display: "flex",
+    alignItems: "center"
+}))
+
 
 const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap, instructor = false }) => {
     const assignmentsDisplayed = instructor ? sortAssignments(assignments) : sortAssignments(filterAssignmentsByReleaseDate(assignments))
+    const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     const getSectionInfo = (assignmentID: string): string => {
         let sectionID = student.actualSections?.[course.ID]?.[assignmentID]
@@ -42,47 +44,63 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
         return "Unassigned"
     }
 
-    return <Table sx={{ marginTop: 1 }}>
-        <colgroup>
-            <col width="35%" />
-            <col width="18%" />
-            <col width="18%" />
-            <col width="34%" />
-        </colgroup>
-        <TableHead>
-            <TableRow>
-                <TableCell>Assignment</TableCell>
-                <TableCell>Due</TableCell>
-                <TableCell>Grade</TableCell>
-                <TableCell>Section</TableCell>
-            </TableRow>
-        </TableHead>
-        <TableBody>
-            {assignmentsDisplayed.map((assignment) => {
-                return <TableRow key={assignment.ID}>
-                    <TableCell component="th" scope="row">
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <Box>{assignment.name}</Box>
-                            {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
-                        </Stack>
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                        {dayjs(assignment.dueDate).format("MMM D, YYYY")}
-                    </TableCell>
-                    <TableCell component="th" scope="row" >
+    return <Stack direction="column">
+        {!isXsScreen &&
+            <Grid container my={1}>
+                <GridItem item xs={12} md={4}>
+                    <TableHeader>Assignment</TableHeader>
+                </GridItem>
+                <GridItem item xs={8.8} md={6}>
+                    <Grid container>
+                        <GridItem item xs={12} md={4}>
+                            <TableHeader>Due Date</TableHeader>
+                        </GridItem>
+                        <GridItem item xs={12} md={8}>
+                            <TableHeader>Section</TableHeader>
+                        </GridItem>
+                    </Grid>
+                </GridItem>
+                <GridItem item xs={3.2} md={2}>
+                    <TableHeader>Grade</TableHeader>
+                </GridItem>
+            </Grid>
+        }
+        <Divider />
+        {assignmentsDisplayed.map((assignment) => (
+            <Box key={assignment.ID}>
+                <Grid container my={1}>
+                    <GridItem item xs={12} md={4} mb={isXsScreen ? 1 : 0} flexWrap="wrap">
+                        <Typography fontSize={14} fontWeight={isXsScreen ? 500 : 400} sx={{ marginRight: 1 }}>
+                            {assignment.name}
+                        </Typography>
+                        {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
+                    </GridItem>
+                    <GridItem item xs={8.8} md={6}>
+                        <Grid container>
+                            <GridItem item xs={12} md={4}>
+                                <Typography fontSize={isXsScreen ? 13.5 : 14}>
+                                    {isXsScreen && "Due: "}{dayjs(assignment.dueDate).format("MMM D, YYYY")}
+                                </Typography>
+                            </GridItem>
+                            <GridItem item xs={12} md={8}>
+                                <Typography fontSize={isXsScreen ? 13.5 : 14}>
+                                    {isXsScreen && "Section: "}{getSectionInfo(assignment.ID)}
+                                </Typography>
+                            </GridItem>
+                        </Grid>
+                    </GridItem>
+                    <GridItem item xs={3.2} md={2}>
                         <GradeChip
                             score={assignment.grades?.[student.ID]?.grade}
                             maxScore={assignment.maxScore}
                             readOnly={true}
                         />
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                        {getSectionInfo(assignment.ID)}
-                    </TableCell>
-                </TableRow>
-            })}
-        </TableBody>
-    </Table>
+                    </GridItem>
+                </Grid>
+                <Divider />
+            </Box>
+        ))}
+    </Stack >
 
 }
 

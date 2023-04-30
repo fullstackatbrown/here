@@ -164,8 +164,6 @@ func (fr *FirebaseRepository) checkUniqueEntryCode(entryCode string) bool {
 
 func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (course *models.Course, err error) {
 
-	// TODO: check same course code and term does not exist
-
 	var entryCode string
 	for {
 		entryCode = utils.GenerateCourseEntryCode()
