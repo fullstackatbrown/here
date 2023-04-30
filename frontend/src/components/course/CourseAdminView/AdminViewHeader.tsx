@@ -10,7 +10,13 @@ interface AdminViewHeaderProps {
 }
 
 export default function AdminViewHeader({ view, access, endElement }: AdminViewHeaderProps) {
-    return <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
+    return <Stack
+        direction="row"
+        alignItems="center"
+        flexWrap="wrap"
+        justifyContent="space-between" mb={1}
+        minHeight={40}
+    >
         <ViewHeader view={view} views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
         {endElement}
     </Stack>

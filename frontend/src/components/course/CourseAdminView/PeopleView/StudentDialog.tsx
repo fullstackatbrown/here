@@ -103,7 +103,12 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
             <>
                 <DialogTitle>{student.displayName} ({student.email})</DialogTitle>
                 <DialogContent>
-                    <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                    <Stack
+                        direction={{ xs: "column", md: "row" }}
+                        alignItems={{ xs: "flex-start", md: "center" }}
+                        spacing={{ xs: 0, md: 1 }}
+                        justifyContent="space-between"
+                    >
                         <Typography variant="button" fontSize={15} fontWeight={500}>Regular Section:&nbsp;</Typography>
                         <Stack direction="row" alignItems="center">
                             {selectedSection !== undefined ?

@@ -74,7 +74,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         view="people"
         access={access}
         endElement={
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
             <SelectMenu
               value={filterBySection}
               formatOption={formatOptions}
