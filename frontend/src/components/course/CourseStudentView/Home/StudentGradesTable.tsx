@@ -1,6 +1,5 @@
 import GradeChip from "@components/shared/GradeChip/GradeChip";
-import { Box, Chip, Stack, Table, TableBody, TableHead, TableRow } from "@mui/material";
-import MuiTableCell from "@mui/material/TableCell";
+import { Chip, Divider, Grid, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { filterAssignmentsByReleaseDate, sortAssignments } from "@util/shared/assignments";
 import formatSectionInfo from "@util/shared/formatSectionInfo";
@@ -19,15 +18,30 @@ interface StudentGradesTableProps {
     instructor?: boolean;
 }
 
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-    padding: theme.spacing(1),
-    ":first-of-type": {
-        paddingLeft: 0,
-    },
-    ":last-of-type": {
-        paddingRight: 0,
-    },
+// const TableCell = styled(MuiTableCell)(({ theme }) => ({
+//     padding: theme.spacing(1),
+//     ":first-of-type": {
+//         paddingLeft: 0,
+//     },
+//     ":last-of-type": {
+//         paddingRight: 0,
+//     },
+// }))
+
+const TableHeader = styled(Typography)(({ theme }) => ({
+    fontWeight: 500,
+    fontSize: 15
 }))
+
+const TableCell = styled(Typography)(({ theme }) => ({
+    fontSize: 15
+}))
+
+const GridItem = styled(Grid)(({ theme }) => ({
+    display: "flex",
+    alignItems: "center"
+}))
+
 
 const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap, instructor = false }) => {
     const assignmentsDisplayed = instructor ? sortAssignments(assignments) : sortAssignments(filterAssignmentsByReleaseDate(assignments))
@@ -42,47 +56,90 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
         return "Unassigned"
     }
 
-    return <Table sx={{ marginTop: 1 }}>
-        <colgroup>
-            <col width="35%" />
-            <col width="18%" />
-            <col width="18%" />
-            <col width="34%" />
-        </colgroup>
-        <TableHead>
-            <TableRow>
-                <TableCell>Assignment</TableCell>
-                <TableCell>Due</TableCell>
-                <TableCell>Grade</TableCell>
-                <TableCell>Section</TableCell>
-            </TableRow>
-        </TableHead>
-        <TableBody>
-            {assignmentsDisplayed.map((assignment) => {
-                return <TableRow key={assignment.ID}>
-                    <TableCell component="th" scope="row">
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <Box>{assignment.name}</Box>
+    return <Stack direction="column" mt={2}>
+        <Grid container my={1}>
+            <GridItem item xs={12} md={4}>
+                <TableHeader>Assignment</TableHeader>
+            </GridItem>
+            <GridItem item xs={12} md={2}>
+                <TableHeader>Due Date</TableHeader>
+            </GridItem>
+            <GridItem item xs={12} md={2}>
+                <TableHeader>Grade</TableHeader>
+            </GridItem>
+            <GridItem item xs={12} md={4}>
+                <TableHeader>Section</TableHeader>
+            </GridItem>
+        </Grid>
+        <Divider />
+        {assignmentsDisplayed.map((assignment) => (
+            <>
+                <Grid container my={1}>
+                    <GridItem item xs={12} md={4}>
+                        <Stack display="flex" flexDirection="row" spacing={1} alignItems="center">
+                            <TableCell>{assignment.name}</TableCell>
                             {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
                         </Stack>
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                        {dayjs(assignment.dueDate).format("MMM D, YYYY")}
-                    </TableCell>
-                    <TableCell component="th" scope="row" >
+                    </GridItem>
+                    <GridItem item xs={12} md={2} alignItems="center">
+                        <TableCell>{dayjs(assignment.dueDate).format("MMM D, YYYY")}</TableCell>
+                    </GridItem>
+                    <GridItem item xs={12} md={2}>
                         <GradeChip
                             score={assignment.grades?.[student.ID]?.grade}
                             maxScore={assignment.maxScore}
                             readOnly={true}
                         />
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                        {getSectionInfo(assignment.ID)}
-                    </TableCell>
-                </TableRow>
-            })}
-        </TableBody>
-    </Table>
+                    </GridItem>
+                    <GridItem item xs={12} md={4}>
+                        <TableCell>{getSectionInfo(assignment.ID)}</TableCell>
+                    </GridItem>
+                </Grid>
+                <Divider />
+            </>
+        ))}
+    </Stack >
+    // <Table sx={{ marginTop: 1 }}>
+    //     <colgroup>
+    //         <col width="35%" />
+    //         <col width="18%" />
+    //         <col width="18%" />
+    //         <col width="34%" />
+    //     </colgroup>
+    //     <TableHead>
+    //         <TableRow>
+    //             <TableCell>Assignment</TableCell>
+    //             <TableCell>Due</TableCell>
+    //             <TableCell>Grade</TableCell>
+    //             <TableCell>Section</TableCell>
+    //         </TableRow>
+    //     </TableHead>
+    //     <TableBody>
+    //         {assignmentsDisplayed.map((assignment) => {
+    //             return <TableRow key={assignment.ID}>
+    //                 <TableCell component="th" scope="row">
+    //                     <Stack direction="row" spacing={1} alignItems="center">
+    //                         <Box>{assignment.name}</Box>
+    //                         {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
+    //                     </Stack>
+    //                 </TableCell>
+    //                 <TableCell component="th" scope="row">
+    //                     {dayjs(assignment.dueDate).format("MMM D, YYYY")}
+    //                 </TableCell>
+    //                 <TableCell component="th" scope="row" >
+    //                     <GradeChip
+    //                         score={assignment.grades?.[student.ID]?.grade}
+    //                         mamdcore={assignment.mamdcore}
+    //                         readOnly={true}
+    //                     />
+    //                 </TableCell>
+    //                 <TableCell component="th" scope="row">
+    //                     {getSectionInfo(assignment.ID)}
+    //                 </TableCell>
+    //             </TableRow>
+    //         })}
+    //     </TableBody>
+    // </Table>
 
 }
 
