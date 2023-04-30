@@ -119,7 +119,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     })
 
     const getCurrentSectionID = (assignmentID): string => {
-        if ((assignmentID) && (student.actualSections?.[assignmentID])) {
+        if ((assignmentID) && (student.actualSections?.[course.ID]?.[assignmentID])) {
             return student.actualSections?.[course.ID][assignmentID]
         } else {
             return student.defaultSections?.[course.ID]
