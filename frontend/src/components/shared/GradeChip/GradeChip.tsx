@@ -8,7 +8,7 @@ import { useDialog } from '../ConfirmDialog/ConfirmDialogProvider';
 interface GradeChipProps {
   score: number | undefined;
   maxScore: number;
-  instructor?: boolean;
+  readOnly?: boolean;
   editable?: boolean;
   handleCreateGrade?: (grade: number) => void;
   handleDeleteGrade?: () => void;
@@ -18,7 +18,7 @@ type FormData = {
   grade: string
 };
 
-const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, editable = false, handleCreateGrade, handleDeleteGrade }) => {
+const GradeChip: FC<GradeChipProps> = ({ score, maxScore, readOnly = true, editable = false, handleCreateGrade, handleDeleteGrade }) => {
   const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
     defaultValues: { grade: score ? score.toString() : "" }
   });
@@ -68,7 +68,7 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, edi
 
   return (
     <Stack direction="row" spacing={0.5} alignItems="center">
-      <Box width={instructor ? 40 : 28} ml={editable ? -1 : 0} mr={editable ? 1 : 0} height={30} display="flex" alignItems="center">
+      <Box width={readOnly ? 28 : 40} ml={editable ? -1 : 0} mr={editable ? 1 : 0} height={30} display="flex" alignItems="center">
         {editable ?
           <form onSubmit={onSubmit}>
             <TextField
@@ -87,10 +87,12 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, edi
             }}
           >
             {score === undefined ?
-              (instructor ? <HelpOutlineIcon fontSize="small" /> :
+              (readOnly ?
                 <Tooltip title="Instructor has not released this grade" placement="right">
                   <HelpOutlineIcon fontSize="small" />
-                </Tooltip>)
+                </Tooltip> :
+                <HelpOutlineIcon fontSize="small" />
+              )
               :
               <Fragment>
                 &nbsp;{score}
@@ -110,7 +112,7 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, instructor = true, edi
           /
         </Typography>
       </Box>
-      <Box display="flex" width={instructor ? 35 : 22} justifyContent="flex-end">
+      <Box display="flex" width={readOnly ? 22 : 35} justifyContent="flex-end">
         <Typography
           variant="body2"
           sx={{

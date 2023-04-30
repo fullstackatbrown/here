@@ -175,6 +175,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                                                 <GradeChip
                                                     score={grade ? grade.grade : undefined}
                                                     maxScore={assignment.maxScore}
+                                                    readOnly={false}
                                                     editable={editGrade && editGrade === userID}
                                                     handleCreateGrade={handleSubmitGrade(userID)}
                                                     handleDeleteGrade={grade ? handleDeleteGrade(userID) : undefined}

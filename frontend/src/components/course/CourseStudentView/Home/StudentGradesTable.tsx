@@ -73,7 +73,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
                         <GradeChip
                             score={assignment.grades?.[student.ID]?.grade}
                             maxScore={assignment.maxScore}
-                            instructor={false}
+                            readOnly={true}
                         />
                     </TableCell>
                     <TableCell component="th" scope="row">
