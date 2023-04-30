@@ -90,7 +90,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
       {invitedStudents && hasNoStudent() ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&
-          <Box overflow="scroll">
+          <Box>
             <PeopleTable
               {...{ course, assignments, sectionsMap }}
               students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}

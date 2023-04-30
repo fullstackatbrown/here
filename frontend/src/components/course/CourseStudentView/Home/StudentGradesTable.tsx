@@ -21,7 +21,7 @@ interface StudentGradesTableProps {
 
 const TableHeader = styled(Typography)(({ theme }) => ({
     fontWeight: 500,
-    fontSize: 15
+    fontSize: 14
 }))
 
 const GridItem = styled(Grid)(({ theme }) => ({
@@ -70,7 +70,7 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
             <>
                 <Grid container my={1}>
                     <GridItem item xs={12} md={4} mb={isXsScreen ? 1 : 0} flexWrap="wrap">
-                        <Typography fontSize={15} fontWeight={isXsScreen ? 500 : 400} sx={{ marginRight: 1 }}>
+                        <Typography fontSize={14} fontWeight={isXsScreen ? 500 : 400} sx={{ marginRight: 1 }}>
                             {assignment.name}
                         </Typography>
                         {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
@@ -78,12 +78,12 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
                     <GridItem item xs={8.8} md={6}>
                         <Grid container>
                             <GridItem item xs={12} md={4}>
-                                <Typography fontSize={isXsScreen ? 13.5 : 15}>
+                                <Typography fontSize={isXsScreen ? 13.5 : 14}>
                                     {isXsScreen && "Due: "}{dayjs(assignment.dueDate).format("MMM D, YYYY")}
                                 </Typography>
                             </GridItem>
                             <GridItem item xs={12} md={8}>
-                                <Typography fontSize={isXsScreen ? 13.5 : 15}>
+                                <Typography fontSize={isXsScreen ? 13.5 : 14}>
                                     {isXsScreen && "Section: "}{getSectionInfo(assignment.ID)}
                                 </Typography>
                             </GridItem>
