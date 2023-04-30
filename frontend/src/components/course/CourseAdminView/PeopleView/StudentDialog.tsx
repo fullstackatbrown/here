@@ -36,7 +36,6 @@ export interface StudentDialogProps {
 const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments, sectionsMap, open, onClose }) => {
     const [student, setStudent] = useState<User | undefined>(undefined);
     const defaultSectionID = () => student?.defaultSections?.[course.ID] || UNASSIGNED
-    console.log(defaultSectionID())
     const [selectedSection, setSelectedSection] = useState<string | undefined>(undefined); // undefined means not in edit mode
 
     useEffect(() => {
@@ -99,50 +98,54 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
             .catch()
     }
 
-    return student && <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="md" keepMounted={false}>
-        <DialogTitle>{student.displayName} ({student.email})</DialogTitle>
-        <DialogContent>
-            <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-                <Typography variant="button" fontSize={15} fontWeight={500}>Regular Section:&nbsp;</Typography>
-                <Stack direction="row" alignItems="center">
-                    {selectedSection !== undefined ?
-                        <SelectMenu
-                            value={selectedSection}
-                            formatOption={formatOptions}
-                            options={sectionOptions()}
-                            onSelect={(val) => setSelectedSection(val)}
-                            defaultValue={defaultSectionID()}
-                        />
-                        :
-                        <Typography color="secondary" variant="button" fontSize={14} mr={1}>
-                            {defaultSectionID() === UNASSIGNED ? UNASSIGNED : formatSectionInfo(sectionsMap[defaultSectionID()], true)}
-                        </Typography>
-                    }
-                    {selectedSection !== undefined ?
-                        <Stack direction="row" alignItems="center" spacing={0.5}>
-                            <Tooltip title="confirm" placement="bottom">
-                                <IconButton sx={{ p: 0.5 }} onClick={handleChangeDefaultSection}>
-                                    <CheckIcon sx={{ fontSize: 18 }} />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="discard" placement="bottom">
-                                <IconButton sx={{ p: 0.5 }} onClick={closeEditMode}>
-                                    <CloseIcon sx={{ fontSize: 18 }} />
-                                </IconButton>
-                            </Tooltip>
-                        </Stack>
-                        :
-                        <Tooltip title={`change section for ${student.displayName}`} placement="bottom">
-                            <IconButton sx={{ p: 0.5 }} onClick={openEditMode}>
-                                <EditIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                        </Tooltip>
+    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="md" keepMounted={false}>
+        {student &&
+            <>
+                <DialogTitle>{student.displayName} ({student.email})</DialogTitle>
+                <DialogContent>
+                    <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                        <Typography variant="button" fontSize={15} fontWeight={500}>Regular Section:&nbsp;</Typography>
+                        <Stack direction="row" alignItems="center">
+                            {selectedSection !== undefined ?
+                                <SelectMenu
+                                    value={selectedSection}
+                                    formatOption={formatOptions}
+                                    options={sectionOptions()}
+                                    onSelect={(val) => setSelectedSection(val)}
+                                    defaultValue={defaultSectionID()}
+                                />
+                                :
+                                <Typography color="secondary" variant="button" fontSize={14} mr={1}>
+                                    {defaultSectionID() === UNASSIGNED ? UNASSIGNED : formatSectionInfo(sectionsMap[defaultSectionID()], true)}
+                                </Typography>
+                            }
+                            {selectedSection !== undefined ?
+                                <Stack direction="row" alignItems="center" spacing={0.5}>
+                                    <Tooltip title="confirm" placement="bottom">
+                                        <IconButton sx={{ p: 0.5 }} onClick={handleChangeDefaultSection}>
+                                            <CheckIcon sx={{ fontSize: 18 }} />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="discard" placement="bottom">
+                                        <IconButton sx={{ p: 0.5 }} onClick={closeEditMode}>
+                                            <CloseIcon sx={{ fontSize: 18 }} />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Stack>
+                                :
+                                <Tooltip title={`change section for ${student.displayName}`} placement="bottom">
+                                    <IconButton sx={{ p: 0.5 }} onClick={openEditMode}>
+                                        <EditIcon sx={{ fontSize: 18 }} />
+                                    </IconButton>
+                                </Tooltip>
 
-                    }
-                </Stack>
-            </Stack>
-            <StudentGradesTable {...{ course, student, sectionsMap, assignments }} />
-        </DialogContent>
+                            }
+                        </Stack>
+                    </Stack>
+                    <StudentGradesTable {...{ course, student, sectionsMap, assignments }} instructor />
+                </DialogContent>
+            </>
+        }
     </Dialog >;
 };
 
