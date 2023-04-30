@@ -10,8 +10,8 @@ import { Course, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
-import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import AdminViewHeader from "../AdminViewHeader";
+import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
 
 export interface SettingsViewProps {
     course: Course;
@@ -26,6 +26,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
 
     const loading = staffLoading || adminLoading || adminInvitesLoading || staffInvitesLoading;
     const isCourseActive = course.status === CourseStatus.CourseActive;
+    const showSnackbar = useSnackbar();
 
     useEffect(() => {
         if (copyButtonRef.current) {
@@ -45,6 +46,13 @@ export default function SettingsView({ course }: SettingsViewProps) {
             .catch(() => { })
     }
 
+    const showCopyToClipboardSnackbar = () => {
+        showSnackbar({
+            message: "Copied to clipboard",
+            severity: "success",
+        });
+    }
+
     return (
         <>
             <AdminViewHeader view="settings" access={CoursePermission.CourseAdmin} />
@@ -55,10 +63,14 @@ export default function SettingsView({ course }: SettingsViewProps) {
                         <Typography fontWeight={500}>
                             Course Entry Code:
                         </Typography>
-                        <Button color="inherit" sx={{ paddingTop: 0, paddingBottom: 0, fontSize: 16 }} ref={copyButtonRef}>
+                        <Button
+                            color="inherit" sx={{ paddingTop: 0, paddingBottom: 0, fontSize: 16 }}
+                            ref={copyButtonRef} onClick={showCopyToClipboardSnackbar}
+                        >
                             {course.entryCode}
                             <ContentCopyIcon
-                                style={{ fontSize: 13, marginLeft: 5 }} />
+                                style={{ fontSize: 13, marginLeft: 5 }}
+                            />
                         </Button>
                     </Stack>
                     <Typography>
