@@ -311,6 +311,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		return err
 	}
 
+	// Send notification to student
 	notificationMsg := fmt.Sprintf("Your swap request has been %s", req.Status)
 	if req.HandledBy == nil {
 		notificationMsg += " by the system"
