@@ -141,31 +141,19 @@ export function useCourse(courseID: string): [Course | undefined, boolean] {
     return [course, loading];
 }
 
-export function useCourseStaff(courseID: string, access: CoursePermission): [User[], boolean] {
+export function useCourseStaff(course: Course, access: CoursePermission): [User[], boolean] {
     const [loading, setLoading] = useState(true);
     const [staff, setStaff] = useState<User[]>([]);
 
     useEffect(() => {
-        if (courseID) {
-            const db = getFirestore();
-            const unsubscribe = onSnapshot(doc(db, FirestoreCoursesCollection, courseID), (doc) => {
-                const data = doc.data();
-                if (data?.permissions) {
-                    const uids = Object.keys(data.permissions).filter((id) => data.permissions[id] === access);
+        const uids = Object.keys(course.permissions).filter((id) => course.permissions[id] === access);
 
-                    Promise.all(uids.map(uid => AuthAPI.getUserById(uid)))
-                        .then(res => {
-                            setStaff(res);
-                            setLoading(false);
-                        });
-                } else {
-                    setLoading(false);
-                }
+        Promise.all(uids.map(uid => AuthAPI.getUserById(uid)))
+            .then(res => {
+                setStaff(res);
+                setLoading(false);
             });
-
-            return () => unsubscribe();
-        }
-    }, [courseID]);
+    }, [course, access]);
 
     return [staff, loading];
 }

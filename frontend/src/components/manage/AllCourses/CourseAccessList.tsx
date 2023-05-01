@@ -22,8 +22,8 @@ interface CourseAccessListProps {
 const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
     const [expanded, setExpanded] = useState(false);
     const [hover, setHover] = useState(false);
-    const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
-    const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
+    const [staff, staffLoading] = useCourseStaff(course, CoursePermission.CourseStaff);
+    const [admin, adminLoading] = useCourseStaff(course, CoursePermission.CourseAdmin);
     const [adminInvites, adminInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseAdmin);
     const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
     const [editCourseDialogOpen, setEditCourseDialogOpen] = useState<Course | undefined>(undefined);

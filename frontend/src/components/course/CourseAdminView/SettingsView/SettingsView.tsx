@@ -21,8 +21,8 @@ export interface SettingsViewProps {
 
 export default function SettingsView({ course }: SettingsViewProps) {
     const copyButtonRef = useRef(null);
-    const [staff, staffLoading] = useCourseStaff(course.ID, CoursePermission.CourseStaff);
-    const [admin, adminLoading] = useCourseStaff(course.ID, CoursePermission.CourseAdmin);
+    const [staff, staffLoading] = useCourseStaff(course, CoursePermission.CourseStaff);
+    const [admin, adminLoading] = useCourseStaff(course, CoursePermission.CourseAdmin);
     const [adminInvites, adminInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseAdmin);
     const [staffInvites, staffInvitesLoading] = useCourseInvites(course.ID, CoursePermission.CourseStaff);
 
