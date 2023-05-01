@@ -46,7 +46,6 @@ type CourseUserData struct {
 	StudentID      string `firestore:"studentID"`
 	Email          string `firestore:"email"`
 	DisplayName    string `firestore:"displayName"`
-	Pronouns       string `firestore:"pronouns"`
 	DefaultSection string `firestore:"defaultSection"`
 }
 

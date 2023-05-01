@@ -17,11 +17,7 @@ export interface CourseCardProps {
  */
 const CourseCard: FC<CourseCardProps> = ({ course, user }) => {
   const router = useRouter();
-
-  const getAccess = (): CoursePermission => {
-    const permission = user.permissions[course.ID];
-    return permission as CoursePermission || CoursePermission.CourseStudent
-  }
+  const access = user.permissions?.[course.ID] as CoursePermission || CoursePermission.CourseStudent
 
   return (
     <Card variant="outlined" sx={{ ':hover': { boxShadow: 2 } }}>
@@ -51,7 +47,7 @@ const CourseCard: FC<CourseCardProps> = ({ course, user }) => {
           {course.status === CourseStatus.CourseArchived &&
             <Chip label="Archived" size="small" color="secondary" sx={{ fontWeight: 600 }} />
           }
-          <UserAccessChip access={getAccess()} size="small" />
+          <UserAccessChip access={access} size="small" />
         </Stack>
       </Box>
     </Card>

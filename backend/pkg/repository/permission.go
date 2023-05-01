@@ -175,7 +175,6 @@ func (fr *FirebaseRepository) addStudentToCourse(user *models.User, course *mode
 		StudentID:   user.ID,
 		Email:       user.Email,
 		DisplayName: user.DisplayName,
-		Pronouns:    user.Pronouns,
 	}
 
 	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)

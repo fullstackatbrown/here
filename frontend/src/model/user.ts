@@ -10,7 +10,6 @@ export interface User {
   ID: string;
   displayName: string;
   email: string;
-  pronouns: string;
   photoUrl: string;
   courses: string[];
   defaultSections: Record<string, string>;

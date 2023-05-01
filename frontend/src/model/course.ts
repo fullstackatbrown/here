@@ -22,7 +22,6 @@ export interface CourseUserData {
   studentID: string;
   email: string;
   displayName: string;
-  pronouns: string;
   defaultSection: string;
 }
 
