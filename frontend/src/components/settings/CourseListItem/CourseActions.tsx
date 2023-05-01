@@ -1,8 +1,7 @@
 import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
-import IconButton from "@components/shared/IconButton";
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DoDisturbOnOutlinedIcon from '@mui/icons-material/DoDisturbOnOutlined';
-import { Button, Stack } from "@mui/material";
+import { Button, IconButton, Stack, Tooltip } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
 import { Course, CourseStatus } from "model/course";
@@ -69,14 +68,20 @@ const CourseActions: FC<CourseActionsProps> = ({ course }) => {
                 }
                 {course.status === CourseStatus.CourseActive &&
                     <Stack direction="row" spacing={0.5}>
-                        <IconButton label="Deactivate" size="small"
-                            onClick={handleChangeCourseStatus(CourseStatus.CourseInactive)}>
-                            <DoDisturbOnOutlinedIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                        <IconButton label="Archive" size="small"
-                            onClick={handleChangeCourseStatus(CourseStatus.CourseArchived)} >
-                            <ArchiveOutlinedIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
+                        <Tooltip title="Deactivate">
+                            <IconButton size="small"
+                                onClick={handleChangeCourseStatus(CourseStatus.CourseInactive)}
+                            >
+                                <DoDisturbOnOutlinedIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Archive">
+                            <IconButton size="small"
+                                onClick={handleChangeCourseStatus(CourseStatus.CourseArchived)}
+                            >
+                                <ArchiveOutlinedIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                        </Tooltip>
                     </Stack>
                 }
                 {course.status === CourseStatus.CourseArchived &&

@@ -35,7 +35,6 @@ type Profile struct {
 	ID              string                       `json:"id" firestore:"id,omitempty"`
 	DisplayName     string                       `json:"displayName" firestore:"displayName"`
 	Email           string                       `json:"email" firestore:"email"`
-	Pronouns        string                       `json:"pronouns" firestore:"pronouns"`
 	PhotoURL        string                       `json:"photoUrl" firestore:"photoUrl"`
 	Courses         []string                     `json:"courses" firestore:"courses"`
 	DefaultSections map[string]string            `json:"defaultSections" firestore:"defaultSections"`

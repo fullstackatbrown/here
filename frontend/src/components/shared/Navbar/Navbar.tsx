@@ -1,9 +1,8 @@
-import { FC, useEffect, useState } from "react";
-import NextLink from "next/link";
-import { AppBar, Box, Divider, LinearProgress, Link, Stack, Toolbar } from "@mui/material";
-import IconButton from "../IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "@components/shared/Logo";
+import MenuIcon from "@mui/icons-material/Menu";
+import { AppBar, Box, Divider, IconButton, LinearProgress, Link, Stack, Toolbar, Tooltip } from "@mui/material";
+import NextLink from "next/link";
+import { FC, useEffect, useState } from "react";
 
 export interface NavbarProps {
     /** Displays a menu button on the leading edge of the navbar. */
@@ -53,16 +52,19 @@ const Navbar: FC<NavbarProps> = ({
             {loading && <LinearProgress sx={{ position: "absolute", bottom: 0, width: "100%", height: 2 }} />}
             <Box sx={(theme) => ({ backgroundColor: theme.palette.background.default })}>
                 <Toolbar variant={compact ? "dense" : "regular"} >
-                    {showMenuButton && <IconButton
-                        onClick={onOpenMenu}
-                        label="Main menu"
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}>
-                        <MenuIcon />
-                    </IconButton>}
+                    {showMenuButton &&
+                        <Tooltip title="Main Menu">
+                            <IconButton
+                                onClick={onOpenMenu}
+                                size="large"
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                sx={{ mr: 2 }}>
+                                <MenuIcon />
+                            </IconButton>
+                        </Tooltip>
+                    }
                     <Stack sx={{ flexGrow: 1 }} direction="row" alignItems="center" spacing={1}>
                         <NextLink href="/">
                             <Link variant="h6" component="button" color="inherit" underline="hover"

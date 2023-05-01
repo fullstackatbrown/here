@@ -1,17 +1,15 @@
 import AccountMenu from "@components/shared/AccountMenu";
-import Button from "@components/shared/Button";
-import IconButton from "@components/shared/IconButton";
 import Navbar from "@components/shared/Navbar";
 import CloseIcon from "@mui/icons-material/Close";
-import { Badge, Box, Container, Divider, Drawer, Paper, Stack, Toolbar, Typography } from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import { Badge, Box, Button, Container, Divider, Drawer, IconButton, Paper, Stack, Toolbar, Tooltip, Typography } from "@mui/material";
+import AuthAPI from "api/auth/api";
 import { useAuth, useNotifications } from "api/auth/hooks";
+import { Notification } from "model/user";
 import Head from "next/head";
 import { Router } from "next/router";
 import { FC, ReactNode, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Notification } from "model/user";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import AuthAPI from "api/auth/api";
 import NotificationItem from "../NotificationItem";
 
 export interface AppLayoutProps {
@@ -53,9 +51,12 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
     <NotificationsIcon />
 
   const endItems = [
-    <IconButton key="notifications" label="Notifications" onClick={() => setNotificationMenu(true)}>
-      {badgedNotificationIcon}
-    </IconButton>,
+    <Tooltip title="Notifications">
+      <IconButton key="notifications" onClick={() => setNotificationMenu(true)}>
+        {badgedNotificationIcon}
+      </IconButton>
+    </Tooltip>
+    ,
     <AccountMenu key="account" user={currentUser!} />,
   ];
   if (actionButton) {
@@ -81,9 +82,11 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
           <Toolbar>
             <Stack width="100%" direction="row" alignItems="center" justifyContent="space-between">
               <Typography variant="h6">Notifications</Typography>
-              <IconButton label="Close" onClick={() => setNotificationMenu(false)}>
-                <CloseIcon />
-              </IconButton>
+              <Tooltip title="Close">
+                <IconButton onClick={() => setNotificationMenu(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
             </Stack>
           </Toolbar>
           <Divider />
