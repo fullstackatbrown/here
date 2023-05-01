@@ -14,7 +14,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { handleBadRequestError } from "@util/errors";
 import SectionAPI from "api/section/api";
 import { Day, Section } from "model/section";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -34,19 +34,19 @@ type FormData = {
 };
 
 const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section, courseID }) => {
-    const defaultValues = {
+    const defaultValues = useMemo(() => ({
         day: section ? section.day : undefined,
         starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
         endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
         location: section ? section.location : undefined,
         capacity: section ? section.capacity : undefined,
-    }
+    }), [section])
 
     const { register, handleSubmit, control, reset, watch, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     });
 
-    useEffect(() => { reset(defaultValues) }, [section]);
+    useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
     const onSubmit = handleSubmit(async data => {
         const startTime = new Date(data.starttime).toISOString()

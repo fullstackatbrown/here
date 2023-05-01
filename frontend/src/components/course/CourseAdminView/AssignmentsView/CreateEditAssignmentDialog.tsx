@@ -6,7 +6,7 @@ import { getNextWeekDate } from '@util/shared/time';
 import AssignmentAPI from "api/assignment/api";
 import { Assignment } from 'model/assignment';
 import { Course } from "model/course";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { Controller, useForm } from 'react-hook-form';
 import toast from "react-hot-toast";
 
@@ -26,19 +26,19 @@ type FormData = {
 };
 
 const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open, onClose, course, assignment }) => {
-    const defaultValues = {
+    const defaultValues = useMemo(() => ({
         name: assignment ? assignment.name : undefined,
         optional: assignment ? assignment.optional : false,
         releaseDate: assignment ? assignment.releaseDate.toISOString() : new Date().toISOString(),
         dueDate: assignment ? assignment.dueDate.toISOString() : getNextWeekDate().toISOString(),
         maxScore: assignment ? assignment.maxScore : 1,
-    }
+    }), [assignment])
 
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     });
 
-    useEffect(() => { reset(defaultValues) }, [assignment]);
+    useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
     const clearTime = (isoTime: string) => {
         const date = new Date(isoTime)
