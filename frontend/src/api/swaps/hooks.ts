@@ -55,7 +55,7 @@ export function usePastSwaps(courseID: string, studentID: string = undefined): [
     );
 
     return () => unsubscribe();
-  }, [courseID, queryConstraints, studentID]);
+  }, [courseID, queryConstraints]);
 
   return [swaps, loading];
 }
@@ -79,7 +79,7 @@ export function useSwapsByStudent(courseID: string, studentID: string): [Swap[] 
     );
 
     return () => unsubscribe();
-  }, [courseID]);
+  }, [courseID, studentID]);
 
   return [swaps, loading];
 }

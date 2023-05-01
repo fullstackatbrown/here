@@ -32,7 +32,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     useEffect(() => {
         setNumResponses(getNumResponses())
         setFormattedResponses(formatSectionResponses(survey.capacity, survey.responses))
-    }, [survey.responses])
+    }, [survey.responses, survey.capacity])
 
 
     const handleRunAlgorithm = () => {
