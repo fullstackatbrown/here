@@ -7,8 +7,10 @@ export function usePendingSwaps(courseID: string, studentID: string = undefined)
   const [loading, setLoading] = useState(true);
   const [swaps, setSections] = useState<Swap[] | undefined>(undefined);
 
-  let queryConstraints = [where("status", "==", "pending")];
-  if (studentID) queryConstraints.push(where("studentID", "==", studentID));
+  const queryConstraints = useMemo(() => [
+    where("status", "==", "pending"),
+    studentID ? where("studentID", "==", studentID) : null,
+  ].filter(Boolean), [studentID]);
 
   useEffect(() => {
     const db = getFirestore();
