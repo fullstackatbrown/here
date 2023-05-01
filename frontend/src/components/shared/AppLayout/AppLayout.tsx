@@ -1,17 +1,16 @@
 import AccountMenu from "@components/shared/AccountMenu";
-import Button from "@components/shared/Button";
 import IconButton from "@components/shared/IconButton";
 import Navbar from "@components/shared/Navbar";
 import CloseIcon from "@mui/icons-material/Close";
-import { Badge, Box, Container, Divider, Drawer, Paper, Stack, Toolbar, Typography } from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import { Badge, Box, Button, Container, Divider, Drawer, Paper, Stack, Toolbar, Typography } from "@mui/material";
+import AuthAPI from "api/auth/api";
 import { useAuth, useNotifications } from "api/auth/hooks";
+import { Notification } from "model/user";
 import Head from "next/head";
 import { Router } from "next/router";
 import { FC, ReactNode, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Notification } from "model/user";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import AuthAPI from "api/auth/api";
 import NotificationItem from "../NotificationItem";
 
 export interface AppLayoutProps {

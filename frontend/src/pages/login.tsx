@@ -1,10 +1,8 @@
-import React from "react";
-import { Box, Container, Paper, Typography } from "@mui/material";
-import Button from "@components/shared/Button";
 import GoogleIcon from "@mui/icons-material/Google";
+import { Box, Button, Container, Paper, Typography } from "@mui/material";
+import { Errors } from "@util/errors";
 import AuthAPI from "api/auth/api";
 import { toast } from "react-hot-toast";
-import { Errors } from "@util/errors";
 
 export default function Login() {
     function handleSignIn() {

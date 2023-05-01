@@ -1,7 +1,7 @@
-import Button from "@components/shared/Button";
 import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import {
     Box,
+    Button,
     Checkbox, Dialog,
     DialogActions,
     DialogContent,
@@ -12,7 +12,7 @@ import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
 import { sortSurveyTimes } from "@util/shared/sortSectionTime";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import toast from "react-hot-toast";
 
 export interface SurveyDialogProps {

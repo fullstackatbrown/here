@@ -1,5 +1,4 @@
-import Button from "@components/shared/Button";
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { parseCourses, parseStaffData, parseTerm } from "@util/shared/parseBulkUpload";
 import { capitalizeWords } from "@util/shared/string";

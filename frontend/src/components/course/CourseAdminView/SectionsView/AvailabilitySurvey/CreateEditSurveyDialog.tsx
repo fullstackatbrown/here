@@ -1,5 +1,5 @@
-import Button from "@components/shared/Button";
 import {
+    Button,
     Dialog,
     DialogActions,
     DialogContent,

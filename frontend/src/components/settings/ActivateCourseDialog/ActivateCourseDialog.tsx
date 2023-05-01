@@ -1,12 +1,11 @@
-import { FC } from "react";
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
-import Button from "@components/shared/Button";
-import { Controller, useForm } from "react-hook-form";
+import { DisabledTextField } from "@components/shared/DisabledTextField/DisabledTextField";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import CourseAPI from "api/course/api";
 import { Course, CourseStatus } from "model/course";
+import { FC } from "react";
+import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { handleBadRequestError } from "@util/errors";
-import { DisabledTextField } from "@components/shared/DisabledTextField/DisabledTextField";
 
 export interface ActivateCourseDialogProps {
     course: Course;
