@@ -1,5 +1,3 @@
-import { Timestamp } from "google/protobuf/timestamp";
-
 export const enum CoursePermission {
   CourseAdmin = "admin",
   CourseStaff = "staff",
@@ -21,10 +19,10 @@ export interface User {
 
 export interface Notification {
   ID: string;
-  Title: string;
-  Body: string;
-  Timestamp: Timestamp;
-  Type: NotificationType;
+  title: string;
+  body: string;
+  timestamp: Date;
+  type: NotificationType;
 }
 
 export const enum NotificationType {

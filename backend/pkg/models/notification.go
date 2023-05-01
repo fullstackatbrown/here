@@ -11,9 +11,9 @@ const (
 )
 
 type Notification struct {
-	ID        string           `json:"id" mapstructure:"id"`
-	Title     string           `json:"title" mapstructure:"title"`
-	Body      string           `json:"body" mapstructure:"body"`
-	Timestamp time.Time        `json:"timestamp" mapstructure:"timestamp"`
-	Type      NotificationType `json:"type" mapstructure:"type"`
+	ID        string           `json:"id" firestore:"id"`
+	Title     string           `json:"title" firestore:"title"`
+	Body      string           `json:"body" firestore:"body"`
+	Timestamp time.Time        `json:"timestamp" firestore:"timestamp"`
+	Type      NotificationType `json:"type" firestore:"type"`
 }

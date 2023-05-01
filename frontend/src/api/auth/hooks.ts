@@ -39,14 +39,23 @@ export function useSession(): AuthState {
                     doc(db, FirestoreProfilesCollection, sessionUser.ID),
                     (doc) => {
                         if (doc.exists()) {
-                            const user = { ID: doc.data().id, ...doc.data() } as User
+                            const user = {
+                                ID: doc.data().id,
+                                ...doc.data(),
+                                // Convert timestamps to Date objects
+                                notifications: doc.get("notifications").map(
+                                    (notification: any) => {
+                                        return {
+                                            ...notification,
+                                            timestamp: notification.timestamp.toDate(),
+                                        } as Notification;
+                                    }
+                                ),
+                            } as User
                             setAuthState({
                                 loading: false,
                                 isAuthenticated: true,
-                                currentUser: {
-                                    ...user,
-                                    // notifications: user.notifications.reverse(),
-                                },
+                                currentUser: user,
                                 isTA: (courseID) =>
                                     user.permissions != null &&
                                     user.permissions[courseID] != undefined,
