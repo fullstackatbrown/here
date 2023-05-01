@@ -1,16 +1,17 @@
-import { FC } from "react";
+import ClearIcon from '@mui/icons-material/Clear';
 import {
     Box,
+    IconButton,
     ListItem,
     ListItemText,
     Paper,
+    Tooltip,
 } from "@mui/material";
-import IconButton from "@components/shared/IconButton";
-import ClearIcon from '@mui/icons-material/Clear';
-import { toast } from "react-hot-toast";
 import AuthAPI from "api/auth/api";
-import { Notification } from "model/user";
 import { formatDistance } from "date-fns";
+import { Notification } from "model/user";
+import { FC } from "react";
+import { toast } from "react-hot-toast";
 
 export interface NotificationItemProps {
     notification: Notification
@@ -21,12 +22,14 @@ const NotificationItem: FC<NotificationItemProps> = ({ notification }) => {
         <Box>
             <ListItem
                 secondaryAction={
-                    <IconButton edge="end" label="Clear notification" onClick={() => {
-                        AuthAPI.clearNotification(notification.ID)
-                            .catch(() => toast.error("Error clearing notification."));
-                    }}>
-                        <ClearIcon />
-                    </IconButton>
+                    <Tooltip title="Clear notification">
+                        <IconButton edge="end" onClick={() => {
+                            AuthAPI.clearNotification(notification.ID)
+                                .catch(() => toast.error("Error clearing notification."));
+                        }}>
+                            <ClearIcon />
+                        </IconButton>
+                    </Tooltip>
                 }
             >
                 <ListItemText primary={notification.Title}
