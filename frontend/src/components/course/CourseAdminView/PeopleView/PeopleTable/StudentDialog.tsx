@@ -4,6 +4,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import {
+    Backdrop,
+    CircularProgress,
     Dialog,
     DialogContent,
     DialogTitle,
@@ -101,65 +103,68 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
             .catch()
     }
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="md" keepMounted={false}>
-        {student &&
-            <>
-                <DialogTitle>{student.displayName} ({student.email})</DialogTitle>
-                <DialogContent>
-                    <Stack direction="column" spacing={2}>
-                        <Stack
-                            direction={{ xs: "column", md: "row" }}
-                            alignItems={{ xs: "flex-start", md: "center" }}
-                            spacing={{ xs: 0, md: 1 }}
-                            justifyContent="space-between"
-                        >
-                            <Typography variant="button" fontSize={15} fontWeight={500}>Regular Section:&nbsp;</Typography>
-                            <Stack direction="row" alignItems="center">
-                                {selectedSection !== undefined ?
-                                    <SelectMenu
-                                        value={selectedSection}
-                                        formatOption={formatOptions}
-                                        options={sectionOptions()}
-                                        onSelect={(val) => setSelectedSection(val)}
-                                        defaultValue={defaultSectionID()}
-                                    />
-                                    :
-                                    <Typography color="secondary" variant="button" fontSize={14} mr={1}>
-                                        {defaultSectionID() === UNASSIGNED ? UNASSIGNED : formatSectionInfo(sectionsMap[defaultSectionID()], true)}
-                                    </Typography>
-                                }
-                                {selectedSection !== undefined ?
-                                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                                        <Tooltip title="confirm" placement="bottom">
-                                            <IconButton sx={{ p: 0.5 }} onClick={handleChangeDefaultSection}>
-                                                <CheckIcon sx={{ fontSize: 18 }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="discard" placement="bottom">
-                                            <IconButton sx={{ p: 0.5 }} onClick={closeEditMode}>
-                                                <CloseIcon sx={{ fontSize: 18 }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </Stack>
-                                    :
-                                    <Tooltip title={`change section for ${student.displayName}`} placement="bottom">
-                                        <IconButton sx={{ p: 0.5 }} onClick={openEditMode}>
-                                            <EditIcon sx={{ fontSize: 18 }} />
+    return student ?
+        <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="md" keepMounted={false}>
+            < DialogTitle > {student.displayName}({student.email})</DialogTitle >
+            <DialogContent>
+                <Stack direction="column" spacing={2}>
+                    <Stack
+                        direction={{ xs: "column", md: "row" }}
+                        alignItems={{ xs: "flex-start", md: "center" }}
+                        spacing={{ xs: 0, md: 1 }}
+                        justifyContent="space-between"
+                    >
+                        <Typography variant="button" fontSize={15} fontWeight={500}>Regular Section:&nbsp;</Typography>
+                        <Stack direction="row" alignItems="center">
+                            {selectedSection !== undefined ?
+                                <SelectMenu
+                                    value={selectedSection}
+                                    formatOption={formatOptions}
+                                    options={sectionOptions()}
+                                    onSelect={(val) => setSelectedSection(val)}
+                                    defaultValue={defaultSectionID()}
+                                />
+                                :
+                                <Typography color="secondary" variant="button" fontSize={14} mr={1}>
+                                    {defaultSectionID() === UNASSIGNED ? UNASSIGNED : formatSectionInfo(sectionsMap[defaultSectionID()], true)}
+                                </Typography>
+                            }
+                            {selectedSection !== undefined ?
+                                <Stack direction="row" alignItems="center" spacing={0.5}>
+                                    <Tooltip title="confirm" placement="bottom">
+                                        <IconButton sx={{ p: 0.5 }} onClick={handleChangeDefaultSection}>
+                                            <CheckIcon sx={{ fontSize: 18 }} />
                                         </IconButton>
                                     </Tooltip>
+                                    <Tooltip title="discard" placement="bottom">
+                                        <IconButton sx={{ p: 0.5 }} onClick={closeEditMode}>
+                                            <CloseIcon sx={{ fontSize: 18 }} />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Stack>
+                                :
+                                <Tooltip title={`change section for ${student.displayName}`} placement="bottom">
+                                    <IconButton sx={{ p: 0.5 }} onClick={openEditMode}>
+                                        <EditIcon sx={{ fontSize: 18 }} />
+                                    </IconButton>
+                                </Tooltip>
 
-                                }
-                            </Stack>
-                        </Stack>
-                        <Stack direction="column" spacing={0.5}>
-                            {isXsScreen && <Typography variant="button" fontSize={15} fontWeight={500}>Assignments & Grades</Typography>}
-                            <StudentGradesTable {...{ course, student, sectionsMap, assignments }} instructor />
+                            }
                         </Stack>
                     </Stack>
-                </DialogContent>
-            </>
-        }
-    </Dialog >;
+                    <Stack direction="column" spacing={0.5}>
+                        {isXsScreen && <Typography variant="button" fontSize={15} fontWeight={500}>Assignments & Grades</Typography>}
+                        <StudentGradesTable {...{ course, student, sectionsMap, assignments }} instructor />
+                    </Stack>
+                </Stack>
+            </DialogContent>
+        </Dialog > :
+        <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={open && !student}
+        >
+            <CircularProgress color="inherit" />
+        </Backdrop>
 };
 
 export default StudentDialog;

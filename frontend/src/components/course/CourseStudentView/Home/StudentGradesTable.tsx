@@ -47,10 +47,10 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
     return <Stack direction="column">
         {!isXsScreen &&
             <Grid container my={1}>
-                <GridItem item xs={12} md={4}>
+                <GridItem item xs={12} md={4.8}>
                     <TableHeader>Assignment</TableHeader>
                 </GridItem>
-                <GridItem item xs={8.8} md={6}>
+                <GridItem item xs={8.8} md={5.2}>
                     <Grid container>
                         <GridItem item xs={12} md={4}>
                             <TableHeader>Due Date</TableHeader>
@@ -69,13 +69,13 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
         {assignmentsDisplayed.map((assignment) => (
             <Box key={assignment.ID}>
                 <Grid container my={1}>
-                    <GridItem item xs={12} md={4} mb={isXsScreen ? 1 : 0} flexWrap="wrap">
+                    <GridItem item xs={12} md={4.8} mb={isXsScreen ? 1 : 0} flexWrap="wrap">
                         <Typography fontSize={14} fontWeight={isXsScreen ? 500 : 400} sx={{ marginRight: 1 }}>
                             {assignment.name}
                         </Typography>
                         {assignment.optional && <Chip label="optional" variant="outlined" size="small" color="primary" />}
                     </GridItem>
-                    <GridItem item xs={8.8} md={6}>
+                    <GridItem item xs={8.8} md={5.2}>
                         <Grid container>
                             <GridItem item xs={12} md={4}>
                                 <Typography fontSize={isXsScreen ? 13.5 : 14}>
