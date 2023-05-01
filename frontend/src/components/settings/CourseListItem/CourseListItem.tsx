@@ -5,6 +5,7 @@ import { Course } from "model/course";
 import { FC } from "react";
 import CourseActions from "./CourseActions";
 import { CoursePermission } from "model/user";
+import UserAccessChip from "@components/home/CourseCard/UserAccessChip";
 
 export interface CourseListItemProps {
     course: Course;
@@ -18,6 +19,7 @@ const CourseListItem: FC<CourseListItemProps> = ({ course, access }) => {
                 <Stack direction="row" display="flex" alignItems="center" spacing={1}>
                     <Typography>{course.code}: {course.title}</Typography>
                     <CourseStatusChip status={course.status} />
+                    <UserAccessChip access={access} variant="outlined" />
                 </Stack>
                 <Typography color="secondary" fontSize={14}>{capitalizeWords(course.term)}</Typography>
             </Stack>

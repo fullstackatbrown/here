@@ -47,7 +47,7 @@ const CourseCard: FC<CourseCardProps> = ({ course, user }) => {
           {course.status === CourseStatus.CourseArchived &&
             <Chip label="Archived" size="small" color="secondary" sx={{ fontWeight: 600 }} />
           }
-          <UserAccessChip access={access} size="small" />
+          <UserAccessChip access={access} size="medium" />
         </Stack>
       </Box>
     </Card>

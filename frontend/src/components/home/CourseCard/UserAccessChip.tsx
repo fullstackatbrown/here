@@ -1,23 +1,48 @@
 import React, { FC } from "react";
-import { Chip } from "@mui/material";
+import { Chip, styled } from "@mui/material";
 import { Course } from "model/course";
 import { CoursePermission } from "model/user";
 
 export interface UserAccessChipProps {
     access: CoursePermission;
     size?: "small" | "medium";
+    variant?: "outlined" | "filled";
 }
 
-const UserAccessChip: FC<UserAccessChipProps> = ({ access, size }) => {
+const MyChip = styled(Chip)(({ size }) => {
+    switch (size) {
+        case "medium":
+            return {
+                height: 24,
+                fontSize: 14,
+                fontWeight: 500,
+                '& .MuiChip-label': {
+                    paddingLeft: 8,
+                    paddingRight: 8,
+                },
+            }
+        default:
+            return {
+                height: 18,
+                fontSize: 12,
+                fontWeight: 500,
+                '& .MuiChip-label': {
+                    paddingLeft: 6,
+                    paddingRight: 6,
+                },
+            }
+    }
+});
+
+
+const UserAccessChip: FC<UserAccessChipProps> = ({ access, size, variant }) => {
     switch (access) {
         case CoursePermission.CourseAdmin:
-            return <Chip label="Admin" size={size} color="primary" sx={{ fontWeight: 600 }} />;
+            return <MyChip label="admin" color="primary" {...{ size, variant }} />;
         case CoursePermission.CourseStaff:
-            return <Chip label="Staff" size={size} color="primary" sx={{ fontWeight: 600 }} />;
-        case CoursePermission.CourseStudent:
-            return <Chip label="Student" size={size} color="success" sx={{ fontWeight: 600 }} />;
+            return <MyChip label="staff" color="primary" {...{ size, variant }} />;
         default:
-            return <Chip label="Student" size={size} color="success" sx={{ fontWeight: 600 }} />;
+            return <MyChip label="student" color="success" {...{ size, variant }} />;
     }
 };
 
