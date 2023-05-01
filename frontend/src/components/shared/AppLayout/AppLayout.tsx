@@ -51,8 +51,8 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
     <NotificationsIcon />
 
   const endItems = [
-    <Tooltip title="Notifications">
-      <IconButton key="notifications" onClick={() => setNotificationMenu(true)}>
+    <Tooltip key="notifications" title="Notifications">
+      <IconButton onClick={() => setNotificationMenu(true)}>
         {badgedNotificationIcon}
       </IconButton>
     </Tooltip>

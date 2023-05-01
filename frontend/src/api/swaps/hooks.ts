@@ -24,7 +24,7 @@ export function usePendingSwaps(courseID: string, studentID: string = undefined)
       });
 
     return () => unsubscribe();
-  }, [courseID]);
+  }, [courseID, queryConstraints]);
 
   return [swaps, loading];
 }
