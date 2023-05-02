@@ -3,7 +3,7 @@ import AccessList from "@components/shared/AccessList/AccessList";
 import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
 import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Button, Stack, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
@@ -118,7 +118,10 @@ export default function SettingsView({ course }: SettingsViewProps) {
                         Admin & Staff
                     </Typography>
 
-                    {!loading &&
+                    {loading ?
+                        <Box my={1}>
+                            <CircularProgress />
+                        </Box> :
                         <Stack spacing={0.5}>
                             <AccessList access={CoursePermission.CourseAdmin} users={admin} emails={adminInvites} />
                             <AccessList course={course} access={CoursePermission.CourseStaff} users={staff} emails={staffInvites} />
