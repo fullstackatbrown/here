@@ -8,7 +8,7 @@ import {
     TextField
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { formatCourseCode, formatCourseTerm, parseCourseTerm } from "@util/shared/string";
+import { formatCourseCode, formatCourseTerm, parseCourseTerm, validateCourseCode } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course } from "model/course";
 import { FC, useEffect, useMemo } from "react";
@@ -44,6 +44,10 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
     useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
     const onSubmit = handleSubmit(async data => {
+        if (!validateCourseCode(data.code)) {
+            toast.error("Invalid course code");
+            return;
+        }
         if (course) {
             toast.promise(CourseAPI.updateCourseInfo(
                 course.ID, data.title, formatCourseCode(data.code), formatCourseTerm(data.term)),
@@ -84,15 +88,18 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
                         setTerm={(term: [Season, string]) => { setValue("term", term) }}
                     />
                     <TextField
-                        {...register("title")}
-                        label="Name"
+                        {...register("code")}
+                        label="Course Code"
+                        placeholder="cs1300"
                         type="text"
                         fullWidth
                         required
+                        autoFocus
                     />
                     <TextField
-                        {...register("code")}
-                        label="Course Code"
+                        {...register("title")}
+                        label="Name"
+                        placeholder="User Interface and User Experience"
                         type="text"
                         fullWidth
                         required
