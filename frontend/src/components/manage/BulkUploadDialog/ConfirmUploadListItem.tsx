@@ -14,7 +14,6 @@ interface ConfirmUploadListItemProps {
 
 const ConfirmUploadListItem: FC<ConfirmUploadListItemProps> = ({ courseCode, courseTitle, permissions }) => {
     const [expanded, setExpanded] = useState(true);
-    const [hover, setHover] = useState(false);
     const theme = useTheme();
 
     const getEmailsByPermission = (permission: CoursePermission) => {
@@ -28,8 +27,6 @@ const ConfirmUploadListItem: FC<ConfirmUploadListItemProps> = ({ courseCode, cou
                 px={1}
                 py={0.5}
                 onClick={() => setExpanded(!expanded)}
-                onMouseEnter={() => setHover(true)}
-                onMouseLeave={() => setHover(false)}
             >
                 <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
                     <Stack direction="row" spacing={4} alignItems="center" py={0.5}>

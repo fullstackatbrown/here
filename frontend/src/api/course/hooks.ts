@@ -146,6 +146,10 @@ export function useCourseStaff(course: Course, access: CoursePermission): [User[
     const [staff, setStaff] = useState<User[]>([]);
 
     useEffect(() => {
+        if (!course || !course.permissions) {
+            setLoading(false);
+            return;
+        }
         const uids = Object.keys(course.permissions).filter((id) => course.permissions[id] === access);
 
         Promise.all(uids.map(uid => AuthAPI.getUserById(uid)))

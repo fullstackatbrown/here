@@ -2,17 +2,13 @@ import { AddPermissionRequest } from "model/course";
 import { formatCourseCode, formatCourseName, validateCourseCode, validateEmail } from "./string";
 import { CoursePermission } from "model/user";
 
-export function parseBulkUpload(data: string) {
-
-}
-
 // Expected data comes in the format of 
 // course_code,course_name
 // e.g. cs101,Intro to Computer Science
 
 // Returns a map from course_code to course_name, or an error message if any
 
-// 1. Ignore empty course codes or names
+// 1. Check for empty course codes or names
 // 2. For course code, lower case everything and remove all spaces
 // 3. For course name, keep at most 1 space between words
 // 3. Check for same course code but different course name
@@ -21,9 +17,12 @@ export function parseCourses(data: string): [Record<string, string> | undefined,
     const lines = data.split("\n");
     const courses: Record<string, string> = {};
     for (const line of lines) {
+        if (line == "") {
+            continue;
+        }
         const [code, name] = line.split(",");
         if (code === "" || name === "" || !code || !name) {
-            continue;
+            return [undefined, "Course code or name cannot be empty"];
         }
         const courseCode = formatCourseCode(code);
         const courseName = formatCourseName(name);
@@ -40,46 +39,12 @@ export function parseCourses(data: string): [Record<string, string> | undefined,
 
         courses[courseCode] = courseName;
     }
-
-    if (Object.keys(courses).length === 0) {
-        return [undefined, "Must enter at least one valid course"];
-    }
     return [courses, undefined];
 }
 
-export function parseTerm(term: string): [string | undefined, string | undefined] {
-    const formatRe = new RegExp(/\b(fall|winter|spring|summer)\s?(\d{4})\b/, "gmi");
-    if (!term.match(formatRe)) {
-        return [undefined, "Invalid term format"]
-    }
-
-    // Convert the iterator from finding groups to an array and assign season/year
-    let foundGroups = Array.from(formatRe.exec(term));
-    const [season, year] = [foundGroups[1], foundGroups[2]];
-    if (!season || !year) {
-        return [undefined, "Invalid term format"];
-    }
-
-    const seasonLowered = season.toLowerCase()
-    // Validate season using regex
-    if (!/^(fall|winter|spring|summer)$/.test(seasonLowered)) {
-        return [undefined, "Invalid season"];
-    }
-
-    // Make sure year is at least the current year
-    const currentYear = new Date().getFullYear();
-    if (parseInt(year) < currentYear) {
-        return [undefined, `Year must be at least ${currentYear}`];
-    }
-
-    const formattedTerm = `${seasonLowered} ${year}`;
-    return [formattedTerm, undefined];
-}
-
-
 // Expected data comes in the format of
 // email,role,course_code
-// 1. if any field is empty, ignore the line
+// 1. check for empty fields
 // 2. role can only be "admin" or "staff"
 // 3. email must be a valid email
 // 4. course code must be a valid course code, i.e. can be found in the courses Record
@@ -92,10 +57,13 @@ export function parseStaffData(data: string, courses: Record<string, string>): [
     const staff: Record<string, AddPermissionRequest> = {};
     const permissionsByCourse: Record<string, AddPermissionRequest[]> = {};
     for (const line of lines) {
-        const [email, role, courseCode] = line.split(",");
-        // Ignore line if any field is empty
-        if (email === "" || role === "" || courseCode === "" || !email || !role || !courseCode) {
+        if (line == "") {
             continue;
+        }
+        const [email, role, courseCode] = line.split(",");
+        // Check for empty fields
+        if (email === "" || role === "" || courseCode === "" || !email || !role || !courseCode) {
+            return [undefined, "Email, role, or course code cannot be empty"];
         }
 
         // Validate role

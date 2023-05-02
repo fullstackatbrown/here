@@ -64,6 +64,7 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = repo.Repository.GetCourseByInfo(req.Code, req.Term)
 	if err == nil {
 		http.Error(w, "Course already exists", http.StatusBadRequest)
+		return
 	}
 
 	c, err := repo.Repository.CreateCourse(req)

@@ -1,44 +1,37 @@
-import { Stack, TextField } from "@mui/material";
+import { Stack, TextField, Typography } from "@mui/material";
+import { capitalizeWords } from "@util/shared/string";
+import { Course } from "model/course";
 import { FC } from "react";
-import { useForm } from "react-hook-form";
-
-export type AddCoursesData = {
-    term: string;
-    data: string;
-};
 
 interface AddCoursesStepProps {
-    addCoursesData: AddCoursesData;
-    setAddCoursesData: (data: AddCoursesData) => void;
+    term: string;
+    courses: Course[];
+    addCoursesData: string;
+    setAddCoursesData: (data: string) => void;
 }
 
-
-const AddCoursesStep: FC<AddCoursesStepProps> = ({ addCoursesData, setAddCoursesData }) => {
+const AddCoursesStep: FC<AddCoursesStepProps> = ({ term, courses, addCoursesData, setAddCoursesData }) => {
 
     return <Stack spacing={2} my={1}>
-        <TextField
-            required
-            label="Term"
-            type="text"
-            fullWidth
-            size="small"
-            variant="outlined"
-            value={addCoursesData.term}
-            onChange={(e) => setAddCoursesData({ ...addCoursesData, term: e.target.value })}
-        />
+        <Typography fontWeight={500}>
+            Existing {capitalizeWords(term)} Courses: {courses.length > 0 ? courses.map(course => course.code).join(", ") : "None"}
+        </Typography>
+        <Typography whiteSpace="pre" mb={2}>
+            To add new courses, paste comma-separated values with the following schema: (course_code,course_name).
+        </Typography>
         <TextField
             required
             autoFocus
-            label="CSV Data"
+            label="New Courses"
             type="textarea"
             fullWidth
             multiline
             rows={10}
             size="small"
             variant="outlined"
-            value={addCoursesData.data}
+            value={addCoursesData}
             placeholder={`cs1300,User Interface and User Experience\ncs0200,Program Design with Data Structures and Algorithms`}
-            onChange={(e) => setAddCoursesData({ ...addCoursesData, data: e.target.value })}
+            onChange={(e) => setAddCoursesData(e.target.value)}
         />
     </Stack>
 }

@@ -1,3 +1,5 @@
+import { Season } from "./terms";
+
 export function capitalizeWords(str: string): string {
     // capitalize first letter of each word
     return str.replace(/\w\S*/g, (txt) => {
@@ -11,8 +13,13 @@ export function formatCourseCode(code: string): string {
 }
 
 // Formates course term by keeping at most one space between words, lowercasing the string, and trimming the string
-export function formatCourseTerm(term: string): string {
-    return term.replace(/\s+/g, " ").toLowerCase().trim();;
+export function formatCourseTerm(term: [Season, string]): string {
+    return `${term[0]} ${term[1]}`;
+}
+
+export function parseCourseTerm(term: string): [Season, string] {
+    const [season, year] = term.split(" ");
+    return [season as Season, year];
 }
 
 // Formats course name by keeping at most one space between words and trimming the string
