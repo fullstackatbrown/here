@@ -10,6 +10,12 @@ const (
 	FirestoreInvitesCollection = "invites"
 )
 
+var CourseFieldsToExclude = []string{
+	"Sections", "SectionsLock", "SectionsListenerCancelFunc",
+	"Assignments", "AssignmentsLock", "AssignmentsListenerCancelFunc",
+	"PendingSwaps", "PendingSwapsLock", "PendingSwapsListenerCancelFunc",
+}
+
 type Course struct {
 	ID                  string                      `firestore:"id,omitempty"`
 	Title               string                      `firestore:"title"`

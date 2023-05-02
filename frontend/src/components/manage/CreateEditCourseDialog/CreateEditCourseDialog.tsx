@@ -11,7 +11,7 @@ import { handleBadRequestError } from "@util/errors";
 import { formatCourseCode, formatCourseTerm } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course } from "model/course";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -29,17 +29,17 @@ type FormData = {
 };
 
 const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose, course, courseTerm }) => {
-    const defaultValues = {
+    const defaultValues = useMemo(() => ({
         title: course ? course.title : undefined,
         code: course ? course.code : undefined,
         term: course ? course.term : courseTerm,
-    }
+    }), [course, courseTerm])
 
-    const { register, handleSubmit, control, reset, watch, formState: { } } = useForm<FormData>({
+    const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     });
 
-    useEffect(() => { reset(defaultValues) }, [course]);
+    useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
     const onSubmit = handleSubmit(async data => {
         if (course) {

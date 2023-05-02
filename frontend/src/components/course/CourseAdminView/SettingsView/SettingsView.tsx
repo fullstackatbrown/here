@@ -36,7 +36,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
                 text: () => course.entryCode,
             });
         }
-    }, []);
+    }, [course.entryCode]);
 
     const changeAutoApproveRequests = () => {
         toast.promise(CourseAPI.updateCourse(course.ID, undefined, !course.autoApproveRequests),

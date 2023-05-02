@@ -13,7 +13,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func (fr *FirebaseRepository) initializeSectionsListener(course *models.Course, courseID string) error {
+// CoursesLock should be locked on entry
+func (fr *FirebaseRepository) initializeSectionsListener(course *models.Course) error {
 
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newSections := make(map[string]*models.Section)
@@ -43,7 +44,7 @@ func (fr *FirebaseRepository) initializeSectionsListener(course *models.Course, 
 
 	done := make(chan func())
 	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
-		courseID).Collection(models.FirestoreSectionsCollection).Query
+		course.ID).Collection(models.FirestoreSectionsCollection).Query
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)
 		if err != nil {

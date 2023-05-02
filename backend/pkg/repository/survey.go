@@ -106,7 +106,7 @@ func (fr *FirebaseRepository) CreateSurvey(req *models.CreateSurveyRequest) (*mo
 	return survey, nil
 }
 
-func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest, capacity map[string]map[string]int) error {
+func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) error {
 	v := reflect.ValueOf(*req)
 	typeOfS := v.Type()
 
@@ -122,9 +122,21 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest, capa
 		}
 	}
 
+	// Get all the sections
+	sections, err := fr.GetSectionByCourse(*req.CourseID)
+	if err != nil {
+		return fmt.Errorf("Error getting sections: %v", err)
+	}
+
+	// Get all unique section times
+	capacity, err := models.GetUniqueSectionTimes(sections)
+	if err != nil {
+		return fmt.Errorf("Error getting unique section times: %v", err)
+	}
+
 	updates = append(updates, firestore.Update{Path: "capacity", Value: capacity})
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
 		models.FirestoreSurveysCollection).Doc(*req.SurveyID).Update(firebase.Context, updates)
 	return err
 }

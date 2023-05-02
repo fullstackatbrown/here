@@ -1,14 +1,16 @@
 import { collection, getFirestore, onSnapshot, query, where } from "@firebase/firestore";
 import { FirestoreCoursesCollection, FirestoreSwapsCollection } from "api/firebaseConst";
 import { Swap } from "model/swap";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function usePendingSwaps(courseID: string, studentID: string = undefined): [Swap[] | undefined, boolean] {
   const [loading, setLoading] = useState(true);
   const [swaps, setSections] = useState<Swap[] | undefined>(undefined);
 
-  let queryConstraints = [where("status", "==", "pending")];
-  if (studentID) queryConstraints.push(where("studentID", "==", studentID));
+  const queryConstraints = useMemo(() => [
+    where("status", "==", "pending"),
+    studentID ? where("studentID", "==", studentID) : null,
+  ].filter(Boolean), [studentID]);
 
   useEffect(() => {
     const db = getFirestore();
@@ -24,7 +26,7 @@ export function usePendingSwaps(courseID: string, studentID: string = undefined)
       });
 
     return () => unsubscribe();
-  }, [courseID]);
+  }, [courseID, queryConstraints]);
 
   return [swaps, loading];
 }
@@ -33,8 +35,10 @@ export function usePastSwaps(courseID: string, studentID: string = undefined): [
   const [loading, setLoading] = useState(true);
   const [swaps, setSections] = useState<Swap[] | undefined>(undefined);
 
-  let queryConstraints = [where("status", "!=", "pending")];
-  if (studentID) queryConstraints.push(where("studentID", "==", studentID));
+  const queryConstraints = useMemo(() => [
+    where("status", "!=", "pending"),
+    studentID ? where("studentID", "==", studentID) : null,
+  ].filter(Boolean), [studentID]);
 
   useEffect(() => {
     const db = getFirestore();
@@ -51,7 +55,7 @@ export function usePastSwaps(courseID: string, studentID: string = undefined): [
     );
 
     return () => unsubscribe();
-  }, [courseID]);
+  }, [courseID, queryConstraints]);
 
   return [swaps, loading];
 }
@@ -75,7 +79,7 @@ export function useSwapsByStudent(courseID: string, studentID: string): [Swap[] 
     );
 
     return () => unsubscribe();
-  }, [courseID]);
+  }, [courseID, studentID]);
 
   return [swaps, loading];
 }

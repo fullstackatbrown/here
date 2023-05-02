@@ -10,7 +10,7 @@ import { Course } from "model/course";
 import { Section } from "model/section";
 import { Swap } from "model/swap";
 import { User } from "model/user";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { SwapStatus } from "model/swap";
@@ -36,14 +36,14 @@ type FormData = {
 
 const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, assignmentsMap, student, sectionsMap, swap }) => {
     const assignments = Object.values(assignmentsMap)
-    const defaultValues: FormData = {
+    const defaultValues: FormData = useMemo(() => ({
         courseID: course.ID,
         isPermanent: swap ? swap.assignmentID === "" : true,
         reason: swap ? swap.reason : "",
         assignmentID: swap ? swap.assignmentID : "",
         oldSectionID: student.defaultSections?.[course.ID] ? student.defaultSections[course.ID] : "",
         newSectionID: swap ? swap.newSectionID : "",
-    }
+    }), [course, student, swap])
 
     const { register, handleSubmit, setValue, control, reset, watch, unregister, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
@@ -52,6 +52,14 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     const watchIsPermanent = watch("isPermanent")
     const watchAssignmentID = watch("assignmentID")
     const watchOldSectionID = watch("oldSectionID")
+
+    const getCurrentSectionID = (assignmentID: string) => {
+        if ((assignmentID) && (student.actualSections?.[course.ID]?.[assignmentID])) {
+            return student.actualSections?.[course.ID][assignmentID]
+        } else {
+            return student.defaultSections?.[course.ID]
+        }
+    }
 
     useEffect(() => {
         if (watchIsPermanent) {
@@ -66,7 +74,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         }
         setValue("newSectionID", defaultValues["newSectionID"])
         setValue("reason", defaultValues["reason"])
-    }, [watchIsPermanent]);
+    }, [watchIsPermanent, watchAssignmentID, defaultValues]);
 
     useEffect(() => {
         if (watchAssignmentID === "") {
@@ -81,7 +89,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
 
     useEffect(() => {
         reset(defaultValues);
-    }, [student, swap])
+    }, [defaultValues, reset])
 
     const handleOnClose = () => {
         onClose()
@@ -115,14 +123,6 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                 .catch(() => handleOnClose())
         }
     })
-
-    const getCurrentSectionID = (assignmentID): string => {
-        if ((assignmentID) && (student.actualSections?.[course.ID]?.[assignmentID])) {
-            return student.actualSections?.[course.ID][assignmentID]
-        } else {
-            return student.defaultSections?.[course.ID]
-        }
-    }
 
     return <Dialog open={open} onClose={handleOnClose} fullWidth>
         <form onSubmit={onSubmit}>

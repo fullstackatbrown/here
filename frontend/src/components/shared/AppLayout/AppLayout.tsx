@@ -30,7 +30,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
   const [notificationMenu, setNotificationMenu] = useState(false);
 
   useNotifications(currentUser, (a: Notification) => {
-    toast.success(a.Title, { duration: 5000 });
+    toast.success(a.title, { duration: 5000 });
   });
 
   // Bind page load events to pageLoading state so loading bar is displayed on navigation.
@@ -51,8 +51,8 @@ const AppLayout: FC<AppLayoutProps> = ({ title, maxWidth, loading, actionButton,
     <NotificationsIcon />
 
   const endItems = [
-    <Tooltip title="Notifications">
-      <IconButton key="notifications" onClick={() => setNotificationMenu(true)}>
+    <Tooltip key="notifications" title="Notifications">
+      <IconButton onClick={() => setNotificationMenu(true)}>
         {badgedNotificationIcon}
       </IconButton>
     </Tooltip>

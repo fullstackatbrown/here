@@ -10,7 +10,7 @@ import formatSectionResponses, { TimeCount } from "@util/shared/formatSectionRes
 import SurveyAPI from 'api/surveys/api';
 import { Section } from 'model/section';
 import { Survey, SurveyResponse } from "model/survey";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import toast from 'react-hot-toast';
 import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
@@ -26,14 +26,13 @@ export interface SurveyResponsesDialogProps {
 }
 
 const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey, numStudents, sections }) => {
-    const [formattedResponses, setFormattedResponses] = useState<TimeCount[]>([])
-    const [numResponses, setNumResponses] = useState(0)
+    const numResponses = useMemo(() =>
+        survey.responses ? Object.keys(survey.responses).length : 0,
+        [survey.responses])
 
-    useEffect(() => {
-        setNumResponses(getNumResponses())
-        setFormattedResponses(formatSectionResponses(survey.capacity, survey.responses))
-    }, [survey.responses])
-
+    const formattedResponses = useMemo(() =>
+        formatSectionResponses(survey.capacity, survey.responses),
+        [survey.responses, survey.capacity])
 
     const handleRunAlgorithm = () => {
         toast.promise(SurveyAPI.generateResults(survey.courseID, survey.ID), {
@@ -43,8 +42,6 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         })
             .catch(() => { })
     }
-
-    const getNumResponses = () => survey.responses ? Object.keys(survey.responses).length : 0
 
     const hasResults = () => survey.results && survey.resultsReadable ? Object.keys(survey.results).length > 0 : false
 
@@ -84,7 +81,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                         {numResponses} responses
                     </Typography>
                 </Stack>
-                <Button variant="outlined" startIcon={<DownloadIcon />} disabled={getNumResponses() === 0} onClick={handleExportResponses}>
+                <Button variant="outlined" startIcon={<DownloadIcon />} disabled={numResponses === 0} onClick={handleExportResponses}>
                     Export Responses
                 </Button>
             </Stack>
@@ -102,7 +99,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                         Capacity may be overridden if there is no solution.
                     </Typography>
                 </Stack>
-                <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={getNumResponses() === 0} onClick={handleRunAlgorithm}>
+                <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={numResponses === 0} onClick={handleRunAlgorithm}>
                     Run Algorithm
                 </Button>
             </Stack>

@@ -28,7 +28,7 @@ export default function CoursePage() {
         router.push("/").then(() => toast.error("You are not enrolled in this course."));
       }
     }
-  }, [router, course, courseLoading, isAuthenticated, currentUser]);
+  }, [router, course, courseLoading, isAuthenticated, access, isStudent, currentUser]);
 
   return (
     <AppLayout title={course?.title} maxWidth={false} loading={courseLoading}>

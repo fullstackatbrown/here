@@ -36,13 +36,13 @@ function MyApp(props: MyAppProps) {
         undefined
     );
 
-    function currentThemeMode() {
+    const currentThemeMode = useMemo(() => {
         if (themeMode === "system" || !themeMode) {
             return prefersDarkMode ? "dark" : "light";
         } else {
             return themeMode;
         }
-    }
+    }, [themeMode, prefersDarkMode]);
 
     const muiTheme = useMemo(() => {
         // save the new theme mode to local storage
@@ -61,11 +61,11 @@ function MyApp(props: MyAppProps) {
             }
 
             localStorage.setItem("theme-mode", themeMode!);
-            return responsiveFontSizes(createTheme(theme(currentThemeMode())));
+            return responsiveFontSizes(createTheme(theme(currentThemeMode)));
         } else {
             return responsiveFontSizes(createTheme(theme("light")));
         }
-    }, [themeMode, prefersDarkMode]);
+    }, [themeMode, currentThemeMode]);
 
     firebaseInit();
     const session = useSession();
@@ -94,11 +94,11 @@ function MyApp(props: MyAppProps) {
                                         style: {
                                             padding: "10px",
                                             backgroundColor:
-                                                currentThemeMode() === "dark"
+                                                currentThemeMode === "dark"
                                                     ? "#353535"
                                                     : "#fff",
                                             color:
-                                                currentThemeMode() === "dark"
+                                                currentThemeMode === "dark"
                                                     ? "#fff"
                                                     : "#212121",
                                             fontWeight: 500,

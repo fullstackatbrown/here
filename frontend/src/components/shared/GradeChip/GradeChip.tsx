@@ -1,6 +1,6 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Stack, TextField, Tooltip, Typography } from "@mui/material";
-import { FC, Fragment, useEffect } from 'react';
+import { FC, Fragment, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDialog } from '../ConfirmDialog/ConfirmDialogProvider';
 
@@ -18,13 +18,14 @@ type FormData = {
 };
 
 const GradeChip: FC<GradeChipProps> = ({ score, maxScore, readOnly = true, editable = false, handleCreateGrade, handleDeleteGrade }) => {
+  const defaultValues = useMemo(() => ({ grade: score ? score.toString() : "" }), [score])
   const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
-    defaultValues: { grade: score ? score.toString() : "" }
+    defaultValues: defaultValues
   });
 
   const showDialog = useDialog();
 
-  useEffect(() => { reset({ grade: score ? score.toString() : "" }) }, [score])
+  useEffect(() => { reset(defaultValues) }, [defaultValues, reset])
 
   const onSubmit = handleSubmit(async data => {
     const grade = Number(data.grade)

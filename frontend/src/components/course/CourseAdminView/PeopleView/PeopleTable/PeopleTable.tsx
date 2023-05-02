@@ -4,7 +4,7 @@ import { sortStudentsByName } from "@util/shared/formatStudentsList";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus, CourseUserData } from 'model/course';
 import { Section } from "model/section";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import StudentDialog from "./StudentDialog";
 import { EnrolledStudentRow, InvitedStudentRow } from './StudentRow';
 
@@ -38,19 +38,13 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
     const [page, setPage] = useState(0);
     const isCourseActive = course.status === CourseStatus.CourseActive;
 
-
-    const getDisplayedStudents = () => {
+    const studentsDisplayed = useMemo(() => {
         const enrolledStudents = sortStudentsByName(students).map((student) => ({ type: "enrolled", student } as StudentRowData))
         const invitedStudentsRows = invitedStudents.map((email) => ({ type: "invited", email } as StudentRowData))
         return [...enrolledStudents, ...invitedStudentsRows]
-    }
-
-    const [studentsDisplayed, setStudentsDisplayed] = useState<StudentRowData[]>(getDisplayedStudents());
-    const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
-
-    useEffect(() => {
-        setStudentsDisplayed(getDisplayedStudents())
     }, [students, invitedStudents])
+
+    const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
 
     return (
         <>

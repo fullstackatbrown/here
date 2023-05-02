@@ -41,11 +41,6 @@ func Start() {
 		AllowCredentials: true,
 	})
 
-	// chi.Walk(router, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-	// 	fmt.Printf("[%s]: '%s' has %d middlewares\n", method, route, len(middlewares))
-	// 	return nil
-	// })
-
 	handler := c.Handler(router)
 	log.Printf("Server is listening on port %v\n", config.Config.Port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", config.Config.Port), handler))

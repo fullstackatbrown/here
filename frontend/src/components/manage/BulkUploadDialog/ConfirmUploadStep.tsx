@@ -1,5 +1,5 @@
 import { Box, Stack, TextField, Typography } from "@mui/material";
-import { SinglePermissionRequest } from "model/course";
+import { AddPermissionRequest } from "model/course";
 import { FC } from "react";
 import ConfirmUploadListItem from "./ConfirmUploadListItem";
 import { capitalizeWords } from "@util/shared/string";
@@ -7,7 +7,7 @@ import { capitalizeWords } from "@util/shared/string";
 interface ConfirmUploadStepProps {
     term: string;
     courses: Record<string, string>;
-    permissionsByCourse: Record<string, SinglePermissionRequest[]>;
+    permissionsByCourse: Record<string, AddPermissionRequest[]>;
     success: boolean;
 }
 
@@ -25,7 +25,7 @@ const ConfirmUploadStep: FC<ConfirmUploadStepProps> = ({ term, courses, permissi
             </Box>
         }
         {Object.entries(permissionsByCourse).map(([courseCode, permissions]) =>
-            <ConfirmUploadListItem courseCode={courseCode} courseTitle={courses[courseCode]} permissions={permissionsByCourse[courseCode]} />
+            <ConfirmUploadListItem key={courseCode} courseCode={courseCode} courseTitle={courses[courseCode]} permissions={permissions} />
         )}
     </Stack>
 }

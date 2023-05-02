@@ -32,8 +32,8 @@ const NotificationItem: FC<NotificationItemProps> = ({ notification }) => {
                     </Tooltip>
                 }
             >
-                <ListItemText primary={notification.Title}
-                    secondary={`${notification.Body} (${formatDistance(notification.Timestamp.toDate(), new Date(), { addSuffix: true })})`} />
+                <ListItemText primary={notification.title}
+                    secondary={`${notification.body} (${formatDistance(notification.timestamp, new Date(), { addSuffix: true })})`} />
             </ListItem>
         </Box>
     </Paper>;

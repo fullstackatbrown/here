@@ -16,7 +16,7 @@ export default function Manage() {
                             <AllCourses />
                             <AdminList />
                         </> :
-                        <Typography textAlign="center" variant="h6">Sorry, you don't have the permissions to access this page.</Typography>
+                        <Typography textAlign="center" variant="h6">Sorry, you don&apos;t have the permissions to access this page.</Typography>
                     )}
             </Stack>
         </AppLayout>

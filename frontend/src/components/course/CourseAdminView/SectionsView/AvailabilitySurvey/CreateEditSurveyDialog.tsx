@@ -13,7 +13,7 @@ import { handleBadRequestError } from "@util/errors";
 import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -32,18 +32,18 @@ type FormData = {
 };
 
 const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, survey }) => {
-    const defaultValues = {
+    const defaultValues = useMemo(() => ({
         name: survey ? survey.name : "Time Availability Survey",
         description: survey ? survey.description : "Please select all the times that you will be available.",
         enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
         endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
-    }
+    }), [survey])
 
     const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     });
 
-    useEffect(() => { reset(defaultValues) }, [survey]);
+    useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
     const onSubmit = handleSubmit(async data => {
         const endDate = new Date(data.enddate)
