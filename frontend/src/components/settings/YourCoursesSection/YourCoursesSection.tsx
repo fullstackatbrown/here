@@ -4,6 +4,7 @@ import { useCoursesByIDs } from "api/course/hooks";
 import { CoursePermission, User } from "model/user";
 import { FC } from "react";
 import CourseListItem from "../CourseListItem/CourseListItem";
+import { CourseStatus } from "model/course";
 
 export interface YourCoursesSectionProps {
     user: User;
@@ -18,6 +19,7 @@ const YourCoursesSection: FC<YourCoursesSectionProps> = ({ user }) => {
                 <Stack spacing={2}>
                     {sortCoursesByTerm(courses).map((course) => {
                         const access = user.permissions?.[course.ID] as CoursePermission || CoursePermission.CourseStudent
+                        if (access === CoursePermission.CourseStudent && course.status === CourseStatus.CourseInactive) return <></>
                         return <CourseListItem key={course.ID} {...{ course, access }} />
                     })}
                 </Stack> :
