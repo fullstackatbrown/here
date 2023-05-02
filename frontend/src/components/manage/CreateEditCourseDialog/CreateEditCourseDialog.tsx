@@ -8,12 +8,14 @@ import {
     TextField
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { formatCourseCode, formatCourseTerm } from "@util/shared/string";
+import { formatCourseCode, formatCourseTerm, parseCourseTerm } from "@util/shared/string";
 import CourseAPI from "api/course/api";
 import { Course } from "model/course";
 import { FC, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import TermTextfield from "../TermTextfield/TermTextfield";
+import { Season, getCurrentTerm } from "@util/shared/terms";
 
 export interface CreateEditCourseDialogProps {
     open: boolean;
@@ -25,17 +27,17 @@ export interface CreateEditCourseDialogProps {
 type FormData = {
     title: string;
     code: string;
-    term: string;
+    term: [Season, string];
 };
 
-const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose, course, courseTerm }) => {
+const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose, course, courseTerm = getCurrentTerm() }) => {
     const defaultValues = useMemo(() => ({
         title: course ? course.title : undefined,
         code: course ? course.code : undefined,
-        term: course ? course.term : courseTerm,
+        term: course ? parseCourseTerm(course.term) : parseCourseTerm(courseTerm),
     }), [course, courseTerm])
 
-    const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
+    const { register, handleSubmit, reset, setValue, getValues, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     });
 
@@ -77,24 +79,23 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
             <DialogTitle>{course ? "Edit" : "Create"} Course</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} my={1}>
-                    {/* TODO: better way to enter term, string is too dangerous, or find a way to validate */}
-                    <TextField
-                        {...register("term")}
-                        label="Term"
-                        type="text"
-                        fullWidth
+                    <TermTextfield
+                        term={getValues("term")}
+                        setTerm={(term: [Season, string]) => { setValue("term", term) }}
                     />
                     <TextField
                         {...register("title")}
                         label="Name"
                         type="text"
                         fullWidth
+                        required
                     />
                     <TextField
                         {...register("code")}
                         label="Course Code"
                         type="text"
                         fullWidth
+                        required
                     />
                 </Stack>
             </DialogContent>

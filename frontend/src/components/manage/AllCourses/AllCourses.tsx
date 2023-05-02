@@ -16,7 +16,7 @@ const AllCourses: FC<AllCoursesProps> = ({ }) => {
 
     return <>
         <CreateEditCourseDialog open={addCourseDialogOpen} onClose={() => setAddCourseDialogOpen(false)} />
-        <BulkUploadDialog open={bulkUploadDialogOpen} onClose={() => setBulkUploadDialogOpen(false)} />
+        {courses && <BulkUploadDialog coursesByTerm={courses} open={bulkUploadDialogOpen} onClose={() => setBulkUploadDialogOpen(false)} />}
         <Box>
             <Stack display="flex" direction="row" justifyContent="space-between" alignItems="center">
                 <Typography variant="h6" fontWeight={600} mb={1.5}>

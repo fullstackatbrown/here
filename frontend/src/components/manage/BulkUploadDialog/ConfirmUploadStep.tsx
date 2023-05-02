@@ -8,22 +8,17 @@ interface ConfirmUploadStepProps {
     term: string;
     courses: Record<string, string>;
     permissionsByCourse: Record<string, AddPermissionRequest[]>;
-    success: boolean;
 }
 
 
-const ConfirmUploadStep: FC<ConfirmUploadStepProps> = ({ term, courses, permissionsByCourse, success }) => {
+const ConfirmUploadStep: FC<ConfirmUploadStepProps> = ({ term, courses, permissionsByCourse }) => {
 
-    const displayString = `${Object.keys(permissionsByCourse).length} courses for ${capitalizeWords(term)}`
+    const numCourses = Object.keys(permissionsByCourse).length;
 
     return <Stack my={1}>
-        {
-            <Box ml={1} mb={1}>
-                {success ?
-                    <Typography fontWeight={500}>Successfully created {displayString}!</Typography> :
-                    <Typography fontWeight={500}>Creating {displayString}</Typography>}
-            </Box>
-        }
+        <Typography ml={1} mb={1} fontWeight={500}>
+            Adding staff for {numCourses} course{numCourses > 1 && "s"} for {capitalizeWords(term)}
+        </Typography>
         {Object.entries(permissionsByCourse).map(([courseCode, permissions]) =>
             <ConfirmUploadListItem key={courseCode} courseCode={courseCode} courseTitle={courses[courseCode]} permissions={permissions} />
         )}

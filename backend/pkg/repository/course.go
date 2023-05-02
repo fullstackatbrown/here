@@ -149,6 +149,27 @@ func (fr *FirebaseRepository) GetCourseByInfo(code string, term string) (*models
 			return course, nil
 		}
 	}
+
+	// if not in cache, look in firestore
+	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).
+		Where("code", "==", code).Where("term", "==", term)
+	doc, err := query.Documents(firebase.Context).GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(doc) > 0 {
+		// Should only have one course
+		var c models.Course
+		err = mapstructure.Decode(doc[0].Data(), &c)
+		if err != nil {
+			log.Panicf("Error destructuring document: %v", err)
+			return nil, err
+		}
+		c.ID = doc[0].Ref.ID
+		return &c, nil
+	}
+
 	return nil, qerrors.CourseNotFoundError
 }
 
@@ -457,25 +478,32 @@ func (fr *FirebaseRepository) assignTemporarySection(req *models.AssignSectionsR
 
 func (fr *FirebaseRepository) BulkUpload(req *models.BulkUploadRequest) error {
 	for _, r := range req.Requests {
-		// Create the course
-		course, err := fr.CreateCourse(&models.CreateCourseRequest{
-			Title: r.Title,
-			Code:  r.Code,
-			Term:  r.Term,
-		})
-
+		// Create course if course doesnt exist
+		course, err := fr.GetCourseByInfo(r.Code, r.Term)
 		if err != nil {
-			return err
+			if err != qerrors.CourseNotFoundError {
+				return err
+			}
+
+			// Course does not exist
+			course, err = fr.CreateCourse(&models.CreateCourseRequest{
+				Title: r.Title,
+				Code:  r.Code,
+				Term:  r.Term,
+			})
+			if err != nil {
+				return err
+			}
 		}
 
 		// Add permissions
-
 		for _, perm := range r.Permissions {
 			_, err = fr.AddPermissions(&models.AddPermissionRequest{
 				CourseID:   course.ID,
 				Email:      perm.Email,
 				Permission: perm.Permission,
 			})
+			// Skip if permission already exists
 			if err != nil {
 				return err
 			}

@@ -2,6 +2,13 @@
 // Season is a string with the following values: "Winter", "Fall", "Summer", "Spring"
 // Year is a string with the following format: "YYYY"
 
+export enum Season {
+    Winter = "winter",
+    Fall = "fall",
+    Summer = "summer",
+    Spring = "spring",
+}
+
 import { Course } from "model/course";
 
 function termComparator(a: string, b: string) {
@@ -53,17 +60,25 @@ export function getTerms(courses: Record<string, Course[]>): string[] {
 
 // compute current term based on current month
 export function getCurrentTerm(): string {
+    return `${getCurrentSeason()} ${getCurrentYear()}`;
+}
+
+export function getCurrentSeason(): Season {
     const date = new Date();
-    const year = date.getFullYear();
     const month = date.getMonth();
 
     if (month >= 0 && month <= 5) {
-        return `spring ${year}`;
+        return Season.Spring;
     }
     if (month >= 6 && month <= 8) {
-        return `summer ${year}`;
+        return Season.Summer;
     }
     if (month >= 9 && month <= 12) {
-        return `fall ${year}`;
+        return Season.Fall;
     }
+}
+
+export function getCurrentYear(): string {
+    const date = new Date();
+    return `${date.getFullYear()}`;
 }

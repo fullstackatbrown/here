@@ -1,36 +1,23 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { parseCourses, parseStaffData, parseTerm } from "@util/shared/parseBulkUpload";
-import { capitalizeWords } from "@util/shared/string";
+import { parseCourses, parseStaffData } from "@util/shared/parseBulkUpload";
+import { getCurrentTerm } from "@util/shared/terms";
 import CourseAPI from "api/course/api";
-import { AddPermissionRequest, createCourseAndPermissionsRequest } from "model/course";
+import { AddPermissionRequest, Course, createCourseAndPermissionsRequest } from "model/course";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
-import AddCoursesStep, { AddCoursesData } from "./AddCoursesStep";
-import AddStaffStep, { AddStaffData } from "./AddStaffStep";
+import AddCoursesStep from "./AddCoursesStep";
+import AddStaffStep from "./AddStaffStep";
 import ConfirmUploadStep from "./ConfirmUploadStep";
-
-// TODO: handle term name
+import SelectTermStep from "./SelectTermStep";
 
 export interface BulkUploadDialogProps {
     open: boolean;
     onClose: () => void;
+    coursesByTerm: Record<string, Course[]>;
 }
 
-const steps = ['Add Courses', 'Add Admin & Staff', 'Confirm'];
-
-const instructions = [
-    [
-        "Paste comma-separated values with the following schema: (course_code,course_name).",
-        "Rows with empty course codes or names will be ignored",
-    ],
-    [
-        "Paste comma-separated values with the following schema: (email,[staff/admin],course_code).",
-        "Rows with empty fields will be ignored",
-    ],
-    [],
-    []
-]
+const steps = ['Select Term', 'Add Courses', 'Add Admin & Staff', 'Confirm'];
 
 export interface BulkUploadRequest {
     term: string;
@@ -45,77 +32,72 @@ export interface BulkUploadRequest {
     };
 }
 
-
-
-const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
+const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose, coursesByTerm }) => {
     const [activeStep, setActiveStep] = useState(0);
     const [error, setError] = useState<[number, string] | undefined>(undefined);
-    const [addCoursesData, setAddCoursesData] = useState<AddCoursesData | undefined>({ term: "", data: "" });
-    const [term, setTerm] = useState<string | undefined>(undefined);
+
+    const [term, setTerm] = useState<string>(getCurrentTerm());
+    const [addCoursesData, setAddCoursesData] = useState<string>("");
+    const [addStaffData, setAddStaffData] = useState<string>("");
+
     const [courses, setCourses] = useState<Record<string, string> | undefined>(undefined);
     const [permissionsByCourse, setPermissionsByCourse] = useState<Record<string, AddPermissionRequest[]> | undefined>(undefined);
-    const [success, setSuccess] = useState<boolean>(false);
-
-    const [addStaffData, setAddStaffData] = useState<AddStaffData>({ data: "" });
 
     const theme = useTheme();
 
     const handleNext = () => { setActiveStep((prevActiveStep) => prevActiveStep + 1); };
 
-    const handleBack = () => { setActiveStep((prevActiveStep) => prevActiveStep - 1); };
+    const handleBack = () => {
+        setError(undefined);
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
 
     const reset = () => {
-        setTerm(undefined);
+        setTerm(getCurrentTerm());
         setCourses(undefined);
         setActiveStep(0);
         setError(undefined);
-        setAddCoursesData({ term: "", data: "" });
+        setAddCoursesData("");
+        setAddStaffData("");
         setPermissionsByCourse(undefined);
-        setSuccess(false);
     }
 
     const handleAddCourses = () => {
         setError(undefined)
-
-        if (addCoursesData.data === "" || addCoursesData.term === "") {
-            setError([0, "All fields must be filled out"])
-            return
-        }
-
-        const [term, termError] = parseTerm(addCoursesData!.term)
-        if (termError !== undefined) {
-            setError([0, termError])
-            return
-        }
-
-        const [courses, coursesError] = parseCourses(addCoursesData!.data)
+        const [newCourses, coursesError] = parseCourses(addCoursesData)
         if (coursesError !== undefined) {
-            setError([0, coursesError])
+            setError([1, coursesError])
             return
         }
 
-        setTerm(term)
-        setCourses(courses)
+        const numExistingCourses = coursesByTerm[term]?.length ?? 0
+        if (!(Object.keys(newCourses).length || numExistingCourses)) {
+            setError([1, "There must be at least one valid course"])
+            return
+        }
 
+        for (const courseCode in newCourses) {
+            if (coursesByTerm[term]?.find(course => course.code === courseCode)) {
+                setError([1, `Course ${courseCode} already exists`])
+                return
+            }
+        }
+
+        const allCourses = { ...coursesByTerm[term]?.reduce((acc, curr) => { acc[curr.code] = curr.title; return acc }, {}), ...newCourses }
+        setCourses(allCourses)
         handleNext()
     }
 
-    const handleValidateData = () => {
+    const handleAddStaff = () => {
         setError(undefined)
 
-        if (addStaffData.data === "") {
-            setError([1, "All fields must be filled out"])
-            return
-        }
-
-        const [permissions, error] = parseStaffData(addStaffData.data, courses!)
+        const [permissions, error] = parseStaffData(addStaffData, courses)
         if (error !== undefined) {
-            setError([1, error])
+            setError([2, error])
             return
         }
 
         setPermissionsByCourse(permissions)
-
         handleNext()
     }
 
@@ -138,8 +120,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
             error: (err) => handleBadRequestError(err)
         })
             .then(() => {
-                setSuccess(true)
-                handleClose()
+                handleClose();
             })
             .catch(() => { })
     }
@@ -147,12 +128,6 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
     const handleClose = () => {
         onClose()
         reset()
-    }
-
-    const formatCourseCodes = (courseCodes: string[]) => {
-        return courseCodes.reduce((acc, curr) => {
-            return acc + ", " + curr
-        })
     }
 
     return <Dialog
@@ -166,15 +141,9 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
         <DialogContent sx={{ minHeight: 400 }}>
             <Stepper activeStep={activeStep}>
                 {steps.map((label, index) => {
-                    const stepProps: {
-                        completed?: boolean,
-                    } = {};
-                    const labelProps: {
-                        error?: boolean;
-                    } = {};
-                    if (error?.[0] === index) {
-                        labelProps.error = true;
-                    }
+                    const stepProps: { completed?: boolean, } = {};
+                    const labelProps: { error?: boolean; } = {};
+                    if (error?.[0] === index) { labelProps.error = true; }
                     return (
                         <Step key={label} {...stepProps}>
                             <StepLabel {...labelProps}>{label}</StepLabel>
@@ -183,21 +152,13 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
                 })}
             </Stepper>
             <Box mt={3} ml={1} mb={2}>
-                {instructions[activeStep].map(
-                    (row: string) =>
-                        <Typography mb={0.5} key={row}>
-                            {row}
-                        </Typography>
-                )}
-                {activeStep === 1 &&
-                    <Typography mt={1.5} fontWeight={500}>{capitalizeWords(term)} Courses: {formatCourseCodes(Object.keys(courses!))}</Typography>
-                }
                 <Box ml={-0.5} my={2}>
                     {
                         {
-                            0: <AddCoursesStep addCoursesData={addCoursesData} setAddCoursesData={setAddCoursesData} />,
-                            1: <AddStaffStep addStaffData={addStaffData} setAddStaffData={setAddStaffData} />,
-                            2: <ConfirmUploadStep term={term!} courses={courses!} permissionsByCourse={permissionsByCourse!} success={success} />,
+                            0: <SelectTermStep {...{ term, setTerm }} />,
+                            1: <AddCoursesStep {...{ term, addCoursesData, setAddCoursesData }} courses={coursesByTerm[term] || []} />,
+                            2: <AddStaffStep {...{ term, courses, addStaffData, setAddStaffData }} />,
+                            3: <ConfirmUploadStep {...{ term, courses, permissionsByCourse }} />,
                         }[activeStep]
                     }
                 </Box>
@@ -205,16 +166,15 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose }) => {
             </Box>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between", mx: 1 }}>
-            {success ? <Box /> : <Button onClick={handleClose}>Cancel</Button>}
+            <Button onClick={handleClose}>Cancel</Button>
             <Stack direction="row" spacing={2}>
-                {!(activeStep === 0 || activeStep === steps.length - 1) && <Button onClick={handleBack} sx={{ mr: 1 }}>Back</Button>}
+                {!(activeStep === 0) && <Button onClick={handleBack} sx={{ mr: 1 }}>Back</Button>}
                 {
                     {
-                        0: <Button onClick={handleAddCourses} variant="contained">Next</Button>,
-                        1: <Button onClick={handleValidateData} variant="contained">Next</Button>,
-                        2: success ?
-                            <Button onClick={handleClose} variant="contained">Complete</Button> :
-                            <Button onClick={handleConfirmUpload} variant="contained">Confirm Upload</Button>,
+                        0: <Button onClick={handleNext} variant="contained">Next</Button>,
+                        1: <Button onClick={handleAddCourses} variant="contained">Next</Button>,
+                        2: <Button onClick={handleAddStaff} variant="contained">Next</Button>,
+                        3: <Button onClick={handleConfirmUpload} variant="contained">Confirm Upload</Button>,
                     }[activeStep]
                 }
             </Stack>
