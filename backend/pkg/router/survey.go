@@ -76,32 +76,20 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	req.SurveyID = &surveyID
 	req.CourseID = &courseID
 
-	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	// Get all the section times
-	sections, err := repo.Repository.GetSectionByCourse(*req.CourseID)
+	_, err = repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	capacity, err := models.GetUniqueSectionTimes(sections)
+	err = repo.Repository.UpdateSurvey(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = repo.Repository.UpdateSurvey(req, capacity)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, survey)
-
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully updated survey " + surveyID))
 }
 
 func deleteSurveyHandler(w http.ResponseWriter, r *http.Request) {

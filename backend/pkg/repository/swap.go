@@ -13,7 +13,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func (fr *FirebaseRepository) initializePendingSwapsListener(course *models.Course, courseID string) error {
+// CoursesLock should be locked on entry
+func (fr *FirebaseRepository) initializePendingSwapsListener(course *models.Course) error {
 	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
 		newSwaps := make(map[string]*models.Swap)
 		for _, doc := range docs {
@@ -42,7 +43,7 @@ func (fr *FirebaseRepository) initializePendingSwapsListener(course *models.Cour
 
 	done := make(chan func())
 	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
-		courseID).Collection(models.FirestoreSwapsCollection).Query.Where("status", "==", models.STATUS_PENDING)
+		course.ID).Collection(models.FirestoreSwapsCollection).Query.Where("status", "==", models.STATUS_PENDING)
 	go func() {
 		err := fr.createCollectionInitializer(query, &done, handleDocs)
 		if err != nil {

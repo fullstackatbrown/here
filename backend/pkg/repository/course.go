@@ -41,34 +41,44 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 
 		oldCourses := fr.courses
 
-		fr.courses = newCourses
-		fr.coursesEntryCodes = newCoursesEntryCodes
-
-		// If a course is newly added to the list (e.g. just set to active), initialize the sections and assignments listeners
-		for courseID, course := range fr.courses {
+		for courseID, course := range newCourses {
 			if _, ok := oldCourses[courseID]; !ok {
-				log.Printf("Initializing listeners for course %s", courseID)
-				err := fr.initializeSectionsListener(course, courseID)
+				// For newly added courses (e.g. just set to active), initialize the sections and assignments listeners
+				fr.courses[courseID] = course
+				fr.coursesEntryCodes[course.EntryCode] = course
+				log.Printf("Initializing listeners for course %s with address %p", course.Code, course)
+				err := fr.initializeSectionsListener(course)
 				if err != nil {
-					return fmt.Errorf("error initializing sections listener for course %s: %v", courseID, err)
+					return fmt.Errorf("error initializing sections listener for course %s: %v", course.Code, err)
 				}
-				err = fr.initializeAssignmentsListener(course, courseID)
+				err = fr.initializeAssignmentsListener(course)
 				if err != nil {
-					return fmt.Errorf("error initializing assignments listener for course %s: %v", courseID, err)
+					return fmt.Errorf("error initializing assignments listener for course %s: %v", course.Code, err)
 				}
-				err = fr.initializePendingSwapsListener(course, courseID)
+				err = fr.initializePendingSwapsListener(course)
 				if err != nil {
-					return fmt.Errorf("error initializing pending swaps listener for course %s: %v", courseID, err)
+					return fmt.Errorf("error initializing pending swaps listener for course %s: %v", course.Code, err)
+				}
+			} else {
+				// For existing courses, update the existing course with the new data
+				err := utils.UpdateStruct(oldCourses[courseID], course, models.CourseFieldsToExclude)
+				if err != nil {
+					return fmt.Errorf("error updating for course %s", course.Code)
 				}
 			}
 		}
 
-		// If a course is newly removed from the list (e.g. just set to inactive), cancel the sections and assignments listeners
+		// If a course is newly removed from the list (e.g. just set to inactive),
+		// cancel the sections and assignments listeners
+		// remove the course from the courses map
 		for id, course := range oldCourses {
-			if _, ok := fr.courses[id]; !ok {
-				log.Printf("Cancelling listeners for course %s", id)
+			if _, ok := newCourses[id]; !ok {
+				log.Printf("Cancelling listeners for course %s", course.Code)
 				course.SectionsListenerCancelFunc()
 				course.AssignmentsListenerCancelFunc()
+				course.PendingSwapsListenerCancelFunc()
+				delete(fr.courses, id)
+				delete(fr.coursesEntryCodes, course.EntryCode)
 			}
 		}
 
@@ -217,6 +227,8 @@ func (fr *FirebaseRepository) DeleteCourse(req *models.DeleteCourseRequest) erro
 	if err != nil {
 		return err
 	}
+
+	// TODO: delete permissions for the course from users
 
 	// Delete all invites for the course
 	iter := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Where("courseID", "==", req.CourseID).Documents(firebase.Context)
