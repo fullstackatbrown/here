@@ -1,14 +1,16 @@
 import { Section } from "model/section";
 import { formatSectionTime } from "./formatTime";
 
-export default function formatSectionInfo(section: Section, abbreviated = false): string {
+export default function formatSectionInfo(section: Section, abbreviated = false, withCapacity = false): string {
     if (section === undefined) {
         return "section not found";
     }
     const timeFormatted = formatSectionTime(section, abbreviated);
     const location = section.location !== "" ? ` @ ${section.location}` : "";
 
-    return timeFormatted + location
+    const capacity = withCapacity ? ` (${section.capacity - section.numEnrolled} seats available)` : "";
+
+    return timeFormatted + location + capacity
 }
 
 export function getSectionAvailableSeats(section: Section, assignmentID: string = undefined): number {

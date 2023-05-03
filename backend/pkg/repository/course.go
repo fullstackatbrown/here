@@ -378,13 +378,14 @@ func (fr *FirebaseRepository) assignPermanentSection(req *models.AssignSectionsR
 	}
 
 	oldSectionID := course.Students[req.StudentID].DefaultSection
+	_, sectionNotExistErr := fr.GetSectionByID(req.CourseID, oldSectionID)
 
 	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID),
 		[]firestore.Update{
 			{Path: "students." + req.StudentID + ".defaultSection", Value: req.NewSectionID},
 		})
 
-	if oldSectionID != "" {
+	if oldSectionID != "" && sectionNotExistErr == nil {
 		batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
 			req.CourseID).Collection(models.FirestoreSectionsCollection).Doc(oldSectionID), []firestore.Update{
 			{Path: "numEnrolled", Value: firestore.Increment(-1)},

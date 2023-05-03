@@ -1,9 +1,8 @@
-import { Box, Button, Card, Paper, Stack, Typography } from "@mui/material";
-import { useSurvey } from "api/surveys/hooks";
+import { Box, Button, Stack, Tooltip, Typography } from "@mui/material";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CreateSurveyDialog from "./CreateEditSurveyDialog";
 import SurveyCard from "./SurveyCard";
 import SurveyDialog from "./SurveyDialog";
@@ -11,11 +10,11 @@ import SurveyDialog from "./SurveyDialog";
 export interface AvailabilitySurveyProps {
   course: Course;
   sections: Section[];
+  survey: Survey;
 }
 
-export default function AvailabilitySurvey({ course, sections }: AvailabilitySurveyProps) {
+export default function AvailabilitySurvey({ course, sections, survey }: AvailabilitySurveyProps) {
   const [createSurveyDialog, setCreateSurveyDialog] = useState(false);
-  const [survey, loading] = useSurvey(course.ID || undefined);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const isCourseActive = course.status === CourseStatus.CourseActive;
 
@@ -43,7 +42,21 @@ export default function AvailabilitySurvey({ course, sections }: AvailabilitySur
         <Typography variant="h6" fontWeight={600}>
           Availability Survey
         </Typography>
-        {!survey && <Button disabled={!isCourseActive} onClick={() => setCreateSurveyDialog(true)}>+ Create Survey</Button>}
+        {!survey &&
+          <Tooltip
+            title="Enabled after creating sections"
+            disableHoverListener={sections.length > 0}
+            disableFocusListener={sections.length > 0}
+            placement="right"
+          >
+            <span>
+              <Button disabled={!isCourseActive || sections.length === 0} onClick={() => setCreateSurveyDialog(true)}>
+                + Create Survey
+              </Button>
+            </span>
+          </Tooltip>
+
+        }
       </Stack>
       <Box height={100}>
         {survey && (

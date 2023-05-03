@@ -7,6 +7,7 @@ import AdminViewHeader from "../AdminViewHeader";
 import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
+import { useSurvey } from "api/surveys/hooks";
 
 export interface SectionsViewProps {
   course: Course;
@@ -20,6 +21,7 @@ const SectionsView: FC<SectionsViewProps> = ({
   sectionsMap,
 }) => {
   const sections = Object.values(sectionsMap);
+  const [survey, surveyLoading] = useSurvey(course.ID || undefined);
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
 
   return (
@@ -58,8 +60,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         ))}
       </Stack>
       {access === CoursePermission.CourseAdmin &&
-        sections &&
-        sections.length > 0 && <AvailabilitySurvey {...{ course, sections }} />}
+        !surveyLoading && <AvailabilitySurvey {...{ course, sections, survey }} />}
     </>
   );
 };

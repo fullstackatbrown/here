@@ -10,6 +10,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
+	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -138,7 +139,35 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 
 func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) error {
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return err
+	}
+
+	section, err := fr.GetSectionByID(req.CourseID, req.SectionID)
+	if err != nil {
+		return err
+	}
+
+	// Remove all students currently enrolled in the section
+	if section.NumEnrolled > 0 {
+		for _, student := range course.Students {
+			if student.DefaultSection == req.SectionID {
+				err := fr.RemoveStudentFromSection(&models.AssignSectionsRequest{
+					CourseID:     req.CourseID,
+					StudentID:    student.StudentID,
+					OldSectionID: req.SectionID,
+				})
+				// TODO: send notification
+				if err != nil {
+					glog.Warningf("Error removing student %s from section %s: %v", student.StudentID, req.SectionID, err)
+				}
+			}
+		}
+	}
+
+	// Delete the section
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
 		models.FirestoreSectionsCollection).Doc(req.SectionID).Delete(firebase.Context)
 
 	return err

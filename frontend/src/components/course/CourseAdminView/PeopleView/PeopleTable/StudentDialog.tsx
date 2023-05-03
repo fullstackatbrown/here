@@ -70,9 +70,8 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
     const formatOptions = (val: string | undefined) => {
         if (val === UNASSIGNED || val === undefined) return UNASSIGNED
         const section = sectionsMap[val] as Section
-        const seatsAvail = section.capacity - section.numEnrolled
         const current = val === defaultSectionID()
-        return `${formatSectionInfo(section, true)} (${current ? "current" : seatsAvail + " seats available"})`
+        return current ? `${formatSectionInfo(section, true)} (current)` : formatSectionInfo(section, true, true)
     }
 
     const openEditMode = () => {
@@ -100,7 +99,7 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
                 closeEditMode()
                 setStudent({ ...student, defaultSections: { ...student?.defaultSections, [course.ID]: newSectionID } })
             })
-            .catch()
+            .catch(() => { })
     }
 
     return student ?
