@@ -4,6 +4,7 @@ import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusCh
 import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { useGoogleLogin } from '@react-oauth/google';
 import { handleBadRequestError } from "@util/errors";
 import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
@@ -54,6 +55,13 @@ export default function SettingsView({ course }: SettingsViewProps) {
             severity: "success",
         });
     }
+
+    const handleAuthorizeGCal = useGoogleLogin({
+        onSuccess: codeResponse => console.log(codeResponse),
+        onError: error => console.log(error),
+        flow: 'auth-code',
+        scope: 'https://www.googleapis.com/auth/calendar.events',
+    });
 
     return (
         <>
@@ -110,6 +118,21 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     </Stack>
                     <Button disabled={!isCourseActive} variant="outlined" onClick={() => changeAutoApproveRequests()}>
                         Turn {course.autoApproveRequests ? "Off" : "On"}
+                    </Button>
+                </Stack>
+                <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    alignItems={{ xs: "start", md: "center" }}
+                    justifyContent="space-between"
+                    spacing={2}
+                >
+                    <Stack direction="column" maxWidth={{ md: "70%" }} spacing={0.5}>
+                        <Typography fontWeight={500} whiteSpace="pre">
+                            Test OAuth
+                        </Typography>
+                    </Stack>
+                    <Button variant="outlined" onClick={handleAuthorizeGCal}>
+                        Authorize
                     </Button>
                 </Stack>
 
