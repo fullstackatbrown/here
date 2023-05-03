@@ -224,15 +224,17 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 }
 
 func (fr *FirebaseRepository) DeleteCourse(req *models.DeleteCourseRequest) error {
-	// 1. First delete the course from all students currently registered for the course
-	// 2. Delete the course
-	// 3. Delete all relevant invites
+	// 1. Delete the course from all students currently registered for the course
+	// 2. Delete the course from all staff and admin with permissions
+	// 3. Delete the course
+	// 4. Delete all relevant invites
 	course, err := fr.GetCourseByID(req.CourseID)
 	if err != nil {
 		return err
 	}
 
-	for studentID, _ := range course.Students {
+	// Delete course from students
+	for studentID := range course.Students {
 		studentRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(studentID)
 		_, err := studentRef.Update(firebase.Context, []firestore.Update{
 			{Path: "courses", Value: firestore.ArrayRemove(req.CourseID)},
@@ -244,12 +246,21 @@ func (fr *FirebaseRepository) DeleteCourse(req *models.DeleteCourseRequest) erro
 		}
 	}
 
+	// Delete course from staff and admin
+	for userID := range course.Permissions {
+		userRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(userID)
+		_, err := userRef.Update(firebase.Context, []firestore.Update{
+			{Path: "permissions." + req.CourseID, Value: firestore.Delete},
+		})
+		if err != nil {
+			glog.Warningf("Error removing course from user %s: %v", userID, err)
+		}
+	}
+
 	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Delete(firebase.Context)
 	if err != nil {
 		return err
 	}
-
-	// TODO: delete permissions for the course from users
 
 	// Delete all invites for the course
 	iter := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Where("courseID", "==", req.CourseID).Documents(firebase.Context)
