@@ -5,7 +5,8 @@ import {
     Checkbox, Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, FormControlLabel, Stack, Typography
+    DialogTitle, FormControlLabel, Stack,
+    Typography
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
@@ -34,7 +35,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
     }
 
     async function onSubmit() {
-        if (preview) {
+        if (preview && !survey.published) {
             if (new Date(survey.endTime) < new Date()) {
                 alert("This survey's end time is in the past. Please edit before publishing.");
                 onClose();
@@ -85,7 +86,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
     }
 
     return <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" keepMounted={false}>
-        <DialogTitle>{survey.name}{preview && " (Preview)"}</DialogTitle>
+        <DialogTitle>{survey.name}{preview && (survey.published ? " (Published)" : " (Preview)")}</DialogTitle>
         <DialogContent>
             <Typography variant="body1" mb={1}> {survey.description} </Typography>
             <Typography variant="body1" mb={2}> This survey will end on&nbsp;
@@ -104,7 +105,9 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
         </DialogContent>
         <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={onSubmit} variant="contained">{preview ? "Publish" : "Submit"}</Button>
+            <Button disabled={preview && survey.published} onClick={onSubmit} variant="contained">
+                {preview ? "Publish" : "Submit"}
+            </Button>
         </DialogActions>
     </Dialog>;
 };

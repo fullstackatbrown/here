@@ -1,6 +1,8 @@
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import ClearIcon from "@mui/icons-material/Clear";
 import CreateIcon from "@mui/icons-material/Create";
-import { Box, Card, IconButton, Stack, Typography } from "@mui/material";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Box, Card, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import SurveyAPI from "api/surveys/api";
 import { Section } from "model/section";
@@ -10,8 +12,6 @@ import toast from "react-hot-toast";
 import CreateSurveyDialog from "./CreateEditSurveyDialog";
 import SurveyDialog from "./SurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
-import { CourseStatus } from "model/course";
-import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 
 export interface SurveyCardProps {
   survey: Survey;
@@ -27,12 +27,12 @@ export interface SurveyCardProps {
 const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active }) => {
   const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
-  const [surveyResponsesDialog, setSUrveyResponsesDialog] = useState(false);
+  const [surveyResponsesDialog, setSurveyResponsesDialog] = useState(false);
   const showDialog = useDialog();
 
   const handleClick = () => {
     if (survey.published) {
-      setSUrveyResponsesDialog(true);
+      setSurveyResponsesDialog(true);
     } else {
       setSurveyPreviewDialog(true);
     }
@@ -65,6 +65,11 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
     setUpdateSurveyDialog(true);
   };
 
+  const handleShowPreview = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setSurveyPreviewDialog(true);
+  };
+
   const getNumResponses = () => (survey.responses ? Object.keys(survey.responses).length : 0);
 
   return (
@@ -78,7 +83,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
       <SurveyResponsesDialog
         open={surveyResponsesDialog}
-        onClose={() => setSUrveyResponsesDialog(false)}
+        onClose={() => setSurveyResponsesDialog(false)}
         survey={survey}
         numStudents={numStudents}
         sections={sections}
@@ -95,6 +100,13 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
           </Stack>
 
           <Stack direction={{ xs: "column", md: "row" }}>
+            {survey.published &&
+              <Tooltip title="Preview">
+                <IconButton onClick={handleShowPreview} size={"small"} disabled={!active} sx={{ marginRight: 0.5, marginTop: 0.3 }}>
+                  <VisibilityIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            }
             <IconButton onClick={handleUpdateSurvey} size={"small"} disabled={!active}>
               <CreateIcon fontSize="small" />
             </IconButton>
