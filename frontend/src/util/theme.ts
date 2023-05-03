@@ -1,5 +1,5 @@
-import {red} from '@mui/material/colors';
-import {ThemeOptions} from "@mui/material";
+import { red } from '@mui/material/colors';
+import { ThemeOptions } from "@mui/material";
 
 const theme = (mode: "light" | "dark"): ThemeOptions => {
     return {
