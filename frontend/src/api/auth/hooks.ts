@@ -112,16 +112,15 @@ export function useUser(
 }
 
 /** useAdmins is a hook that fetches all admins. */
-// TODO(n-young): should use a query.
 export function useAdmins(): [User[] | undefined, boolean] {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState<User[] | undefined>(undefined);
 
     useEffect(() => {
         const db = getFirestore();
-        const unsubscribe = onSnapshot(
-            collection(db, FirestoreProfilesCollection),
-            (querySnapshot) => {
+        const unsubscribe = onSnapshot(query(collection(db, FirestoreProfilesCollection),
+            where("isAdmin", "==", true))
+            , (querySnapshot) => {
                 const res: User[] = [];
                 querySnapshot.forEach((doc) => {
                     if (doc.data().isAdmin)
