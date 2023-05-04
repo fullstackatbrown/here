@@ -73,13 +73,7 @@ func (fr *FirebaseRepository) CreateSurvey(req *models.CreateSurveyRequest) (*mo
 	}
 
 	// Get all the sections
-	sections, err := fr.GetSectionByCourse(req.CourseID)
-	if err != nil {
-		return nil, fmt.Errorf("Error getting sections: %v", err)
-	}
-
-	// Get all unique section times
-	capacity, err := models.GetUniqueSectionTimes(sections)
+	capacity, err := fr.GetUniqueSectionTimes(req.CourseID)
 	if err != nil {
 		return nil, fmt.Errorf("Error getting unique section times: %v", err)
 	}
@@ -122,14 +116,8 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 		}
 	}
 
-	// Get all the sections
-	sections, err := fr.GetSectionByCourse(*req.CourseID)
-	if err != nil {
-		return fmt.Errorf("Error getting sections: %v", err)
-	}
-
 	// Get all unique section times
-	capacity, err := models.GetUniqueSectionTimes(sections)
+	capacity, err := fr.GetUniqueSectionTimes(*req.CourseID)
 	if err != nil {
 		return fmt.Errorf("Error getting unique section times: %v", err)
 	}

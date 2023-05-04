@@ -75,21 +75,33 @@ func (fr *FirebaseRepository) GetSectionByID(courseID string, sectionID string) 
 	return section, nil
 }
 
-func (fr *FirebaseRepository) GetSectionByCourse(courseID string) ([]*models.Section, error) {
+// Returns a map from a unique time, to a map from section id (that has the time) to capacity
+func (fr *FirebaseRepository) GetUniqueSectionTimes(courseID string) (map[string]map[string]int, error) {
 	course, err := fr.GetCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
 
+	capacity := make(map[string]map[string]int)
+
 	course.SectionsLock.RLock()
 	defer course.SectionsLock.RUnlock()
-	// TODO: lock
-	sections := make([]*models.Section, 0)
+
 	for _, section := range course.Sections {
-		sections = append(sections, section)
+		t := fmt.Sprintf("%s,%s,%s", section.Day, section.StartTime, section.EndTime)
+
+		_, ok := capacity[t]
+		if !ok {
+			capacity[t] = make(map[string]int)
+		}
+		_, ok = capacity[t][section.ID]
+		if !ok {
+			capacity[t][section.ID] = 0
+		}
+		capacity[t][section.ID] += section.Capacity
 	}
 
-	return sections, nil
+	return capacity, nil
 }
 
 func (fr *FirebaseRepository) GetSectionByInfo(courseID string, startTime string, endTime string, location string) (*models.Section, error) {
