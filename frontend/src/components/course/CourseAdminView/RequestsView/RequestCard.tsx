@@ -11,9 +11,10 @@ import { CourseUserData } from "model/course";
 import { Section } from "model/section";
 import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
-import RequestInformation from "../RequestInformation";
+import RequestInformation from "./RequestInformation";
+import RequestStatusChip from "./RequestStatusChip";
 
-export interface PendingRequestProps {
+export interface RequestCardProps {
   active: boolean;
   request: Swap;
   student: CourseUserData;
@@ -23,7 +24,7 @@ export interface PendingRequestProps {
   handleSwap: (request: Swap, status: SwapStatus) => void;
 }
 
-const PendingRequest: FC<PendingRequestProps> = ({
+const RequestCard: FC<RequestCardProps> = ({
   active,
   request,
   student,
@@ -58,16 +59,21 @@ const PendingRequest: FC<PendingRequestProps> = ({
           <Stack direction="row" spacing={4} alignItems="center" py={{ xs: 1, md: 0.5 }}>
             <Stack direction="row" spacing={1} minWidth={{ md: 280 }} alignItems="center">
               <Box width={17} display="flex" alignItems="center">
-                {expanded ? (
-                  <ExpandMore sx={{ fontSize: 16 }} />
-                ) : (
+                {expanded ?
+                  <ExpandMore sx={{ fontSize: 16 }} /> :
                   <KeyboardArrowRightIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-                )}
+                }
               </Box>
               {/* TODO: handle exceptionally long string */}
               <Typography sx={{ fontSize: 15 }}>
                 {request.studentName} - {assignment ? "One Time" : "Permanent"}{!student && " (no longer enrolled)"}
               </Typography>
+              {request.status !== SwapStatus.Pending &&
+                <RequestStatusChip
+                  status={request.status}
+                  style={{ marginRight: "auto" }}
+                />
+              }
             </Stack>
             {!expanded && !isXsScreen && student && (
               <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
@@ -83,7 +89,7 @@ const PendingRequest: FC<PendingRequestProps> = ({
             )}
           </Stack>
           <Box display="flex" width={80} justifyContent="flex-end">
-            {(hover || expanded) && active ? (
+            {(request.status === SwapStatus.Pending && (hover || expanded) && active) ? (
               <Stack direction="row" display="flex" alignItems="center" spacing={{ xs: 0.5, md: 0 }}>
                 <Tooltip title="approve" disableTouchListener>
                   <IconButton
@@ -126,4 +132,4 @@ const PendingRequest: FC<PendingRequestProps> = ({
   );
 };
 
-export default PendingRequest;
+export default RequestCard;
