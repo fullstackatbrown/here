@@ -340,6 +340,14 @@ func (fr *FirebaseRepository) RemoveStudentFromSection(req *models.AssignSection
 	return err
 }
 
+func (fr *FirebaseRepository) SetGapiToken(courseID string, accessToken string, refreshToken string) error {
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Update(firebase.Context, []firestore.Update{
+		{Path: "gapiAccessToken", Value: accessToken},
+		{Path: "gapiRefreshToken", Value: refreshToken},
+	})
+	return err
+}
+
 // Helpers
 func (fr *FirebaseRepository) approveSwap(courseID string, swap *models.Swap) (batch *firestore.WriteBatch, err error) {
 	if swap.AssignmentID == "" {

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"net/http"
 	"strings"
 	"sync"
 )
@@ -38,6 +39,10 @@ type Course struct {
 	PendingSwapsLock               sync.RWMutex     `firestore:"-"`
 	PendingSwaps                   map[string]*Swap `firestore:"-"`
 	PendingSwapsListenerCancelFunc func()           `firestore:"-"`
+
+	GapiRefreshToken string       `firestore:"gapiRefreshToken,omitempty"`
+	GapiAccessToken  string       `firestore:"gapiAccessToken,omitempty"`
+	GapiClient       *http.Client `firestore:"-"`
 }
 
 type CourseStatus string

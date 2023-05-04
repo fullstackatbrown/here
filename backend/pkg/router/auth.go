@@ -226,10 +226,23 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: Include courseID in state
 	// TODO: Check OAuth state
 	code := r.URL.Query().Get("code")
 	state := r.URL.Query().Get("state")
 	fmt.Println(state)
+
+	type State struct {
+		RedirectUrl string `json:"redirectUrl"`
+		CourseID    string `json:"courseID"`
+	}
+
+	var stateObj State
+	err := json.Unmarshal([]byte(state), &stateObj)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	token, err := config.Config.OAuthConfig.Exchange(context.Background(), code)
 	if err != nil {
@@ -238,12 +251,21 @@ func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("courseID:" + stateObj.CourseID)
 	fmt.Println("accesstoken: " + token.AccessToken)
 	fmt.Println("refreshtoken: " + token.RefreshToken)
 
-	// TODO: Store refresh token in database
+	// err = repo.Repository.SetGapiToken(, token.AccessToken, token.RefreshToken)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
-	http.Redirect(w, r, state, http.StatusPermanentRedirect)
+	// Initiate Gapi client
+	// gapiClient := config.Config.OAuthConfig.Client(context.Background(), token)
+
+	// Redirect to course page
+	http.Redirect(w, r, stateObj.RedirectUrl, http.StatusPermanentRedirect)
 }
 
 // POST: /signout
