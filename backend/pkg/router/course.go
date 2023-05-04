@@ -17,6 +17,7 @@ func CourseRoutes() *chi.Mux {
 	router.Use(middleware.AuthCtx())
 	router.With(middleware.RequireAdmin()).Post("/", createCourseHandler)
 	router.With(middleware.RequireAdmin()).Post("/bulkUpload", bulkUploadHandler)
+	router.With(middleware.RequireAdmin()).HandleFunc("/gapi/authorizeCallback", authorizeGapiCallbackHandler)
 
 	router.Route("/{courseID}", func(r chi.Router) {
 		r.Use(middleware.CourseCtx())
@@ -35,6 +36,7 @@ func CourseRoutes() *chi.Mux {
 		r.Mount("/swaps", SwapRoutes())
 		r.Mount("/surveys", SurveyRoutes())
 		r.Mount("/permissions", PermissionRoutes())
+		r.Mount("/gapi", GapiRoutes())
 	})
 
 	return router

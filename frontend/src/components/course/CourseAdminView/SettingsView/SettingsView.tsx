@@ -15,7 +15,6 @@ import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import AdminViewHeader from "../AdminViewHeader";
-import AuthAPI from "api/auth/api";
 
 export interface SettingsViewProps {
     course: Course;
@@ -59,7 +58,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
     }
 
     function handleAuthorizeGCal() {
-        AuthAPI.authorizeGcal(course.ID, `${process.env.NEXT_PUBLIC_CLIENT_URL}/course/${course.ID}?view=settings`)
+        CourseAPI.authorizeGapi(course.ID, `${process.env.NEXT_PUBLIC_CLIENT_URL}/course/${course.ID}?view=settings`)
     }
 
     return (

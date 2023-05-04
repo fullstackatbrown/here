@@ -14,6 +14,7 @@ import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AdminViewHeader from "../AdminViewHeader";
 import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
+import CourseAPI from "api/course/api";
 
 export interface PeopleViewProps {
   course: Course;
@@ -63,6 +64,11 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     exportStudentList(course, sectionsMap, invitedStudents)
   }
 
+  const handleSendEmailInvite = () => {
+    CourseAPI.sendEmail(course.ID)
+
+  }
+
   const hasNoStudent = () => {
     return (!course.students || Object.keys(course.students).length === 0) && (invitedStudents.length === 0)
   }
@@ -83,7 +89,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
               defaultValue={ALL_STUDENTS}
             />
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List"]} handlers={[handleAddStudent, handleExportStudentList]} />}
+            {access === CoursePermission.CourseAdmin && <MoreMenu keys={["Add Student", "Export Student List", "Send Email Invite"]} handlers={[handleAddStudent, handleExportStudentList, handleSendEmailInvite]} />}
           </Stack>
         }
       />

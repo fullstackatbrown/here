@@ -1,9 +1,7 @@
 package router
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -43,7 +41,6 @@ func AuthRoutes() *chi.Mux {
 
 	// Alter the current session. No auth middlewares required.
 	router.Post("/session", createSessionHandler)
-	router.HandleFunc("/authorizeGapi/callback", authorizeGapiCallbackHandler)
 	router.Post("/signout", signOutHandler)
 
 	return router
@@ -223,49 +220,6 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("success"))
 	return
-}
-
-func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Include courseID in state
-	// TODO: Check OAuth state
-	code := r.URL.Query().Get("code")
-	state := r.URL.Query().Get("state")
-	fmt.Println(state)
-
-	type State struct {
-		RedirectUrl string `json:"redirectUrl"`
-		CourseID    string `json:"courseID"`
-	}
-
-	var stateObj State
-	err := json.Unmarshal([]byte(state), &stateObj)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	token, err := config.Config.OAuthConfig.Exchange(context.Background(), code)
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Println("courseID:" + stateObj.CourseID)
-	fmt.Println("accesstoken: " + token.AccessToken)
-	fmt.Println("refreshtoken: " + token.RefreshToken)
-
-	// err = repo.Repository.SetGapiToken(, token.AccessToken, token.RefreshToken)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// Initiate Gapi client
-	// gapiClient := config.Config.OAuthConfig.Client(context.Background(), token)
-
-	// Redirect to course page
-	http.Redirect(w, r, stateObj.RedirectUrl, http.StatusPermanentRedirect)
 }
 
 // POST: /signout

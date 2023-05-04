@@ -7,11 +7,13 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
+	"github.com/fullstackatbrown/here/pkg/gapi"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/iterator"
 )
 
@@ -340,12 +342,28 @@ func (fr *FirebaseRepository) RemoveStudentFromSection(req *models.AssignSection
 	return err
 }
 
-func (fr *FirebaseRepository) SetGapiToken(courseID string, accessToken string, refreshToken string) error {
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Update(firebase.Context, []firestore.Update{
-		{Path: "gapiAccessToken", Value: accessToken},
-		{Path: "gapiRefreshToken", Value: refreshToken},
-	})
-	return err
+func (fr *FirebaseRepository) SetGapiClient(courseID string, token *oauth2.Token) error {
+	client := gapi.GetClient(token)
+	fmt.Println(client)
+
+	course, err := fr.GetCourseByID(courseID)
+	if err != nil {
+		return err
+	}
+
+	course.GapiLock.Lock()
+	defer course.GapiLock.Unlock()
+	course.GapiToken = token
+	course.GapiClient = client
+
+	return nil
+	// TODO: Encryption
+
+	// _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Update(firebase.Context, []firestore.Update{
+	// 	{Path: "gapiAccessToken", Value: accessToken},
+	// 	{Path: "gapiRefreshToken", Value: refreshToken},
+	// })
+	// return err
 }
 
 // Helpers

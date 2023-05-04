@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+
+	"golang.org/x/oauth2"
 )
 
 const (
@@ -15,6 +17,7 @@ var CourseFieldsToExclude = []string{
 	"Sections", "SectionsLock", "SectionsListenerCancelFunc",
 	"Assignments", "AssignmentsLock", "AssignmentsListenerCancelFunc",
 	"PendingSwaps", "PendingSwapsLock", "PendingSwapsListenerCancelFunc",
+	"GapiClient", "GapiLock", "GapiToken",
 }
 
 type Course struct {
@@ -40,9 +43,9 @@ type Course struct {
 	PendingSwaps                   map[string]*Swap `firestore:"-"`
 	PendingSwapsListenerCancelFunc func()           `firestore:"-"`
 
-	GapiRefreshToken string       `firestore:"gapiRefreshToken,omitempty"`
-	GapiAccessToken  string       `firestore:"gapiAccessToken,omitempty"`
-	GapiClient       *http.Client `firestore:"-"`
+	GapiLock   sync.RWMutex  `firestore:"-"`
+	GapiToken  *oauth2.Token `firestore:"-"`
+	GapiClient *http.Client  `firestore:"-"`
 }
 
 type CourseStatus string
