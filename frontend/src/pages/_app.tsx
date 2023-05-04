@@ -17,7 +17,6 @@ import { useSession, AuthProvider } from "api/auth/hooks";
 import { ThemeMode, ThemeModeProvider } from "@util/mui/useThemeMode";
 import DialogProvider from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import SnackbarProvider from "@components/shared/Snackbar/SnackbarProvider";
-import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -74,52 +73,48 @@ function MyApp(props: MyAppProps) {
     if (session.loading) return null;
 
     return (
-        <GoogleOAuthProvider
-            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-        >
-            <AuthProvider value={session}>
-                <CacheProvider value={emotionCache}>
-                    <ThemeModeProvider
-                        value={[themeMode!, setThemeMode, prefersDarkMode]}
-                    >
-                        <Head>
-                            <title>Here</title>
-                            <meta
-                                name="viewport"
-                                content="minimum-scale=1, initial-scale=1, width=device-width"
-                            />
-                        </Head>
-                        <ThemeProvider theme={muiTheme}>
-                            <DialogProvider>
-                                <SnackbarProvider>
-                                    <CssBaseline />
-                                    <Toaster
-                                        toastOptions={{
-                                            style: {
-                                                padding: "10px",
-                                                backgroundColor:
-                                                    currentThemeMode === "dark"
-                                                        ? "#353535"
-                                                        : "#fff",
-                                                color:
-                                                    currentThemeMode === "dark"
-                                                        ? "#fff"
-                                                        : "#212121",
-                                                fontWeight: 500,
-                                            },
-                                        }}
-                                        containerStyle={{
-                                            top: 9,
-                                        }}
-                                    />
-                                    <Component {...pageProps} />
-                                </SnackbarProvider>
-                            </DialogProvider>
-                        </ThemeProvider>
-                    </ThemeModeProvider>
-                </CacheProvider>
-            </AuthProvider>
-        </GoogleOAuthProvider>
+        <AuthProvider value={session}>
+            <CacheProvider value={emotionCache}>
+                <ThemeModeProvider
+                    value={[themeMode!, setThemeMode, prefersDarkMode]}
+                >
+                    <Head>
+                        <title>Here</title>
+                        <meta
+                            name="viewport"
+                            content="minimum-scale=1, initial-scale=1, width=device-width"
+                        />
+                    </Head>
+                    <ThemeProvider theme={muiTheme}>
+                        <DialogProvider>
+                            <SnackbarProvider>
+                                <CssBaseline />
+                                <Toaster
+                                    toastOptions={{
+                                        style: {
+                                            padding: "10px",
+                                            backgroundColor:
+                                                currentThemeMode === "dark"
+                                                    ? "#353535"
+                                                    : "#fff",
+                                            color:
+                                                currentThemeMode === "dark"
+                                                    ? "#fff"
+                                                    : "#212121",
+                                            fontWeight: 500,
+                                        },
+                                    }}
+                                    containerStyle={{
+                                        top: 9,
+                                    }}
+                                />
+                                <Component {...pageProps} />
+                            </SnackbarProvider>
+                        </DialogProvider>
+                    </ThemeProvider>
+                </ThemeModeProvider>
+            </CacheProvider>
+        </AuthProvider>
     );
 }
 

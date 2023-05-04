@@ -4,8 +4,9 @@ import urls from "@util/urls";
 type Endpoint = string;
 
 async function performGetRequest<V>(endpoint: Endpoint, config?: AxiosRequestConfig) {
+    const url = endpoint.startsWith("http") ? endpoint : urls.API_URL + endpoint;
     try {
-        const res = await axios.get<V>(urls.API_URL + endpoint, {
+        const res = await axios.get<V>(url, {
             withCredentials: true,
             ...config
         });

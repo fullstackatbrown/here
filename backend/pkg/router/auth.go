@@ -43,7 +43,7 @@ func AuthRoutes() *chi.Mux {
 
 	// Alter the current session. No auth middlewares required.
 	router.Post("/session", createSessionHandler)
-	router.Post("/authorizeGapi", authorizeGapiHandler)
+	router.Get("/authorizeGapi", authorizeGapiHandler)
 	router.HandleFunc("/authorizeGapi/callback", authorizeGapiCallbackHandler)
 	router.Post("/signout", signOutHandler)
 
@@ -232,18 +232,8 @@ func authorizeGapiHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
-	// var req struct {
-	// 	Code string `json:"code"`
-	// }
-
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
-
 	// TODO: Check OAuth state
-	code := r.FormValue("code")
+	code := r.URL.Query().Get("code")
 	fmt.Println(code)
 
 	token, err := config.Config.OAuthConfig.Exchange(context.Background(), code)
@@ -254,14 +244,7 @@ func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(token.AccessToken)
-	// response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// defer response.Body.Close()
-
-	// fmt.Println(response.Body)
+	fmt.Println(token.RefreshToken)
 }
 
 // POST: /signout

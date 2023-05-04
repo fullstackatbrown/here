@@ -4,20 +4,18 @@ import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusCh
 import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
-import { useGoogleLogin } from '@react-oauth/google';
-import { Errors, handleBadRequestError } from "@util/errors";
+import { handleBadRequestError } from "@util/errors";
 import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
 import { useCourseStaff } from "api/course/hooks";
 import ClipboardJS from 'clipboard';
 import { Course, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
+import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import AdminViewHeader from "../AdminViewHeader";
 import AuthAPI from "api/auth/api";
-import APIClient from "api/APIClient";
-import { useRouter } from "next/router";
 
 export interface SettingsViewProps {
     course: Course;
@@ -60,32 +58,9 @@ export default function SettingsView({ course }: SettingsViewProps) {
         });
     }
 
-    // const handleAuthorizeGCal = useGoogleLogin({
-    //     onSuccess: codeResponse => console.log(codeResponse),
-    //     onError: error => console.log(error),
-    //     flow: 'auth-code',
-    //     scope: 'https://www.googleapis.com/auth/calendar.events',
-    // });
-
     function handleAuthorizeGCal() {
         AuthAPI.authorizeGcal()
-            .then(() => { router.push(`${router.query.courseID}?view=settings`, undefined, { shallow: true }); })
-            .catch((err) => console.log(err));
     }
-
-    // const handleAuthorizeGCal = useGoogleLogin({
-    //     onSuccess: codeResponse => {
-    //         return APIClient.post('/users/authorizeGapi/callback', { code: codeResponse.code });
-    //         // router.push(`${router.query.courseID}?view=settings`, undefined, { shallow: true });
-    //         // return APIClient.post('/users/oauth', { code: codeResponse });
-    //     },
-    //     // onSuccess: codeResponse => { console.log(codeResponse) },
-    //     // ux_mode: 'redirect',
-    //     onError: error => console.log(error),
-    //     flow: 'auth-code',
-    //     scope: 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
-    //     redirect_uri: 'http://localhost:8080/users/authorizeGapi/callback',
-    // })
 
     return (
         <>
