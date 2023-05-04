@@ -43,7 +43,6 @@ func AuthRoutes() *chi.Mux {
 
 	// Alter the current session. No auth middlewares required.
 	router.Post("/session", createSessionHandler)
-	router.Get("/authorizeGapi", authorizeGapiHandler)
 	router.HandleFunc("/authorizeGapi/callback", authorizeGapiCallbackHandler)
 	router.Post("/signout", signOutHandler)
 
@@ -226,15 +225,11 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func authorizeGapiHandler(w http.ResponseWriter, r *http.Request) {
-	url := config.Config.OAuthConfig.AuthCodeURL("pseudo-random")
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-}
-
 func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: Check OAuth state
 	code := r.URL.Query().Get("code")
-	fmt.Println(code)
+	state := r.URL.Query().Get("state")
+	fmt.Println(state)
 
 	token, err := config.Config.OAuthConfig.Exchange(context.Background(), code)
 	if err != nil {
@@ -243,8 +238,12 @@ func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(token.AccessToken)
-	fmt.Println(token.RefreshToken)
+	fmt.Println("accesstoken: " + token.AccessToken)
+	fmt.Println("refreshtoken: " + token.RefreshToken)
+
+	// TODO: Store refresh token in database
+
+	http.Redirect(w, r, state, http.StatusPermanentRedirect)
 }
 
 // POST: /signout

@@ -59,7 +59,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
     }
 
     function handleAuthorizeGCal() {
-        AuthAPI.authorizeGcal()
+        AuthAPI.authorizeGcal(`${process.env.NEXT_PUBLIC_CLIENT_URL}/course/${router.query.courseID}?view=settings`)
     }
 
     return (

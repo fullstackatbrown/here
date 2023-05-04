@@ -72,7 +72,7 @@ async function signInWithGoogle() {
         });
 }
 
-async function authorizeGcal() {
+async function authorizeGcal(currentUrl: string) {
     var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
 
     // Create <form> element to submit parameters to OAuth 2.0 endpoint.
@@ -87,7 +87,7 @@ async function authorizeGcal() {
         'response_type': 'code',
         'scope': 'https://www.googleapis.com/auth/drive.metadata.readonly',
         'include_granted_scopes': 'true',
-        'state': 'pass-through value',
+        'state': currentUrl,
         'access_type': 'offline',
     };
 
