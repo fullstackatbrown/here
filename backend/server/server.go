@@ -34,10 +34,11 @@ func Start() {
 
 	router := Routes()
 	c := cors.New(cors.Options{
-		AllowedOrigins:   config.Config.AllowedOrigins,
-		AllowedHeaders:   []string{"Cookie", "Content-Type"},
-		AllowedMethods:   []string{"GET", "POST", "DELETE", "PATCH"},
-		ExposedHeaders:   []string{"Set-Cookie"},
+		AllowedOrigins: config.Config.AllowedOrigins,
+		AllowedHeaders: []string{"Cookie", "Content-Type"},
+		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH"},
+		// ExposedHeaders:   []string{"Set-Cookie"},
+		ExposedHeaders:   []string{"*"},
 		AllowCredentials: true,
 	})
 

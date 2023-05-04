@@ -5,6 +5,9 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
+	"golang.org/x/oauth2"
 )
 
 var Config *ServerConfig
@@ -26,17 +29,30 @@ type ServerConfig struct {
 	Port int
 	// FirebaseConfig is the path to the Firebase Admin config JSON.
 	FirebaseConfig string
+	// OAuthConfig is the OAuth2 config for Google Sign-In.
+	OAuthConfig oauth2.Config
 }
 
 func DefaultDevelopmentConfig() *ServerConfig {
+	godotenv.Load()
 	return &ServerConfig{
-		AllowedOrigins:          []string{"http://localhost:3000", "http://jennyyu.local:3000"},
+		AllowedOrigins:          []string{"http://localhost:3000", "http://jennyyu.local:3000", "https://accounts.google.com"},
 		AllowedEmailDomains:     []string{"brown.edu", "gmail.com"},
 		IsHTTPS:                 false,
 		SessionCookieName:       "here-session",
 		SessionCookieExpiration: time.Hour * 24 * 14,
 		Port:                    8080,
 		FirebaseConfig:          "dev-firebase-config.json",
+		OAuthConfig: oauth2.Config{
+			ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+			ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+			RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
+			Scopes:       []string{"https://www.googleapis.com/auth/calendar.events", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  "https://accounts.google.com/o/oauth2/auth",
+				TokenURL: "https://oauth2.googleapis.com/token",
+			},
+		},
 	}
 }
 
