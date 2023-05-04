@@ -158,10 +158,10 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func applyResultsHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	surveyID := chi.URLParam(r, "surveyID")
 
-	err := repo.Repository.ApplySurveyResults(courseID, surveyID)
+	err := repo.Repository.ApplySurveyResults(course, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

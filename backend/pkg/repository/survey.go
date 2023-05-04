@@ -10,6 +10,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/fullstackatbrown/here/pkg/utils"
+	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
 	"google.golang.org/api/iterator"
 )
@@ -180,20 +181,19 @@ func (fr *FirebaseRepository) generateReadableResults(courseID string, results m
 		for _, studentID := range studentIDs {
 			student, err := fr.GetProfileById(studentID)
 			if err != nil {
-				// TODO: handle error, maybe remove from results if user profile not found? (e.g. user deleted account)
-				return nil, err
+				// student no longer exists
+				// TODO: handle error, maybe remove from results
+				continue
 			}
 			students = append(students, student.DisplayName)
 		}
-
 		readableResults[sectionID] = students
 	}
-
 	return
 }
 
-func (fr *FirebaseRepository) ApplySurveyResults(courseID string, surveyID string) error {
-	survey, err := fr.GetSurveyByID(courseID, surveyID)
+func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID string) error {
+	survey, err := fr.GetSurveyByID(course.ID, surveyID)
 	if err != nil {
 		return fmt.Errorf("error getting survey: %v\n", err)
 	}
@@ -205,17 +205,18 @@ func (fr *FirebaseRepository) ApplySurveyResults(courseID string, surveyID strin
 		for _, uid := range userIDs {
 
 			batch, err := fr.assignPermanentSection(&models.AssignSectionsRequest{
-				CourseID:     courseID,
+				Course:       course,
 				StudentID:    uid,
 				NewSectionID: sectionID,
 			})
 
 			if err != nil {
-				return fmt.Errorf("error assigning section: %v", err)
+				continue
 			}
 
 			if _, err := batch.Commit(firebase.Context); err != nil {
-				return fmt.Errorf("error committing batch: %v", err)
+				glog.Warningf("error assigning section for student %s: %v", uid, err)
+				continue
 			}
 		}
 	}

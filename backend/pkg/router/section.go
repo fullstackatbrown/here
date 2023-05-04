@@ -27,21 +27,8 @@ func SectionRoutes() *chi.Mux {
 	return router
 }
 
-func getSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
-	sectionID := chi.URLParam(r, "sectionID")
-
-	section, err := repo.Repository.GetSectionByID(courseID, sectionID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, section)
-}
-
 func createSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	var req *models.CreateSectionRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -50,10 +37,10 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
+	req.Course = course
 
 	// Check if a section with the same time and location already exists
-	s, err := repo.Repository.GetSectionByInfo(courseID, req.StartTime, req.EndTime, req.Location)
+	s, err := repo.Repository.GetSectionByInfo(course, req.StartTime, req.EndTime, req.Location)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -98,10 +85,10 @@ func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	sectionID := chi.URLParam(r, "sectionID")
 
-	err := repo.Repository.DeleteSection(&models.DeleteSectionRequest{CourseID: courseID, SectionID: sectionID})
+	err := repo.Repository.DeleteSection(&models.DeleteSectionRequest{Course: course, SectionID: sectionID})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

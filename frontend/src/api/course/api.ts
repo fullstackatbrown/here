@@ -1,11 +1,6 @@
 import APIClient from "api/APIClient";
-import { AddPermissionRequest, Course, createCourseAndPermissionsRequest } from "model/course";
+import { createCourseAndPermissionsRequest } from "model/course";
 import { CoursePermission } from "model/user";
-
-
-async function getCourse(courseID: string): Promise<Course> {
-  return await APIClient.get(`/courses/${courseID}`, {});
-}
 
 async function deleteCourse(courseID: string): Promise<boolean> {
   return APIClient.delete(`/courses/${courseID}`, {});
@@ -93,7 +88,6 @@ async function bulkUpload(
 }
 
 const CourseAPI = {
-  getCourse,
   createCourse,
   deleteCourse,
   updateCourse,

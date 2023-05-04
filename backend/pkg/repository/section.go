@@ -104,12 +104,7 @@ func (fr *FirebaseRepository) GetUniqueSectionTimes(courseID string) (map[string
 	return capacity, nil
 }
 
-func (fr *FirebaseRepository) GetSectionByInfo(courseID string, startTime string, endTime string, location string) (*models.Section, error) {
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return nil, err
-	}
-
+func (fr *FirebaseRepository) GetSectionByInfo(course *models.Course, startTime string, endTime string, location string) (*models.Section, error) {
 	locationCollapsed := utils.CollapseString(location)
 
 	course.SectionsLock.RLock()
@@ -128,7 +123,7 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 
 	section = &models.Section{
 		Day:                models.Day(req.Day),
-		CourseID:           req.CourseID,
+		CourseID:           req.Course.ID,
 		StartTime:          req.StartTime,
 		EndTime:            req.EndTime,
 		Location:           req.Location,
@@ -138,7 +133,7 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 		SwappedOutStudents: make(map[string][]string),
 	}
 
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSectionsCollection).Add(firebase.Context, section)
 	if err != nil {
 		return nil, fmt.Errorf("error creating assignment: %v\n", err)
@@ -150,23 +145,17 @@ func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (s
 }
 
 func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) error {
-
-	course, err := fr.GetCourseByID(req.CourseID)
-	if err != nil {
-		return err
-	}
-
-	section, err := fr.GetSectionByID(req.CourseID, req.SectionID)
+	section, err := fr.GetSectionByID(req.Course.ID, req.SectionID)
 	if err != nil {
 		return err
 	}
 
 	// Remove all students currently enrolled in the section
 	if section.NumEnrolled > 0 {
-		for _, student := range course.Students {
+		for _, student := range req.Course.Students {
 			if student.DefaultSection == req.SectionID {
-				err := fr.RemoveStudentFromSection(&models.AssignSectionsRequest{
-					CourseID:     req.CourseID,
+				err := fr.AssignStudentToSection(&models.AssignSectionsRequest{
+					Course:       req.Course,
 					StudentID:    student.StudentID,
 					OldSectionID: req.SectionID,
 				})
@@ -179,7 +168,7 @@ func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) er
 	}
 
 	// Delete the section
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSectionsCollection).Doc(req.SectionID).Delete(firebase.Context)
 
 	return err

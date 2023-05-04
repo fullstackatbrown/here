@@ -34,8 +34,8 @@ type GetSectionRequest struct {
 }
 
 type CreateSectionRequest struct {
-	CourseID string `json:"courseid,omitempty"`
-	Day      Day    `json:"day"`
+	Course *Course `json:"course,omitempty"`
+	Day    Day     `json:"day"`
 	// must be ISO8601 compliant, UTC Time
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
@@ -55,6 +55,6 @@ type UpdateSectionRequest struct {
 }
 
 type DeleteSectionRequest struct {
-	CourseID  string
+	Course    *Course
 	SectionID string
 }

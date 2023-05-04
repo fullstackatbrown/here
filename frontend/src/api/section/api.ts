@@ -5,13 +5,6 @@ async function getSections(courseID: string): Promise<Section[]> {
   return APIClient.get(`/courses/${courseID}/sections`);
 }
 
-async function getSectionByID(
-  courseID: string,
-  sectionID: string
-): Promise<Section> {
-  return APIClient.get(`/courses/${courseID}/sections/${sectionID}`);
-}
-
 async function deleteSection(
   courseID: string,
   sectionID: string
@@ -56,7 +49,6 @@ async function updateSection(
 
 const SectionAPI = {
   getSections,
-  getSectionByID,
   deleteSection,
   createSection,
   updateSection,
