@@ -1,11 +1,10 @@
-import { Stack, Typography, Button, Menu, MenuItem, MenuProps, styled } from "@mui/material";
-import { access } from "fs";
+import MenuIcon from '@mui/icons-material/Menu';
+import { Button, Menu, MenuItem, MenuProps, Typography, styled } from "@mui/material";
+import { capitalizeWords } from "@util/shared/string";
 import { View } from "model/general";
 import { CoursePermission } from "model/user";
-import { FC, useState } from "react";
-import MenuIcon from '@mui/icons-material/Menu';
-import { capitalizeWords } from "@util/shared/string";
 import { useRouter } from "next/router";
+import { FC, useState } from "react";
 
 interface ViewHeaderProps {
     view: View;
@@ -68,7 +67,7 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
                 sx={{ display: { md: "none" } }}
             >
                 {views.map((view) => {
-                    // TODO: make more extensible
+                    // Make course settings only accessible to admin
                     if (view === "settings" && access === CoursePermission.CourseStaff) return null;
                     return <MenuItem key={view} sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigateTo(view)} >
                         {capitalizeWords(view)}

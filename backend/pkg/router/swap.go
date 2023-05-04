@@ -117,11 +117,13 @@ func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
 	req.SwapID = swapID
 	req.HandledBy = handledBy
 
-	// TODO: check student status
-
-	err = repo.Repository.HandleSwap(req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	badRequestErr, internalErr := repo.Repository.HandleSwap(req)
+	if badRequestErr != nil {
+		http.Error(w, badRequestErr.Error(), http.StatusBadRequest)
+		return
+	}
+	if internalErr != nil {
+		http.Error(w, internalErr.Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -1,9 +1,9 @@
+import UndoIcon from '@mui/icons-material/Undo';
 import { IconButton, Stack, TablePagination, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { sortRequestsByTime } from "@util/shared/requestTime";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
-import UndoIcon from '@mui/icons-material/Undo';
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Swap, SwapStatus } from "model/swap";
@@ -82,8 +82,6 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;
             const oldSection = r.oldSectionID ? sectionsMap[r.oldSectionID] : undefined;
             const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
-            // TODO: mark the request as archived if student is no longer enrolled in the course
-            // right now it's just not displayed and the count of requests would be off
             return <RequestCard
               key={`request${r.ID}`}
               active={isCourseActive}

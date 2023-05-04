@@ -237,21 +237,24 @@ func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) (badRequ
 	return nil, err
 }
 
-func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
+func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) (badRequestErr error, internalError error) {
 	batch := fr.firestoreClient.Batch()
 
 	swap, err := fr.GetSwapByID(req.Course.ID, req.SwapID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	// TODO: Check if student is in the course
 
 	// Assign sections if the swap is approved
 	if req.Status == models.STATUS_APPROVED {
+		// Check if student is in the course
+		if _, ok := req.Course.Students[swap.StudentID]; !ok {
+			return fmt.Errorf("Student is no longer enrolled in this course"), nil
+		}
+
 		batch, err = fr.approveSwap(req.Course, swap)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -259,7 +262,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 	if req.Status == models.STATUS_PENDING && swap.Status == models.STATUS_APPROVED {
 		batch, err = fr.undoSwap(req.Course, swap)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -279,12 +282,12 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 	_, err = batch.Commit(firebase.Context)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	course, err := fr.GetCourseByID(req.Course.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Send notification to student
@@ -304,7 +307,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		glog.Warningf("error sending claim notification: %v\n", err)
 	}
 
-	return nil
+	return nil, nil
 
 }
 
@@ -350,21 +353,10 @@ func (fr *FirebaseRepository) expireSwaps() {
 			if swap.AssignmentID == "" {
 				continue
 			}
-			// if assignment no longer exists, archive swap
-			if _, ok := course.Assignments[swap.AssignmentID]; !ok {
-				err := fr.HandleSwap(&models.HandleSwapRequest{
-					Course: course,
-					SwapID: swap.ID,
-					Status: models.STATUS_ARCHIVED,
-				})
-				if err != nil {
-					glog.Warning("error archiving swap: %v\n", err)
-				}
-				continue
-			}
-			// if assignment is expired, archive swap
-			if course.Assignments[swap.AssignmentID].DueDate.Before(time.Now()) {
-				err := fr.HandleSwap(&models.HandleSwapRequest{
+			assignment, ok := course.Assignments[swap.AssignmentID]
+			// if assignment no longer exists or is past due date, archive swap
+			if !ok || assignment.DueDate.Before(time.Now()) {
+				_, err := fr.HandleSwap(&models.HandleSwapRequest{
 					Course: course,
 					SwapID: swap.ID,
 					Status: models.STATUS_ARCHIVED,
