@@ -68,7 +68,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                 onMouseEnter={() => !isXsScreen && setHover(true)}
                 onMouseLeave={() => setHover(false)}
             >
-                <Grid container spacing={3.5} display="flex" flexDirection="row" alignItems="center">
+                <Grid container spacing={3.5} display="flex" flexDirection="row" alignItems="center" >
                     {/* Left: arrow and student name */}
                     <Grid item xs={8} md={expanded ? 10 : 3}>
                         <Box display="flex" flexDirection="row" alignItems="center" py={{ xs: 1, md: 0.5 }}>
@@ -112,7 +112,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
             </Box >
             <Collapse in={expanded}>
                 <Box ml={4} mt={1} mb={2}>
-                    <RequestInformation {...{ request, student, assignment, oldSection, newSection }} />
+                    <RequestInformation {...{ request, student, assignment, oldSection, newSection }} studentView />
                 </Box>
             </Collapse>
         </>

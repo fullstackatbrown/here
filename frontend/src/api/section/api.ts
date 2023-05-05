@@ -36,7 +36,8 @@ async function updateSection(
   startTime?: string,
   endTime?: string,
   location?: string,
-  capacity?: number
+  capacity?: number,
+  notifyStudent?: boolean
 ): Promise<string> {
   return APIClient.patch(`/courses/${courseID}/sections/${sectionID}`, {
     day,
@@ -44,6 +45,7 @@ async function updateSection(
     endTime,
     location,
     capacity,
+    notifyStudent
   });
 }
 

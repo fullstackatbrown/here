@@ -44,14 +44,15 @@ type CreateSectionRequest struct {
 }
 
 type UpdateSectionRequest struct {
-	CourseID  *string `json:"courseid,omitempty"`
+	Course    *Course `json:"course,omitempty"`
 	SectionID *string `json:"sectionid,omitempty"`
 	Day       *Day    `json:"day,omitempty"`
 	// must be ISO8601 compliant, UTC Time
-	StartTime *string `json:"startTime,omitempty"`
-	EndTime   *string `json:"endTime,omitempty"`
-	Location  *string `json:"location,omitempty"`
-	Capacity  *int    `json:"capacity,omitempty"`
+	StartTime     *string `json:"startTime,omitempty"`
+	EndTime       *string `json:"endTime,omitempty"`
+	Location      *string `json:"location,omitempty"`
+	Capacity      *int    `json:"capacity,omitempty"`
+	NotifyStudent bool    `json:"notifyStudent,omitempty"`
 }
 
 type DeleteSectionRequest struct {

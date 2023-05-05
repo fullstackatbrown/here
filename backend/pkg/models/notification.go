@@ -8,6 +8,8 @@ const (
 	NotificationGradeUpdated   NotificationType = "RELEASE_GRADES"
 	NotificationRequestUpdated NotificationType = "REQUEST_UPDATED"
 	NotificationAnnouncement   NotificationType = "ANNOUNCEMENT"
+	NotificationSectionUpdate  NotificationType = "SECTION_UPDATED"
+	NotificationSectionDelete  NotificationType = "SECTION_DELETED"
 )
 
 type Notification struct {

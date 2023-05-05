@@ -32,7 +32,8 @@ const SectionCard: FC<SectionCardProps> = ({ section, active }) => {
     const confirmed = await showDialog({
       title: 'Delete Section',
       message: "Are you sure you want to delete this section? This action cannot be undone.",
-      warning: section.numEnrolled > 0 && "Deleting this section will affect all students who are currently enrolled in the section."
+      warning: section.numEnrolled > 0 &&
+        "Students currently enrolled will be automatically removed from the section and notified."
     });
     if (confirmed) {
       toast.promise(SectionAPI.deleteSection(section.courseID, section.ID), {

@@ -152,6 +152,7 @@ func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) er
 
 	// Remove all students currently enrolled in the section
 	if section.NumEnrolled > 0 {
+		fr.coursesLock.RLock()
 		for _, student := range req.Course.Students {
 			if student.DefaultSection == req.SectionID {
 				err := fr.AssignStudentToSection(&models.AssignSectionsRequest{
@@ -159,12 +160,18 @@ func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) er
 					StudentID:    student.StudentID,
 					OldSectionID: req.SectionID,
 				})
-				// TODO: send notification
 				if err != nil {
 					glog.Warningf("Error removing student %s from section %s: %v", student.StudentID, req.SectionID, err)
 				}
+
+				// Notify student
+				err = fr.notifySectionDelete(student.StudentID, req.Course.Code)
+				if err != nil {
+					glog.Warningf("Error notifying student %s", student.StudentID, err)
+				}
 			}
 		}
+		fr.coursesLock.RUnlock()
 	}
 
 	// Delete the section
@@ -186,12 +193,42 @@ func (fr *FirebaseRepository) UpdateSection(req *models.UpdateSectionRequest) er
 		val := v.Field(i).Interface()
 
 		// Only include the fields that are set
-		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "SectionID") {
+		if (field != "Course") && (field != "SectionID") && (field != "NotifyStudent") && (!reflect.ValueOf(val).IsNil()) {
 			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
 		}
 	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSectionsCollection).Doc(*req.SectionID).Update(firebase.Context, updates)
+	if err != nil {
+		return err
+	}
+
+	// notify all students currently enrolled
+	if req.NotifyStudent {
+		fr.coursesLock.RLock()
+		for _, student := range req.Course.Students {
+			if student.DefaultSection == *req.SectionID {
+				fr.notifySectionUpdate(student.StudentID, req.Course.Code)
+			}
+		}
+		fr.coursesLock.RUnlock()
+	}
+
+	return nil
+}
+
+// Helpers
+func (fr *FirebaseRepository) notifySectionUpdate(studentID string, courseCode string) error {
+	title := fmt.Sprintf("%s: Section Update", courseCode)
+	body := "Your section has been updated. Please check your schedule."
+	err := fr.AddNotification(studentID, title, body, models.NotificationSectionUpdate)
+	return err
+}
+
+func (fr *FirebaseRepository) notifySectionDelete(studentID string, courseCode string) error {
+	title := fmt.Sprintf("%s: Section Deleted", courseCode)
+	body := "Your section has been deleted. Please contact the instructor about nexts teps."
+	err := fr.AddNotification(studentID, title, body, models.NotificationSectionDelete)
 	return err
 }

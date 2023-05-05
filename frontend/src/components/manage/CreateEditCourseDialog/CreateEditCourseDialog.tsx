@@ -48,9 +48,19 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
             toast.error("Invalid course code");
             return;
         }
+        const code = formatCourseCode(data.code)
+        const term = formatCourseTerm(data.term)
         if (course) {
+            // Check if there are changes
+            if (course.title === data.title &&
+                course.code === code &&
+                course.term === term) {
+                handleOnClose()
+                toast.success("No changes made!")
+                return
+            }
             toast.promise(CourseAPI.updateCourseInfo(
-                course.ID, data.title, formatCourseCode(data.code), formatCourseTerm(data.term)),
+                course.ID, data.title, code, term),
                 {
                     loading: 'Updating course...',
                     success: 'Course updated!',

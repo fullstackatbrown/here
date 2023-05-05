@@ -1,13 +1,22 @@
 package repository
 
 import (
+	"time"
+
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
 	"github.com/google/uuid"
 )
 
-func (fr *FirebaseRepository) AddNotification(userID string, notification models.Notification) error {
+func (fr *FirebaseRepository) AddNotification(userID string, title string, body string, notificationType models.NotificationType) error {
+	notification := models.Notification{
+		Title:     title,
+		Body:      body,
+		Timestamp: time.Now(),
+		Type:      notificationType,
+	}
+
 	notification.ID = uuid.New().String()
 	_, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(userID).Update(firebase.Context, []firestore.Update{
 		{

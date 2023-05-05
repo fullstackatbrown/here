@@ -1,16 +1,16 @@
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import ClearIcon from "@mui/icons-material/Clear";
 import CreateIcon from "@mui/icons-material/Create";
-import { Box, Card, IconButton, Stack, Typography, useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, Card, IconButton, Stack, Typography } from "@mui/material";
+import { handleBadRequestError } from "@util/errors";
 import AssignmentAPI from "api/assignment/api";
+import dayjs from "dayjs";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus } from "model/course";
-import { FC, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
-import dayjs from "dayjs";
-import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
-import { handleBadRequestError } from "@util/errors";
+import MyChip from "@components/shared/MyChip/MyChip";
 
 export interface AssignmentCardProps {
   course: Course;
@@ -64,18 +64,16 @@ const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardPr
       <Card sx={{ ":hover": { boxShadow: 2 } }} variant={"outlined"} onClick={() => { handleNavigate(assignment.ID) }}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>
-            <Typography variant="body2" noWrap>
-              {assignment.name}
-            </Typography>
+            <Stack direction="row" alignItems="center" mb={0.5}>
+              <Typography variant="body2">
+                {assignment.name}
+              </Typography>
+              {assignment.optional && <MyChip label="optional" variant="outlined" color="primary" style={{ marginLeft: 6 }} />}
+            </Stack>
             <Stack
-              spacing={{
-                xs: 0,
-                md: 2,
-              }}
+              spacing={{ xs: 0, md: 2, }}
               direction={{ xs: "column", md: "row" }}
-              sx={{
-                color: "text.disabled",
-              }}
+              sx={{ color: "text.disabled" }}
             >
               <Typography
                 variant="body2"
@@ -101,7 +99,7 @@ const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardPr
             </Stack>
           </Stack>
 
-          <Stack direction={{ xs: "column", md: "row" }} alignItems="center" justifyContent="center">
+          <Stack direction="row" alignItems="center" justifyContent="center">
             <IconButton onClick={handleEditAssignment(assignment)} size={"small"} disabled={!isCourseActive}>
               <CreateIcon fontSize="small" />
             </IconButton>

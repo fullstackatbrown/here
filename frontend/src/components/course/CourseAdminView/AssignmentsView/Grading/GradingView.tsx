@@ -1,7 +1,8 @@
 import GradeChip from '@components/shared/GradeChip/GradeChip';
+import MyChip from '@components/shared/MyChip/MyChip';
 import SearchBar from '@components/shared/SearchBar/SearchBar';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import { Button, Stack, Table, TableBody, TableHead, TablePagination, TableRow, Typography, useMediaQuery } from '@mui/material';
+import { Stack, Table, TableBody, TableHead, TablePagination, TableRow, Typography, useMediaQuery } from '@mui/material';
 import MuiTableCell from "@mui/material/TableCell";
 import { Theme, styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
@@ -12,11 +13,11 @@ import GradeAPI from 'api/grades/api';
 import { Assignment } from 'model/assignment';
 import { Course, CourseUserData } from 'model/course';
 import { Section } from 'model/section';
+import { CoursePermission } from 'model/user';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/Menu/SelectMenu';
 import ViewHeader from '../../../../shared/ViewHeader/ViewHeader';
-import { CoursePermission } from 'model/user';
 
 interface GradingViewProps {
     course: Course;
@@ -124,13 +125,16 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                 display="flex"
                 justifyContent="space-between"
             >
-                <Typography
-                    variant="h6"
-                    fontWeight={500}
-                    style={{ fontSize: 17 }}
-                >
-                    {assignment.name}
-                </Typography>
+                <Stack direction="row" alignItems="center">
+                    <Typography
+                        variant="h6"
+                        fontWeight={500}
+                        style={{ fontSize: 17 }}
+                    >
+                        {assignment.name}
+                    </Typography>
+                    <MyChip label="optional" variant="outlined" color="primary" style={{ marginLeft: 6 }} size="medium" />
+                </Stack>
                 <Stack direction="row" display="flex" alignItems="center" spacing={1}>
                     <SelectMenu
                         value={filterBySection}

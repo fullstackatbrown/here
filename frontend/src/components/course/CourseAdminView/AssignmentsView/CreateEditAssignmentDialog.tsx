@@ -54,6 +54,16 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
             return
         }
         if (assignment) {
+            // Check if there are changes
+            if (assignment.name === data.name &&
+                assignment.optional === data.optional &&
+                assignment.releaseDate.toISOString() === releaseDate &&
+                assignment.dueDate.toISOString() === dueDate &&
+                assignment.maxScore === data.maxScore) {
+                handleOnClose()
+                toast.success("No changes made!")
+                return
+            }
             toast.promise(AssignmentAPI.updateAssignment(
                 assignment.courseID, assignment.ID, data.name, data.optional, releaseDate, dueDate, data.maxScore),
                 {

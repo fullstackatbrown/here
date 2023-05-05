@@ -1,12 +1,16 @@
 import {
     Alert,
     Button,
+    Checkbox,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle, FormControl,
+    FormControlLabel,
     InputLabel, MenuItem, Select, Stack,
-    TextField
+    Switch,
+    TextField,
+    Typography
 } from "@mui/material";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -31,6 +35,7 @@ type FormData = {
     endtime: string;
     location: string | null;
     capacity: number | null;
+    notifyStudent: boolean;
 };
 
 const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section, courseID }) => {
@@ -40,6 +45,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
         location: section ? section.location : undefined,
         capacity: section ? section.capacity : undefined,
+        notifyStudent: section?.numEnrolled > 0 ? true : false
     }), [section])
 
     const { register, handleSubmit, control, reset, watch, formState: { } } = useForm<FormData>({
@@ -52,10 +58,24 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         const startTime = new Date(data.starttime).toISOString()
         const endTime = new Date(data.endtime).toISOString()
         if (section) {
+            let notifyStudent = data.notifyStudent
+            // Check if there are changes
+            if (section.day === data.day && section.startTime === startTime && section.endTime === endTime
+                && section.location === data.location) {
+                if (section.capacity === data.capacity) {
+                    // No changes made
+                    handleOnClose()
+                    toast.success("No changes made!")
+                    return
+                } else {
+                    // Only capacity changed
+                    notifyStudent = false
+                }
+            }
             toast.promise(SectionAPI.updateSection(
                 section.courseID, section.ID, data.day,
                 startTime, endTime,
-                data.location, data.capacity),
+                data.location, data.capacity, notifyStudent),
                 {
                     loading: "Updating section...",
                     success: "Section updated!",
@@ -88,8 +108,29 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
             <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
             <DialogContent>
                 {section?.numEnrolled > 0 &&
-                    <Alert severity="warning" sx={{ marginBottom: 2.5 }}>
-                        Editing this section will affect the students who are currently enrolled.
+                    <Alert
+                        severity="warning" sx={{ marginBottom: 2.5 }}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                        action={
+                            <Controller
+                                name="notifyStudent"
+                                control={control}
+                                render={({ field: { value, onChange } }) => (
+                                    <FormControlLabel
+                                        control={<Checkbox size="small" color="warning" />}
+                                        label={
+                                            <Typography style={{ fontSize: '12px' }}>
+                                                Notify Students
+                                            </Typography>
+                                        }
+                                        checked={value}
+                                        onChange={onChange}
+                                    />
+                                )}
+                            />
+                        }
+                    >
+                        Editing this section will affect the students who are currently enrolled. Capacity changes will not be notified.
                     </Alert>
                 }
                 <Stack spacing={2} my={1}>
@@ -141,21 +182,23 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                             )}
                         />
                     </Stack>
-                    <TextField
-                        {...register("location")}
-                        label="Location"
-                        type="text"
-                        fullWidth
-                    />
-                    <TextField
-                        {...register("capacity", { valueAsNumber: true })}
-                        label="Capacity"
-                        type="number"
-                        required
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
+                    <Stack direction="row" spacing={2}>
+                        <TextField
+                            {...register("location")}
+                            label="Location"
+                            type="text"
+                            fullWidth
+                        />
+                        <TextField
+                            {...register("capacity", { valueAsNumber: true })}
+                            label="Capacity"
+                            type="number"
+                            required
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </Stack>
                 </Stack>
             </DialogContent>
             <DialogActions>

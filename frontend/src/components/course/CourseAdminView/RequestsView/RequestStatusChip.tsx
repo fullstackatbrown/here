@@ -1,24 +1,13 @@
-import React, { FC } from "react";
-import { Box, Chip, styled } from "@mui/material";
-import { SwapStatus } from "model/swap";
-import DoneIcon from '@mui/icons-material/Done';
+import SmallChip from "@components/shared/MyChip/MyChip";
 import { formatRequestTime } from "@util/shared/requestTime";
+import { SwapStatus } from "model/swap";
+import React, { FC } from "react";
 
 export interface RequestStatusChipProps {
     status: SwapStatus;
     timestamp?: Date;
     style?: React.CSSProperties
 }
-
-const MyChip = styled(Chip)({
-    height: 20,
-    fontSize: 11,
-    fontWeight: 500,
-    '& .MuiChip-label': {
-        paddingLeft: 6,
-        paddingRight: 6,
-    },
-});
 
 const colors: Record<SwapStatus, "success" | "error" | "secondary" | "primary"> = {
     [SwapStatus.Approved]: "success",
@@ -32,7 +21,7 @@ const RequestStatusChip: FC<RequestStatusChipProps> = ({ status, timestamp, styl
     const pending = status === SwapStatus.Pending;
     const getLabel = (status: SwapStatus) =>
         (pending ? "submitted" : status) + (timestamp ? ` ${formatRequestTime(timestamp, false, pending)}` : "")
-    return <MyChip label={getLabel(status)} variant="outlined" color={colors[status]} style={style} />;
+    return <SmallChip label={getLabel(status)} variant="outlined" color={colors[status]} style={style} />;
 };
 
 export default RequestStatusChip;

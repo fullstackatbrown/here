@@ -61,7 +61,7 @@ func createSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	sectionID := chi.URLParam(r, "sectionID")
 	var req *models.UpdateSectionRequest
 
@@ -71,7 +71,7 @@ func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = &courseID
+	req.Course = course
 	req.SectionID = &sectionID
 
 	err = repo.Repository.UpdateSection(req)
