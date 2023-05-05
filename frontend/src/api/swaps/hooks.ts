@@ -18,7 +18,11 @@ export function usePendingSwaps(courseID: string, studentID: string = undefined)
       courseID, FirestoreSwapsCollection), ...queryConstraints), (querySnapshot) => {
         const res: Swap[] = [];
         querySnapshot.forEach((doc) => {
-          res.push({ ID: doc.id, ...doc.data(), requestTime: doc.get("requestTime").toDate() } as Swap);
+          res.push({
+            ID: doc.id, ...doc.data(),
+            requestTime: doc.get("requestTime").toDate(),
+            handledTime: doc.get("handledTime")?.toDate()
+          } as Swap);
         });
 
         setSections(res);
@@ -46,7 +50,11 @@ export function usePastSwaps(courseID: string, studentID: string = undefined): [
       courseID, FirestoreSwapsCollection), ...queryConstraints), (querySnapshot) => {
         const res: Swap[] = [];
         querySnapshot.forEach((doc) => {
-          res.push({ ID: doc.id, ...doc.data(), requestTime: doc.get("requestTime").toDate() } as Swap);
+          res.push({
+            ID: doc.id, ...doc.data(),
+            requestTime: doc.get("requestTime").toDate(),
+            handledTime: doc.get("handledTime")?.toDate()
+          } as Swap);
         });
 
         setSections(res);
@@ -70,7 +78,11 @@ export function useSwapsByStudent(courseID: string, studentID: string): [Swap[] 
       courseID, FirestoreSwapsCollection), where("studentID", "==", studentID)), (querySnapshot) => {
         const res: Swap[] = [];
         querySnapshot.forEach((doc) => {
-          res.push({ ID: doc.id, ...doc.data(), requestTime: doc.get("requestTime").toDate() } as Swap);
+          res.push({
+            ID: doc.id, ...doc.data(),
+            requestTime: doc.get("requestTime").toDate(),
+            handledTime: doc.get("handledTime")?.toDate()
+          } as Swap);
         });
 
         setSections(res);

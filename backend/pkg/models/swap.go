@@ -21,6 +21,7 @@ type Swap struct {
 	NewSectionID string        `firestore:"newSectionID"`
 	AssignmentID string        `firestore:"assignmentID"`
 	RequestTime  time.Time     `firestore:"requestTime"`
+	HandledTime  time.Time     `firestore:"handledTime,omitempty"`
 	Reason       string        `firestore:"reason"`
 	Status       RequestStatus `firestore:"status"`
 	HandledBy    string        `firestore:"handledBy"`

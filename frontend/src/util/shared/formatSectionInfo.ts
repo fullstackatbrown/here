@@ -9,7 +9,6 @@ export default function formatSectionInfo(section: Section, abbreviated = false,
     const location = section.location !== "" ? ` @ ${section.location}` : "";
 
     const capacity = withCapacity ? ` (${section.capacity - section.numEnrolled} seats available)` : "";
-
     return timeFormatted + location + capacity
 }
 

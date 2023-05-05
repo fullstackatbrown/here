@@ -75,8 +75,9 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
         {assignmentsMap &&
           sectionsMap &&
           (rowsPerPage > 0
-            ? sortRequestsByTime(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : sortRequestsByTime(requests)
+            ? sortRequestsByTime(requests, type === "pending")
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : sortRequestsByTime(requests, type === "pending")
           ).map((r) => {
             const student = course.students[r.studentID];
             const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;

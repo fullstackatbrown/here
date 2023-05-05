@@ -24,7 +24,7 @@ const RequestInformation: FC<RequestInformationProps> = ({ request, oldSection, 
         "Type": assignment ? `One Time - ${assignment.name}` : "Permanent",
         "Old Section": formatSectionInfo(oldSection, true),
         "New Section": formatSectionInfo(newSection, true),
-        "Time": formatRequestTime(request, true),
+        "Time": formatRequestTime(request.requestTime, true),
         "Reason": request.reason,
     }
 

@@ -1,5 +1,5 @@
 import { Stack, TablePagination, Typography } from "@mui/material";
-import { sortRequestsByTime } from "@util/shared/requestTime";
+import { sortStudentRequests } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
@@ -52,8 +52,8 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
                     <Typography variant="body1" mt={1}>You have made no swap requests</Typography>
                 }
                 {(rowsPerPage > 0 ?
-                    sortRequestsByTime(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
-                    sortRequestsByTime(requests)
+                    sortStudentRequests(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
+                    sortStudentRequests(requests)
                 )
                     .map((r) => {
                         const student = course.students[r.studentID];

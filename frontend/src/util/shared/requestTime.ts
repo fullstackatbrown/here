@@ -1,13 +1,34 @@
-import { Swap } from "model/swap"
+import { Swap, SwapStatus } from "model/swap"
+import { partition } from "./array"
 
-// swap requests from latest to earliest
-export const sortRequestsByTime = (swapRequests: Swap[]): Swap[] => {
+// sort swap requests from latest to earliest
+// if pending, sort by request time
+// if not pending, sort by handled time
+export const sortRequestsByTime = (swapRequests: Swap[], pending: boolean = true): Swap[] => {
     return swapRequests.sort((a, b) => {
-        return b.requestTime.getTime() - a.requestTime.getTime();
+        return pending ? b.requestTime.getTime() - a.requestTime.getTime() : b.handledTime.getTime() - a.handledTime.getTime()
     })
 }
 
-export const formatRequestTime = (request: Swap, detailed = false): string => {
+// returns pending requests first, sorted by request time
+// followed by non-pending requests, sorted by handled time
+export const sortStudentRequests = (swapRequests: Swap[]): Swap[] => {
+    const [pendingRequests, nonPendingRequests] = partition(swapRequests, (swap) => swap.status === SwapStatus.Pending)
+    return sortRequestsByTime(pendingRequests).concat(sortRequestsByTime(nonPendingRequests, false))
+}
+
+// return time in the format of "Jan 1"
+// if detailed is set, return time in the format of "Jan 1, 12:00 AM"
+// if recentShowTime is set, return time in the format of "12:00 AM" if the time is today
+export const formatRequestTime = (time: Date, detailed = false, recentShowTime = false): string => {
+    if (recentShowTime && time.toDateString() === new Date().toDateString()) {
+        return time.toLocaleString("default", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+        });
+    }
+
     const options: Intl.DateTimeFormatOptions = {
         month: "short",
         day: "2-digit",
@@ -17,5 +38,5 @@ export const formatRequestTime = (request: Swap, detailed = false): string => {
         options.minute = "numeric"
         options.hour12 = true
     }
-    return request.requestTime.toLocaleString("default", options);
+    return time.toLocaleString("default", options);
 }
