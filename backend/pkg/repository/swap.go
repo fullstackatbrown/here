@@ -292,13 +292,12 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) (badRequ
 	}
 
 	// Send notification to student
-	title := fmt.Sprintf("%s: Request Update", course.Code)
-	body := fmt.Sprintf("Your swap request has been %s", req.Status)
+	msg := fmt.Sprintf("Your swap request has been %s", req.Status)
 	if req.HandledBy == nil {
-		body += " by the system"
+		msg += " by the system"
 	}
 
-	err = fr.AddNotification(swap.StudentID, title, body, models.NotificationRequestUpdated)
+	err = fr.AddNotificationWithMsg(swap.StudentID, course.Code, models.NotificationRequestUpdated, msg)
 	if err != nil {
 		glog.Warningf("error sending claim notification: %v\n", err)
 	}

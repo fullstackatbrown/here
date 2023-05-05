@@ -37,10 +37,9 @@ func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*mode
 		return nil, err
 	}
 
-	title := fmt.Sprintf("%s: Your grade has been released", course.Code)
-	err = fr.AddNotification(req.StudentID, title, "", models.NotificationGradeUpdated)
+	err = fr.AddNotification(req.StudentID, course.Code, models.NotificationGradeUpdated)
 	if err != nil {
-		glog.Warningf("error sending claim notification: %v\n", err)
+		glog.Warningf("error sending notification: %v\n", err)
 	}
 
 	return grade, nil

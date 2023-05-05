@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -9,10 +10,29 @@ import (
 	"github.com/google/uuid"
 )
 
-func (fr *FirebaseRepository) AddNotification(userID string, title string, body string, notificationType models.NotificationType) error {
+func (fr *FirebaseRepository) AddNotification(userID string, courseCode string, notificationType models.NotificationType) error {
 	notification := models.Notification{
-		Title:     title,
-		Body:      body,
+		Title:     fmt.Sprintf("%s: %s", courseCode, notificationType),
+		Body:      models.NotificationMsg[notificationType],
+		Timestamp: time.Now(),
+		Type:      notificationType,
+	}
+
+	notification.ID = uuid.New().String()
+	_, err := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(userID).Update(firebase.Context, []firestore.Update{
+		{
+			Path:  "notifications",
+			Value: firestore.ArrayUnion(notification),
+		},
+	})
+
+	return err
+}
+
+func (fr *FirebaseRepository) AddNotificationWithMsg(userID string, courseCode string, notificationType models.NotificationType, msg string) error {
+	notification := models.Notification{
+		Title:     fmt.Sprintf("%s: %s", courseCode, notificationType),
+		Body:      msg,
 		Timestamp: time.Now(),
 		Type:      notificationType,
 	}

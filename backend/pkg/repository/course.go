@@ -343,7 +343,13 @@ func (fr *FirebaseRepository) AssignStudentToSection(req *models.AssignSectionsR
 	}
 
 	_, err = batch.Commit(firebase.Context)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Notify student
+	fr.AddNotification(req.StudentID, req.Course.Code, models.NotificationNewSectionAssignment)
+	return nil
 }
 
 // Helpers

@@ -165,7 +165,7 @@ func (fr *FirebaseRepository) DeleteSection(req *models.DeleteSectionRequest) er
 				}
 
 				// Notify student
-				err = fr.notifySectionDelete(student.StudentID, req.Course.Code)
+				err = fr.AddNotification(student.StudentID, req.Course.Code, models.NotificationSectionDeleted)
 				if err != nil {
 					glog.Warningf("Error notifying student %s", student.StudentID, err)
 				}
@@ -209,26 +209,14 @@ func (fr *FirebaseRepository) UpdateSection(req *models.UpdateSectionRequest) er
 		fr.coursesLock.RLock()
 		for _, student := range req.Course.Students {
 			if student.DefaultSection == *req.SectionID {
-				fr.notifySectionUpdate(student.StudentID, req.Course.Code)
+				err := fr.AddNotification(student.StudentID, req.Course.Code, models.NotificationSectionUpdated)
+				if err != nil {
+					glog.Warningf("Error notifying student %s", student.StudentID, err)
+				}
 			}
 		}
 		fr.coursesLock.RUnlock()
 	}
 
 	return nil
-}
-
-// Helpers
-func (fr *FirebaseRepository) notifySectionUpdate(studentID string, courseCode string) error {
-	title := fmt.Sprintf("%s: Section Update", courseCode)
-	body := "Your section has been updated. Please check your schedule."
-	err := fr.AddNotification(studentID, title, body, models.NotificationSectionUpdate)
-	return err
-}
-
-func (fr *FirebaseRepository) notifySectionDelete(studentID string, courseCode string) error {
-	title := fmt.Sprintf("%s: Section Deleted", courseCode)
-	body := "Your section has been deleted. Please contact the instructor about nexts teps."
-	err := fr.AddNotification(studentID, title, body, models.NotificationSectionDelete)
-	return err
 }

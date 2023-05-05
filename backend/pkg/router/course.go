@@ -147,8 +147,6 @@ func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: send notification to student
-
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully assigned section for student " + req.StudentID))
 }
