@@ -32,7 +32,16 @@ func (fr *FirebaseRepository) CreateGrade(req *models.CreateGradeRequest) (*mode
 	}
 
 	// Send a notification to the student
-	fr.sendUpdateGradeNotification(req.CourseID, req.StudentID)
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return nil, err
+	}
+
+	title := fmt.Sprintf("%s: Your grade has been released", course.Code)
+	err = fr.AddNotification(req.StudentID, title, "", models.NotificationGradeUpdated)
+	if err != nil {
+		glog.Warningf("error sending claim notification: %v\n", err)
+	}
 
 	return grade, nil
 }
@@ -47,25 +56,4 @@ func (fr *FirebaseRepository) DeleteGrade(req *models.DeleteGradeRequest) error 
 	})
 
 	return err
-}
-
-func (fr *FirebaseRepository) sendUpdateGradeNotification(courseID string, studentID string) error {
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return err
-	}
-
-	notification := models.Notification{
-		Title:     "Your grade has been updated",
-		Body:      course.Code,
-		Timestamp: time.Now(),
-		Type:      models.NotificationGradeUpdated,
-	}
-
-	err = fr.AddNotification(studentID, notification)
-	if err != nil {
-		glog.Warningf("error sending claim notification: %v\n", err)
-	}
-
-	return nil
 }
