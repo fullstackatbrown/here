@@ -77,7 +77,7 @@ const RequestCard: FC<RequestCardProps> = ({
       >
         <Grid container spacing={3.5} display="flex" flexDirection="row" alignItems="center">
           {/* Left: arrow and student name */}
-          <Grid item xs={8} md={expanded ? 10.4 : 3}>
+          <Grid item xs={8} md={expanded ? 10.2 : 3}>
             <Box display="flex" flexDirection="row" alignItems="center" py={{ xs: 1, md: 0.5 }}>
               {expanded ?
                 <ExpandMore sx={{ fontSize: 16 }} /> :
@@ -90,14 +90,14 @@ const RequestCard: FC<RequestCardProps> = ({
           </Grid>
 
           {/* Middle: request info, only display on hover, no display on mobile */}
-          <Grid item md={7.4} display={{ xs: "none", md: expanded ? "none" : "flex" }} alignItems="center">
+          <Grid item md={7.2} display={{ xs: "none", md: expanded ? "none" : "flex" }} alignItems="center">
             <Typography color="secondary" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: 14 }}>
               {formatRequestInfo()}
             </Typography>
           </Grid>
 
           {/* Right: either time or the buttons */}
-          <Grid item xs={4} md={1.6} display="flex" justifyContent="flex-end" alignItems="center">
+          <Grid item xs={4} md={1.8} display="flex" justifyContent="flex-end" alignItems="center">
             {(pending && (hover || expanded) && active) ? (
               <>
                 <Tooltip title="approve" disableTouchListener>
