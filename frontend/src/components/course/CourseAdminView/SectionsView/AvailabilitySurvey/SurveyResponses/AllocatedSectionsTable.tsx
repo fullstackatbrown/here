@@ -7,6 +7,7 @@ import {
     TableBody,
     TableHead,
     TableRow,
+    Tooltip,
     Typography,
     styled
 } from "@mui/material";
@@ -19,6 +20,7 @@ import { formatSectionTime } from "@util/shared/formatTime";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import React from "react";
 
 export interface AllocatedSectionsTableProps {
@@ -68,11 +70,10 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, resu
         </TableHead>
         <TableBody>
             {sortSections(sections).map((section) => {
-                // TODO: some sections may not be in the survey
+                const notInSurvey = !(section.ID in results)
                 const numStudents = results[section.ID]?.length || 0
                 const time = formatSectionTime(section)
                 const students = resultsReadable[section.ID] || []
-                // const students = Array(20).fill("Jenny Yu") // for testing UI only
                 const open = selectedSection === section.ID
                 return (
                     <React.Fragment key={section.ID}>
@@ -95,6 +96,11 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, resu
                             </TableCell>
                             <TableCell open={open}>
                                 <Box display="flex" alignItems="center">
+                                    {notInSurvey &&
+                                        <Tooltip title="Added after survey has been published">
+                                            <ErrorOutlineIcon color="secondary" sx={{ fontSize: 15 }} />
+                                        </Tooltip>
+                                    }
                                     {numStudents > 0 && (open ?
                                         <KeyboardArrowUpIcon color="secondary" sx={{ fontSize: 15 }} /> :
                                         <KeyboardArrowDownIcon color="secondary" sx={{ fontSize: 15 }} />)}
@@ -110,7 +116,6 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, resu
                                             {students.join(", ")}
                                         </Typography>
                                     </Stack>
-
                                 </Collapse>
                             </MuiTableCell>
                         </TableRow>
