@@ -1,9 +1,5 @@
 package models
 
-import (
-	"fmt"
-)
-
 const (
 	FirestoreSectionsCollection = "sections"
 )
@@ -38,8 +34,8 @@ type GetSectionRequest struct {
 }
 
 type CreateSectionRequest struct {
-	CourseID string `json:"courseid,omitempty"`
-	Day      Day    `json:"day"`
+	Course *Course `json:"course,omitempty"`
+	Day    Day     `json:"day"`
 	// must be ISO8601 compliant, UTC Time
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
@@ -59,33 +55,6 @@ type UpdateSectionRequest struct {
 }
 
 type DeleteSectionRequest struct {
-	CourseID  string
+	Course    *Course
 	SectionID string
-}
-
-func (section *Section) TimeAsString() (string, error) {
-	return fmt.Sprintf("%s,%s,%s", section.Day, section.StartTime, section.EndTime), nil
-}
-
-// Returns a map from a unique time, to a map from section id (that has the time) to capacity
-func GetUniqueSectionTimes(sections []*Section) (map[string]map[string]int, error) {
-	capacity := make(map[string]map[string]int)
-	for _, s := range sections {
-		t, err := s.TimeAsString()
-		if err != nil {
-			return nil, err
-		}
-
-		_, ok := capacity[t]
-		if !ok {
-			capacity[t] = make(map[string]int)
-		}
-		_, ok = capacity[t][s.ID]
-		if !ok {
-			capacity[t][s.ID] = 0
-		}
-		capacity[t][s.ID] += s.Capacity
-	}
-
-	return capacity, nil
 }

@@ -28,7 +28,7 @@ func AssignmentRoutes() *chi.Mux {
 }
 
 func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	var req *models.CreateAssignmentRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -37,10 +37,10 @@ func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
+	req.CourseID = course.ID
 
 	// Check if an assignment with the same name exists
-	a, err := repo.Repository.GetAssignmentByName(courseID, req.Name)
+	a, err := repo.Repository.GetAssignmentByName(course, req.Name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

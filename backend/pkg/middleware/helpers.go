@@ -10,6 +10,10 @@ func rejectBadRequest(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
+func rejectNotFound(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusNotFound)
+}
+
 func rejectForbiddenRequest(w http.ResponseWriter) {
 	http.Error(w, "You do not have permission to access this resource", http.StatusForbidden)
 }

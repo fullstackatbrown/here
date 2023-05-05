@@ -55,8 +55,9 @@ func (fr *FirebaseRepository) initializeAssignmentsListener(course *models.Cours
 	return nil
 }
 
+// Only works for active courses
 func (fr *FirebaseRepository) GetAssignmentByID(courseID string, assignmentID string) (*models.Assignment, error) {
-	course, err := fr.GetCourseByID(courseID)
+	course, err := fr.GetActiveCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,12 +73,7 @@ func (fr *FirebaseRepository) GetAssignmentByID(courseID string, assignmentID st
 	return assignment, nil
 }
 
-func (fr *FirebaseRepository) GetAssignmentByName(courseID string, name string) (assignment *models.Assignment, err error) {
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return nil, err
-	}
-
+func (fr *FirebaseRepository) GetAssignmentByName(course *models.Course, name string) (assignment *models.Assignment, err error) {
 	nameCollapsed := utils.CollapseString(name)
 
 	course.AssignmentsLock.RLock()

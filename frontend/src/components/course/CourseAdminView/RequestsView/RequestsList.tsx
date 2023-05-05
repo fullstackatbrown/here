@@ -1,4 +1,5 @@
-import { Stack, TablePagination, Typography } from "@mui/material";
+import UndoIcon from '@mui/icons-material/Undo';
+import { IconButton, Stack, TablePagination, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { sortRequestsByTime } from "@util/shared/requestTime";
 import SwapAPI from "api/swaps/api";
@@ -8,8 +9,7 @@ import { Section } from "model/section";
 import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
-import PastRequest from "./PastRequests/PastRequestCard";
-import PendingRequest from "./PendingRequests/PendingRequestCard";
+import RequestCard from "./RequestCard";
 
 export interface RequestsListProps {
   course: Course;
@@ -24,13 +24,29 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
   const [rowsPerPage, setRowsPerPage] = useState(type === "pending" ? -1 : 5);
   const isCourseActive = course.status === CourseStatus.CourseActive
 
+  const undoSwap = (request: Swap) => {
+    toast.promise(SwapAPI.handleSwap(course.ID, request.ID, SwapStatus.Pending), {
+      loading: "Updating request...",
+      success: "Request updated!",
+      error: (err) => handleBadRequestError(err),
+    }, { id: 'handleSwap' })
+  }
+
   const handleSwap = (request: Swap, status: SwapStatus) => {
-    toast
-      .promise(SwapAPI.handleSwap(course.ID, request.ID, status), {
-        loading: "Updating request...",
-        success: "Request updated!",
-        error: (err) => handleBadRequestError(err),
-      })
+    toast.promise(SwapAPI.handleSwap(course.ID, request.ID, status), {
+      loading: "Updating request...",
+      success:
+        <span>
+          Request updated!
+          <IconButton
+            sx={{ p: { xs: 1, md: 0.5 }, color: "inherit", marginLeft: 1 }}
+            onClick={() => undoSwap(request)}
+          >
+            <UndoIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
+          </IconButton>
+        </span>,
+      error: (err) => handleBadRequestError(err),
+    }, { id: 'handleSwap' }) // use id to prevent duplicate toasts
       .catch(() => { });
   };
 
@@ -66,31 +82,16 @@ const RequestsList: FC<RequestsListProps> = ({ course, assignmentsMap, sectionsM
             const assignment = r.assignmentID ? assignmentsMap[r.assignmentID] : undefined;
             const oldSection = r.oldSectionID ? sectionsMap[r.oldSectionID] : undefined;
             const newSection = r.newSectionID ? sectionsMap[r.newSectionID] : undefined;
-            // TODO: mark the request as archived if student is no longer enrolled in the course
-            // right now it's just not displayed and the count of requests would be off
-            return type === "pending" ? (
-              <PendingRequest
-                key={`request${r.ID}`}
-                active={isCourseActive}
-                request={r}
-                student={student}
-                assignment={assignment}
-                oldSection={oldSection}
-                newSection={newSection}
-                handleSwap={handleSwap}
-              />
-            ) : (
-              <PastRequest
-                key={`request${r.ID}`}
-                active={isCourseActive}
-                request={r}
-                student={student}
-                assignment={assignment}
-                oldSection={oldSection}
-                newSection={newSection}
-                handleSwap={handleSwap}
-              />
-            );
+            return <RequestCard
+              key={`request${r.ID}`}
+              active={isCourseActive}
+              request={r}
+              student={student}
+              assignment={assignment}
+              oldSection={oldSection}
+              newSection={newSection}
+              handleSwap={handleSwap}
+            />
           })}
 
         {rowsPerPage != -1 && requests.length > rowsPerPage && (

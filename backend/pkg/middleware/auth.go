@@ -34,16 +34,6 @@ func AuthCtx() func(http.Handler) http.Handler {
 				return
 			}
 
-			// Testing only
-			// userID := "3mVvKLpz1SceBaPxcKkYUEsuuy72"
-			// userID := "hDEeDZK7N3g8TFqWjaPgocC0Fxz2"
-			// user, err := repository.Repository.GetUserByID(userID)
-			// if err != nil {
-			// 	// Missing session cookie.
-			// 	rejectUnauthorizedRequest(w)
-			// 	return
-			// }
-
 			// create a new request context containing the authenticated user
 			ctxWithUser := context.WithValue(r.Context(), "currentUser", user)
 			rWithUser := r.WithContext(ctxWithUser)

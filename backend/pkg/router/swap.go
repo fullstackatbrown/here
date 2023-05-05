@@ -26,7 +26,7 @@ func SwapRoutes() *chi.Mux {
 }
 
 func createSwapHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	user, err := middleware.GetUserFromRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -41,7 +41,7 @@ func createSwapHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
+	req.Course = course
 	req.User = user
 
 	// Whether if student is already in the section is checked in frontend
@@ -60,7 +60,7 @@ func createSwapHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	swapID := chi.URLParam(r, "swapID")
 
 	user, err := middleware.GetUserFromRequest(r)
@@ -77,7 +77,7 @@ func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
+	req.Course = course
 	req.SwapID = swapID
 	req.User = user
 
@@ -97,7 +97,7 @@ func updateSwapHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	swapID := chi.URLParam(r, "swapID")
 	handledBy, err := middleware.GetUserFromRequest(r)
 	if err != nil {
@@ -113,13 +113,17 @@ func handleSwapHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
+	req.Course = course
 	req.SwapID = swapID
 	req.HandledBy = handledBy
 
-	err = repo.Repository.HandleSwap(req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	badRequestErr, internalErr := repo.Repository.HandleSwap(req)
+	if badRequestErr != nil {
+		http.Error(w, badRequestErr.Error(), http.StatusBadRequest)
+		return
+	}
+	if internalErr != nil {
+		http.Error(w, internalErr.Error(), http.StatusInternalServerError)
 		return
 	}
 

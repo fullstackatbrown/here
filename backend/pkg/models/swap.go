@@ -27,25 +27,25 @@ type Swap struct {
 }
 
 type CreateSwapRequest struct {
-	CourseID     string `json:"courseID,omitempty"`
-	User         *User  `json:"user,omitempty"`
-	OldSectionID string `json:"oldSectionID"`
-	NewSectionID string `json:"newSectionID"`
-	AssignmentID string `json:"assignmentID"`
-	Reason       string `json:"reason"`
+	Course       *Course `json:"course,omitempty"`
+	User         *User   `json:"user,omitempty"`
+	OldSectionID string  `json:"oldSectionID"`
+	NewSectionID string  `json:"newSectionID"`
+	AssignmentID string  `json:"assignmentID"`
+	Reason       string  `json:"reason"`
 }
 
 type UpdateSwapRequest struct {
-	CourseID     string `json:"courseID"`
-	User         *User  `json:"user,omitempty"`
-	SwapID       string `json:"swapID"`
-	NewSectionID string `json:"newSectionID"`
-	AssignmentID string `json:"assignmentID"`
-	Reason       string `json:"reason"`
+	Course       *Course `json:"course,omitempty"`
+	User         *User   `json:"user,omitempty"`
+	SwapID       string  `json:"swapID"`
+	NewSectionID string  `json:"newSectionID"`
+	AssignmentID string  `json:"assignmentID"`
+	Reason       string  `json:"reason"`
 }
 
 type HandleSwapRequest struct {
-	CourseID  string        `json:"courseID,omitempty"`
+	Course    *Course       `json:"course,omitempty"`
 	SwapID    string        `json:"swapID,omitempty"`
 	Status    RequestStatus `json:"status,omitempty"`
 	HandledBy *User         `json:"handledBy,omitempty"`

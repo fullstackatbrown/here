@@ -194,16 +194,33 @@ func (fr *FirebaseRepository) addStudentToCourse(user *models.User, course *mode
 	return false, false, nil
 }
 
+// 1. Remove course from student (courses, defaultSections, actualSections)
+// 2. Remove student from course
+// 3. Remove student from section, if exists
+// Student grades are kept
 func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, courseID string) error {
-	// TODO: delete other user data
+	// check if the student is previously enrolled in any section
+	profile, err := fr.GetProfileById(userID)
+	if err != nil {
+		return err
+	}
+	defaultSection, hadOldSection := profile.DefaultSections[courseID]
 
 	batch := fr.firestoreClient.Batch()
-	// Remove course for student
+	// remove course from student
 	userProfileRef := fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(userID)
 	batch.Update(userProfileRef, []firestore.Update{
 		{
 			Path:  "courses",
 			Value: firestore.ArrayRemove(courseID),
+		},
+		{
+			Path:  "defaultSections." + courseID,
+			Value: firestore.Delete,
+		},
+		{
+			Path:  "actualSections." + courseID,
+			Value: firestore.Delete,
 		},
 	})
 
@@ -216,8 +233,21 @@ func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, courseID st
 		},
 	})
 
+	if hadOldSection {
+		// decrement section enrolled count
+		sectionRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).
+			Collection(models.FirestoreSectionsCollection).Doc(defaultSection)
+
+		batch.Update(sectionRef, []firestore.Update{
+			{
+				Path:  "numEnrolled",
+				Value: firestore.Increment(-1),
+			},
+		})
+	}
+
 	// Commit the batch.
-	_, err := batch.Commit(firebase.Context)
+	_, err = batch.Commit(firebase.Context)
 	if err != nil {
 		return err
 	}

@@ -15,7 +15,12 @@ func CourseCtx() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			courseID := chi.URLParam(r, "courseID")
 
-			ctx := context.WithValue(r.Context(), "courseID", courseID)
+			course, err := repo.Repository.GetCourseByID(courseID)
+			if err != nil {
+				rejectNotFound(w, err)
+			}
+
+			ctx := context.WithValue(r.Context(), "course", course)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -24,13 +29,13 @@ func CourseCtx() func(http.Handler) http.Handler {
 func RequireCourseActive() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			courseID := r.Context().Value("courseID").(string)
+			course := r.Context().Value("course").(*models.Course)
 
-			course, err := repo.Repository.GetActiveCourseByID(courseID)
-			if err != nil {
+			if course.Status != models.CourseActive {
 				rejectBadRequest(w, fmt.Errorf("Cannot perform this operation on a %s course", course.Status))
 				return
 			}
+
 			next.ServeHTTP(w, r)
 		})
 	}
@@ -45,8 +50,8 @@ func RequireCourseAdmin() func(handler http.Handler) http.Handler {
 				return
 			}
 
-			courseID := r.Context().Value("courseID").(string)
-			if !hasCourseAdminPermission(user, courseID) {
+			course := r.Context().Value("course").(*models.Course)
+			if !hasCourseAdminPermission(user, course.ID) {
 				rejectForbiddenRequest(w)
 				return
 			}
@@ -65,8 +70,8 @@ func RequireCourseStaff() func(handler http.Handler) http.Handler {
 				return
 			}
 
-			courseID := r.Context().Value("courseID").(string)
-			if !hasCourseStaffPermission(user, courseID) {
+			course := r.Context().Value("course").(*models.Course)
+			if !hasCourseStaffPermission(user, course.ID) {
 				rejectForbiddenRequest(w)
 				return
 			}
@@ -85,8 +90,8 @@ func RequireCourseOrSiteAdmin() func(handler http.Handler) http.Handler {
 				return
 			}
 
-			courseID := r.Context().Value("courseID").(string)
-			if !hasCourseStaffPermission(user, courseID) && !user.IsAdmin {
+			course := r.Context().Value("course").(*models.Course)
+			if !hasCourseStaffPermission(user, course.ID) && !user.IsAdmin {
 				rejectForbiddenRequest(w)
 				return
 			}

@@ -99,7 +99,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
             </Typography>
           </Stack>
 
-          <Stack direction={{ xs: "column", md: "row" }}>
+          <Stack direction="row">
             {survey.published &&
               <Tooltip title="Preview">
                 <IconButton onClick={handleShowPreview} size={"small"} disabled={!active} sx={{ marginRight: 0.5, marginTop: 0.3 }}>

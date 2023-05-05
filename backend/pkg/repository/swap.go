@@ -135,19 +135,14 @@ func (fr *FirebaseRepository) checkSwapRequestDueDate(courseID string, assignmen
 
 func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *models.Swap, badRequestErr error, internalErr error) {
 
-	course, err := fr.GetCourseByID(req.CourseID)
-	if err != nil {
-		return nil, err, nil
-	}
-
 	// Check for conflicting swaps
-	requestErr := fr.checkDuplicateSwapRequest(course, req.User.ID, req.AssignmentID, req.OldSectionID, req.NewSectionID)
+	requestErr := fr.checkDuplicateSwapRequest(req.Course, req.User.ID, req.AssignmentID, req.OldSectionID, req.NewSectionID)
 	if requestErr != nil {
 		return nil, requestErr, nil
 	}
 
 	// Check if the assignment due date has passed
-	requestErr = fr.checkSwapRequestDueDate(req.CourseID, req.AssignmentID)
+	requestErr = fr.checkSwapRequestDueDate(req.Course.ID, req.AssignmentID)
 	if requestErr != nil {
 		return nil, requestErr, nil
 	}
@@ -163,9 +158,9 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *m
 		Status:       models.STATUS_PENDING,
 	}
 
-	if course.AutoApproveRequests {
+	if req.Course.AutoApproveRequests {
 		// check the availability of the new section
-		section, err := fr.GetSectionByID(course.ID, req.NewSectionID)
+		section, err := fr.GetSectionByID(req.Course.ID, req.NewSectionID)
 		if err != nil {
 			return nil, err, nil
 		}
@@ -188,17 +183,18 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *m
 	}
 
 	batch := fr.firestoreClient.Batch()
+	var err error
 
 	// If the swap is approved, assign the sections
 	if swap.Status == models.STATUS_APPROVED {
-		batch, err = fr.approveSwap(req.CourseID, swap)
+		batch, err = fr.approveSwap(req.Course, swap)
 		if err != nil {
 			return nil, nil, err
 		}
 	}
 
 	// Create the swap in the batch
-	ref := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	ref := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSwapsCollection).NewDoc()
 	batch.Create(ref, swap)
 
@@ -214,13 +210,8 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *m
 }
 
 func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) (badRequestErr error, internalErr error) {
-	course, err := fr.GetCourseByID(req.CourseID)
-	if err != nil {
-		return err, nil
-	}
-
 	// Find the old swap
-	oldSwap, err := fr.GetPendingSwapByID(req.CourseID, req.SwapID)
+	oldSwap, err := fr.GetPendingSwapByID(req.Course.ID, req.SwapID)
 	if err != nil {
 		return fmt.Errorf("No swap with status pending found"), nil
 	}
@@ -231,12 +222,12 @@ func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) (badRequ
 	}
 
 	// Check for conflicting swaps
-	requestErr := fr.checkDuplicateSwapRequest(course, req.User.ID, req.AssignmentID, oldSwap.OldSectionID, req.NewSectionID)
+	requestErr := fr.checkDuplicateSwapRequest(req.Course, req.User.ID, req.AssignmentID, oldSwap.OldSectionID, req.NewSectionID)
 	if requestErr != nil {
 		return requestErr, nil
 	}
 
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSwapsCollection).Doc(req.SwapID).Update(firebase.Context, []firestore.Update{
 		{Path: "newSectionID", Value: req.NewSectionID},
 		{Path: "reason", Value: req.Reason},
@@ -246,45 +237,32 @@ func (fr *FirebaseRepository) UpdateSwap(req *models.UpdateSwapRequest) (badRequ
 	return nil, err
 }
 
-func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
+func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) (badRequestErr error, internalError error) {
 	batch := fr.firestoreClient.Batch()
 
-	swap, err := fr.GetSwapByID(req.CourseID, req.SwapID)
+	swap, err := fr.GetSwapByID(req.Course.ID, req.SwapID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Assign sections if the swap is approved
 	if req.Status == models.STATUS_APPROVED {
-		batch, err = fr.approveSwap(req.CourseID, swap)
+		// Check if student is in the course
+		if _, ok := req.Course.Students[swap.StudentID]; !ok {
+			return fmt.Errorf("Student is no longer enrolled in this course"), nil
+		}
+
+		batch, err = fr.approveSwap(req.Course, swap)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	// If status was approved, but now marking as pending, undo the swap
 	if req.Status == models.STATUS_PENDING && swap.Status == models.STATUS_APPROVED {
-		if swap.AssignmentID == "" {
-			// Permanent Swap
-			batch, err = fr.assignPermanentSection(&models.AssignSectionsRequest{
-				CourseID:     req.CourseID,
-				StudentID:    swap.StudentID,
-				NewSectionID: swap.OldSectionID,
-			})
-			if err != nil {
-				return err
-			}
-
-		} else {
-			// Temporary Swap
-			batch, err = fr.assignTemporarySection(&models.AssignSectionsRequest{
-				CourseID:     req.CourseID,
-				StudentID:    swap.StudentID,
-				OldSectionID: swap.NewSectionID,
-				NewSectionID: swap.OldSectionID,
-				AssignmentID: swap.AssignmentID,
-			})
-
+		batch, err = fr.undoSwap(req.Course, swap)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -295,7 +273,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		handledBy = "system"
 	}
 
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSwapsCollection).Doc(req.SwapID), []firestore.Update{
 		{Path: "status", Value: req.Status},
 		{Path: "handledBy", Value: handledBy},
@@ -304,12 +282,12 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 	_, err = batch.Commit(firebase.Context)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	course, err := fr.GetCourseByID(req.CourseID)
+	course, err := fr.GetCourseByID(req.Course.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Send notification to student
@@ -329,7 +307,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) error {
 		glog.Warningf("error sending claim notification: %v\n", err)
 	}
 
-	return nil
+	return nil, nil
 
 }
 
@@ -367,7 +345,7 @@ func (fr *FirebaseRepository) scheduleExpireSwaps() {
 func (fr *FirebaseRepository) expireSwaps() {
 	fr.coursesLock.RLock()
 	defer fr.coursesLock.RUnlock()
-	for courseID, course := range fr.courses {
+	for _, course := range fr.courses {
 		course.PendingSwapsLock.RLock()
 		course.AssignmentsLock.RLock()
 
@@ -375,24 +353,13 @@ func (fr *FirebaseRepository) expireSwaps() {
 			if swap.AssignmentID == "" {
 				continue
 			}
-			// if assignment no longer exists, archive swap
-			if _, ok := course.Assignments[swap.AssignmentID]; !ok {
-				err := fr.HandleSwap(&models.HandleSwapRequest{
-					CourseID: courseID,
-					SwapID:   swap.ID,
-					Status:   models.STATUS_ARCHIVED,
-				})
-				if err != nil {
-					glog.Warning("error archiving swap: %v\n", err)
-				}
-				continue
-			}
-			// if assignment is expired, archive swap
-			if course.Assignments[swap.AssignmentID].DueDate.Before(time.Now()) {
-				err := fr.HandleSwap(&models.HandleSwapRequest{
-					CourseID: courseID,
-					SwapID:   swap.ID,
-					Status:   models.STATUS_ARCHIVED,
+			assignment, ok := course.Assignments[swap.AssignmentID]
+			// if assignment no longer exists or is past due date, archive swap
+			if !ok || assignment.DueDate.Before(time.Now()) {
+				_, err := fr.HandleSwap(&models.HandleSwapRequest{
+					Course: course,
+					SwapID: swap.ID,
+					Status: models.STATUS_ARCHIVED,
 				})
 				if err != nil {
 					glog.Warning("error archiving swap: %v\n", err)

@@ -20,7 +20,6 @@ func CourseRoutes() *chi.Mux {
 
 	router.Route("/{courseID}", func(r chi.Router) {
 		r.Use(middleware.CourseCtx())
-		r.Get("/", getCourseHandler)
 
 		// site admin only
 		r.With(middleware.RequireAdmin()).Delete("/", deleteCourseHandler)
@@ -38,18 +37,6 @@ func CourseRoutes() *chi.Mux {
 	})
 
 	return router
-}
-
-func getCourseHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
-
-	course, err := repo.Repository.GetCourseByID(courseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, course)
 }
 
 func createCourseHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,13 +64,7 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
-
-	course, err := repo.Repository.GetCourseByID(courseID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	course := r.Context().Value("course").(*models.Course)
 
 	// Cannot delete course if currently active or archived
 	if course.Status != models.CourseInactive {
@@ -91,18 +72,18 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: courseID})
+	err := repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: course.ID})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(200)
-	w.Write([]byte("Successfully deleted course " + courseID))
+	w.Write([]byte("Successfully deleted course " + course.ID))
 }
 
 func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 
 	var req *models.UpdateCourseRequest
 
@@ -112,7 +93,7 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = &courseID
+	req.CourseID = &course.ID
 
 	err = repo.Repository.UpdateCourse(req)
 	if err != nil {
@@ -121,11 +102,11 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(200)
-	w.Write([]byte("Successfully updated course " + courseID))
+	w.Write([]byte("Successfully updated course " + course.ID))
 }
 
 func updateCourseInfoHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 
 	var req *models.UpdateCourseInfoRequest
 
@@ -135,7 +116,7 @@ func updateCourseInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = &courseID
+	req.CourseID = &course.ID
 
 	err = repo.Repository.UpdateCourseInfo(req)
 	if err != nil {
@@ -144,11 +125,11 @@ func updateCourseInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(200)
-	w.Write([]byte("Successfully updated course status " + courseID))
+	w.Write([]byte("Successfully updated course status " + course.ID))
 }
 
 func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 
 	var req *models.AssignSectionsRequest
 
@@ -158,18 +139,7 @@ func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
-
-	if req.NewSectionID == "" {
-		err = repo.Repository.RemoveStudentFromSection(req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(200)
-		w.Write([]byte("Successfully unassigned section"))
-	}
+	req.Course = course
 
 	err = repo.Repository.AssignStudentToSection(req)
 	if err != nil {
@@ -180,8 +150,7 @@ func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: send notification to student
 
 	w.WriteHeader(200)
-	w.Write([]byte("Successfully assigned student to course " + courseID))
-
+	w.Write([]byte("Successfully assigned section for student " + req.StudentID))
 }
 
 func bulkUploadHandler(w http.ResponseWriter, r *http.Request) {
