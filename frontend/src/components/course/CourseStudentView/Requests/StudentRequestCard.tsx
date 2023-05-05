@@ -1,5 +1,5 @@
 import RequestInformation from "@components/course/CourseAdminView/RequestsView/RequestInformation";
-import RequestStatusChip from "@components/course/CourseAdminView/RequestsView/RequestStatusChip";
+import StatusChip from "@components/course/CourseAdminView/RequestsView/RequestStatusChip";
 import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import { ExpandMore } from "@mui/icons-material";
 import CloseIcon from '@mui/icons-material/Close';
@@ -79,7 +79,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                                 }
                             </Box>
                             <Typography sx={{ fontSize: 14 }}>{assignment ? "One Time Swap" : "Permanent Swap"}</Typography>
-                            <RequestStatusChip
+                            <StatusChip
                                 status={request.status}
                                 style={{ marginRight: "auto" }}
                             />
@@ -107,7 +107,7 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
                                 </IconButton>
                             </Tooltip>
                         </Stack> :
-                        <Typography color="secondary" fontSize={14}>{formatRequestTime(request)}</Typography>
+                        <Typography color="secondary" fontSize={14}>{formatRequestTime(request.requestTime)}</Typography>
                     }
                 </Stack >
             </Box >

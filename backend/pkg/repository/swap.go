@@ -277,6 +277,7 @@ func (fr *FirebaseRepository) HandleSwap(req *models.HandleSwapRequest) (badRequ
 		models.FirestoreSwapsCollection).Doc(req.SwapID), []firestore.Update{
 		{Path: "status", Value: req.Status},
 		{Path: "handledBy", Value: handledBy},
+		{Path: "handledTime", Value: time.Now()},
 	})
 
 	_, err = batch.Commit(firebase.Context)

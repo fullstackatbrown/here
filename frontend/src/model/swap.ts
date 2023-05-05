@@ -13,6 +13,7 @@ export interface Swap {
   oldSectionID: string;
   newSectionID: string;
   requestTime: Date;
+  handledTime?: Date;
   reason: string;
   status: SwapStatus;
   handledBy: string;

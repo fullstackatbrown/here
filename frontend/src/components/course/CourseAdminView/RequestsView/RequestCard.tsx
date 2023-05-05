@@ -12,7 +12,7 @@ import { Section } from "model/section";
 import { Swap, SwapStatus } from "model/swap";
 import { FC, useState } from "react";
 import RequestInformation from "./RequestInformation";
-import RequestStatusChip from "./RequestStatusChip";
+import StatusChip from "./RequestStatusChip";
 
 export interface RequestCardProps {
   active: boolean;
@@ -37,12 +37,45 @@ const RequestCard: FC<RequestCardProps> = ({
   const [hover, setHover] = useState(false);
   const theme = useTheme();
   const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const pending = request.status === SwapStatus.Pending;
+  console.log(request)
 
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
       handleSwap(request, status);
     };
+  }
+
+  function studentNameTrimmed() {
+    if (request.studentName.length > 23 && pending) {
+      return request.studentName.substring(0, 23) + ".";
+    }
+    return request.studentName;
+  }
+
+  function formatRequestInfo() {
+    if (!student) {
+      return "[No Longer Enrolled; Please Archive]"
+    }
+
+    // TODO: handle exceptionally long string
+    const permanentLabel = !assignment ? "[Permanent] " : "";
+
+    let info = `${permanentLabel}${formatSectionInfo(oldSection, true)} → ${formatSectionInfo(newSection, true)}`
+    if (info.length > 72) {
+      info = info.substring(0, 72) + " ...";
+    }
+    const overCapacityLabel = getSectionAvailableSeats(newSection, assignment?.ID) <= 0 ? " (!)" : "";
+
+    return (
+      <>
+        {info}
+        <Box component="span" color={theme.palette.error.main}>
+          {overCapacityLabel}
+        </Box>
+      </>)
+
   }
 
   return (
@@ -57,40 +90,27 @@ const RequestCard: FC<RequestCardProps> = ({
       >
         <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
           <Stack direction="row" spacing={4} alignItems="center" py={{ xs: 1, md: 0.5 }}>
-            <Stack direction="row" spacing={1} minWidth={{ md: 280 }} alignItems="center">
+            <Stack direction="row" spacing={1} width={{ md: 200 }} alignItems="center">
               <Box width={17} display="flex" alignItems="center">
                 {expanded ?
                   <ExpandMore sx={{ fontSize: 16 }} /> :
                   <KeyboardArrowRightIcon sx={{ fontSize: 16, color: "text.disabled" }} />
                 }
               </Box>
-              {/* TODO: handle exceptionally long string */}
               <Typography sx={{ fontSize: 15 }}>
-                {request.studentName} - {assignment ? "One Time" : "Permanent"}{!student && " (no longer enrolled)"}
+                {expanded ? request.studentName : studentNameTrimmed()}
               </Typography>
-              {request.status !== SwapStatus.Pending &&
-                <RequestStatusChip
-                  status={request.status}
-                  style={{ marginRight: "auto" }}
-                />
-              }
+
             </Stack>
             {!expanded && !isXsScreen && student && (
-              <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 15 }}>
-                {formatSectionInfo(oldSection, true)}
-                &nbsp;&nbsp;{"→"}&nbsp;&nbsp;
-                {formatSectionInfo(newSection, true)}&nbsp;
-                {getSectionAvailableSeats(newSection, assignment?.ID) <= 0 && (
-                  <Box component="span" color={theme.palette.error.main}>
-                    (!)
-                  </Box>
-                )}
+              <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 14 }}>
+                {formatRequestInfo()}
               </Typography>
             )}
           </Stack>
-          <Box display="flex" width={80} justifyContent="flex-end">
-            {(request.status === SwapStatus.Pending && (hover || expanded) && active) ? (
-              <Stack direction="row" display="flex" alignItems="center" spacing={{ xs: 0.5, md: 0 }}>
+          <Box display="flex" maxWidth={110} justifyContent="flex-end">
+            {(pending && (hover || expanded) && active) ? (
+              <Stack direction="row" display="flex" alignItems="center" spacing={0.5}>
                 <Tooltip title="approve" disableTouchListener>
                   <IconButton
                     sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
@@ -116,12 +136,14 @@ const RequestCard: FC<RequestCardProps> = ({
                 </Tooltip>
               </Stack>
             ) : (
-              <Typography color="secondary" fontSize={14}>
-                {formatRequestTime(request)}
-              </Typography>
+              pending ?
+                <Typography color="secondary" fontSize={14}>
+                  {formatRequestTime(request.requestTime, false, pending)}
+                </Typography> :
+                <StatusChip status={request.status} timestamp={request.handledTime} />
             )}
           </Box>
-        </Stack>
+        </Stack >
       </Box >
       <Collapse in={expanded}>
         <Box ml={4} mt={1} mb={2}>
