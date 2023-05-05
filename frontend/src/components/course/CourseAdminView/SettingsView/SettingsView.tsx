@@ -28,7 +28,6 @@ export default function SettingsView({ course }: SettingsViewProps) {
 
     const loading = staffLoading || adminLoading || adminInvitesLoading || staffInvitesLoading;
     const isCourseActive = course.status === CourseStatus.CourseActive;
-    const showSnackbar = useSnackbar();
 
     useEffect(() => {
         if (copyButtonRef.current) {
@@ -46,13 +45,6 @@ export default function SettingsView({ course }: SettingsViewProps) {
                 error: (err) => handleBadRequestError(err)
             })
             .catch(() => { })
-    }
-
-    const showCopyToClipboardSnackbar = () => {
-        showSnackbar({
-            message: "Copied to clipboard",
-            severity: "success",
-        });
     }
 
     return (
@@ -81,7 +73,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
                         </Typography>
                         <Button
                             color="inherit" sx={{ paddingTop: 0, paddingBottom: 0, fontSize: 16 }}
-                            ref={copyButtonRef} onClick={showCopyToClipboardSnackbar}
+                            ref={copyButtonRef} onClick={() => { toast.success("Copied to clipboard") }}
                         >
                             {course.entryCode}
                             <ContentCopyIcon
