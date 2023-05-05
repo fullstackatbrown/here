@@ -302,12 +302,19 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 		}
 
 		if invite.CourseID != "" {
+			course, err := fr.GetCourseByID(invite.CourseID)
+			// if course no longer exists, delete the invite
+			if err != nil {
+				_, err = doc.Ref.Delete(firebase.Context)
+				if err != nil {
+					glog.Warningf("Error deleting invite: %v\n", err)
+				}
+				continue
+			}
+
 			if invite.Permission == models.CourseStudent {
 				// Add as student
-				course, _ := fr.GetCourseByID(invite.CourseID)
-				// if course no longer exists, do nothing
 				fr.addStudentToCourse(user, course)
-
 			} else {
 				// Add as staff
 				_, err = fr.AddPermissions(&models.AddPermissionRequest{
@@ -320,6 +327,7 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 				}
 			}
 		}
+
 		if invite.IsAdmin {
 			_, err = fr.firestoreClient.Collection(models.FirestoreProfilesCollection).Doc(user.ID).Update(firebase.Context, []firestore.Update{
 				{
