@@ -12,3 +12,8 @@ export const unique = (arr: any[]) => {
     return arr.filter((item, index) => arr.indexOf(item) === index);
 }
 
+export const partition = <T>(array: T[], isValid: (elem: T) => boolean) => {
+    return array.reduce(([pass, fail], elem) => {
+        return isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
+    }, [[], []]);
+}

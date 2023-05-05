@@ -29,8 +29,9 @@ const colors: Record<SwapStatus, "success" | "error" | "secondary" | "primary"> 
 }
 
 const RequestStatusChip: FC<RequestStatusChipProps> = ({ status, timestamp, style }) => {
-    console.log(timestamp)
-    const getLabel = (status: SwapStatus) => status + (timestamp ? ` ${formatRequestTime(timestamp)}` : "")
+    const pending = status === SwapStatus.Pending;
+    const getLabel = (status: SwapStatus) =>
+        (pending ? "submitted" : status) + (timestamp ? ` ${formatRequestTime(timestamp, false, pending)}` : "")
     return <MyChip label={getLabel(status)} variant="outlined" color={colors[status]} style={style} />;
 };
 

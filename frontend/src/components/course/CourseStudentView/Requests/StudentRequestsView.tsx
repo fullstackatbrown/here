@@ -1,10 +1,10 @@
-import { Button, Stack, Theme, Tooltip, useMediaQuery } from "@mui/material";
+import { Button, Theme, Tooltip, useMediaQuery } from "@mui/material";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Swap } from "model/swap";
 import { User } from "model/user";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import StudentViewHeader from "../StudentViewHeader";
 import StudentRequestsList from "./StudentRequestsList";
 import SwapRequestDialog from "./SwapRequestDialog";
