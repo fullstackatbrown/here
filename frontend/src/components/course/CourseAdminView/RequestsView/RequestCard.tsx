@@ -3,7 +3,7 @@ import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { Box, Collapse, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Collapse, Grid, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
@@ -38,7 +38,6 @@ const RequestCard: FC<RequestCardProps> = ({
   const theme = useTheme();
   const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const pending = request.status === SwapStatus.Pending;
-  console.log(request)
 
   function onClickHandleSwap(status: SwapStatus) {
     return (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -47,25 +46,13 @@ const RequestCard: FC<RequestCardProps> = ({
     };
   }
 
-  function studentNameTrimmed() {
-    if (request.studentName.length > 23 && pending) {
-      return request.studentName.substring(0, 23) + ".";
-    }
-    return request.studentName;
-  }
-
   function formatRequestInfo() {
     if (!student) {
       return "[No Longer Enrolled; Please Archive]"
     }
 
-    // TODO: handle exceptionally long string
     const permanentLabel = !assignment ? "[Permanent] " : "";
-
     let info = `${permanentLabel}${formatSectionInfo(oldSection, true)} → ${formatSectionInfo(newSection, true)}`
-    if (info.length > 72) {
-      info = info.substring(0, 72) + " ...";
-    }
     const overCapacityLabel = getSectionAvailableSeats(newSection, assignment?.ID) <= 0 ? " (!)" : "";
 
     return (
@@ -88,32 +75,34 @@ const RequestCard: FC<RequestCardProps> = ({
         onMouseEnter={() => !isXsScreen && setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-          <Stack direction="row" spacing={4} alignItems="center" py={{ xs: 1, md: 0.5 }}>
-            <Stack direction="row" spacing={1} width={{ md: 200 }} alignItems="center">
-              <Box width={17} display="flex" alignItems="center">
-                {expanded ?
-                  <ExpandMore sx={{ fontSize: 16 }} /> :
-                  <KeyboardArrowRightIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-                }
-              </Box>
-              <Typography sx={{ fontSize: 15 }}>
-                {expanded ? request.studentName : studentNameTrimmed()}
+        <Grid container spacing={3.5} display="flex" flexDirection="row" alignItems="center">
+          {/* Left: arrow and student name */}
+          <Grid item xs={8} md={expanded ? 10.4 : 3}>
+            <Box display="flex" flexDirection="row" alignItems="center" py={{ xs: 1, md: 0.5 }}>
+              {expanded ?
+                <ExpandMore sx={{ fontSize: 16 }} /> :
+                <KeyboardArrowRightIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+              }
+              <Typography sx={{ fontSize: 15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ml: 1 }}>
+                {request.studentName}
               </Typography>
+            </Box>
+          </Grid>
 
-            </Stack>
-            {!expanded && !isXsScreen && student && (
-              <Typography color="secondary" sx={{ whiteSpace: "pre-line", fontSize: 14 }}>
-                {formatRequestInfo()}
-              </Typography>
-            )}
-          </Stack>
-          <Box display="flex" maxWidth={110} justifyContent="flex-end">
+          {/* Middle: request info, only display on hover, no display on mobile */}
+          <Grid item md={7.4} display={{ xs: "none", md: expanded ? "none" : "flex" }} alignItems="center">
+            <Typography color="secondary" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: 14 }}>
+              {formatRequestInfo()}
+            </Typography>
+          </Grid>
+
+          {/* Right: either time or the buttons */}
+          <Grid item xs={4} md={1.6} display="flex" justifyContent="flex-end" alignItems="center">
             {(pending && (hover || expanded) && active) ? (
-              <Stack direction="row" display="flex" alignItems="center" spacing={0.5}>
+              <>
                 <Tooltip title="approve" disableTouchListener>
                   <IconButton
-                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
+                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit", mr: 0.5 }}
                     onClick={onClickHandleSwap(SwapStatus.Approved)}
                   >
                     <CheckIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
@@ -121,7 +110,7 @@ const RequestCard: FC<RequestCardProps> = ({
                 </Tooltip>
                 <Tooltip title="deny" disableTouchListener>
                   <IconButton
-                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }}
+                    sx={{ p: { xs: 1, md: 0.5 }, color: "inherit", mr: 0.5 }}
                     onClick={onClickHandleSwap(SwapStatus.Denied)}>
                     <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>
@@ -134,7 +123,7 @@ const RequestCard: FC<RequestCardProps> = ({
                     <ArchiveOutlinedIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
                   </IconButton>
                 </Tooltip>
-              </Stack>
+              </>
             ) : (
               pending ?
                 <Typography color="secondary" fontSize={14}>
@@ -142,14 +131,16 @@ const RequestCard: FC<RequestCardProps> = ({
                 </Typography> :
                 <StatusChip status={request.status} timestamp={request.handledTime} />
             )}
-          </Box>
-        </Stack >
+          </Grid>
+        </Grid>
       </Box >
-      <Collapse in={expanded}>
+
+      {/* Info that is displayed on click */}
+      < Collapse in={expanded}>
         <Box ml={4} mt={1} mb={2}>
           <RequestInformation {...{ request, student, assignment, oldSection, newSection }} />
         </Box>
-      </Collapse>
+      </Collapse >
     </>
   );
 };
