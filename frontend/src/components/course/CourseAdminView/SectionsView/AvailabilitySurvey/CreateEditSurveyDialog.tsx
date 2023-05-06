@@ -1,4 +1,5 @@
 import {
+    Alert,
     Button,
     Dialog,
     DialogActions,
@@ -91,11 +92,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
 
     const getInstructionText = () => {
         if (survey) {
-            if (!survey.published) {
-                return "This will update the survey with the new section times. You will be able to see the preview before publishing it."
-            } else {
-                return "This will update the existing survey and sync it with the section times. Keep in mind that the survey is already published."
-            }
+            return survey.published ? "" : "This will update the survey with the new section times. You will be able to see the preview before publishing it."
         } else {
             return "This will autogenerate a survey from the section times. You will be able to see the preview before publishing it."
         }
@@ -107,6 +104,11 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 {survey ? "Update" : "Create"} Survey
             </DialogTitle>
             <DialogContent>
+                {survey && survey.published &&
+                    <Alert severity="warning" sx={{ marginBottom: 2.5 }} style={{ display: 'flex', alignItems: 'center' }} >
+                        This survey has already been published. Previous student responses will be kept and might not match the new section times.
+                    </Alert>
+                }
                 <Typography variant="body1" mb={2}>
                     {getInstructionText()}
                 </Typography>
