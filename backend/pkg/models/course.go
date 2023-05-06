@@ -52,7 +52,7 @@ type CourseUserData struct {
 	StudentID      string `firestore:"studentID"`
 	Email          string `firestore:"email"`
 	DisplayName    string `firestore:"displayName"`
-	DefaultSection string `firestore:"defaultSection"`
+	DefaultSection string `firestore:"defaultSection,omitempty"`
 }
 
 type GetCourseRequest struct {

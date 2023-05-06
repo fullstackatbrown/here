@@ -9,7 +9,7 @@ import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
-import CreateSurveyDialog from "./CreateEditSurveyDialog";
+import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyDialog from "./SurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 
@@ -79,6 +79,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
         onClose={() => setUpdateSurveyDialog(false)}
         courseID={survey.courseID}
         survey={survey}
+        sections={sections}
       />
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
       <SurveyResponsesDialog

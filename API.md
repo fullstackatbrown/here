@@ -78,7 +78,7 @@
     entryCode: string                              # course's entry code, 6 randomly generated characters
     autoApproveRequests: boolean                   # whether swap requests will be automatically approved
     term: string                                   # semester this course is offered
-    students: map[string]string                    # map from studentIDs to sectionIDs
+    students: map[string]CourseUserData            # map from studentIDs to student info
     permissions: map[string]CoursePermission       # map from userID to their permission for the course (admin or staff)
 
     <b>sections (sub-collection)</b>
@@ -127,9 +127,9 @@
         published: bool                            # whether if the survey is published
         endTime: timestamp                         # when this survey will be made unavailable
         description: string
-        capacity: map[string]map[string]int        # map from time to a map from sectionID to capacity
-        responses: map[string][]string             # map from studentID to available times
-        results: map[string][]string               # final results: map from sectionID to list of studentIDs
+        capacity: map[string]int                   # map from option to capacity
+        responses: map[string][]string             # map from studentID to chosen options
+        results: map[string][]CourseUserData       # map from option to list of student data
 
 <b>profiles</b>
     displayName: string

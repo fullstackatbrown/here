@@ -112,20 +112,22 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 		val := v.Field(i).Interface()
 
 		// Only include the fields that are set
-		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "SurveyID") {
+		if (field != "CourseID") && (field != "SurveyID") && (field != "updateCapacity") && (!reflect.ValueOf(val).IsNil()) {
 			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
 		}
 	}
 
-	// Get all unique section times
-	capacity, err := fr.GetUniqueSectionTimes(*req.CourseID)
-	if err != nil {
-		return fmt.Errorf("Error getting unique section times: %v", err)
+	if req.UpdateCapacity {
+		// Get all unique section times
+		capacity, err := fr.GetUniqueSectionTimes(*req.CourseID)
+		if err != nil {
+			return fmt.Errorf("Error getting unique section times: %v", err)
+		}
+
+		updates = append(updates, firestore.Update{Path: "capacity", Value: capacity})
 	}
 
-	updates = append(updates, firestore.Update{Path: "capacity", Value: capacity})
-
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
 		models.FirestoreSurveysCollection).Doc(*req.SurveyID).Update(firebase.Context, updates)
 	return err
 }

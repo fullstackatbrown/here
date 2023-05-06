@@ -1,4 +1,4 @@
-import { Section } from "./section";
+import { CourseUserData } from "./course";
 
 export interface Survey {
   ID: string;
@@ -6,11 +6,10 @@ export interface Survey {
   name: string;
   description: string;
   endTime: string;
-  capacity: Record<string, Record<string, number>>;
+  options: Record<string, number>;
   responses: Record<string, string[]>;
   published: boolean;
-  results: Record<string, string[]>;
-  resultsReadable: Record<string, string[]>;
+  results: Record<string, CourseUserData[]>;
 }
 
 export interface SurveyResponse {

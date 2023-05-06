@@ -3,7 +3,7 @@ import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { useState } from "react";
-import CreateSurveyDialog from "./CreateEditSurveyDialog";
+import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyCard from "./SurveyCard";
 import SurveyDialog from "./SurveyDialog";
 
@@ -29,6 +29,7 @@ export default function AvailabilitySurvey({ course, sections, survey }: Availab
         open={createSurveyDialog}
         onClose={() => setCreateSurveyDialog(false)}
         courseID={course.ID}
+        sections={sections}
       />
       {survey && (
         <SurveyDialog

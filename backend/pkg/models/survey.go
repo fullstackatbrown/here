@@ -30,11 +30,12 @@ type CreateSurveyRequest struct {
 }
 
 type UpdateSurveyRequest struct {
-	CourseID    *string `json:"courseid,omitempty"`
-	SurveyID    *string `json:"surveyid,omitempty"`
-	Name        *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	EndTime     *string `json:"endTime,omitempty"`
+	CourseID       *string `json:"courseid,omitempty"`
+	SurveyID       *string `json:"surveyid,omitempty"`
+	Name           *string `json:"name,omitempty"`
+	Description    *string `json:"description,omitempty"`
+	EndTime        *string `json:"endTime,omitempty"`
+	UpdateCapacity bool    `json:"updateCapacity,omitempty"`
 }
 
 type CreateSurveyResponseRequest struct {
