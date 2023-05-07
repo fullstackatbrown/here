@@ -159,7 +159,6 @@ func (fr *FirebaseRepository) UpdateSurveyResults(courseID string, surveyID stri
 			student, err := fr.GetProfileById(studentID)
 			if err != nil {
 				// student no longer exists
-				// TODO: handle error, maybe remove from results
 				continue
 			}
 			students = append(students, models.CourseUserData{
@@ -190,6 +189,11 @@ func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID
 
 	for option, students := range survey.Results {
 		for _, student := range students {
+
+			if _, ok := course.Students[student.StudentID]; !ok {
+				// if student no longer enrolled in the course, skip
+				continue
+			}
 
 			batch, err := fr.assignPermanentSection(&models.AssignSectionsRequest{
 				Course:       course,
