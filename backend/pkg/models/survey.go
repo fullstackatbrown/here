@@ -23,7 +23,7 @@ type SurveyOption struct {
 }
 
 type CreateSurveyRequest struct {
-	CourseID        string                    `json:"courseid,omitempty"`
+	Course          *Course                   `json:"course,omitempty"`
 	Name            string                    `json:"name"`
 	Description     string                    `json:"description"`
 	EndTime         string                    `json:"endTime"`
@@ -32,7 +32,7 @@ type CreateSurveyRequest struct {
 }
 
 type UpdateSurveyRequest struct {
-	CourseID        *string                   `json:"courseid,omitempty"`
+	Course          *Course                   `json:"course,omitempty"`
 	SurveyID        *string                   `json:"surveyid,omitempty"`
 	Name            *string                   `json:"name,omitempty"`
 	Description     *string                   `json:"description,omitempty"`

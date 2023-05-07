@@ -40,9 +40,7 @@ func SurveyRoutes() *chi.Mux {
 }
 
 func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
-
-	// TODO: Check survey of same name
+	course := r.Context().Value("course").(*models.Course)
 
 	var req *models.CreateSurveyRequest
 
@@ -52,7 +50,14 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
+	req.Course = course
+
+	// Check if a survey with the same name exists
+	_, err = repo.Repository.GetSurveyByName(course, req.Name)
+	if err == nil {
+		http.Error(w, "A survey with the same name already exists", http.StatusBadRequest)
+		return
+	}
 
 	s, err := repo.Repository.CreateSurvey(req)
 	if err != nil {
@@ -64,7 +69,7 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	surveyID := chi.URLParam(r, "surveyID")
 
 	// TODO: Check survey of same name
@@ -77,11 +82,12 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.SurveyID = &surveyID
-	req.CourseID = &courseID
+	req.Course = course
 
-	_, err = repo.Repository.GetSurveyByID(courseID, surveyID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	// Check if a survey with the same name exists
+	s, err := repo.Repository.GetSurveyByName(course, *req.Name)
+	if err == nil && s.ID != surveyID {
+		http.Error(w, "A survey with the same name already exists", http.StatusBadRequest)
 		return
 	}
 

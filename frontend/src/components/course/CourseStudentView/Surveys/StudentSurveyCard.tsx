@@ -34,7 +34,11 @@ const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, course, student
                 disabled={ended}
             />
             <Grid container
-                sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
+                sx={{
+                    "&:hover": { backgroundColor: theme.palette.action.hover },
+                    // borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+                    // borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                }}
                 mx={-0.8}
                 pr={2}
                 py={1.5}

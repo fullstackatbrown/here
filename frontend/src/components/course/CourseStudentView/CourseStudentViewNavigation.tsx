@@ -17,9 +17,7 @@ export default function CourseStudentViewNavigation({ surveys, student }: Course
 
   const numPendingSurvey = useMemo(() => {
     // published, didn't fill out, has not ended
-    console.log(surveys)
-    console.log(surveys.filter(s => s.published && !(s.responses?.[student.ID]) && new Date(s.endTime) > new Date()))
-    return surveys.filter(s => s.published && !(s.responses?.[student.ID]) && new Date(s.endTime) > new Date()).length
+    return surveys?.filter(s => s.published && !(s.responses?.[student.ID]) && new Date(s.endTime) > new Date()).length
   }, [surveys, student])
 
   function navigateTo(view: View) {

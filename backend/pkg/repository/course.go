@@ -55,6 +55,10 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 				if err != nil {
 					return fmt.Errorf("error initializing assignments listener for course %s: %v", course.Code, err)
 				}
+				err = fr.initializeSurveysListener(course)
+				if err != nil {
+					return fmt.Errorf("error initializing surveys listener for course %s: %v", course.Code, err)
+				}
 				err = fr.initializePendingSwapsListener(course)
 				if err != nil {
 					return fmt.Errorf("error initializing pending swaps listener for course %s: %v", course.Code, err)
@@ -76,6 +80,7 @@ func (fr *FirebaseRepository) initializeCoursesListener() {
 				log.Printf("Cancelling listeners for course %s", course.Code)
 				course.SectionsListenerCancelFunc()
 				course.AssignmentsListenerCancelFunc()
+				course.SurveysListenerCancelFunc()
 				course.PendingSwapsListenerCancelFunc()
 				delete(fr.courses, id)
 				delete(fr.coursesEntryCodes, course.EntryCode)

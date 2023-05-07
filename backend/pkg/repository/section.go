@@ -57,9 +57,9 @@ func (fr *FirebaseRepository) initializeSectionsListener(course *models.Course) 
 	return nil
 }
 
-// GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
+// Only works for active courses
 func (fr *FirebaseRepository) GetSectionByID(courseID string, sectionID string) (*models.Section, error) {
-	course, err := fr.GetCourseByID(courseID)
+	course, err := fr.GetActiveCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (fr *FirebaseRepository) GetSectionByInfo(course *models.Course, startTime 
 		}
 	}
 
-	return nil, nil
+	return nil, qerrors.SectionNotFoundError
 }
 
 func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {
