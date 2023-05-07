@@ -41,6 +41,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
 
     return (
         <>
+            {/* TODO: multiple surveys */}
             {survey &&
                 <SurveyDialog
                     open={surveyDialog}

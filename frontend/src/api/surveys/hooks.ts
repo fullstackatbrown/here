@@ -3,9 +3,9 @@ import { FirestoreCoursesCollection, FirestoreSurveysCollection } from "api/fire
 import { Survey } from "model/survey";
 import { useEffect, useState } from "react";
 
-export function useSurvey(courseID: string): [Survey | undefined, boolean] {
+export function useSurveys(courseID: string): [Survey[] | undefined, boolean] {
     const [loading, setLoading] = useState(true);
-    const [survey, setSurvey] = useState<Survey | undefined>(undefined);
+    const [survey, setSurvey] = useState<Survey[] | undefined>(undefined);
 
     useEffect(() => {
         const db = getFirestore();
@@ -17,7 +17,7 @@ export function useSurvey(courseID: string): [Survey | undefined, boolean] {
                 querySnapshot.forEach((doc) => {
                     res.push({ ID: doc.id, ...doc.data() } as Survey);
                 });
-                setSurvey(res[0])
+                setSurvey(res);
             }
             setLoading(false);
         });

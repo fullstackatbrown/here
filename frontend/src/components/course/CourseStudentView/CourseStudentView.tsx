@@ -3,7 +3,7 @@ import {
 } from "@mui/material";
 import { useAssignmentsMap } from "api/assignment/hooks";
 import { useSectionsMap } from "api/section/hooks";
-import { useSurvey } from "api/surveys/hooks";
+import { useSurveys } from "api/surveys/hooks";
 import { useSwapsByStudent } from "api/swaps/hooks";
 import { Course } from "model/course";
 import { User } from "model/user";
@@ -25,7 +25,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID)
   const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID)
   const [requests, requestsLoading] = useSwapsByStudent(course.ID, student.ID);
-  const [survey, surveyLoading] = useSurvey(course.ID);
+  const [survey, surveyLoading] = useSurveys(course.ID);
 
   useEffect(() => {
     const view = router.query.view;

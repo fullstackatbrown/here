@@ -10,10 +10,10 @@ import SurveyDialog from "./SurveyDialog";
 export interface SurveyProps {
   course: Course;
   sections: Section[];
-  survey: Survey;
+  surveys: Survey[];
 }
 
-export default function SurveySection({ course, sections, survey }: SurveyProps) {
+export default function SurveySection({ course, sections, surveys }: SurveyProps) {
   const [createSurveyDialog, setCreateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const isCourseActive = course.status === CourseStatus.CourseActive;
@@ -31,28 +31,21 @@ export default function SurveySection({ course, sections, survey }: SurveyProps)
         courseID={course.ID}
         sections={sections}
       />
-      {survey && (
-        <SurveyDialog
-          open={surveyPreviewDialog}
-          onClose={() => setSurveyPreviewDialog(false)}
-          preview={true}
-          survey={survey}
-        />
-      )}
       <Stack direction="row" justifyContent="space-between" mb={1}>
         <Typography variant="h6" fontWeight={600}>
           Survey
         </Typography>
-        {!survey &&
-          <Button disabled={!isCourseActive} onClick={() => setCreateSurveyDialog(true)}>
-            + Create Survey
-          </Button>
-        }
+        <Button disabled={!isCourseActive} onClick={() => setCreateSurveyDialog(true)}>
+          + Create Survey
+        </Button>
       </Stack>
+      {/* TODO: sorting between the surveys */}
       <Box height={100}>
-        {survey && (
-          <SurveyCard survey={survey} numStudents={numStudents()} sections={sections} active={isCourseActive} />
-        )}
+        <Stack direction="column" spacing={2} mb={5}>
+          {surveys?.map((survey) =>
+            <SurveyCard survey={survey} numStudents={numStudents()} sections={sections} active={isCourseActive} />
+          )}
+        </Stack >
       </Box>
     </>
   );

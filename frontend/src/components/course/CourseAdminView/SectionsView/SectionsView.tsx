@@ -6,7 +6,7 @@ import { FC, useState } from "react";
 import AdminViewHeader from "../AdminViewHeader";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
-import { useSurvey } from "api/surveys/hooks";
+import { useSurveys } from "api/surveys/hooks";
 import SurveySection from "./Survey/Survey";
 
 export interface SectionsViewProps {
@@ -21,7 +21,7 @@ const SectionsView: FC<SectionsViewProps> = ({
   sectionsMap,
 }) => {
   const sections = Object.values(sectionsMap);
-  const [survey, surveyLoading] = useSurvey(course.ID || undefined);
+  const [surveys, surveysLoading] = useSurveys(course.ID || undefined);
   const [createSectionDialog, setcreateSectionDialog] = useState(false);
 
   return (
@@ -60,7 +60,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         ))}
       </Stack>
       {access === CoursePermission.CourseAdmin &&
-        !surveyLoading && <SurveySection {...{ course, sections, survey }} />}
+        !surveysLoading && <SurveySection {...{ course, sections, surveys }} />}
     </>
   );
 };
