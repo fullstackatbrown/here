@@ -5,10 +5,9 @@ import { ExpandMore } from "@mui/icons-material";
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Box, Collapse, Grid, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Collapse, Grid, IconButton, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
-import { formatRequestTime } from "@util/shared/requestTime";
+import formatSectionInfo from "@util/shared/formatSectionInfo";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus, CourseUserData } from "model/course";
@@ -60,56 +59,57 @@ const StudentRequestCard: FC<StudentRequestCardProps> = ({ request, student, cou
 
     return (
         <>
-            <Box
+            <Grid
+                container
                 sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
                 px={1}
                 py={0.5}
+                width="100%"
+                display="flex" flexDirection="row" alignItems="center"
                 onClick={() => setExpanded(!expanded)}
                 onMouseEnter={() => !isXsScreen && setHover(true)}
                 onMouseLeave={() => setHover(false)}
             >
-                <Grid container spacing={3.5} display="flex" flexDirection="row" alignItems="center" >
-                    {/* Left: arrow and student name */}
-                    <Grid item xs={8} md={expanded ? 10 : 3}>
-                        <Box display="flex" flexDirection="row" alignItems="center" py={{ xs: 1, md: 0.5 }}>
-                            {expanded ?
-                                <ExpandMore sx={{ fontSize: 16 }} /> :
-                                <KeyboardArrowRightIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-                            }
-                            <Typography sx={{ fontSize: 15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ml: 1 }}>
-                                {assignment ? "One Time Swap" : "Permanent Swap"}
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    {/* Middle: request info, only display on hover, no display on mobile */}
-                    <Grid item md={7} display={{ xs: "none", md: expanded ? "none" : "flex" }} alignItems="center">
-                        <Typography color="secondary" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: 14 }}>
-                            {formatSectionInfo(oldSection, true)} → {formatSectionInfo(newSection, true)}
+                {/* Left: arrow and student name */}
+                <Grid item xs={8} md={expanded ? 10 : 3}>
+                    <Box display="flex" flexDirection="row" alignItems="center" py={{ xs: 1, md: 0.5 }}>
+                        {expanded ?
+                            <ExpandMore sx={{ fontSize: 16 }} /> :
+                            <KeyboardArrowRightIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+                        }
+                        <Typography sx={{ fontSize: 15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ml: 1 }}>
+                            {assignment ? "One Time Swap" : "Permanent Swap"}
                         </Typography>
-                    </Grid>
-
-                    {/* Right: either time or the buttons */}
-                    <Grid item xs={4} md={2} display="flex" justifyContent="flex-end" alignItems="center">
-                        {(hover || expanded) && isCourseActive && pending ? (
-                            <>
-                                <Tooltip title="edit">
-                                    <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickEditSwap}>
-                                        <EditIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="cancel">
-                                    <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickCancelSwap}>
-                                        <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
-                                    </IconButton>
-                                </Tooltip>
-                            </>
-                        ) : (
-                            <StatusChip status={request.status} timestamp={pending ? request.requestTime : request.handledTime} />
-                        )}
-                    </Grid>
+                    </Box>
                 </Grid>
-            </Box >
+
+                {/* Middle: request info, only display on hover, no display on mobile */}
+                <Grid item md={7} display={{ xs: "none", md: expanded ? "none" : "flex" }} alignItems="center">
+                    <Typography color="secondary" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: 14 }}>
+                        {formatSectionInfo(oldSection, true)} → {formatSectionInfo(newSection, true)}
+                    </Typography>
+                </Grid>
+
+                {/* Right: either time or the buttons */}
+                <Grid item xs={4} md={2} display="flex" justifyContent="flex-end" alignItems="center">
+                    {(hover || expanded) && isCourseActive && pending ? (
+                        <>
+                            <Tooltip title="edit">
+                                <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickEditSwap}>
+                                    <EditIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="cancel">
+                                <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickCancelSwap}>
+                                    <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
+                                </IconButton>
+                            </Tooltip>
+                        </>
+                    ) : (
+                        <StatusChip status={request.status} timestamp={pending ? request.requestTime : request.handledTime} />
+                    )}
+                </Grid>
+            </Grid>
             <Collapse in={expanded}>
                 <Box ml={4} mt={1} mb={2}>
                     <RequestInformation {...{ request, student, assignment, oldSection, newSection }} studentView />
