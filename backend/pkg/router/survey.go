@@ -72,8 +72,6 @@ func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	course := r.Context().Value("course").(*models.Course)
 	surveyID := chi.URLParam(r, "surveyID")
 
-	// TODO: Check survey of same name
-
 	var req *models.UpdateSurveyRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)

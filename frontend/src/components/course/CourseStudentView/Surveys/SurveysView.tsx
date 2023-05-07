@@ -13,12 +13,8 @@ export interface SurveysViewProps {
 }
 
 const SurveysView: FC<SurveysViewProps> = ({ course, surveys, student }) => {
-    const surveysVisible = useMemo(() => {
-        return surveys.filter(survey => survey.published)
-    }, [surveys])
-
     const surveySorted = useMemo(() => {
-        return surveys.filter(s => s.published).sort((a, b) => {
+        return surveys.filter(survey => survey.published).filter(s => s.published).sort((a, b) => {
             return new Date(a.endTime).getTime() - new Date(b.endTime).getTime()
         })
     }, [surveys])
@@ -31,8 +27,11 @@ const SurveysView: FC<SurveysViewProps> = ({ course, surveys, student }) => {
                     <Typography variant="body1" mt={1}>The instructor has not published any survey</Typography>
                 }
                 {surveySorted
-                    .map((survey) =>
-                        <StudentSurveyCard key={survey.ID} {...{ survey, student, course }} />
+                    .map((survey, index) =>
+                        <StudentSurveyCard
+                            key={survey.ID} {...{ survey, student }}
+                            index={index}
+                        />
                     )}
             </Stack>
         </>

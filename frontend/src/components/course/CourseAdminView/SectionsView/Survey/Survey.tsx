@@ -2,7 +2,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyCard from "./SurveyCard";
 
@@ -21,6 +21,10 @@ export default function SurveySection({ course, sections, surveys }: SurveyProps
     return Object.keys(course.students).length;
   }
 
+  const surveysSorted = useMemo(() => {
+    return surveys.sort((a, b) => new Date(a.endTime).getTime() - new Date(b.endTime).getTime())
+  }, [surveys])
+
   return (
     <>
       <CreateSurveyDialog
@@ -37,10 +41,9 @@ export default function SurveySection({ course, sections, surveys }: SurveyProps
           + Create Survey
         </Button>
       </Stack>
-      {/* TODO: sorting between the surveys */}
       <Box height={100}>
         <Stack direction="column" spacing={2} mb={5}>
-          {surveys?.map((survey) =>
+          {surveysSorted.map((survey) =>
             <SurveyCard survey={survey} numStudents={numStudents()} sections={sections} active={isCourseActive} />
           )}
         </Stack >

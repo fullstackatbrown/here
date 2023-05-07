@@ -1,6 +1,7 @@
 import SurveyDialog from "@components/course/CourseAdminView/SectionsView/Survey/SurveyDialog";
 import MyChip from "@components/shared/MyChip/MyChip";
-import { Grid, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import { Grid, IconButton, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { formatDistance } from "date-fns";
 import { Course } from "model/course";
 import { Survey } from "model/survey";
@@ -9,11 +10,11 @@ import { FC, useMemo, useState } from "react";
 
 export interface StudentSurveyCardProps {
     survey: Survey;
-    course: Course;
     student: User;
+    index: number;
 }
 
-const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, course, student }) => {
+const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, student, index }) => {
 
     const filledOut = useMemo(() => survey.responses?.[student.ID] !== undefined, [survey, student]);
     const ended = useMemo(() => survey.endTime && new Date(survey.endTime) < new Date(), [survey]);
@@ -36,11 +37,12 @@ const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, course, student
             <Grid container
                 sx={{
                     "&:hover": { backgroundColor: theme.palette.action.hover },
-                    // borderTop: "1px solid rgba(0, 0, 0, 0.12)",
-                    // borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                    borderTop: index === 0 ? "1px solid rgba(0, 0, 0, 0.12)" : "none",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+
                 }}
                 mx={-0.8}
-                pr={2}
+                pr={1.5}
                 py={1.5}
                 width="100%"
                 display="flex" flexDirection="row" alignItems="center"
@@ -48,13 +50,13 @@ const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, course, student
                 onMouseEnter={() => !isXsScreen && setHover(true)}
                 onMouseLeave={() => setHover(false)}
             >
-                <Grid item xs={8} md={3}>
+                <Grid item xs={8} md={3.5} display="flex" flexDirection="row" alignItems="center">
                     <Typography sx={{ fontSize: 15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ml: 1 }}>
                         {survey.name}
                     </Typography>
                 </Grid>
 
-                <Grid item md={7} display={{ xs: "none", md: "flex" }} alignItems="center">
+                <Grid item md={6.5} display={{ xs: "none", md: "flex" }} alignItems="center">
                     <Typography color="secondary" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: 14 }}>
                         {survey.description}
                     </Typography>
@@ -63,7 +65,7 @@ const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, course, student
                 <Grid item xs={4} md={2} display="flex" justifyContent="flex-end" alignItems="center">
                     {hover ?
                         <Typography fontSize={12} color="inherit" variant="button">
-                            {ended ? "View" : (filledOut ? "Update" : "Create")} Response
+                            click to {ended ? "view" : (filledOut ? "update" : "fill")}
                         </Typography> :
                         (filledOut ?
                             <MyChip label="submitted" variant="outlined" color="success" />
