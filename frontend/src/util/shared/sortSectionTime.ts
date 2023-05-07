@@ -40,21 +40,25 @@ export function sortSections(sections: Section[]): Section[] {
     return sections;
 }
 
-export function getUniqueSectionTimes(sections: Section[]): SurveyOption[] {
+// Returns (1) a list of survey options (which is a list of unique section times with their total capacity)
+// (2) a map from unique section times to the corresponding sections and their capacity
+export function getUniqueSectionTimes(sections: Section[]): [SurveyOption[], Record<string, Record<string, number>>] {
     let times: Record<string, DayTime> = {};
-    let capacity: Record<string, number> = {};
+    let capacity: Record<string, Record<string, number>> = {};
     for (const section of sections) {
         const t = formatSectionTime(section);
         if (!(t in times)) {
             times[t] = section;
-            capacity[t] = section.capacity;
-        } else {
-            capacity[t] += section.capacity;
+            capacity[t] = {};
         }
+        capacity[t][section.ID] = section.capacity;
     }
     const listOfSections = mapToList(times);
     listOfSections.sort((a, b) => timeComparator(times[a.option], times[b.option]));
-    return listOfSections.map(section => {
-        return { option: section.option, capacity: capacity[section.option] };
+    const surveyOptions = listOfSections.map(section => {
+        const totalCapacity = Object.values(capacity[section.option]).reduce((a, b) => a + b, 0);
+        return { option: section.option, capacity: totalCapacity };
     })
+
+    return [surveyOptions, capacity];
 }

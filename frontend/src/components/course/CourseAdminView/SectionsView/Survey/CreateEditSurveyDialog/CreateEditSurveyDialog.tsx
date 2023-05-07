@@ -12,17 +12,17 @@ import {
     Stepper
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
+import { getUniqueSectionTimes } from "@util/shared/sortSectionTime";
 import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
 import { Section } from "model/section";
-import { Survey } from "model/survey";
+import { Survey, SurveyOption } from "model/survey";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import SurveyStepOne from "./SurveyStepOne";
 import SurveyStepThree from "./SurveyStepThree";
 import SurveyStepTwo from "./SurveyStepTwo";
-import { SurveyOption } from "model/survey"
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;
@@ -38,12 +38,17 @@ export type SurveyFormData = {
     enddate: Date,
     endtime: Date,
     endDateParsed: string,
-    options: SurveyOption[]
+    options: SurveyOption[],
+    sectionCapacity?: Record<string, Record<string, number>>
 };
 
 const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, survey, sections }) => {
     const [activeStep, setActiveStep] = useState(0);
+    // if we have a survey, we look at whether if it uses section data by checking if sectionCapacity is defined
+    const [useSectionData, setUseSectionData] = useState(survey ? survey.sectionCapacity !== undefined : true)
     const steps = ['Basic Information', 'Survey Fields', 'Preview'];
+
+    const [options, capacity] = useMemo(() => getUniqueSectionTimes(sections), [sections])
 
     const defaultValues = useMemo(() => ({
         name: survey ? survey.name : "Time Availability Survey",
@@ -51,23 +56,30 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
         endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
         endDateParsed: survey ? survey.endTime : getNextWeekDate().toISOString(),
-        options: survey ? survey.options : [{ option: "", capacity: "" }]
+        options: survey ? survey.options : options,
+        sectionCapacity: survey ? survey.sectionCapacity : capacity
     }), [survey])
 
     const { register, handleSubmit, control, reset, setValue, getValues, watch, formState: { } } = useForm<SurveyFormData>({
         defaultValues: defaultValues
     });
 
-    const { fields, remove, insert, replace } = useFieldArray({
+    const { fields, remove, insert } = useFieldArray({
         name: "options",
         control,
-        rules: {
-            required: "Please add at least 1 option"
-        }
     });
 
     const watchenddate = watch("enddate")
     const watchendtime = watch("endtime")
+
+    // control the entire field array, which means each onChange reflects on the fields object.
+    const watchOptions = watch("options");
+    const controlledOptions = fields.map((field, index) => {
+        return {
+            ...field,
+            ...watchOptions[index]
+        };
+    });
 
     useEffect(() => {
         if (watchenddate && watchendtime) {
@@ -75,9 +87,23 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
             const endTime = new Date(watchendtime)
             endDate.setHours(endTime.getHours(), endTime.getMinutes())
             setValue("endDateParsed", endDate.toISOString())
-            console.log(endDate.toISOString())
         }
     }, [watchenddate, watchendtime])
+
+    useEffect(() => {
+        if (useSectionData) {
+            setValue("options", options)
+            setValue("sectionCapacity", capacity)
+        } else {
+            // if sectionCapacity is set, it means that useSectionData was previously true
+            // hence we reset the fields
+            // otherwise we need to keep the user entered data
+            if (getValues("sectionCapacity")) {
+                setValue("options", [{ option: "", capacity: NaN }])
+                setValue("sectionCapacity", undefined)
+            }
+        }
+    }, [useSectionData, sections])
 
     const handleNext = () => {
         if (activeStep === 0) {
@@ -86,22 +112,29 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 return
             }
         } else if (activeStep === 1) {
-            if (fields.length === 0 || fields.every(field => field.option === "" && field.capacity === "")) {
-                toast.error("Please add at least 1 option.")
+            console.log(controlledOptions)
+            // Check if all fields are filled
+            if (controlledOptions.some((field) => field.option === "" || Number.isNaN(field.capacity))) {
+                toast.error("Please fill in all the fields.")
                 return
             }
         }
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
 
-    const handleBack = () => { setActiveStep((prevActiveStep) => prevActiveStep - 1); };
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
 
     useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
     const onSubmit = handleSubmit(async (data, event) => {
-        console.log(data)
         if (survey) {
-            toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, data.endDateParsed, data.options), {
+            toast.promise(SurveyAPI.updateSurvey(
+                courseID, survey.ID, data.name,
+                data.description, data.endDateParsed,
+                data.options, data.sectionCapacity
+            ), {
                 loading: "Updating survey...",
                 success: "Survey updated!",
                 error: (err) => {
@@ -115,7 +148,10 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 .then(() => handleOnClose())
                 .catch(() => { })
         } else {
-            toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description, data.endDateParsed, data.options), {
+            toast.promise(SurveyAPI.createSurvey(
+                courseID, data.name,
+                data.description, data.endDateParsed,
+                data.options, data.sectionCapacity), {
                 loading: "Creating survey...",
                 success: "Survey created!",
                 error: (err) => {
@@ -135,6 +171,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         onClose()
         reset()
         setActiveStep(0)
+        setUseSectionData(true)
     }
 
     return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
@@ -165,7 +202,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                     {
                         {
                             0: <SurveyStepOne {...{ register, control }} />,
-                            1: <SurveyStepTwo {...{ register, fields, remove, setValue, insert, replace, sections }} />,
+                            1: <SurveyStepTwo options={controlledOptions} {...{ register, remove, setValue, insert, useSectionData, setUseSectionData }} />,
                             2: <SurveyStepThree {...{ getValues }} />,
                         }[activeStep]
                     }

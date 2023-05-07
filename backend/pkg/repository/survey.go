@@ -65,12 +65,13 @@ func (fr *FirebaseRepository) GetSurveyByCourse(courseID string) (survey *models
 func (fr *FirebaseRepository) CreateSurvey(req *models.CreateSurveyRequest) (*models.Survey, error) {
 
 	survey := &models.Survey{
-		Name:        req.Name,
-		Description: req.Description,
-		EndTime:     req.EndTime,
-		CourseID:    req.CourseID,
-		Options:     req.Options,
-		Published:   false,
+		Name:            req.Name,
+		Description:     req.Description,
+		EndTime:         req.EndTime,
+		CourseID:        req.CourseID,
+		Options:         req.Options,
+		SectionCapacity: req.SectionCapacity,
+		Published:       false,
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(

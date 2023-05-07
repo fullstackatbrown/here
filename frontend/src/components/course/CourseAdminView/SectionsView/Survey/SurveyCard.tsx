@@ -45,9 +45,9 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
   const handleDeleteSurvey = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     const confirmed = await showDialog({
-      title: 'Delete Survey',
-      message: `Are you sure you want to delete ${survey.name}? This action cannot be undone.`,
-      warning: survey.published && "This survey is already published. Deleting this survey will delete all student responses."
+      title: `Confirm Delete Survey?`,
+      warning: survey.published && "This survey is already published. Deleting this survey will delete all student responses.",
+      message: "This action cannot be undone."
     });
     if (confirmed) {
       toast

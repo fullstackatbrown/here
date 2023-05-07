@@ -1,15 +1,23 @@
 import APIClient from "api/APIClient";
 import { SurveyOption } from "model/survey";
 
-async function createSurvey(courseID: string, name: string, description: string, endTime: string, options: SurveyOption[]): Promise<string> {
+async function createSurvey(
+  courseID: string, name: string,
+  description: string, endTime: string,
+  options: SurveyOption[], sectionCapacity: Record<string, Record<string, number>>
+): Promise<string> {
   return APIClient.post(`/courses/${courseID}/surveys`, {
-    name, description, endTime, options
+    name, description, endTime, options, sectionCapacity
   });
 }
 
-async function updateSurvey(courseID: string, surveyID: string, name: string, description: string, endTime: string, options: SurveyOption[]): Promise<string> {
+async function updateSurvey(
+  courseID: string, surveyID: string, name: string,
+  description: string, endTime: string,
+  options: SurveyOption[], sectionCapacity: Record<string, Record<string, number>>
+): Promise<string> {
   return APIClient.patch(`/courses/${courseID}/surveys/${surveyID}`, {
-    name, description, endTime, options
+    name, description, endTime, options, sectionCapacity
   });
 }
 async function publishSurvey(

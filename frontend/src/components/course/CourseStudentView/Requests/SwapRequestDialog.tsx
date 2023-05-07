@@ -116,7 +116,6 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                     error: (err) => handleBadRequestError(err)
                 })
                 .then((res) => {
-                    console.log(res)
                     handleOnClose()
                 }
                 )
