@@ -56,7 +56,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     }
 
     const handleExportResults = () => {
-        exportSurveyResults(survey.results, sections)
+        exportSurveyResults(survey.results)
     }
 
     const handleExportResponses = () => {
