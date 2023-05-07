@@ -74,6 +74,8 @@ func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 	req.CourseID = courseID
 	req.AssignmentID = assignmentID
 
+	// TODO: check assignment same name
+
 	err = repo.Repository.UpdateAssignment(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -16,10 +16,9 @@ import { useCourseInvites } from "api/auth/hooks";
 export interface CourseAdminViewProps {
   course: Course;
   access: CoursePermission;
-  headerInView: boolean;
 }
 
-export default function CourseAdminView({ course, access, headerInView }: CourseAdminViewProps) {
+export default function CourseAdminView({ course, access }: CourseAdminViewProps) {
   const router = useRouter();
   const { courseID } = router.query;
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID);
@@ -38,7 +37,7 @@ export default function CourseAdminView({ course, access, headerInView }: Course
   return (
     <Grid container>
       <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
-        <CourseAdminViewNavigation access={access} headerInView={headerInView} />
+        <CourseAdminViewNavigation access={access} />
       </Grid>
       <Grid item xs={11} md={7.3}>
         {router.query.view && !loading && (

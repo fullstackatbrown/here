@@ -4,32 +4,15 @@ import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
-import { useState } from "react";
 
 interface CourseAdminViewNavigationProps {
   access: CoursePermission;
-  headerInView: boolean;
 }
 
-export default function CourseAdminViewNavigation({
-  access, headerInView
-}: CourseAdminViewNavigationProps) {
+export default function CourseAdminViewNavigation({ access }: CourseAdminViewNavigationProps) {
   const router = useRouter();
   const { query } = router;
   const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
-  const [open, setOpen] = useState(true);
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-
-  // useEffect(() => {
-  //     if (!headerInView) {
-  //         setOpen(false)
-  //     } else {
-  //         setOpen(true)
-  //     }
-  // }, [headerInView])
-
 
   function navigateTo(view: View) {
     return router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true });
@@ -68,8 +51,6 @@ export default function CourseAdminViewNavigation({
           xs: "none",
           md: "flex",
         },
-        transform: open ? "translate3d(0, 0, 0)" : "translate3d(-130px, 0, 0)",
-        transition: "transform 0.5s ease-in-out",
       }}
       flexDirection="row"
       alignItems="start"

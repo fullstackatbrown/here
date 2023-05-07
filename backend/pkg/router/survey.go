@@ -42,6 +42,8 @@ func SurveyRoutes() *chi.Mux {
 func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 
+	// TODO: Check survey of same name
+
 	var req *models.CreateSurveyRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -62,9 +64,10 @@ func createSurveyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSurveyHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: what if the survey is already published
 	courseID := chi.URLParam(r, "courseID")
 	surveyID := chi.URLParam(r, "surveyID")
+
+	// TODO: Check survey of same name
 
 	var req *models.UpdateSurveyRequest
 

@@ -8,12 +8,11 @@ import { FC } from "react";
 import toast from "react-hot-toast";
 
 export interface CourseHeaderProps {
-  intersectionRef: (node?: Element) => void;
   course: Course;
   access: CoursePermission;
 }
 
-export const CourseHeader: FC<CourseHeaderProps> = ({ intersectionRef, course, access }) => {
+export const CourseHeader: FC<CourseHeaderProps> = ({ course, access }) => {
   const showDialog = useDialog()
   const handleReactivateCourse = async () => {
     const confirmed = await showDialog({
@@ -43,7 +42,7 @@ export const CourseHeader: FC<CourseHeaderProps> = ({ intersectionRef, course, a
         </Alert>
       }
       <Stack direction="row" spacing={2} alignItems="center">
-        <Typography ref={intersectionRef} variant="h5" fontWeight={600}>
+        <Typography variant="h5" fontWeight={600}>
           {course.code}: {course.title}
         </Typography>
       </Stack>

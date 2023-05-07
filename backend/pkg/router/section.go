@@ -71,6 +71,8 @@ func updateSectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: Check if a section with the same time and location already exists
+
 	req.Course = course
 	req.SectionID = &sectionID
 

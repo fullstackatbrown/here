@@ -13,6 +13,7 @@ import CourseStudentViewNavigation from "./CourseStudentViewNavigation";
 import StudentHomeView from "./Home/StudentHomeView";
 import StudentRequestsView from "./Requests/StudentRequestsView";
 import StudentSettingsView from "./Settings/StudentSettingsView";
+import SurveysView from "./Surveys/SurveysView";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -28,7 +29,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
 
   useEffect(() => {
     const view = router.query.view;
-    if (view === undefined || !["home", "my requests", "settings"].includes(view as string)) {
+    if (view === undefined || !["home", "my requests", "settings", "surveys"].includes(view as string)) {
       router.push(`${course.ID}/?view=home`, undefined, { shallow: true });
     }
   }, [router, course]);
@@ -37,13 +38,14 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
     !sectionsMapLoading && !assignmentsMapLoading && !surveysLoading &&
     <Grid container>
       <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
-        <CourseStudentViewNavigation />
+        <CourseStudentViewNavigation {...{ student, surveys }} />
       </Grid>
       <Grid item xs={11} md={7.3}>
         {router.query.view && sectionsMap && assignmentsMap && (
           <>
             {router.query.view === "home" && !surveysLoading && <StudentHomeView {...{ course, student, surveys, sectionsMap, assignmentsMap }} />}
             {router.query.view === "my requests" && !requestsLoading && <StudentRequestsView {...{ course, student, requests, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "surveys" && <SurveysView {...{ course, student, surveys }} />}
             {router.query.view === "settings" && <StudentSettingsView course={course} />}
           </>)}
       </Grid>

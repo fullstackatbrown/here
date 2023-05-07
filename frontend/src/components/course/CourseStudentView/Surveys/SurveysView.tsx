@@ -1,20 +1,30 @@
-import { Card, Dialog, DialogContent, DialogTitle, Grid } from "@mui/material";
-import { formatDistance } from "date-fns";
+import { Button, Grid } from "@mui/material";
+import { Course } from "model/course";
+import { FC, useMemo } from "react";
+import StudentViewHeader from "../StudentViewHeader";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AuthAPI from "api/auth/api";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
+import { handleBadRequestError } from "@util/errors";
+import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import { Survey } from "model/survey";
 import { User } from "model/user";
-import { FC, useMemo } from "react";
+import { formatDistance } from "date-fns";
 
-interface AllSurveysDialogProps {
-    open: boolean;
-    onClose: () => void;
+export interface SurveysViewProps {
+    course: Course;
     surveys: Survey[];
     student: User;
 }
 
-const AllSurveysDialog: FC<AllSurveysDialogProps> = ({ open, onClose, surveys, student }) => {
+const SurveysView: FC<SurveysViewProps> = ({ course, surveys, student }) => {
+    const surveysVisible = useMemo(() => {
+        return surveys.filter(survey => survey.published)
+    }, [surveys])
 
     const surveyInformation = useMemo(() => {
-        const surveysSorted = surveys.sort((a, b) => {
+        const surveysSorted = surveys.filter(s => s.published).sort((a, b) => {
             return new Date(a.endTime).getTime() - new Date(b.endTime).getTime()
         })
 
@@ -27,11 +37,9 @@ const AllSurveysDialog: FC<AllSurveysDialogProps> = ({ open, onClose, surveys, s
         })
     }, [surveys])
 
-
-
-    return <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>All Surveys</DialogTitle>
-        <DialogContent>
+    return (
+        <>
+            <StudentViewHeader view="surveys" />
             {surveyInformation.map((info) => (
                 <Grid container spacing={2} key={info.survey.ID}>
                     <Grid item xs={12} sm={6} md={4} >
@@ -46,11 +54,14 @@ const AllSurveysDialog: FC<AllSurveysDialogProps> = ({ open, onClose, surveys, s
                 </Grid>
 
             ))}
+        </>
+    );
+};
 
-        </DialogContent>
-    </Dialog>
+export default SurveysView;
 
-
-}
-
-export default AllSurveysDialog
+// {surveysVisible.length > 0 &&
+//     <Button variant={isXsScreen ? "outlined" : "text"} startIcon={<CalendarMonth />} onClick={() => { setAllSurveysDialog(true) }}>
+//         {/* {studentHasFilledOutSurvey() ? "Update Survey Response" : "Fill Out Survey"} */}
+//     </Button>
+//   }
