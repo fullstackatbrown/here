@@ -11,31 +11,31 @@ type Survey struct {
 	Description string                      `firestore:"description"`
 	Published   bool                        `firestore:"published"`
 	EndTime     string                      `firestore:"endTime"`
-	Options     []Option                    `firestore:"options"`
+	Options     []SurveyOption              `firestore:"options"`
 	Responses   map[string][]string         `firestore:"responses"`
 	Results     map[string][]CourseUserData `firestore:"results"`
 }
 
-type Option struct {
+type SurveyOption struct {
 	Option   string `firestore:"option"`
 	Capacity int    `firestore:"capacity"`
 }
 
 type CreateSurveyRequest struct {
-	CourseID    string   `json:"courseid,omitempty"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	EndTime     string   `json:"endTime"`
-	Options     []Option `json:"options"`
+	CourseID    string         `json:"courseid,omitempty"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	EndTime     string         `json:"endTime"`
+	Options     []SurveyOption `json:"options"`
 }
 
 type UpdateSurveyRequest struct {
-	CourseID    *string   `json:"courseid,omitempty"`
-	SurveyID    *string   `json:"surveyid,omitempty"`
-	Name        *string   `json:"name,omitempty"`
-	Description *string   `json:"description,omitempty"`
-	EndTime     *string   `json:"endTime,omitempty"`
-	Options     *[]Option `json:"options"`
+	CourseID    *string         `json:"courseid,omitempty"`
+	SurveyID    *string         `json:"surveyid,omitempty"`
+	Name        *string         `json:"name,omitempty"`
+	Description *string         `json:"description,omitempty"`
+	EndTime     *string         `json:"endTime,omitempty"`
+	Options     *[]SurveyOption `json:"options"`
 }
 
 type CreateSurveyResponseRequest struct {

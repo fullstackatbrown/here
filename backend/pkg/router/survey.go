@@ -151,7 +151,7 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// res is a map from section id to list of studentIDs
 	// res = utils.GetAssignedSections(res, survey.Capacity)
-	// repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
+	repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully generated results for survey " + surveyID))

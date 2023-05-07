@@ -14,8 +14,8 @@ import { Section } from 'model/section';
 import { Survey, SurveyResponse } from "model/survey";
 import { FC, useMemo } from "react";
 import toast from 'react-hot-toast';
-import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
+import SurveyResultsTable from './SurveyResultsTable';
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -92,10 +92,10 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} mb={2}>
                 <Stack direction="column" maxWidth="70%">
                     <Typography fontSize={17} fontWeight={500}>
-                        Allocate Sections
+                        Algorithm Results
                     </Typography>
                     <Typography mb={3}>
-                        This will run an algorithm to automatically allocate sections based on student availability and section capacity.
+                        This will run an algorithm to automatically match students to options based on capacity and student availability.
                         Capacity may be overridden if there is no solution.
                     </Typography>
                 </Stack>
@@ -110,7 +110,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 alignItems: 'center',
             }}>
                 <Box sx={{ width: '70%', }}>
-                    {hasResults() && <AllocatedSectionsTable results={survey.results} sections={sections} />}
+                    {hasResults() && <SurveyResultsTable options={survey.options} results={survey.results} />}
                 </Box>
             </Box>
         </DialogContent>
