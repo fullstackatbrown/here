@@ -1,17 +1,14 @@
-import {
-    Box
-} from "@mui/material";
 import { blue } from '@mui/material/colors';
-import { TimeCount } from "@util/shared/formatSectionResponses";
+import { OptionCount } from "@util/shared/survey";
 import {
-    BarElement, CategoryScale, Chart as ChartJS, LinearScale, Scale
+    BarElement, CategoryScale, Chart as ChartJS, LinearScale
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Bar } from 'react-chartjs-2';
 
 export interface SurveyResponsesBarChartProps {
-    formattedResponses: TimeCount[];
+    formattedResponses: OptionCount[];
     numResponses: number;
     numStudents: number;
 }
@@ -82,7 +79,7 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
 
     useEffect(() => {
         setChartData({
-            labels: formattedResponses.map((data) => data.time),
+            labels: formattedResponses.map((data) => data.option),
             datasets: [
                 {
                     data: formattedResponses.map((data) => data.count),

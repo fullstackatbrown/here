@@ -6,7 +6,7 @@ export interface Survey {
   name: string;
   description: string;
   endTime: string;
-  options: Option[];
+  options: SurveyOption[];
   responses: Record<string, string[]>;
   published: boolean;
   results: Record<string, CourseUserData[]>;
@@ -18,7 +18,7 @@ export interface SurveyResponse {
   availability: string[];
 }
 
-export interface Option {
+export interface SurveyOption {
   option: string,
   capacity: any
 }

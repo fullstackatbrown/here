@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 import SurveyStepOne from "./SurveyStepOne";
 import SurveyStepThree from "./SurveyStepThree";
 import SurveyStepTwo from "./SurveyStepTwo";
-import { Option } from "model/survey"
+import { SurveyOption } from "model/survey"
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;
@@ -38,7 +38,7 @@ export type SurveyFormData = {
     enddate: Date,
     endtime: Date,
     endDateParsed: string,
-    options: Option[]
+    options: SurveyOption[]
 };
 
 const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, survey, sections }) => {

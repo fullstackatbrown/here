@@ -1,4 +1,5 @@
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import DownloadIcon from '@mui/icons-material/Download';
 import {
     Box,
     Button, Dialog, DialogActions, DialogContent,
@@ -6,16 +7,15 @@ import {
     Stack, Typography
 } from "@mui/material";
 import { handleBadRequestError } from '@util/errors';
-import formatSectionResponses, { TimeCount } from "@util/shared/formatSectionResponses";
+import { exportSurveyResponses, exportSurveyResults } from '@util/shared/export';
+import formatSurveyResponses from '@util/shared/survey';
 import SurveyAPI from 'api/surveys/api';
 import { Section } from 'model/section';
 import { Survey, SurveyResponse } from "model/survey";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import toast from 'react-hot-toast';
 import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
-import { exportSurveyResponses, exportSurveyResults } from '@util/shared/export';
-import DownloadIcon from '@mui/icons-material/Download';
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -31,8 +31,8 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         [survey.responses])
 
     const formattedResponses = useMemo(() =>
-        formatSectionResponses(survey.capacity, survey.responses),
-        [survey.responses, survey.capacity])
+        formatSurveyResponses(survey.options, survey.responses),
+        [survey.responses, survey.options])
 
     const handleRunAlgorithm = () => {
         toast.promise(SurveyAPI.generateResults(survey.courseID, survey.ID), {
@@ -43,7 +43,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
             .catch(() => { })
     }
 
-    const hasResults = () => survey.results && survey.resultsReadable ? Object.keys(survey.results).length > 0 : false
+    const hasResults = () => survey.results ? Object.keys(survey.results).length > 0 : false
 
     const handleApplyResults = () => {
         toast.promise(SurveyAPI.applyResults(survey.courseID, survey.ID), {
@@ -56,7 +56,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     }
 
     const handleExportResults = () => {
-        exportSurveyResults(survey.resultsReadable, sections)
+        exportSurveyResults(survey.results, sections)
     }
 
     const handleExportResponses = () => {
@@ -110,7 +110,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 alignItems: 'center',
             }}>
                 <Box sx={{ width: '70%', }}>
-                    {hasResults() && <AllocatedSectionsTable results={survey.results} resultsReadable={survey.resultsReadable} sections={sections} />}
+                    {hasResults() && <AllocatedSectionsTable results={survey.results} sections={sections} />}
                 </Box>
             </Box>
         </DialogContent>

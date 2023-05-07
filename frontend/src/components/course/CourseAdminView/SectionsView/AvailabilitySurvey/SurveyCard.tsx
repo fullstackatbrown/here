@@ -82,13 +82,13 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
         sections={sections}
       />
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
-      {/* <SurveyResponsesDialog
+      <SurveyResponsesDialog
         open={surveyResponsesDialog}
         onClose={() => setSurveyResponsesDialog(false)}
         survey={survey}
         numStudents={numStudents}
         sections={sections}
-      /> */}
+      />
       <Card sx={{ ":hover": { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>

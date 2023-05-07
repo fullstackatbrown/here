@@ -1,8 +1,7 @@
-import { Section, Day } from "model/section";
-import { TimeCount } from "./formatSectionResponses";
+import { Day, Section } from "model/section";
+import { SurveyOption } from "model/survey";
 import { formatSectionTime } from "./formatTime";
 import { mapToList } from "./survey";
-import { Option } from "model/survey";
 
 interface DayTime {
     day: Day;
@@ -41,21 +40,7 @@ export function sortSections(sections: Section[]): Section[] {
     return sections;
 }
 
-export function sortSurveyResponses(times: TimeCount[]): TimeCount[] {
-    let dayTimes: DayTime[] = [];
-    times.forEach(t => {
-        const [day, startTime, endTime] = t.time.split(",");
-        dayTimes.push({ day: day as Day, startTime: startTime, endTime: endTime });
-    });
-    dayTimes.sort(timeComparator);
-    return dayTimes.map(section => {
-        const time = `${section.day},${section.startTime},${section.endTime}`
-        const count = times.find(t => t.time === time)?.count || 0;
-        return { time, count }
-    });
-}
-
-export function getUniqueSectionTimes(sections: Section[]): Option[] {
+export function getUniqueSectionTimes(sections: Section[]): SurveyOption[] {
     let times: Record<string, DayTime> = {};
     let capacity: Record<string, number> = {};
     for (const section of sections) {

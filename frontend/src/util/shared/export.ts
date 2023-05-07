@@ -1,8 +1,8 @@
 import { ExportToCsv } from 'export-to-csv';
 import { Assignment } from "model/assignment";
-import { Course } from "model/course";
+import { Course, CourseUserData } from "model/course";
 import { Section } from "model/section";
-import { formatSectionTime, formatSurveyTime } from "./formatTime";
+import { formatSectionTime } from "./formatTime";
 import listToMapWithID from "./listToMap";
 import { SurveyResponse } from "model/survey";
 import formatSectionInfo from './formatSectionInfo';
@@ -86,7 +86,7 @@ const getNameFromEmail = (email: string): string => {
     return email.split("@")[0].split("_").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ").replace(/[0-9]/g, '')
 }
 
-export function exportSurveyResults(results: Record<string, string[]>, sections: Section[]) {
+export function exportSurveyResults(results: Record<string, CourseUserData[]>, sections: Section[]) {
     const sectionsMap = listToMapWithID(sections) as Record<string, Section>;
     options.filename = `survey_results`
     let data = [];
@@ -110,7 +110,7 @@ export function exportSurveyResponses(responses: SurveyResponse[]) {
         data.push({
             "name": response.name,
             "email": response.email,
-            "availability": response.availability.map((a) => formatSurveyTime(a).replace(/\s+/g, '')).join(",")
+            "availability": response.availability.map((a) => a.replace(/\s+/g, '')).join(",")
         });
     }
     const csvExporter = new ExportToCsv(options);
