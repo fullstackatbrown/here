@@ -1,3 +1,4 @@
+import { Theme, useMediaQuery } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import { OptionCount } from "@util/shared/survey";
 import {
@@ -37,14 +38,6 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
             },
         },
         responsive: true,
-        layout: {
-            padding: {
-                left: 60,
-                right: 80,
-                top: 20,
-                bottom: 20
-            }
-        },
         maintainAspectRatio: false,
         plugins: {
             legend: {

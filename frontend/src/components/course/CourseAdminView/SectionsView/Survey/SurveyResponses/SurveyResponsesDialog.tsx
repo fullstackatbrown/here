@@ -4,6 +4,7 @@ import {
     Box,
     Button, Dialog, DialogActions, DialogContent,
     DialogTitle,
+    Grid,
     Stack, Typography
 } from "@mui/material";
 import { handleBadRequestError } from '@util/errors';
@@ -73,25 +74,32 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         <DialogTitle>{survey.name}</DialogTitle>
 
         <DialogContent >
-            <Stack direction="row" alignItems="start" justifyContent="space-between" spacing={2} mb={2}>
-                <Stack direction="column" maxWidth="70%">
+            <Grid container>
+                <Grid item xs={12} md={9}>
                     <Typography fontSize={17} fontWeight={500}>
                         {survey.description}
                     </Typography>
                     <Typography mb={3}>
                         {numResponses} responses
                     </Typography>
-                </Stack>
-                <Button variant="outlined" startIcon={<DownloadIcon />} disabled={numResponses === 0} onClick={handleExportResponses}>
-                    Export Responses
-                </Button>
-            </Stack>
+                </Grid>
+                <Grid item xs={12} md={3} display="flex" alignItems="center" justifyContent={{ xs: "flex-start", md: "flex-end" }}>
+                    <Button variant="outlined" startIcon={<DownloadIcon />} disabled={numResponses === 0} onClick={handleExportResponses}>
+                        Export Responses
+                    </Button>
+                </Grid>
+            </Grid>
 
-            <Box mb={4} sx={{ minHeight: 300 }}>
-                <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} numStudents={numStudents} />
-            </Box>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} mb={2}>
-                <Stack direction="column" maxWidth="70%">
+            <Grid container>
+                <Grid item xs={0} md={2} />
+                <Grid item xs={12} md={8} justifyContent="center" sx={{ minHeight: 240 }} mt={3} mb={5}>
+                    <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} numStudents={numStudents} />
+                </Grid>
+                <Grid item xs={0} md={2} />
+            </Grid>
+
+            <Grid container>
+                <Grid item xs={12} md={9}>
                     <Typography fontSize={17} fontWeight={500}>
                         Algorithm Results
                     </Typography>
@@ -99,26 +107,26 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                         This will run an algorithm to automatically match students to options based on capacity and student availability.
                         Capacity may be overridden if there is no solution.
                     </Typography>
-                </Stack>
-                <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={numResponses === 0} onClick={handleRunAlgorithm}>
-                    Run Algorithm
-                </Button>
-            </Stack>
+                </Grid>
+                <Grid item xs={12} md={3} display="flex" alignItems="center" justifyContent={{ xs: "flex-start", md: "flex-end" }}>
+                    <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={numResponses === 0} onClick={handleRunAlgorithm}>
+                        Run Algorithm
+                    </Button>
+                </Grid>
+            </Grid>
 
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}>
-                <Box sx={{ width: '70%', }}>
+            <Grid container>
+                <Grid item xs={0} md={2} />
+                <Grid item xs={12} md={8} display="flex" justifyContent="center">
                     {hasResults() &&
                         (survey.sectionCapacity ?
                             <AllocatedSectionsTable sections={sections} results={survey.results} /> :
                             <SurveyResultsTable options={survey.options} results={survey.results} />
                         )
                     }
-                </Box>
-            </Box>
+                </Grid>
+                <Grid item xs={0} md={2} />
+            </Grid>
         </DialogContent>
         <DialogActions sx={{ paddingTop: 2 }}>
             {hasResults() && <Button variant="contained" onClick={handleExportResults}>Export Results</Button>}
