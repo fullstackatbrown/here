@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import ClearIcon from '@mui/icons-material/Clear';
 import { Box, Grid, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
+import formatSectionInfo from "@util/shared/section";
 import CourseAPI from "api/course/api";
 import { CourseUserData } from "model/course";
 import { Section } from "model/section";

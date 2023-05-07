@@ -2,7 +2,7 @@ import { DisabledTextField } from "@components/shared/DisabledTextField/Disabled
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography, styled } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { filterAssignmentsByDueDate, filterAssignmentsByReleaseDate } from "@util/shared/assignments";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
+import formatSectionInfo from "@util/shared/section";
 import { sortSections } from "@util/shared/sortSectionTime";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";

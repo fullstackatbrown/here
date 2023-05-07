@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyDialog from "./SurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
+import SurveyStatusChip from "./SurveyStatusChip";
 
 export interface SurveyCardProps {
   survey: Survey;
@@ -93,9 +94,12 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
       <Card sx={{ ":hover": { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>
-            <Typography variant="body2" noWrap>
-              {survey.name}
-            </Typography>
+            <Stack direction="row" alignItems="center" mb={0.5}>
+              <Typography variant="body2">
+                {survey.name}
+              </Typography>
+              <SurveyStatusChip survey={survey} style={{ marginLeft: 6 }} />
+            </Stack>
             <Typography variant="body2" fontWeight={400} sx={{ color: "text.disabled" }}>
               {survey.published ? `${getNumResponses()}/${numStudents} responded` : "Click to preview"}
             </Typography>

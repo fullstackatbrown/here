@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import MuiTableCell, { TableCellProps } from "@mui/material/TableCell";
 import { red } from '@mui/material/colors';
-import { formatSectionTime } from "@util/shared/formatTime";
+import { formatSectionTime } from "@util/shared/time";
 import { sortSections } from "@util/shared/sortSectionTime";
 import { CourseUserData } from "model/course";
 import { Section } from 'model/section';

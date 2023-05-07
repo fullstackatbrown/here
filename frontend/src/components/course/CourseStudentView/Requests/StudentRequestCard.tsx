@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box, Collapse, Grid, IconButton, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
+import formatSectionInfo from "@util/shared/section";
 import SwapAPI from "api/swaps/api";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus, CourseUserData } from "model/course";

@@ -2,7 +2,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import CreateIcon from "@mui/icons-material/Create";
 import { Box, Card, IconButton, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { formatSectionTime } from "@util/shared/formatTime";
+import { formatSectionTime } from "@util/shared/time";
 import SectionAPI from "api/section/api";
 import { Section } from "model/section";
 import React, { FC, useState } from "react";

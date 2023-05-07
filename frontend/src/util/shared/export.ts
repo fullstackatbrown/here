@@ -2,10 +2,10 @@ import { ExportToCsv } from 'export-to-csv';
 import { Assignment } from "model/assignment";
 import { Course, CourseUserData } from "model/course";
 import { Section } from "model/section";
-import { formatSectionTime } from "./formatTime";
+import { formatSectionTime } from "./time";
 import listToMapWithID from "./listToMap";
 import { SurveyResponse } from "model/survey";
-import formatSectionInfo from './formatSectionInfo';
+import formatSectionInfo from './section';
 
 const options = {
     filename: "",

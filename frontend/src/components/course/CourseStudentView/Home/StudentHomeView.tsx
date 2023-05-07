@@ -1,6 +1,6 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Box, Dialog, DialogContent, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery } from "@mui/material";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
+import formatSectionInfo from "@util/shared/section";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";

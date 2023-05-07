@@ -9,7 +9,7 @@ import {
     Typography
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { formatDateTime } from "@util/shared/formatTime";
+import { formatDateTime } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
 import { ChangeEvent, FC, useState } from "react";

@@ -14,7 +14,7 @@ import {
 import { handleBadRequestError } from "@util/errors";
 import { usePrevious } from "@util/hooks";
 import { getUniqueSectionTimes } from "@util/shared/sortSectionTime";
-import { getNextWeekDate } from "@util/shared/time";
+import { getNextWeekDate } from '@util/shared/time';
 import SurveyAPI from "api/surveys/api";
 import { Section } from "model/section";
 import { Survey, SurveyOption } from "model/survey";
