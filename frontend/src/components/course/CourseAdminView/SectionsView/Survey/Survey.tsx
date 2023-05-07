@@ -7,13 +7,13 @@ import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog"
 import SurveyCard from "./SurveyCard";
 import SurveyDialog from "./SurveyDialog";
 
-export interface AvailabilitySurveyProps {
+export interface SurveyProps {
   course: Course;
   sections: Section[];
   survey: Survey;
 }
 
-export default function AvailabilitySurvey({ course, sections, survey }: AvailabilitySurveyProps) {
+export default function SurveySection({ course, sections, survey }: SurveyProps) {
   const [createSurveyDialog, setCreateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const isCourseActive = course.status === CourseStatus.CourseActive;
@@ -41,22 +41,12 @@ export default function AvailabilitySurvey({ course, sections, survey }: Availab
       )}
       <Stack direction="row" justifyContent="space-between" mb={1}>
         <Typography variant="h6" fontWeight={600}>
-          Availability Survey
+          Survey
         </Typography>
         {!survey &&
-          <Tooltip
-            title="Enabled after creating sections"
-            disableHoverListener={sections.length > 0}
-            disableFocusListener={sections.length > 0}
-            placement="right"
-          >
-            <span>
-              <Button disabled={!isCourseActive || sections.length === 0} onClick={() => setCreateSurveyDialog(true)}>
-                + Create Survey
-              </Button>
-            </span>
-          </Tooltip>
-
+          <Button disabled={!isCourseActive} onClick={() => setCreateSurveyDialog(true)}>
+            + Create Survey
+          </Button>
         }
       </Stack>
       <Box height={100}>

@@ -128,7 +128,12 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({ register, fields, remove, setVa
         )}
         <Box mt={1.5}>
             <FormControlLabel
-                control={<Checkbox size="small" onChange={(event) => setUseSectionData(event.target.checked)} />}
+                control={
+                    <Checkbox
+                        size="small"
+                        onChange={(event) => setUseSectionData(event.target.checked)}
+                    />
+                }
                 label="Use Section Data"
                 sx={{
                     '& .MuiTypography-root': {

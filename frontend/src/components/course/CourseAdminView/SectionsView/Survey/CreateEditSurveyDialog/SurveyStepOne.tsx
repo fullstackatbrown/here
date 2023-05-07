@@ -26,7 +26,6 @@ const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control }) => {
             {...register("description")}
             multiline
             required
-            autoFocus
             label="Description"
             type="text"
             fullWidth

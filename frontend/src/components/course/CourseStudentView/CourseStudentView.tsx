@@ -9,7 +9,7 @@ import { Course } from "model/course";
 import { User } from "model/user";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import SurveyDialog from "../CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
+import SurveyDialog from "../CourseAdminView/SectionsView/Survey/SurveyDialog";
 import CourseStudentViewNavigation from "./CourseStudentViewNavigation";
 import StudentRequestsView from "./Requests/StudentRequestsView";
 import StudentHomeView from "./Home/StudentHomeView";

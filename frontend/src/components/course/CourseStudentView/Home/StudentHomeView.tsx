@@ -1,4 +1,4 @@
-import SurveyDialog from "@components/course/CourseAdminView/SectionsView/AvailabilitySurvey/SurveyDialog";
+import SurveyDialog from "@components/course/CourseAdminView/SectionsView/Survey/SurveyDialog";
 import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import { CalendarMonth } from "@mui/icons-material";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';

@@ -4,10 +4,10 @@ import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
 import AdminViewHeader from "../AdminViewHeader";
-import AvailabilitySurvey from "./AvailabilitySurvey/AvailabilitySurvey";
 import CreateEditSectionDialog from "./Sections/CreateEditSectionDialog";
 import SectionCard from "./Sections/SectionCard";
 import { useSurvey } from "api/surveys/hooks";
+import SurveySection from "./Survey/Survey";
 
 export interface SectionsViewProps {
   course: Course;
@@ -60,7 +60,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         ))}
       </Stack>
       {access === CoursePermission.CourseAdmin &&
-        !surveyLoading && <AvailabilitySurvey {...{ course, sections, survey }} />}
+        !surveyLoading && <SurveySection {...{ course, sections, survey }} />}
     </>
   );
 };
