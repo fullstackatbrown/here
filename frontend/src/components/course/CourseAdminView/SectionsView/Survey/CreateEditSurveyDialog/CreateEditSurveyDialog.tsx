@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import SurveyStepOne from "./SurveyStepOne";
 import SurveyStepThree from "./SurveyStepThree";
 import SurveyStepTwo from "./SurveyStepTwo";
+import { usePrevious } from "@util/hooks";
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;
@@ -51,7 +52,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
     const [options, capacity] = useMemo(() => getUniqueSectionTimes(sections), [sections])
 
     const defaultValues = useMemo(() => ({
-        name: survey ? survey.name : "Time Availability Survey",
+        name: survey ? survey.name : "Section Availability Survey",
         description: survey ? survey.description : "Please select all the times that you will be available.",
         enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
         endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
@@ -90,20 +91,24 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         }
     }, [watchenddate, watchendtime])
 
+    const prevUseSectionData: boolean = usePrevious<boolean>(useSectionData);
+
     useEffect(() => {
-        if (useSectionData) {
-            setValue("options", options)
-            setValue("sectionCapacity", capacity)
-        } else {
-            // if sectionCapacity is set, it means that useSectionData was previously true
-            // hence we reset the fields
-            // otherwise we need to keep the user entered data
-            if (getValues("sectionCapacity")) {
+        // if we changed the useSectionData state, we need to resync the section data
+        if (prevUseSectionData !== undefined && prevUseSectionData !== useSectionData) {
+            if (useSectionData) {
+                handleResyncSectionData()
+            } else {
                 setValue("options", [{ option: "", capacity: NaN }])
                 setValue("sectionCapacity", undefined)
             }
         }
     }, [useSectionData, sections])
+
+    const handleResyncSectionData = () => {
+        setValue("options", options)
+        setValue("sectionCapacity", capacity)
+    }
 
     const handleNext = () => {
         if (activeStep === 0) {
@@ -130,6 +135,16 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
 
     const onSubmit = handleSubmit(async (data, event) => {
         if (survey) {
+            // Check if any field has changed
+            if (JSON.stringify(survey.options) === JSON.stringify(data.options) &&
+                JSON.stringify(survey.sectionCapacity) === JSON.stringify(data.sectionCapacity) &&
+                survey.name === data.name &&
+                survey.description === data.description &&
+                survey.endTime === data.endDateParsed) {
+                handleOnClose()
+                toast.success("No changes!")
+                return
+            }
             toast.promise(SurveyAPI.updateSurvey(
                 courseID, survey.ID, data.name,
                 data.description, data.endDateParsed,
@@ -202,7 +217,9 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                     {
                         {
                             0: <SurveyStepOne {...{ register, control }} />,
-                            1: <SurveyStepTwo options={controlledOptions} {...{ register, remove, setValue, insert, useSectionData, setUseSectionData }} />,
+                            1: <SurveyStepTwo
+                                options={controlledOptions} {...{ survey, register, remove, setValue, insert, useSectionData, setUseSectionData, handleResyncSectionData }}
+                            />,
                             2: <SurveyStepThree {...{ getValues }} />,
                         }[activeStep]
                     }

@@ -1,12 +1,14 @@
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
-import { Box, Checkbox, FormControlLabel, Grid, IconButton, Stack, TextField, Typography, styled } from "@mui/material";
-import { Section } from 'model/section';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { Box, Button, Checkbox, FormControlLabel, Grid, IconButton, Stack, TextField, Typography, styled } from "@mui/material";
 import { FC, useState } from "react";
 import { FieldArrayWithId, UseFieldArrayInsert, UseFieldArrayRemove, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { SurveyFormData } from "./CreateEditSurveyDialog";
+import { Survey } from 'model/survey';
 
 export interface SurveyStepTwoProps {
+    survey: Survey;
     register: UseFormRegister<SurveyFormData>;
     remove: UseFieldArrayRemove;
     setValue: UseFormSetValue<SurveyFormData>;
@@ -14,6 +16,7 @@ export interface SurveyStepTwoProps {
     options: FieldArrayWithId<SurveyFormData, "options", "id">[];
     useSectionData: boolean;
     setUseSectionData: (value: boolean) => void;
+    handleResyncSectionData: () => void;
 }
 
 const TableHeader = styled(Typography)(({ theme }) => ({
@@ -27,7 +30,7 @@ const GridItem = styled(Grid)(({ theme }) => ({
 }))
 
 const SurveyStepTwo: FC<SurveyStepTwoProps> = ({
-    register, options, remove, setValue, insert, useSectionData, setUseSectionData
+    survey, register, options, remove, setValue, insert, useSectionData, setUseSectionData, handleResyncSectionData
 }) => {
     const [hover, setHover] = useState<number | undefined>(undefined);
 
@@ -65,28 +68,29 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({
                     <GridItem item xs={7.5}>
                         <TextField
                             {...register(`options.${index}.option` as const)}
-                            required
                             autoFocus
                             type="text"
                             fullWidth
                             size="small"
-                            placeholder="Monday 9:00am - 11:00am"
+                            placeholder="Discussion Group 1"
                             variant="standard"
                             InputProps={{
                                 onFocus: () => setHover(index),
                             }}
-                            // onKeyDown={(event) => {
-                            //     if (event.key === "Enter") {
-                            //         handleInsert(index + 1);
-                            //     }
-                            // }}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                    handleInsert(index + 1);
+                                }
+                                if (event.key === "Backspace" && field.option === "") {
+                                    handleRemove(index);
+                                }
+                            }}
                             disabled={useSectionData}
                         />
                     </GridItem>
                     <GridItem item xs={3}>
                         <TextField
                             {...register(`options.${index}.capacity` as const, { valueAsNumber: true })}
-                            required
                             type="number"
                             placeholder="0"
                             fullWidth
@@ -95,11 +99,11 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({
                             InputProps={{
                                 onFocus: () => setHover(index),
                             }}
-                            // onKeyDown={(event) => {
-                            //     if (event.key === "Enter") {
-                            //         handleInsert(index + 1);
-                            //     }
-                            // }}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                    handleInsert(index + 1);
+                                }
+                            }}
                             disabled={useSectionData}
                         />
                     </GridItem>
@@ -135,8 +139,16 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({
                     },
                 }}
             />
+            {survey && useSectionData &&
+                <Button
+                    startIcon={<RefreshIcon />}
+                    sx={{ fontSize: 14, py: 0.5 }}
+                    onClick={handleResyncSectionData}
+                >
+                    Resync
+                </Button>
+            }
         </Box>
-
     </Stack >
 }
 
