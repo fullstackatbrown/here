@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 import SurveyStepOne from "./SurveyStepOne";
 import SurveyStepTwo from "./SurveyStepTwo";
 import { Section } from "model/section";
+import SurveyStepThree from "./SurveyStepThree";
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;
@@ -39,6 +40,7 @@ export type SurveyFormData = {
     description: string,
     enddate: Date,
     endtime: Date,
+    endDateParsed: string,
     options: KVPair[]
 };
 
@@ -51,10 +53,11 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         description: survey ? survey.description : "Please select all the times that you will be available.",
         enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
         endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
-        options: survey ? mapToList(survey.options) : [{ key: "", value: "" }]
+        endDateParsed: survey ? survey.endTime : getNextWeekDate().toISOString(),
+        options: survey ? survey.options : [{ key: "", value: "" }]
     }), [survey])
 
-    const { register, handleSubmit, control, reset, setValue, formState: { } } = useForm<SurveyFormData>({
+    const { register, handleSubmit, control, reset, setValue, getValues, watch, formState: { } } = useForm<SurveyFormData>({
         defaultValues: defaultValues
     });
 
@@ -66,54 +69,75 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         }
     });
 
-    const handleNext = () => { setActiveStep((prevActiveStep) => prevActiveStep + 1); };
+    const watchenddate = watch("enddate")
+    const watchendtime = watch("endtime")
+
+    useEffect(() => {
+        if (watchenddate && watchendtime) {
+            const endDate = new Date(watchenddate)
+            const endTime = new Date(watchendtime)
+            endDate.setHours(endTime.getHours(), endTime.getMinutes())
+            setValue("endDateParsed", endDate.toISOString())
+            console.log(endDate.toISOString())
+        }
+    }, [watchenddate, watchendtime])
+
+    const handleNext = () => {
+        if (activeStep === 0) {
+            if (new Date(getValues("endDateParsed")) < new Date()) {
+                toast.error("The time you selected is in the past.")
+                return
+            }
+        } else if (activeStep === 1) {
+            if (fields.length === 0 || fields.every(field => field.key === "" && field.value === "")) {
+                toast.error("Please add at least 1 option.")
+                return
+            }
+        }
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
 
     const handleBack = () => { setActiveStep((prevActiveStep) => prevActiveStep - 1); };
 
     useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
-    const onSubmit = handleSubmit(async data => {
-        const endDate = new Date(data.enddate)
-        const endTime = new Date(data.endtime)
-        endDate.setHours(endTime.getHours(), endTime.getMinutes())
-        if (endDate < new Date()) {
-            toast.error("The time you selected is in the past.")
-            return
-        }
+    const onSubmit = handleSubmit(async (data, event) => {
+        console.log(data)
         if (survey) {
-            toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, endDate.toISOString()), {
-                loading: "Updating survey...",
-                success: "Survey updated!",
-                error: (err) => {
-                    if (err.code === "ERR_BAD_REQUEST") {
-                        return err.response.data
-                    } else {
-                        return (err) => handleBadRequestError(err)
-                    }
-                }
-            })
-                .then(() => handleOnClose())
-                .catch(() => { })
+            // toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, data.endDateParsed), {
+            //     loading: "Updating survey...",
+            //     success: "Survey updated!",
+            //     error: (err) => {
+            //         if (err.code === "ERR_BAD_REQUEST") {
+            //             return err.response.data
+            //         } else {
+            //             return (err) => handleBadRequestError(err)
+            //         }
+            //     }
+            // })
+            //     .then(() => handleOnClose())
+            //     .catch(() => { })
         } else {
-            toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description, endDate.toISOString()), {
-                loading: "Creating survey...",
-                success: "Survey created!",
-                error: (err) => {
-                    if (err.code === "ERR_BAD_REQUEST") {
-                        return err.response.data
-                    } else {
-                        return (err) => handleBadRequestError(err)
-                    }
-                }
-            })
-                .then(() => handleOnClose())
-                .catch(() => { })
+            // toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description, data.endDateParsed), {
+            //     loading: "Creating survey...",
+            //     success: "Survey created!",
+            //     error: (err) => {
+            //         if (err.code === "ERR_BAD_REQUEST") {
+            //             return err.response.data
+            //         } else {
+            //             return (err) => handleBadRequestError(err)
+            //         }
+            //     }
+            // })
+            //     .then(() => handleOnClose())
+            //     .catch(() => { })
         }
     });
 
     const handleOnClose = () => {
         onClose()
         reset()
+        setActiveStep(0)
     }
 
     return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
@@ -145,7 +169,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                         {
                             0: <SurveyStepOne {...{ register, control }} />,
                             1: <SurveyStepTwo {...{ register, fields, remove, setValue, insert, replace, sections }} />,
-                            2: <SurveyStepOne {...{ register, control }} />,
+                            2: <SurveyStepThree {...{ getValues }} />,
                         }[activeStep]
                     }
                 </Box>
@@ -157,9 +181,9 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                     {!(activeStep === 0) && <Button onClick={handleBack} sx={{ mr: 1 }}>Back</Button>}
                     {
                         {
-                            0: <Button onClick={handleNext} variant="contained">Next</Button>,
-                            1: <Button onClick={handleNext} variant="contained">Next</Button>,
-                            2: <Button type="submit" variant="contained">{survey ? "Update" : "Create"}</Button>,
+                            0: <Button key="next" onClick={handleNext} variant="contained">Next</Button>,
+                            1: <Button key="next" onClick={handleNext} variant="contained">Next</Button>,
+                            2: <Button key="submit" type="submit" variant="contained">{survey ? "Update" : "Create"}</Button>,
                         }[activeStep]
                     }
                 </Stack>

@@ -9,12 +9,36 @@ import {
     Typography
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
-import { sortSurveyTimes } from "@util/shared/sortSectionTime";
+import { formatDateTime } from "@util/shared/formatTime";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
-import { FC, useState } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import toast from "react-hot-toast";
+
+export interface SurveyDialogContentProps {
+    survey: Survey;
+    availability?: string[];
+    onChangeCheckbox?: (time: string) => (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void;
+}
+
+export const SurveyDialogContent: FC<SurveyDialogContentProps> = ({ survey, availability, onChangeCheckbox }) => {
+    return <>
+        <Typography variant="body1" mb={1}> {survey.description} </Typography>
+        <Typography variant="body1" mb={2}> This survey will end on&nbsp;
+            <Box component="span" fontWeight='fontWeightMedium'>{formatDateTime(survey.endTime)} </Box>
+        </Typography>
+        <Stack >
+            {survey.options.map(obj =>
+                <FormControlLabel
+                    key={obj.key}
+                    control={<Checkbox onChange={onChangeCheckbox && onChangeCheckbox(obj.key)} />}
+                    label={obj.key}
+                    checked={availability && availability.includes(obj.key)}
+                />
+            )}
+        </Stack>
+    </>
+}
 
 export interface SurveyDialogProps {
     open: boolean;
@@ -23,6 +47,7 @@ export interface SurveyDialogProps {
     survey: Survey;
     studentID?: string;
 }
+
 
 const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID }) => {
     // If student has already responded, show their response
@@ -75,8 +100,8 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
     }
 
     function onChangeCheckbox(time: string) {
-        return (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (e.target.checked) {
+        return (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+            if (checked) {
                 setAvailability([...availability, time])
             } else {
                 let newTimes = availability.filter(t => t !== time)
@@ -88,20 +113,7 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
     return <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>{survey.name}{preview && (survey.published ? " (Published)" : " (Preview)")}</DialogTitle>
         <DialogContent>
-            <Typography variant="body1" mb={1}> {survey.description} </Typography>
-            <Typography variant="body1" mb={2}> This survey will end on&nbsp;
-                <Box component="span" fontWeight='fontWeightMedium'>{formatDateTime(survey.endTime)} </Box>
-            </Typography>
-            <Stack >
-                {sortSurveyTimes(Object.keys(survey.capacity)).map(time =>
-                    <FormControlLabel
-                        key={time}
-                        control={<Checkbox onChange={onChangeCheckbox(time)} />}
-                        label={formatSurveyTime(time)}
-                        checked={availability.includes(time)}
-                    />
-                )}
-            </Stack>
+            <SurveyDialogContent {...{ survey, availability, onChangeCheckbox }} />
         </DialogContent>
         <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

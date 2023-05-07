@@ -1,5 +1,3 @@
-import { Section } from "model/section";
-import { formatSectionTime } from "./formatTime";
 
 export interface KVPair {
     key: string,
@@ -12,16 +10,4 @@ export function mapToList<T>(map: Record<string, T>): KVPair[] {
         list.push({ key: key, value: map[key] })
     }
     return list;
-}
-
-export function getUniqueSectionTimes(sections: Section[]): KVPair[] {
-    let times = {};
-    for (const section of sections) {
-        const t = formatSectionTime(section);
-        if (!(t in times)) {
-            times[t] = 0;
-        }
-        times[t] += section.capacity;
-    }
-    return mapToList(times);
 }

@@ -5,7 +5,7 @@ import { FC, useEffect, useState } from "react";
 import { FieldArrayWithId, UseFieldArrayAppend, UseFieldArrayInsert, UseFieldArrayRemove, UseFieldArrayReplace, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { SurveyFormData } from "./CreateEditSurveyDialog";
 import { Section } from 'model/section';
-import { getUniqueSectionTimes } from '@util/shared/survey';
+import { getUniqueSectionTimes } from '@util/shared/sortSectionTime';
 
 export interface SurveyStepTwoProps {
     register: UseFormRegister<SurveyFormData>;
@@ -114,11 +114,11 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({ register, fields, remove, setVa
                     <GridItem item xs={1.5}>
                         {!useSectionData && (hover === index || (hover === undefined && index === fields.length - 1)) &&
                             <Stack direction="row" spacing={0.5}>
-                                <IconButton sx={{ padding: 0.5 }}>
-                                    <ClearIcon onClick={() => handleRemove(index)} sx={{ fontSize: 18 }} />
+                                <IconButton onClick={() => handleRemove(index)} sx={{ padding: 0.5 }}>
+                                    <ClearIcon sx={{ fontSize: 18 }} />
                                 </IconButton>
-                                <IconButton sx={{ padding: 0.3 }}>
-                                    <AddIcon onClick={() => handleInsert(index + 1)} sx={{ fontSize: 20 }} />
+                                <IconButton onClick={() => handleInsert(index + 1)} sx={{ padding: 0.3 }}>
+                                    <AddIcon sx={{ fontSize: 20 }} />
                                 </IconButton>
                             </Stack>
                         }

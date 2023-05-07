@@ -1,3 +1,4 @@
+import { KVPair } from "@util/shared/survey";
 import { CourseUserData } from "./course";
 
 export interface Survey {
@@ -6,7 +7,7 @@ export interface Survey {
   name: string;
   description: string;
   endTime: string;
-  options: Record<string, number>;
+  options: KVPair[];
   responses: Record<string, string[]>;
   published: boolean;
   results: Record<string, CourseUserData[]>;

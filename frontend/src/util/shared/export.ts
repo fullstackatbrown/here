@@ -3,7 +3,7 @@ import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { formatSectionTime, formatSurveyTime } from "./formatTime";
-import listToMap from "./listToMap";
+import listToMapWithID from "./listToMap";
 import { SurveyResponse } from "model/survey";
 import formatSectionInfo from './formatSectionInfo';
 
@@ -87,7 +87,7 @@ const getNameFromEmail = (email: string): string => {
 }
 
 export function exportSurveyResults(results: Record<string, string[]>, sections: Section[]) {
-    const sectionsMap = listToMap(sections) as Record<string, Section>;
+    const sectionsMap = listToMapWithID(sections) as Record<string, Section>;
     options.filename = `survey_results`
     let data = [];
     for (const sectionID of Object.keys(results)) {
