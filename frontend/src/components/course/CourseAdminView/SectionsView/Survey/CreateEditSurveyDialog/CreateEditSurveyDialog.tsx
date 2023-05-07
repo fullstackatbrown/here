@@ -197,7 +197,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
             <DialogContent>
                 {survey && survey.published &&
                     <Alert severity="warning" sx={{ marginBottom: 2.5 }} style={{ display: 'flex', alignItems: 'center' }} >
-                        This survey has already been published. Previous student responses will be kept and might not match the new section times.
+                        This survey has already been published. Previous student responses will be kept and might not match the new options.
                     </Alert>
                 }
                 <Stepper activeStep={activeStep}>

@@ -7,7 +7,7 @@ import {
     Stack, Typography
 } from "@mui/material";
 import { handleBadRequestError } from '@util/errors';
-import { exportSurveyResponses, exportSurveyResults } from '@util/shared/export';
+import { exportSurveyResponses, exportSurveyResults, exportSurveyResultsForSections } from '@util/shared/export';
 import formatSurveyResponses from '@util/shared/survey';
 import SurveyAPI from 'api/surveys/api';
 import { Section } from 'model/section';
@@ -16,6 +16,7 @@ import { FC, useMemo } from "react";
 import toast from 'react-hot-toast';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
 import SurveyResultsTable from './SurveyResultsTable';
+import AllocatedSectionsTable from './AllocatedSectionsTable';
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -56,7 +57,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     }
 
     const handleExportResults = () => {
-        exportSurveyResults(survey.results)
+        survey.sectionCapacity ? exportSurveyResultsForSections(survey.results, sections) : exportSurveyResults(survey.results)
     }
 
     const handleExportResponses = () => {
@@ -110,7 +111,12 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 alignItems: 'center',
             }}>
                 <Box sx={{ width: '70%', }}>
-                    {hasResults() && <SurveyResultsTable options={survey.options} results={survey.results} />}
+                    {hasResults() &&
+                        (survey.sectionCapacity ?
+                            <AllocatedSectionsTable sections={sections} results={survey.results} /> :
+                            <SurveyResultsTable options={survey.options} results={survey.results} />
+                        )
+                    }
                 </Box>
             </Box>
         </DialogContent>

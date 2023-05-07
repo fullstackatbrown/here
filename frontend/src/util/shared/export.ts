@@ -100,22 +100,22 @@ export function exportSurveyResults(results: Record<string, CourseUserData[]>) {
     csvExporter.generateCsv(data);
 }
 
-// export function exportSurveyResults(results: Record<string, CourseUserData[]>, sections: Section[]) {
-//     const sectionsMap = listToMapWithID(sections) as Record<string, Section>;
-//     options.filename = `survey_results`
-//     let data = [];
-//     for (const sectionID of Object.keys(results)) {
-//         const section = sectionsMap[sectionID];
-//         data.push({
-//             "section": formatSectionTime(section),
-//             "location": section.location,
-//             "students": results[sectionID].join(",").replace(/\s+/g, ''),
-//         });
-//     }
+export function exportSurveyResultsForSections(results: Record<string, CourseUserData[]>, sections: Section[]) {
+    const sectionsMap = listToMapWithID(sections) as Record<string, Section>;
+    options.filename = `survey_results`
+    let data = [];
+    for (const sectionID of Object.keys(results)) {
+        const section = sectionsMap[sectionID];
+        data.push({
+            "section": formatSectionTime(section),
+            "location": section.location,
+            "students": results[sectionID].map(s => s.email).join(",").replace(/\s+/g, ''),
+        });
+    }
 
-//     const csvExporter = new ExportToCsv(options);
-//     csvExporter.generateCsv(data);
-// }
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
+}
 
 export function exportSurveyResponses(responses: SurveyResponse[]) {
     options.filename = `survey_responses`
