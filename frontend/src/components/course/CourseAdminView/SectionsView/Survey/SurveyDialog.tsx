@@ -19,19 +19,25 @@ export interface SurveyDialogContentProps {
     survey: Survey;
     availability?: string[];
     onChangeCheckbox?: (time: string) => (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void;
+    disabled: boolean;
 }
 
-export const SurveyDialogContent: FC<SurveyDialogContentProps> = ({ survey, availability, onChangeCheckbox }) => {
+export const SurveyDialogContent: FC<SurveyDialogContentProps> = ({ survey, availability, onChangeCheckbox, disabled }) => {
+    const ended = new Date(survey.endTime) < new Date();
     return <>
-        <Typography variant="body1" mb={1}> {survey.description} </Typography>
-        <Typography variant="body1" mb={2}> This survey will end on&nbsp;
-            <Box component="span" fontWeight='fontWeightMedium'>{formatDateTime(survey.endTime)} </Box>
+        <Typography variant="body1" mb={1} color={disabled ? "secondary" : "inherit"}> {survey.description} </Typography>
+        <Typography variant="body1" mb={2} color={disabled ? "secondary" : "inherit"}>
+            This survey {ended ? "has ended" : "will end"} on
+            &nbsp;
+            <Box component="span" fontWeight='fontWeightMedium'>
+                {formatDateTime(survey.endTime)}
+            </Box>
         </Typography>
         <Stack >
             {survey.options.map(obj =>
                 <FormControlLabel
                     key={obj.option}
-                    control={<Checkbox onChange={onChangeCheckbox && onChangeCheckbox(obj.option)} />}
+                    control={<Checkbox onChange={onChangeCheckbox && onChangeCheckbox(obj.option)} disabled={disabled} />}
                     label={obj.option}
                     checked={availability && availability.includes(obj.option)}
                 />
@@ -46,10 +52,11 @@ export interface SurveyDialogProps {
     preview?: boolean;
     survey: Survey;
     studentID?: string;
+    disabled?: boolean;
 }
 
 
-const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID }) => {
+const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID, disabled = false }) => {
     // If student has already responded, show their response
     const [availability, setAvailability] = useState<string[]>((studentID && survey?.responses?.[studentID]) || []);
     const showDialog = useDialog();
@@ -113,11 +120,11 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
     return <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>{survey.name}{preview && (survey.published ? " (Published)" : " (Preview)")}</DialogTitle>
         <DialogContent>
-            <SurveyDialogContent {...{ survey, availability, onChangeCheckbox }} />
+            <SurveyDialogContent {...{ survey, availability, onChangeCheckbox, disabled }} />
         </DialogContent>
         <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button disabled={preview && survey.published} onClick={onSubmit} variant="contained">
+            <Button disabled={disabled || (preview && survey.published)} onClick={onSubmit} variant="contained">
                 {preview ? "Publish" : "Submit"}
             </Button>
         </DialogActions>

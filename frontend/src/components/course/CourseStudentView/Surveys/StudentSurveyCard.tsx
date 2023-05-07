@@ -1,4 +1,5 @@
-import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
+import SurveyDialog from "@components/course/CourseAdminView/SectionsView/Survey/SurveyDialog";
+import MyChip from "@components/shared/MyChip/MyChip";
 import { Grid, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { formatDistance } from "date-fns";
 import { Course } from "model/course";
@@ -12,77 +13,62 @@ export interface StudentSurveyCardProps {
     student: User;
 }
 
-
-// <Grid container spacing={2} key={info.survey.ID}>
-//     <Grid item xs={12} sm={6} md={4} >
-//         {info.survey.name}
-//     </Grid>
-//     <Grid item xs={12} sm={6} md={4}>
-//         {info.ended ? "Ended" : "Ending"} {formatDistance(new Date(info.survey.endTime), new Date(), { addSuffix: true })}
-//     </Grid>
-//     <Grid item xs={12} sm={6} md={4}>
-//         {info.filledOut ? "Filled out" : "Not filled out"}
-//     </Grid>
-// </Grid>
-
 const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, course, student }) => {
 
     const filledOut = useMemo(() => survey.responses?.[student.ID] !== undefined, [survey, student]);
     const ended = useMemo(() => survey.endTime && new Date(survey.endTime) < new Date(), [survey]);
 
     const [hover, setHover] = useState(false);
+    const [surveyDialogOpen, setSurveyDialogOpen] = useState(false);
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
-    const showDialog = useDialog();
     const theme = useTheme();
-
-    function onClickEditSwap(e: React.MouseEvent<HTMLButtonElement>) {
-        e.stopPropagation();
-    }
 
     return (
         <>
+            <SurveyDialog
+                open={surveyDialogOpen}
+                survey={survey}
+                onClose={() => { setSurveyDialogOpen(false) }}
+                studentID={student.ID}
+                disabled={ended}
+            />
             <Grid container
                 sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
-                mx={-1}
+                mx={-0.8}
+                pr={2}
                 py={1.5}
                 width="100%"
                 display="flex" flexDirection="row" alignItems="center"
+                onClick={() => setSurveyDialogOpen(true)}
                 onMouseEnter={() => !isXsScreen && setHover(true)}
                 onMouseLeave={() => setHover(false)}
             >
-                {/* Left: arrow and student name */}
                 <Grid item xs={8} md={3}>
                     <Typography sx={{ fontSize: 15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ml: 1 }}>
                         {survey.name}
                     </Typography>
                 </Grid>
 
-                {/* Middle: request info, only display on hover, no display on mobile */}
                 <Grid item md={7} display={{ xs: "none", md: "flex" }} alignItems="center">
                     <Typography color="secondary" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: 14 }}>
-                        {ended ? "Ended" : "Ending"} {formatDistance(new Date(survey.endTime), new Date(), { addSuffix: true })}
+                        {survey.description}
                     </Typography>
                 </Grid>
 
-                {/* Right: either time or the buttons */}
                 <Grid item xs={4} md={2} display="flex" justifyContent="flex-end" alignItems="center">
-                    {/* {(hover || expanded) && isCourseActive && pending ? (
-                            <>
-                                <Tooltip title="edit">
-                                    <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickEditSwap}>
-                                        <EditIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="cancel">
-                                    <IconButton sx={{ p: { xs: 1, md: 0.5 }, color: "inherit" }} onClick={onClickCancelSwap}>
-                                        <CloseIcon sx={{ fontSize: { xs: 20, md: 18 } }} />
-                                    </IconButton>
-                                </Tooltip>
-                            </>
-                        ) : (
-                            <StatusChip status={request.status} timestamp={pending ? request.requestTime : request.handledTime} />
-                        )} */}
+                    {hover ?
+                        <Typography fontSize={12} color="inherit" variant="button">
+                            {ended ? "View" : (filledOut ? "Update" : "Create")} Response
+                        </Typography> :
+                        (filledOut ?
+                            <MyChip label="submitted" variant="outlined" color="success" />
+                            : (ended ?
+                                <MyChip label="Ended" variant="outlined" color="secondary" /> :
+                                <MyChip label={`ending ${formatDistance(new Date(survey.endTime), new Date(), { addSuffix: true })}`} variant="outlined" color="primary" />
+                            )
+                        )
+                    }
                 </Grid>
             </Grid>
 
