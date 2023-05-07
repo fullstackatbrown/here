@@ -1,11 +1,10 @@
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import DownloadIcon from '@mui/icons-material/Download';
 import {
-    Box,
     Button, Dialog, DialogActions, DialogContent,
     DialogTitle,
     Grid,
-    Stack, Typography
+    Typography
 } from "@mui/material";
 import { handleBadRequestError } from '@util/errors';
 import { exportSurveyResponses, exportSurveyResults, exportSurveyResultsForSections } from '@util/shared/export';
@@ -15,9 +14,9 @@ import { Section } from 'model/section';
 import { Survey, SurveyResponse } from "model/survey";
 import { FC, useMemo } from "react";
 import toast from 'react-hot-toast';
+import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
 import SurveyResultsTable from './SurveyResultsTable';
-import AllocatedSectionsTable from './AllocatedSectionsTable';
 
 export interface SurveyResponsesDialogProps {
     open: boolean;

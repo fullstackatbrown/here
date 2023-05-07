@@ -1,4 +1,3 @@
-import { Theme, useMediaQuery } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import { OptionCount } from "@util/shared/survey";
 import {

@@ -1,9 +1,7 @@
-import SurveyDialog from "@components/course/CourseAdminView/SectionsView/Survey/SurveyDialog";
+import SurveyDialog from "@components/course/CourseAdminView/SurveysView/SurveyDialog";
 import MyChip from "@components/shared/MyChip/MyChip";
-import EditIcon from '@mui/icons-material/Edit';
-import { Grid, IconButton, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Grid, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { formatDistance } from "date-fns";
-import { Course } from "model/course";
 import { Survey } from "model/survey";
 import { User } from "model/user";
 import { FC, useMemo, useState } from "react";

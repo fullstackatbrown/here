@@ -12,6 +12,7 @@ import {
     Stepper
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
+import { usePrevious } from "@util/hooks";
 import { getUniqueSectionTimes } from "@util/shared/sortSectionTime";
 import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
@@ -23,7 +24,6 @@ import toast from "react-hot-toast";
 import SurveyStepOne from "./SurveyStepOne";
 import SurveyStepThree from "./SurveyStepThree";
 import SurveyStepTwo from "./SurveyStepTwo";
-import { usePrevious } from "@util/hooks";
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;

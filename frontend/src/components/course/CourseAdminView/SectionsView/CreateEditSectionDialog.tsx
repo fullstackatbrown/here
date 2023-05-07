@@ -8,7 +8,6 @@ import {
     DialogTitle, FormControl,
     FormControlLabel,
     InputLabel, MenuItem, Select, Stack,
-    Switch,
     TextField,
     Typography
 } from "@mui/material";

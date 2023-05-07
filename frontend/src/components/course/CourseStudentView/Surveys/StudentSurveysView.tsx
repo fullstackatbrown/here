@@ -6,13 +6,13 @@ import { FC, useMemo } from "react";
 import StudentViewHeader from "../StudentViewHeader";
 import StudentSurveyCard from "./StudentSurveyCard";
 
-export interface SurveysViewProps {
+export interface StudentSurveysViewProps {
     course: Course;
     surveys: Survey[];
     student: User;
 }
 
-const SurveysView: FC<SurveysViewProps> = ({ course, surveys, student }) => {
+const StudentSurveysView: FC<StudentSurveysViewProps> = ({ course, surveys, student }) => {
     const surveySorted = useMemo(() => {
         return surveys.filter(survey => survey.published).filter(s => s.published).sort((a, b) => {
             return new Date(a.endTime).getTime() - new Date(b.endTime).getTime()
@@ -38,4 +38,4 @@ const SurveysView: FC<SurveysViewProps> = ({ course, surveys, student }) => {
     );
 };
 
-export default SurveysView;
+export default StudentSurveysView;

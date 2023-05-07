@@ -19,10 +19,10 @@ export interface SurveyDialogContentProps {
     survey: Survey;
     availability?: string[];
     onChangeCheckbox?: (time: string) => (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void;
-    disabled: boolean;
+    disabled?: boolean;
 }
 
-export const SurveyDialogContent: FC<SurveyDialogContentProps> = ({ survey, availability, onChangeCheckbox, disabled }) => {
+export const SurveyDialogContent: FC<SurveyDialogContentProps> = ({ survey, availability, onChangeCheckbox, disabled = false }) => {
     const ended = new Date(survey.endTime) < new Date();
     return <>
         <Typography variant="body1" mb={1} color={disabled ? "secondary" : "inherit"}> {survey.description} </Typography>
