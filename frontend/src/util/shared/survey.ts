@@ -1,9 +1,4 @@
-
-export interface Option {
-    option: string,
-    capacity: any
-}
-
+import { Option } from "model/survey";
 export function mapToList<T>(map: Record<string, T>): Option[] {
     let list = [];
     for (const key in map) {

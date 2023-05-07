@@ -1,4 +1,3 @@
-import { Option } from "@util/shared/survey";
 import { CourseUserData } from "./course";
 
 export interface Survey {
@@ -17,4 +16,9 @@ export interface SurveyResponse {
   name: string;
   email: string;
   availability: string[];
+}
+
+export interface Option {
+  option: string,
+  capacity: any
 }

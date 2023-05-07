@@ -64,30 +64,13 @@ func (fr *FirebaseRepository) GetSurveyByCourse(courseID string) (survey *models
 
 func (fr *FirebaseRepository) CreateSurvey(req *models.CreateSurveyRequest) (*models.Survey, error) {
 
-	// Check if a survey already exists for the course
-	res, err := fr.GetSurveyByCourse(req.CourseID)
-	if err != nil {
-		return nil, err
-	}
-	if res != nil {
-		return nil, fmt.Errorf("A survey already exists for the course")
-	}
-
-	// Get all the sections
-	capacity, err := fr.GetUniqueSectionTimes(req.CourseID)
-	if err != nil {
-		return nil, fmt.Errorf("Error getting unique section times: %v", err)
-	}
-
 	survey := &models.Survey{
 		Name:        req.Name,
 		Description: req.Description,
 		EndTime:     req.EndTime,
 		CourseID:    req.CourseID,
-		Capacity:    capacity,
+		Options:     req.Options,
 		Published:   false,
-		Responses:   make(map[string][]string),
-		Results:     make(map[string][]string),
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
@@ -112,19 +95,9 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 		val := v.Field(i).Interface()
 
 		// Only include the fields that are set
-		if (field != "CourseID") && (field != "SurveyID") && (field != "updateCapacity") && (!reflect.ValueOf(val).IsNil()) {
+		if (field != "CourseID") && (field != "SurveyID") && (!reflect.ValueOf(val).IsNil()) {
 			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
 		}
-	}
-
-	if req.UpdateCapacity {
-		// Get all unique section times
-		capacity, err := fr.GetUniqueSectionTimes(*req.CourseID)
-		if err != nil {
-			return fmt.Errorf("Error getting unique section times: %v", err)
-		}
-
-		updates = append(updates, firestore.Update{Path: "capacity", Value: capacity})
 	}
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
@@ -150,36 +123,10 @@ func (fr *FirebaseRepository) DeleteSurvey(courseID string, surveyID string) err
 }
 
 func (fr *FirebaseRepository) UpdateSurveyResults(courseID string, surveyID string, results map[string][]string) error {
-	resultsReadable, err := fr.generateReadableResults(courseID, results)
-	if err != nil {
-		return err
-	}
+	finalRes := make(map[string][]models.CourseUserData)
 
-	batch := fr.firestoreClient.Batch()
-
-	// update Results with studentIDs
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
-		{Path: "results", Value: results},
-	})
-
-	// update ResultsReadable with student names
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
-		{Path: "resultsReadable", Value: resultsReadable},
-	})
-
-	_, err = batch.Commit(firebase.Context)
-
-	return err
-}
-
-// Helpers
-func (fr *FirebaseRepository) generateReadableResults(courseID string, results map[string][]string) (readableResults map[string][]string, err error) {
-	readableResults = make(map[string][]string)
-
-	for sectionID, studentIDs := range results {
-		students := make([]string, 0)
+	for option, studentIDs := range results {
+		students := make([]models.CourseUserData, 0)
 		for _, studentID := range studentIDs {
 			student, err := fr.GetProfileById(studentID)
 			if err != nil {
@@ -187,11 +134,21 @@ func (fr *FirebaseRepository) generateReadableResults(courseID string, results m
 				// TODO: handle error, maybe remove from results
 				continue
 			}
-			students = append(students, student.DisplayName)
+			students = append(students, models.CourseUserData{
+				StudentID:   studentID,
+				Email:       student.Email,
+				DisplayName: student.DisplayName,
+			})
 		}
-		readableResults[sectionID] = students
+		finalRes[option] = students
 	}
-	return
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+		{Path: "results", Value: finalRes},
+	})
+	return err
+
 }
 
 func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID string) error {
@@ -203,13 +160,13 @@ func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID
 	// survey.results is a map of sectionID to a list of userIDs
 	// assign every student to the section
 
-	for sectionID, userIDs := range survey.Results {
-		for _, uid := range userIDs {
+	for option, students := range survey.Results {
+		for _, student := range students {
 
 			batch, err := fr.assignPermanentSection(&models.AssignSectionsRequest{
 				Course:       course,
-				StudentID:    uid,
-				NewSectionID: sectionID,
+				StudentID:    student.StudentID,
+				NewSectionID: option,
 			})
 
 			if err != nil {
@@ -217,7 +174,7 @@ func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID
 			}
 
 			if _, err := batch.Commit(firebase.Context); err != nil {
-				glog.Warningf("error assigning section for student %s: %v", uid, err)
+				glog.Warningf("error assigning section for student %s: %v", student.StudentID, err)
 				continue
 			}
 		}

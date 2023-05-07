@@ -1,7 +1,8 @@
 import { Section, Day } from "model/section";
 import { TimeCount } from "./formatSectionResponses";
 import { formatSectionTime } from "./formatTime";
-import { Option, mapToList } from "./survey";
+import { mapToList } from "./survey";
+import { Option } from "model/survey";
 
 interface DayTime {
     day: Day;

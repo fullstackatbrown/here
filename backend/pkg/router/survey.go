@@ -146,12 +146,12 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, exceptions := utils.RunAllocationAlgorithm(survey.Capacity, survey.Responses)
+	res, exceptions := utils.RunAllocationAlgorithm(survey.Options, survey.Responses)
 	res = utils.HandleExceptions(survey.Responses, res, exceptions)
 
 	// res is a map from section id to list of studentIDs
-	res = utils.GetAssignedSections(res, survey.Capacity)
-	repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
+	// res = utils.GetAssignedSections(res, survey.Capacity)
+	// repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
 
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully generated results for survey " + surveyID))

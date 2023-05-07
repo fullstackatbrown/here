@@ -9,23 +9,20 @@ import {
     Stack,
     Step,
     StepLabel,
-    Stepper,
-    TextField, Typography
+    Stepper
 } from "@mui/material";
-import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { handleBadRequestError } from "@util/errors";
-import { Option, mapToList } from "@util/shared/survey";
 import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
+import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { FC, useEffect, useMemo, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import SurveyStepOne from "./SurveyStepOne";
-import SurveyStepTwo from "./SurveyStepTwo";
-import { Section } from "model/section";
 import SurveyStepThree from "./SurveyStepThree";
+import SurveyStepTwo from "./SurveyStepTwo";
+import { Option } from "model/survey"
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;
@@ -104,33 +101,33 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
     const onSubmit = handleSubmit(async (data, event) => {
         console.log(data)
         if (survey) {
-            // toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, data.endDateParsed), {
-            //     loading: "Updating survey...",
-            //     success: "Survey updated!",
-            //     error: (err) => {
-            //         if (err.code === "ERR_BAD_REQUEST") {
-            //             return err.response.data
-            //         } else {
-            //             return (err) => handleBadRequestError(err)
-            //         }
-            //     }
-            // })
-            //     .then(() => handleOnClose())
-            //     .catch(() => { })
+            toast.promise(SurveyAPI.updateSurvey(courseID, survey.ID, data.name, data.description, data.endDateParsed, data.options), {
+                loading: "Updating survey...",
+                success: "Survey updated!",
+                error: (err) => {
+                    if (err.code === "ERR_BAD_REQUEST") {
+                        return err.response.data
+                    } else {
+                        return (err) => handleBadRequestError(err)
+                    }
+                }
+            })
+                .then(() => handleOnClose())
+                .catch(() => { })
         } else {
-            // toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description, data.endDateParsed), {
-            //     loading: "Creating survey...",
-            //     success: "Survey created!",
-            //     error: (err) => {
-            //         if (err.code === "ERR_BAD_REQUEST") {
-            //             return err.response.data
-            //         } else {
-            //             return (err) => handleBadRequestError(err)
-            //         }
-            //     }
-            // })
-            //     .then(() => handleOnClose())
-            //     .catch(() => { })
+            toast.promise(SurveyAPI.createSurvey(courseID, data.name, data.description, data.endDateParsed, data.options), {
+                loading: "Creating survey...",
+                success: "Survey created!",
+                error: (err) => {
+                    if (err.code === "ERR_BAD_REQUEST") {
+                        return err.response.data
+                    } else {
+                        return (err) => handleBadRequestError(err)
+                    }
+                }
+            })
+                .then(() => handleOnClose())
+                .catch(() => { })
         }
     });
 

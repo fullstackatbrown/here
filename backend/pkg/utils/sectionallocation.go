@@ -5,29 +5,27 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/fullstackatbrown/here/pkg/models"
 	"golang.org/x/exp/maps"
 )
 
 // Algorithm for assigning sections
-// Capacity: map from unique times to a map from section id to capacity
+// Options: map from options to capacity
 // Availability: map from student id to a list of sections they are available for
 // results: map from sections to list of studentIDs
 // exceptions: list of studentIDs unassigned
-func RunAllocationAlgorithm(capacity map[string]map[string]int, availability map[string][]string) (results map[string][]string, exceptions []string) {
-
-	uniqueTimeCapacity := make(map[string]int)
-	for time, sectionCapacity := range capacity {
-		for _, capacity := range sectionCapacity {
-			uniqueTimeCapacity[time] += capacity
-		}
+func RunAllocationAlgorithm(options []models.Option, availability map[string][]string) (results map[string][]string, exceptions []string) {
+	// Convert options to map
+	optionsMap := make(map[string]int)
+	for _, option := range options {
+		optionsMap[option.Option] = option.Capacity
 	}
-
-	return runAllocationAlgorithm(uniqueTimeCapacity, availability)
+	return runAllocationAlgorithm(optionsMap, availability)
 }
 
-func runAllocationAlgorithm(uniqueTimeCapacity map[string]int, availability map[string][]string) (results map[string][]string, exceptions []string) {
+func runAllocationAlgorithm(options map[string]int, availability map[string][]string) (results map[string][]string, exceptions []string) {
 
-	section_network := makeFlowNetwork(uniqueTimeCapacity, availability)
+	section_network := makeFlowNetwork(options, availability)
 
 	path, ok := findAugmentingPath(section_network, "source", "sink")
 	for ok {
@@ -41,7 +39,7 @@ func runAllocationAlgorithm(uniqueTimeCapacity map[string]int, availability map[
 	results = make(map[string][]string)
 
 	exceptions = maps.Keys(availability)
-	for section := range uniqueTimeCapacity {
+	for section := range options {
 		assigned_students := make([]string, 0)
 		for student, capacity := range section_network[section] {
 			if capacity == 1 && student != "sink" {
