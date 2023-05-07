@@ -18,13 +18,14 @@ export interface SurveyCardProps {
   numStudents: number;
   sections: Section[];
   active: boolean;
+  admin: boolean;
 }
 
 /**
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active }) => {
+const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active, admin }) => {
   const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const [surveyResponsesDialog, setSurveyResponsesDialog] = useState(false);
@@ -108,12 +109,16 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
                 </IconButton>
               </Tooltip>
             }
-            <IconButton onClick={handleUpdateSurvey} size={"small"} disabled={!active}>
-              <CreateIcon fontSize="small" />
-            </IconButton>
-            <IconButton onClick={handleDeleteSurvey} size={"small"} disabled={!active}>
-              <ClearIcon fontSize="small" />
-            </IconButton>
+            {admin && <>
+              <IconButton onClick={handleUpdateSurvey} size={"small"} disabled={!active}>
+                <CreateIcon fontSize="small" />
+              </IconButton>
+              <IconButton onClick={handleDeleteSurvey} size={"small"} disabled={!active}>
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </>
+            }
+
           </Stack>
         </Box>
       </Card>

@@ -65,7 +65,13 @@ const SurveysView: FC<SurveysViewProps> = ({
       )}
       <Stack direction="column" spacing={2} mb={5}>
         {surveysSorted?.map((survey) => (
-          <SurveyCard survey={survey} numStudents={numStudents()} sections={sections} active={isCourseActive} />
+          <SurveyCard
+            survey={survey}
+            numStudents={numStudents()}
+            sections={sections}
+            active={isCourseActive}
+            admin={access === CoursePermission.CourseAdmin}
+          />
         ))}
       </Stack >
     </>

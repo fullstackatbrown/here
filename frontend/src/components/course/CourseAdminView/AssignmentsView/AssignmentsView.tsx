@@ -75,7 +75,12 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
       )}
       <Stack direction="column" spacing={2} mb={5}>
         {assignments && sortAssignments(assignments).map((assignment) => (
-          <AssignmentCard key={assignment.ID} course={course} assignment={assignment} handleNavigate={handleNavigate} />
+          <AssignmentCard
+            key={assignment.ID}
+            course={course} assignment={assignment}
+            handleNavigate={handleNavigate}
+            admin={access === CoursePermission.CourseAdmin}
+          />
         ))}
       </Stack>
     </>

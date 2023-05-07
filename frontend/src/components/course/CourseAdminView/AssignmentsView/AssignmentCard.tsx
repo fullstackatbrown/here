@@ -16,9 +16,10 @@ export interface AssignmentCardProps {
   course: Course;
   assignment: Assignment;
   handleNavigate: (assignmentID: string) => void;
+  admin: boolean;
 }
 
-const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardProps) => {
+const AssignmentCard = ({ course, assignment, handleNavigate, admin }: AssignmentCardProps) => {
   const [editAssignmentDialog, setEditAssignmentDialog] = useState<Assignment | null>(null);
   const isCourseActive = course.status === CourseStatus.CourseActive;
 
@@ -99,14 +100,16 @@ const AssignmentCard = ({ course, assignment, handleNavigate }: AssignmentCardPr
             </Stack>
           </Stack>
 
-          <Stack direction="row" alignItems="center" justifyContent="center">
-            <IconButton onClick={handleEditAssignment(assignment)} size={"small"} disabled={!isCourseActive}>
-              <CreateIcon fontSize="small" />
-            </IconButton>
-            <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"} disabled={!isCourseActive}>
-              <ClearIcon fontSize="small" />
-            </IconButton>
-          </Stack>
+          {admin &&
+            <Stack direction="row" alignItems="center" justifyContent="center">
+              <IconButton onClick={handleEditAssignment(assignment)} size={"small"} disabled={!isCourseActive}>
+                <CreateIcon fontSize="small" />
+              </IconButton>
+              <IconButton onClick={handleDeleteAssignment(assignment)} size={"small"} disabled={!isCourseActive}>
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          }
         </Box>
       </Card>
     </>

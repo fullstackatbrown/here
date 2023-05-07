@@ -52,6 +52,7 @@ const SectionsView: FC<SectionsViewProps> = ({
           <SectionCard
             key={s.ID}
             active={course.status === CourseStatus.CourseActive}
+            admin={access === CoursePermission.CourseAdmin}
             section={s}
           />
         ))}
