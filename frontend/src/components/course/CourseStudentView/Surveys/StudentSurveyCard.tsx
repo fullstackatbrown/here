@@ -5,6 +5,7 @@ import { formatDistance } from "date-fns";
 import { Survey } from "model/survey";
 import { User } from "model/user";
 import { FC, useMemo, useState } from "react";
+import StudentSurveyStatusChip from "./StudentSurveyStatusChip";
 
 export interface StudentSurveyCardProps {
     survey: Survey;
@@ -15,7 +16,7 @@ export interface StudentSurveyCardProps {
 const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, student, index }) => {
 
     const filledOut = useMemo(() => survey.responses?.[student.ID] !== undefined, [survey, student]);
-    const ended = useMemo(() => survey.endTime && new Date(survey.endTime) < new Date(), [survey]);
+    const ended = useMemo(() => new Date(survey.endTime) < new Date(), [survey]);
 
     const [hover, setHover] = useState(false);
     const [surveyDialogOpen, setSurveyDialogOpen] = useState(false);
@@ -65,13 +66,7 @@ const StudentSurveyCard: FC<StudentSurveyCardProps> = ({ survey, student, index 
                         <Typography fontSize={12} color="inherit" variant="button">
                             click to {ended ? "view" : (filledOut ? "update" : "fill")}
                         </Typography> :
-                        (filledOut ?
-                            <MyChip label="submitted" variant="outlined" color="success" />
-                            : (ended ?
-                                <MyChip label="Ended" variant="outlined" color="secondary" /> :
-                                <MyChip label={`ending ${formatDistance(new Date(survey.endTime), new Date(), { addSuffix: true })}`} variant="outlined" color="primary" />
-                            )
-                        )
+                        <StudentSurveyStatusChip {...{ survey, filledOut }} />
                     }
                 </Grid>
             </Grid>
