@@ -1,7 +1,7 @@
 import { Section, Day } from "model/section";
 import { TimeCount } from "./formatSectionResponses";
 import { formatSectionTime } from "./formatTime";
-import { KVPair, mapToList } from "./survey";
+import { Option, mapToList } from "./survey";
 
 interface DayTime {
     day: Day;
@@ -54,7 +54,7 @@ export function sortSurveyResponses(times: TimeCount[]): TimeCount[] {
     });
 }
 
-export function getUniqueSectionTimes(sections: Section[]): KVPair[] {
+export function getUniqueSectionTimes(sections: Section[]): Option[] {
     let times: Record<string, DayTime> = {};
     let capacity: Record<string, number> = {};
     for (const section of sections) {
@@ -67,8 +67,8 @@ export function getUniqueSectionTimes(sections: Section[]): KVPair[] {
         }
     }
     const listOfSections = mapToList(times);
-    listOfSections.sort((a, b) => timeComparator(times[a.key], times[b.key]));
+    listOfSections.sort((a, b) => timeComparator(times[a.option], times[b.option]));
     return listOfSections.map(section => {
-        return { key: section.key, value: capacity[section.key] };
+        return { option: section.option, capacity: capacity[section.option] };
     })
 }

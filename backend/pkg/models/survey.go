@@ -5,16 +5,15 @@ const (
 )
 
 type Survey struct {
-	ID              string                    `firestore:"id,omitempty"`
-	CourseID        string                    `firestore:"courseID"`
-	Name            string                    `firestore:"name"`
-	Description     string                    `firestore:"description"`
-	Published       bool                      `firestore:"published"`
-	EndTime         string                    `firestore:"endTime"`
-	Capacity        map[string]map[string]int `firestore:"capacity"`
-	Responses       map[string][]string       `firestore:"responses"`
-	Results         map[string][]string       `firestore:"results"`
-	ResultsReadable map[string][]string       `firestore:"resultsReadable"`
+	ID          string                      `firestore:"id,omitempty"`
+	CourseID    string                      `firestore:"courseID"`
+	Name        string                      `firestore:"name"`
+	Description string                      `firestore:"description"`
+	Published   bool                        `firestore:"published"`
+	EndTime     string                      `firestore:"endTime"`
+	Options     map[string]int              `firestore:"options"`
+	Responses   map[string][]string         `firestore:"responses"`
+	Results     map[string][]CourseUserData `firestore:"results"`
 }
 
 type Times struct {

@@ -30,10 +30,10 @@ export const SurveyDialogContent: FC<SurveyDialogContentProps> = ({ survey, avai
         <Stack >
             {survey.options.map(obj =>
                 <FormControlLabel
-                    key={obj.key}
-                    control={<Checkbox onChange={onChangeCheckbox && onChangeCheckbox(obj.key)} />}
-                    label={obj.key}
-                    checked={availability && availability.includes(obj.key)}
+                    key={obj.option}
+                    control={<Checkbox onChange={onChangeCheckbox && onChangeCheckbox(obj.option)} />}
+                    label={obj.option}
+                    checked={availability && availability.includes(obj.option)}
                 />
             )}
         </Stack>

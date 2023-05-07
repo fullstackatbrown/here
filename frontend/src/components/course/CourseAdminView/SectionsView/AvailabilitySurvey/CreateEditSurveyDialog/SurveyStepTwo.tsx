@@ -33,22 +33,22 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({ register, fields, remove, setVa
 
     function handleRemove(index: number) {
         if (index === 0) {
-            setValue(`options.${index}.key`, "")
-            setValue(`options.${index}.value`, "")
+            setValue(`options.${index}.option`, "")
+            setValue(`options.${index}.capacity`, "")
             return
         }
         remove(index);
     }
 
     function handleInsert(index: number) {
-        insert(index, { key: "", value: "" });
+        insert(index, { option: "", capacity: "" });
     }
 
     useEffect(() => {
         if (useSectionData) {
             replace(getUniqueSectionTimes(sections))
         } else {
-            replace([{ key: "", value: "" }])
+            replace([{ option: "", capacity: "" }])
         }
     }, [useSectionData])
 
@@ -72,7 +72,7 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({ register, fields, remove, setVa
                 <Grid container my={1} columnSpacing={3}>
                     <GridItem item xs={7.5}>
                         <TextField
-                            {...register(`options.${index}.key`, { required: true })}
+                            {...register(`options.${index}.option`, { required: true })}
                             required
                             autoFocus
                             type="text"
@@ -93,7 +93,7 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({ register, fields, remove, setVa
                     </GridItem>
                     <GridItem item xs={3}>
                         <TextField
-                            {...register(`options.${index}.value`, { required: true, valueAsNumber: true })}
+                            {...register(`options.${index}.capacity`, { required: true, valueAsNumber: true })}
                             required
                             type="number"
                             placeholder="0"

@@ -15,7 +15,7 @@ import {
 import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { handleBadRequestError } from "@util/errors";
-import { KVPair, mapToList } from "@util/shared/survey";
+import { Option, mapToList } from "@util/shared/survey";
 import { getNextWeekDate } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
@@ -41,7 +41,7 @@ export type SurveyFormData = {
     enddate: Date,
     endtime: Date,
     endDateParsed: string,
-    options: KVPair[]
+    options: Option[]
 };
 
 const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, survey, sections }) => {
@@ -54,7 +54,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
         endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
         endDateParsed: survey ? survey.endTime : getNextWeekDate().toISOString(),
-        options: survey ? survey.options : [{ key: "", value: "" }]
+        options: survey ? survey.options : [{ option: "", capacity: "" }]
     }), [survey])
 
     const { register, handleSubmit, control, reset, setValue, getValues, watch, formState: { } } = useForm<SurveyFormData>({
@@ -89,7 +89,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 return
             }
         } else if (activeStep === 1) {
-            if (fields.length === 0 || fields.every(field => field.key === "" && field.value === "")) {
+            if (fields.length === 0 || fields.every(field => field.option === "" && field.capacity === "")) {
                 toast.error("Please add at least 1 option.")
                 return
             }
