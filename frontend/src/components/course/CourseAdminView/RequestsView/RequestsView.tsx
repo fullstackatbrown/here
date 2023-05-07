@@ -6,32 +6,28 @@ import {
   Collapse,
   Stack
 } from "@mui/material";
-import { usePastSwaps, usePendingSwaps } from "api/swaps/hooks";
+import { usePastSwaps } from "api/swaps/hooks";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
-import { useEffect, useState } from "react";
-import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
-import RequestsList from "./RequestsList";
+import { Swap } from "model/swap";
 import { CoursePermission } from "model/user";
+import { useState } from "react";
 import AdminViewHeader from "../AdminViewHeader";
+import RequestsList from "./RequestsList";
 
 export interface RequestsViewProps {
   course: Course;
   access: CoursePermission;
   sectionsMap: Record<string, Section>;
   assignmentsMap: Record<string, Assignment>;
+  pendingRequests: Swap[];
 }
 
-export default function RequestsView({ course, access, sectionsMap, assignmentsMap }: RequestsViewProps) {
-  const [pendingRequests, pendingRequestsLoading] = usePendingSwaps(course.ID);
-  const [pendingRequestsOpen, setPendingRequestsOpen] = useState(!pendingRequestsLoading);
+export default function RequestsView({ course, access, sectionsMap, assignmentsMap, pendingRequests }: RequestsViewProps) {
+  const [pendingRequestsOpen, setPendingRequestsOpen] = useState(true);
   const [pastRequests, pastRequestsLoading] = usePastSwaps(course.ID);
   const [pastRequestsOpen, setPastRequestsOpen] = useState(false);
-
-  useEffect(() => {
-    setPendingRequestsOpen(!pendingRequestsLoading);
-  }, [pendingRequestsLoading]);
 
   return (
     <>
@@ -60,7 +56,7 @@ export default function RequestsView({ course, access, sectionsMap, assignmentsM
             Past Requests
           </Button>
         </Stack>
-        <Collapse in={pastRequestsOpen} timeout="auto" unmountOnExit>
+        <Collapse in={!pastRequestsLoading && pastRequestsOpen} timeout="auto" unmountOnExit>
           <RequestsList {...{ course, assignmentsMap, sectionsMap }} type="past" requests={pastRequests} />
         </Collapse>
       </Stack >

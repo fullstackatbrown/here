@@ -2,23 +2,27 @@ import { Button, Stack, Typography, buttonClasses } from "@mui/material";
 import { capitalizeWords } from "@util/shared/string";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
+import { Swap } from "model/swap";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 
 interface CourseAdminViewNavigationProps {
   access: CoursePermission;
+  pendingRequests: Swap[];
 }
 
-export default function CourseAdminViewNavigation({ access }: CourseAdminViewNavigationProps) {
+export default function CourseAdminViewNavigation({ access, pendingRequests }: CourseAdminViewNavigationProps) {
   const router = useRouter();
   const { query } = router;
-  const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
+
+  const numPendingRequests = useMemo(() => pendingRequests?.length || 0, [pendingRequests])
 
   function navigateTo(view: View) {
     return router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true });
   }
 
-  function getNavigationButton(view: View, requestsLength?: number) {
+  function getNavigationButton(view: View, pendingCount?: number) {
     return (
       <Button
         key={view}
@@ -34,9 +38,9 @@ export default function CourseAdminViewNavigation({ access }: CourseAdminViewNav
         }}
       >
         {capitalizeWords(view)}
-        {requestsLength !== undefined && requestsLength > 0 &&
+        {pendingCount > 0 &&
           <Typography color="primary" sx={{ fontSize: 14, fontWeight: query.view === view ? 800 : 500 }}>
-            &nbsp;&nbsp;({requestsLength})
+            &nbsp;&nbsp;({pendingCount})
           </Typography>
         }
       </Button >
@@ -59,7 +63,7 @@ export default function CourseAdminViewNavigation({ access }: CourseAdminViewNav
         {getNavigationButton("sections")}
         {getNavigationButton("assignments")}
         {getNavigationButton("people")}
-        {pendingRequests && getNavigationButton("requests", pendingRequests.length)}
+        {pendingRequests && getNavigationButton("requests", numPendingRequests)}
         {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
       </Stack>
       {/* {open ?
