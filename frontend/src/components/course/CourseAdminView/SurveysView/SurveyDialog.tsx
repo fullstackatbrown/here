@@ -9,12 +9,42 @@ import {
     Typography
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { formatDateTime, formatSurveyTime } from "@util/shared/formatTime";
-import { sortSurveyTimes } from "@util/shared/sortSectionTime";
+import { formatDateTime } from "@util/shared/time";
 import SurveyAPI from "api/surveys/api";
 import { Survey } from "model/survey";
-import { FC, useState } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import toast from "react-hot-toast";
+
+export interface SurveyDialogContentProps {
+    survey: Survey;
+    availability?: string[];
+    onChangeCheckbox?: (time: string) => (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void;
+    disabled?: boolean;
+}
+
+export const SurveyDialogContent: FC<SurveyDialogContentProps> = ({ survey, availability, onChangeCheckbox, disabled = false }) => {
+    const ended = new Date(survey.endTime) < new Date();
+    return <>
+        <Typography variant="body1" mb={1} color={disabled ? "secondary" : "inherit"}> {survey.description} </Typography>
+        <Typography variant="body1" mb={2} color={disabled ? "secondary" : "inherit"}>
+            This survey {ended ? "has ended" : "will end"} on
+            &nbsp;
+            <Box component="span" fontWeight='fontWeightMedium'>
+                {formatDateTime(survey.endTime)}
+            </Box>
+        </Typography>
+        <Stack >
+            {survey.options.map(obj =>
+                <FormControlLabel
+                    key={obj.option}
+                    control={<Checkbox onChange={onChangeCheckbox && onChangeCheckbox(obj.option)} disabled={disabled} />}
+                    label={obj.option}
+                    checked={availability && availability.includes(obj.option)}
+                />
+            )}
+        </Stack>
+    </>
+}
 
 export interface SurveyDialogProps {
     open: boolean;
@@ -22,9 +52,11 @@ export interface SurveyDialogProps {
     preview?: boolean;
     survey: Survey;
     studentID?: string;
+    disabled?: boolean;
 }
 
-const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID }) => {
+
+const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, survey, studentID, disabled = false }) => {
     // If student has already responded, show their response
     const [availability, setAvailability] = useState<string[]>((studentID && survey?.responses?.[studentID]) || []);
     const showDialog = useDialog();
@@ -75,8 +107,8 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
     }
 
     function onChangeCheckbox(time: string) {
-        return (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (e.target.checked) {
+        return (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+            if (checked) {
                 setAvailability([...availability, time])
             } else {
                 let newTimes = availability.filter(t => t !== time)
@@ -88,24 +120,11 @@ const SurveyDialog: FC<SurveyDialogProps> = ({ open, onClose, preview = false, s
     return <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" keepMounted={false}>
         <DialogTitle>{survey.name}{preview && (survey.published ? " (Published)" : " (Preview)")}</DialogTitle>
         <DialogContent>
-            <Typography variant="body1" mb={1}> {survey.description} </Typography>
-            <Typography variant="body1" mb={2}> This survey will end on&nbsp;
-                <Box component="span" fontWeight='fontWeightMedium'>{formatDateTime(survey.endTime)} </Box>
-            </Typography>
-            <Stack >
-                {sortSurveyTimes(Object.keys(survey.capacity)).map(time =>
-                    <FormControlLabel
-                        key={time}
-                        control={<Checkbox onChange={onChangeCheckbox(time)} />}
-                        label={formatSurveyTime(time)}
-                        checked={availability.includes(time)}
-                    />
-                )}
-            </Stack>
+            <SurveyDialogContent {...{ survey, availability, onChangeCheckbox, disabled }} />
         </DialogContent>
         <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button disabled={preview && survey.published} onClick={onSubmit} variant="contained">
+            <Button disabled={disabled || (preview && survey.published)} onClick={onSubmit} variant="contained">
                 {preview ? "Publish" : "Submit"}
             </Button>
         </DialogActions>

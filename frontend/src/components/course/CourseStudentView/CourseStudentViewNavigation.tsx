@@ -1,21 +1,30 @@
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { capitalizeWords } from "@util/shared/string";
 import { View } from "model/general";
+import { Survey } from "model/survey";
+import { User } from "model/user";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 
 interface CourseStudentViewNavigationProps {
-
+  surveys: Survey[];
+  student: User;
 }
 
-export default function CourseStudentViewNavigation() {
+export default function CourseStudentViewNavigation({ surveys, student }: CourseStudentViewNavigationProps) {
   const router = useRouter();
   const { query } = router;
+
+  const numPendingSurvey = useMemo(() => {
+    // published, didn't fill out, has not ended
+    return surveys?.filter(s => s.published && !(s.responses?.[student.ID]) && new Date(s.endTime) > new Date()).length
+  }, [surveys, student])
 
   function navigateTo(view: View) {
     return router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true });
   }
 
-  function getNavigationButton(view: View) {
+  function getNavigationButton(view: View, pendingCount?: number) {
     return (
       <Button
         key={view}
@@ -31,6 +40,11 @@ export default function CourseStudentViewNavigation() {
         }}
       >
         {capitalizeWords(view)}
+        {pendingCount > 0 &&
+          <Typography color="primary" sx={{ fontSize: 14, fontWeight: query.view === view ? 800 : 500 }}>
+            &nbsp;&nbsp;({pendingCount})
+          </Typography>
+        }
       </Button >
     );
   }
@@ -52,6 +66,7 @@ export default function CourseStudentViewNavigation() {
       <Stack direction="column" spacing={1}>
         {getNavigationButton("home")}
         {getNavigationButton("my requests")}
+        {getNavigationButton("surveys", numPendingSurvey)}
         {getNavigationButton("settings")}
       </Stack>
     </Stack>

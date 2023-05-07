@@ -35,6 +35,10 @@ type Course struct {
 	Assignments                   map[string]*Assignment `firestore:"-"`
 	AssignmentsListenerCancelFunc func()                 `firestore:"-"`
 
+	SurveysLock               sync.RWMutex       `firestore:"-"`
+	Surveys                   map[string]*Survey `firestore:"-"`
+	SurveysListenerCancelFunc func()             `firestore:"-"`
+
 	PendingSwapsLock               sync.RWMutex     `firestore:"-"`
 	PendingSwaps                   map[string]*Swap `firestore:"-"`
 	PendingSwapsListenerCancelFunc func()           `firestore:"-"`
@@ -52,7 +56,7 @@ type CourseUserData struct {
 	StudentID      string `firestore:"studentID"`
 	Email          string `firestore:"email"`
 	DisplayName    string `firestore:"displayName"`
-	DefaultSection string `firestore:"defaultSection"`
+	DefaultSection string `firestore:"defaultSection,omitempty"`
 }
 
 type GetCourseRequest struct {

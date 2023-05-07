@@ -5,7 +5,7 @@ import { Course } from "model/course";
 import { Section } from "model/section";
 import { Swap } from "model/swap";
 import { User } from "model/user";
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import StudentRequestCard from "./StudentRequestCard";
 import SwapRequestDialog from "./SwapRequestDialog";
 
@@ -21,6 +21,7 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
     const [swapRequestDialog, setSwapRequestDialog] = useState<Swap | undefined>(undefined)
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const requestsSorted = useMemo(() => sortStudentRequests(requests), [requests]);
 
     const handleOpenSwapRequestDialog = (swap: Swap) => {
         setSwapRequestDialog(swap);
@@ -52,8 +53,8 @@ const StudentRequestsList: FC<StudentRequestsListProps> = ({ course, student, se
                     <Typography variant="body1" mt={1}>You have made no swap requests</Typography>
                 }
                 {(rowsPerPage > 0 ?
-                    sortStudentRequests(requests).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
-                    sortStudentRequests(requests)
+                    requestsSorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
+                    requestsSorted
                 )
                     .map((r) => {
                         const student = course.students[r.studentID];

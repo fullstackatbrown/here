@@ -4,7 +4,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Box, Collapse, Grid, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
-import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/formatSectionInfo";
+import formatSectionInfo, { getSectionAvailableSeats } from "@util/shared/section";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
 import { CourseUserData } from "model/course";

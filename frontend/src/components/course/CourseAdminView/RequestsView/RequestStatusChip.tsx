@@ -1,4 +1,4 @@
-import SmallChip from "@components/shared/MyChip/MyChip";
+import MyChip from "@components/shared/MyChip/MyChip";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { SwapStatus } from "model/swap";
 import React, { FC } from "react";
@@ -21,7 +21,7 @@ const RequestStatusChip: FC<RequestStatusChipProps> = ({ status, timestamp, styl
     const pending = status === SwapStatus.Pending;
     const getLabel = (status: SwapStatus) =>
         (pending ? "submitted" : status) + (timestamp ? ` ${formatRequestTime(timestamp, false, pending)}` : "")
-    return <SmallChip label={getLabel(status)} variant="outlined" color={colors[status]} style={style} />;
+    return <MyChip label={getLabel(status)} variant="outlined" color={colors[status]} style={style} />;
 };
 
 export default RequestStatusChip;

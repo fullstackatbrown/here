@@ -1,5 +1,5 @@
 import { Section } from "model/section";
-import { formatSectionTime } from "./formatTime";
+import { formatSectionTime } from "./time";
 
 export default function formatSectionInfo(section: Section, abbreviated = false, withCapacity = false): string {
     if (section === undefined) {

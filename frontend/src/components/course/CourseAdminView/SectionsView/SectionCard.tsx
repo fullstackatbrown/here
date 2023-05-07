@@ -2,7 +2,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import CreateIcon from "@mui/icons-material/Create";
 import { Box, Card, IconButton, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import { formatSectionTime } from "@util/shared/formatTime";
+import { formatSectionTime } from "@util/shared/time";
 import SectionAPI from "api/section/api";
 import { Section } from "model/section";
 import React, { FC, useState } from "react";
@@ -11,6 +11,7 @@ import CreateEditSectionDialog from "./CreateEditSectionDialog";
 import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 
 export interface SectionCardProps {
+  admin: boolean;
   active: boolean;
   section: Section;
 }
@@ -19,7 +20,7 @@ export interface SectionCardProps {
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SectionCard: FC<SectionCardProps> = ({ section, active }) => {
+const SectionCard: FC<SectionCardProps> = ({ admin, section, active }) => {
   const [editSectionDialog, setEditSectionDialog] = useState(false);
   const theme = useTheme();
   const betweenSmalltoMid = useMediaQuery(theme.breakpoints.between("xs", "md"));
@@ -90,14 +91,16 @@ const SectionCard: FC<SectionCardProps> = ({ section, active }) => {
             </Stack>
           </Stack>
 
-          <Stack direction="row" alignItems="center" justifyContent="center">
-            <IconButton onClick={handleEditSection} size={"small"} disabled={!active}>
-              <CreateIcon fontSize="small" />
-            </IconButton>
-            <IconButton onClick={handleDeleteSection} size={"small"} disabled={!active}>
-              <ClearIcon fontSize="small" />
-            </IconButton>
-          </Stack>
+          {admin &&
+            <Stack direction="row" alignItems="center" justifyContent="center">
+              <IconButton onClick={handleEditSection} size={"small"} disabled={!active}>
+                <CreateIcon fontSize="small" />
+              </IconButton>
+              <IconButton onClick={handleDeleteSection} size={"small"} disabled={!active}>
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          }
         </Box>
       </Card>
     </>

@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
-import formatSectionInfo, { formatSectionCapacity } from "@util/shared/formatSectionInfo";
+import formatSectionInfo, { formatSectionCapacity } from "@util/shared/section";
 import { formatRequestTime } from "@util/shared/requestTime";
 import { Assignment } from "model/assignment";
 import { CourseUserData } from "model/course";

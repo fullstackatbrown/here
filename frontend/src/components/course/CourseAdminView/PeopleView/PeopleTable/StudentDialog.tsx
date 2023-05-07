@@ -17,7 +17,7 @@ import {
     useMediaQuery
 } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
+import formatSectionInfo from "@util/shared/section";
 import { UNASSIGNED } from "@util/shared/getStudentsInSection";
 import AuthAPI from "api/auth/api";
 import CourseAPI from "api/course/api";

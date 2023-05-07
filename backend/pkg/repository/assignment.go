@@ -85,7 +85,7 @@ func (fr *FirebaseRepository) GetAssignmentByName(course *models.Course, name st
 		}
 	}
 
-	return nil, nil
+	return nil, qerrors.AssignmentNotFoundError
 }
 
 func (fr *FirebaseRepository) CreateAssignment(req *models.CreateAssignmentRequest) (assignment *models.Assignment, err error) {
@@ -140,7 +140,7 @@ func (fr *FirebaseRepository) UpdateAssignment(req *models.UpdateAssignmentReque
 		return err
 	}
 
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreAssignmentsCollection).Doc(req.AssignmentID).Update(firebase.Context, []firestore.Update{
 		{Path: "name", Value: req.Name},
 		{Path: "optional", Value: req.Optional},

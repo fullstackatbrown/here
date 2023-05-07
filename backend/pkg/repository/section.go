@@ -57,9 +57,9 @@ func (fr *FirebaseRepository) initializeSectionsListener(course *models.Course) 
 	return nil
 }
 
-// GetCourseByID gets the Course from the courses map corresponding to the provided course ID.
+// Only works for active courses
 func (fr *FirebaseRepository) GetSectionByID(courseID string, sectionID string) (*models.Section, error) {
-	course, err := fr.GetCourseByID(courseID)
+	course, err := fr.GetActiveCourseByID(courseID)
 	if err != nil {
 		return nil, err
 	}
@@ -75,35 +75,6 @@ func (fr *FirebaseRepository) GetSectionByID(courseID string, sectionID string) 
 	return section, nil
 }
 
-// Returns a map from a unique time, to a map from section id (that has the time) to capacity
-func (fr *FirebaseRepository) GetUniqueSectionTimes(courseID string) (map[string]map[string]int, error) {
-	course, err := fr.GetCourseByID(courseID)
-	if err != nil {
-		return nil, err
-	}
-
-	capacity := make(map[string]map[string]int)
-
-	course.SectionsLock.RLock()
-	defer course.SectionsLock.RUnlock()
-
-	for _, section := range course.Sections {
-		t := fmt.Sprintf("%s,%s,%s", section.Day, section.StartTime, section.EndTime)
-
-		_, ok := capacity[t]
-		if !ok {
-			capacity[t] = make(map[string]int)
-		}
-		_, ok = capacity[t][section.ID]
-		if !ok {
-			capacity[t][section.ID] = 0
-		}
-		capacity[t][section.ID] += section.Capacity
-	}
-
-	return capacity, nil
-}
-
 func (fr *FirebaseRepository) GetSectionByInfo(course *models.Course, startTime string, endTime string, location string) (*models.Section, error) {
 	locationCollapsed := utils.CollapseString(location)
 
@@ -116,7 +87,7 @@ func (fr *FirebaseRepository) GetSectionByInfo(course *models.Course, startTime 
 		}
 	}
 
-	return nil, nil
+	return nil, qerrors.SectionNotFoundError
 }
 
 func (fr *FirebaseRepository) CreateSection(req *models.CreateSectionRequest) (section *models.Section, err error) {

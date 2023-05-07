@@ -9,22 +9,24 @@ import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
-import CreateSurveyDialog from "./CreateEditSurveyDialog";
+import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyDialog from "./SurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
+import SurveyStatusChip from "./SurveyStatusChip";
 
 export interface SurveyCardProps {
   survey: Survey;
   numStudents: number;
   sections: Section[];
   active: boolean;
+  admin: boolean;
 }
 
 /**
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active }) => {
+const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active, admin }) => {
   const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const [surveyResponsesDialog, setSurveyResponsesDialog] = useState(false);
@@ -45,9 +47,9 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
   const handleDeleteSurvey = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     const confirmed = await showDialog({
-      title: 'Delete Survey',
-      message: `Are you sure you want to delete ${survey.name}? This action cannot be undone.`,
-      warning: survey.published && "This survey is already published. Deleting this survey will delete all student responses."
+      title: `Confirm Delete Survey?`,
+      warning: survey.published && "This survey is already published. Deleting this survey will delete all student responses.",
+      message: "This action cannot be undone."
     });
     if (confirmed) {
       toast
@@ -79,6 +81,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
         onClose={() => setUpdateSurveyDialog(false)}
         courseID={survey.courseID}
         survey={survey}
+        sections={sections}
       />
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
       <SurveyResponsesDialog
@@ -91,9 +94,12 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
       <Card sx={{ ":hover": { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>
-            <Typography variant="body2" noWrap>
-              {survey.name}
-            </Typography>
+            <Stack direction="row" alignItems="center" mb={0.5}>
+              <Typography variant="body2">
+                {survey.name}
+              </Typography>
+              <SurveyStatusChip survey={survey} style={{ marginLeft: 6 }} />
+            </Stack>
             <Typography variant="body2" fontWeight={400} sx={{ color: "text.disabled" }}>
               {survey.published ? `${getNumResponses()}/${numStudents} responded` : "Click to preview"}
             </Typography>
@@ -107,12 +113,16 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
                 </IconButton>
               </Tooltip>
             }
-            <IconButton onClick={handleUpdateSurvey} size={"small"} disabled={!active}>
-              <CreateIcon fontSize="small" />
-            </IconButton>
-            <IconButton onClick={handleDeleteSurvey} size={"small"} disabled={!active}>
-              <ClearIcon fontSize="small" />
-            </IconButton>
+            {admin && <>
+              <IconButton onClick={handleUpdateSurvey} size={"small"} disabled={!active}>
+                <CreateIcon fontSize="small" />
+              </IconButton>
+              <IconButton onClick={handleDeleteSurvey} size={"small"} disabled={!active}>
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </>
+            }
+
           </Stack>
         </Box>
       </Card>

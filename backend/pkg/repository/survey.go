@@ -9,88 +9,99 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 	"github.com/golang/glog"
 	"github.com/mitchellh/mapstructure"
-	"google.golang.org/api/iterator"
 )
 
-func (fr *FirebaseRepository) GetSurveyByID(courseID string, surveyID string) (*models.Survey, error) {
-	doc, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID).Get(firebase.Context)
+// CoursesLock should be locked on entry
+func (fr *FirebaseRepository) initializeSurveysListener(course *models.Course) error {
 
-	if err != nil {
-		return nil, err
+	handleDocs := func(docs []*firestore.DocumentSnapshot) error {
+		newSurveys := make(map[string]*models.Survey)
+		for _, doc := range docs {
+			if !doc.Exists() {
+				continue
+			}
+
+			var c models.Survey
+			err := mapstructure.Decode(doc.Data(), &c)
+			if err != nil {
+				log.Panicf("Error destructuring document: %v", err)
+				return err
+			}
+
+			c.ID = doc.Ref.ID
+			newSurveys[doc.Ref.ID] = &c
+		}
+
+		course.SectionsLock.Lock()
+		defer course.SectionsLock.Unlock()
+
+		course.Surveys = newSurveys
+
+		return nil
 	}
 
-	var survey models.Survey
-	err = mapstructure.Decode(doc.Data(), &survey)
-	if err != nil {
-		log.Panicf("Error destructuring document: %v", err)
-		return nil, err
-	}
-
-	survey.ID = doc.Ref.ID
-	return &survey, nil
+	done := make(chan func())
+	query := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(
+		course.ID).Collection(models.FirestoreSurveysCollection).Query
+	go func() {
+		err := fr.createCollectionInitializer(query, &done, handleDocs)
+		if err != nil {
+			log.Panicf("error creating section collection listener: %v\n", err)
+		}
+	}()
+	cancelFunc := <-done
+	course.SurveysListenerCancelFunc = cancelFunc
+	return nil
 }
 
-func (fr *FirebaseRepository) GetSurveyByCourse(courseID string) (survey *models.Survey, err error) {
-	iter := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Documents(firebase.Context)
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-
-		var survey models.Survey
-		err = mapstructure.Decode(doc.Data(), &survey)
-		if err != nil {
-			log.Panicf("Error destructuring document: %v", err)
-			return nil, err
-		}
-
-		survey.ID = doc.Ref.ID
-		// Guaranteed to have only one survey
-		return &survey, nil
-
+// Only works for active courses
+func (fr *FirebaseRepository) GetSurveyByID(courseID string, surveyID string) (*models.Survey, error) {
+	course, err := fr.GetActiveCourseByID(courseID)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, nil
+	course.SurveysLock.RLock()
+	defer course.SurveysLock.RUnlock()
+
+	survey, ok := course.Surveys[surveyID]
+	if !ok {
+		return nil, qerrors.SurveyNotFoundError
+	}
+
+	return survey, nil
+}
+
+func (fr *FirebaseRepository) GetSurveyByName(course *models.Course, name string) (survey *models.Survey, err error) {
+	course.SurveysLock.RLock()
+	defer course.SurveysLock.RUnlock()
+
+	for _, s := range course.Surveys {
+		if s.Name == name {
+			return s, nil
+		}
+	}
+
+	return nil, qerrors.SurveyNotFoundError
 }
 
 func (fr *FirebaseRepository) CreateSurvey(req *models.CreateSurveyRequest) (*models.Survey, error) {
 
-	// Check if a survey already exists for the course
-	res, err := fr.GetSurveyByCourse(req.CourseID)
-	if err != nil {
-		return nil, err
-	}
-	if res != nil {
-		return nil, fmt.Errorf("A survey already exists for the course")
-	}
-
-	// Get all the sections
-	capacity, err := fr.GetUniqueSectionTimes(req.CourseID)
-	if err != nil {
-		return nil, fmt.Errorf("Error getting unique section times: %v", err)
-	}
-
 	survey := &models.Survey{
-		Name:        req.Name,
-		Description: req.Description,
-		EndTime:     req.EndTime,
-		CourseID:    req.CourseID,
-		Capacity:    capacity,
-		Published:   false,
-		Responses:   make(map[string][]string),
-		Results:     make(map[string][]string),
+		Name:            req.Name,
+		Description:     req.Description,
+		EndTime:         req.EndTime,
+		CourseID:        req.Course.ID,
+		Options:         req.Options,
+		SectionCapacity: req.SectionCapacity,
+		Published:       false,
 	}
 
-	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.CourseID).Collection(
+	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSurveysCollection).Add(firebase.Context, survey)
 	if err != nil {
 		return nil, fmt.Errorf("error creating survey: %v\n", err)
@@ -112,20 +123,12 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 		val := v.Field(i).Interface()
 
 		// Only include the fields that are set
-		if (!reflect.ValueOf(val).IsNil()) && (field != "CourseID") && (field != "SurveyID") {
+		if (field != "Course") && (field != "SurveyID") && (!reflect.ValueOf(val).IsNil()) {
 			updates = append(updates, firestore.Update{Path: utils.LowercaseFirst(field), Value: val})
 		}
 	}
 
-	// Get all unique section times
-	capacity, err := fr.GetUniqueSectionTimes(*req.CourseID)
-	if err != nil {
-		return fmt.Errorf("Error getting unique section times: %v", err)
-	}
-
-	updates = append(updates, firestore.Update{Path: "capacity", Value: capacity})
-
-	_, err = fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(*req.CourseID).Collection(
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(req.Course.ID).Collection(
 		models.FirestoreSurveysCollection).Doc(*req.SurveyID).Update(firebase.Context, updates)
 	return err
 }
@@ -148,48 +151,31 @@ func (fr *FirebaseRepository) DeleteSurvey(courseID string, surveyID string) err
 }
 
 func (fr *FirebaseRepository) UpdateSurveyResults(courseID string, surveyID string, results map[string][]string) error {
-	resultsReadable, err := fr.generateReadableResults(courseID, results)
-	if err != nil {
-		return err
-	}
+	finalRes := make(map[string][]models.CourseUserData)
 
-	batch := fr.firestoreClient.Batch()
-
-	// update Results with studentIDs
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
-		{Path: "results", Value: results},
-	})
-
-	// update ResultsReadable with student names
-	batch.Update(fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID), []firestore.Update{
-		{Path: "resultsReadable", Value: resultsReadable},
-	})
-
-	_, err = batch.Commit(firebase.Context)
-
-	return err
-}
-
-// Helpers
-func (fr *FirebaseRepository) generateReadableResults(courseID string, results map[string][]string) (readableResults map[string][]string, err error) {
-	readableResults = make(map[string][]string)
-
-	for sectionID, studentIDs := range results {
-		students := make([]string, 0)
+	for option, studentIDs := range results {
+		students := make([]models.CourseUserData, 0)
 		for _, studentID := range studentIDs {
 			student, err := fr.GetProfileById(studentID)
 			if err != nil {
 				// student no longer exists
-				// TODO: handle error, maybe remove from results
 				continue
 			}
-			students = append(students, student.DisplayName)
+			students = append(students, models.CourseUserData{
+				StudentID:   studentID,
+				Email:       student.Email,
+				DisplayName: student.DisplayName,
+			})
 		}
-		readableResults[sectionID] = students
+		finalRes[option] = students
 	}
-	return
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+		{Path: "results", Value: finalRes},
+	})
+	return err
+
 }
 
 func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID string) error {
@@ -201,13 +187,18 @@ func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID
 	// survey.results is a map of sectionID to a list of userIDs
 	// assign every student to the section
 
-	for sectionID, userIDs := range survey.Results {
-		for _, uid := range userIDs {
+	for option, students := range survey.Results {
+		for _, student := range students {
+
+			if _, ok := course.Students[student.StudentID]; !ok {
+				// if student no longer enrolled in the course, skip
+				continue
+			}
 
 			batch, err := fr.assignPermanentSection(&models.AssignSectionsRequest{
 				Course:       course,
-				StudentID:    uid,
-				NewSectionID: sectionID,
+				StudentID:    student.StudentID,
+				NewSectionID: option,
 			})
 
 			if err != nil {
@@ -215,7 +206,7 @@ func (fr *FirebaseRepository) ApplySurveyResults(course *models.Course, surveyID
 			}
 
 			if _, err := batch.Commit(firebase.Context); err != nil {
-				glog.Warningf("error assigning section for student %s: %v", uid, err)
+				glog.Warningf("error assigning section for student %s: %v", student.StudentID, err)
 				continue
 			}
 		}

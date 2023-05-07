@@ -2,40 +2,27 @@ import { Button, Stack, Typography, buttonClasses } from "@mui/material";
 import { capitalizeWords } from "@util/shared/string";
 import { usePendingSwaps } from "api/swaps/hooks";
 import { View } from "model/general";
+import { Swap } from "model/swap";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo } from "react";
 
 interface CourseAdminViewNavigationProps {
   access: CoursePermission;
-  headerInView: boolean;
+  pendingRequests: Swap[];
 }
 
-export default function CourseAdminViewNavigation({
-  access, headerInView
-}: CourseAdminViewNavigationProps) {
+export default function CourseAdminViewNavigation({ access, pendingRequests }: CourseAdminViewNavigationProps) {
   const router = useRouter();
   const { query } = router;
-  const [pendingRequests, _] = usePendingSwaps(query.courseID as string);
-  const [open, setOpen] = useState(true);
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
 
-  // useEffect(() => {
-  //     if (!headerInView) {
-  //         setOpen(false)
-  //     } else {
-  //         setOpen(true)
-  //     }
-  // }, [headerInView])
-
+  const numPendingRequests = useMemo(() => pendingRequests?.length || 0, [pendingRequests])
 
   function navigateTo(view: View) {
     return router.push(`${router.query.courseID}?view=${view}`, undefined, { shallow: true });
   }
 
-  function getNavigationButton(view: View, requestsLength?: number) {
+  function getNavigationButton(view: View, pendingCount?: number) {
     return (
       <Button
         key={view}
@@ -51,9 +38,9 @@ export default function CourseAdminViewNavigation({
         }}
       >
         {capitalizeWords(view)}
-        {requestsLength !== undefined && requestsLength > 0 &&
+        {pendingCount > 0 &&
           <Typography color="primary" sx={{ fontSize: 14, fontWeight: query.view === view ? 800 : 500 }}>
-            &nbsp;&nbsp;({requestsLength})
+            &nbsp;&nbsp;({pendingCount})
           </Typography>
         }
       </Button >
@@ -68,8 +55,6 @@ export default function CourseAdminViewNavigation({
           xs: "none",
           md: "flex",
         },
-        transform: open ? "translate3d(0, 0, 0)" : "translate3d(-130px, 0, 0)",
-        transition: "transform 0.5s ease-in-out",
       }}
       flexDirection="row"
       alignItems="start"
@@ -77,21 +62,11 @@ export default function CourseAdminViewNavigation({
       <Stack direction="column" spacing={1}>
         {getNavigationButton("sections")}
         {getNavigationButton("assignments")}
+        {getNavigationButton("surveys")}
         {getNavigationButton("people")}
-        {pendingRequests && getNavigationButton("requests", pendingRequests.length)}
+        {pendingRequests && getNavigationButton("requests", numPendingRequests)}
         {access === CoursePermission.CourseAdmin && getNavigationButton("settings")}
       </Stack>
-      {/* {open ?
-                    <Tooltip title="Hide Menu" placement="right">
-                        <IconButton onClick={toggleDrawer} sx={{ p: 0.5, ml: 2.5 }}>
-                            <KeyboardArrowLeftIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                    </Tooltip> :
-                    <Tooltip title="Show Menu" placement="right">
-                        <IconButton onClick={toggleDrawer} sx={{ p: 0.5, ml: 2.5 }}>
-                            <KeyboardArrowRightIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                    </Tooltip>} */}
     </Stack>
   )
 

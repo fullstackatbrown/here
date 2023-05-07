@@ -2,7 +2,7 @@ import GradeChip from "@components/shared/GradeChip/GradeChip";
 import { Box, Chip, Divider, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
 import { Theme, styled } from "@mui/material/styles";
 import { filterAssignmentsByReleaseDate, sortAssignments } from "@util/shared/assignments";
-import formatSectionInfo from "@util/shared/formatSectionInfo";
+import formatSectionInfo from "@util/shared/section";
 import dayjs from "dayjs";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";

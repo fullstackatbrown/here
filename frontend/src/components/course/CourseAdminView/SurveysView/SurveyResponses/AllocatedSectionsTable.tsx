@@ -1,7 +1,10 @@
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
     Box,
     Collapse,
-    IconButton,
     Stack,
     Table,
     TableBody,
@@ -11,21 +14,16 @@ import {
     Typography,
     styled
 } from "@mui/material";
-import { Section } from 'model/section';
-import { FC, useState } from "react";
 import MuiTableCell, { TableCellProps } from "@mui/material/TableCell";
 import { red } from '@mui/material/colors';
+import { formatSectionTime } from "@util/shared/time";
 import { sortSections } from "@util/shared/sortSectionTime";
-import { formatSectionTime } from "@util/shared/formatTime";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import React from "react";
+import { CourseUserData } from "model/course";
+import { Section } from 'model/section';
+import React, { FC, useState } from "react";
 
 export interface AllocatedSectionsTableProps {
-    results: Record<string, string[]>;
-    resultsReadable: Record<string, string[]>;
+    results: Record<string, CourseUserData[]>;
     sections: Section[];
 }
 
@@ -42,7 +40,7 @@ const TableCell = styled(MuiTableCell)<StyledTableCellProps>(({ theme, open }) =
 }))
 
 
-const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, resultsReadable, sections }) => {
+const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sections }) => {
     const [selectedSection, setSelectedSection] = useState<string>(undefined); // sectionID
 
     const toggleOpen = (sectionID: string) => {
@@ -73,7 +71,6 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, resu
                 const notInSurvey = !(section.ID in results)
                 const numStudents = results[section.ID]?.length || 0
                 const time = formatSectionTime(section)
-                const students = resultsReadable[section.ID] || []
                 const open = selectedSection === section.ID
                 return (
                     <React.Fragment key={section.ID}>
@@ -113,7 +110,7 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, resu
                                     <Stack direction="row" display="flex" alignItems="center" spacing={2}>
                                         <AccountCircleIcon color="secondary" sx={{ fontSize: 16 }} />
                                         <Typography fontSize={14} color="secondary">
-                                            {students.join(", ")}
+                                            {results[section.ID]?.map(s => s.displayName).join(", ")}
                                         </Typography>
                                     </Stack>
                                 </Collapse>

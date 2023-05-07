@@ -40,13 +40,8 @@ func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 	req.CourseID = course.ID
 
 	// Check if an assignment with the same name exists
-	a, err := repo.Repository.GetAssignmentByName(course, req.Name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if a != nil {
+	_, err = repo.Repository.GetAssignmentByName(course, req.Name)
+	if err == nil {
 		http.Error(w, "An assignment with the same name already exists", http.StatusBadRequest)
 		return
 	}
@@ -61,7 +56,7 @@ func createAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
-	courseID := chi.URLParam(r, "courseID")
+	course := r.Context().Value("course").(*models.Course)
 	assignmentID := chi.URLParam(r, "assignmentID")
 	var req *models.UpdateAssignmentRequest
 
@@ -71,8 +66,15 @@ func updateAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.CourseID = courseID
+	req.Course = course
 	req.AssignmentID = assignmentID
+
+	// Check if an assignment with the same name exists
+	a, err := repo.Repository.GetAssignmentByName(course, req.Name)
+	if err == nil && a.ID != assignmentID {
+		http.Error(w, "An assignment with the same name already exists", http.StatusBadRequest)
+		return
+	}
 
 	err = repo.Repository.UpdateAssignment(req)
 	if err != nil {

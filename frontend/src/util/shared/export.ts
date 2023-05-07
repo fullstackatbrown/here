@@ -1,11 +1,11 @@
 import { ExportToCsv } from 'export-to-csv';
 import { Assignment } from "model/assignment";
-import { Course } from "model/course";
+import { Course, CourseUserData } from "model/course";
 import { Section } from "model/section";
-import { formatSectionTime, formatSurveyTime } from "./formatTime";
-import listToMap from "./listToMap";
+import { formatSectionTime } from "./time";
+import listToMapWithID from "./listToMap";
 import { SurveyResponse } from "model/survey";
-import formatSectionInfo from './formatSectionInfo';
+import formatSectionInfo from './section';
 
 const options = {
     filename: "",
@@ -86,8 +86,22 @@ const getNameFromEmail = (email: string): string => {
     return email.split("@")[0].split("_").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ").replace(/[0-9]/g, '')
 }
 
-export function exportSurveyResults(results: Record<string, string[]>, sections: Section[]) {
-    const sectionsMap = listToMap(sections) as Record<string, Section>;
+export function exportSurveyResults(results: Record<string, CourseUserData[]>) {
+    options.filename = `survey_results`
+    let data = [];
+    for (const option of Object.keys(results)) {
+        data.push({
+            "option": option,
+            "students": results[option].map(s => s.email).join(",").replace(/\s+/g, ''),
+        });
+    }
+
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
+}
+
+export function exportSurveyResultsForSections(results: Record<string, CourseUserData[]>, sections: Section[]) {
+    const sectionsMap = listToMapWithID(sections) as Record<string, Section>;
     options.filename = `survey_results`
     let data = [];
     for (const sectionID of Object.keys(results)) {
@@ -95,7 +109,7 @@ export function exportSurveyResults(results: Record<string, string[]>, sections:
         data.push({
             "section": formatSectionTime(section),
             "location": section.location,
-            "students": results[sectionID].join(",").replace(/\s+/g, ''),
+            "students": results[sectionID].map(s => s.email).join(",").replace(/\s+/g, ''),
         });
     }
 
@@ -110,7 +124,7 @@ export function exportSurveyResponses(responses: SurveyResponse[]) {
         data.push({
             "name": response.name,
             "email": response.email,
-            "availability": response.availability.map((a) => formatSurveyTime(a).replace(/\s+/g, '')).join(",")
+            "availability": response.availability.map((a) => a.replace(/\s+/g, '')).join(",")
         });
     }
     const csvExporter = new ExportToCsv(options);
