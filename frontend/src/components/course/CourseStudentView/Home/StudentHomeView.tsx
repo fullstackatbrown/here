@@ -9,20 +9,21 @@ import { Course } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { CoursePermission, User } from "model/user";
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import StudentGradesTable from "./StudentGradesTable";
 import StudentViewHeader from "../StudentViewHeader";
+import AllSurveysDialog from "../AllSurveysDialog/AllSurveysDialog";
 
 export interface StudentHomeViewProps {
     course: Course;
     student: User;
-    survey: Survey;
+    surveys: Survey[];
     sectionsMap: Record<string, Section>;
     assignmentsMap: Record<string, Assignment>;
 }
 
-const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, sectionsMap, assignmentsMap }) => {
-    const [surveyDialog, setSurveyDialog] = useState(false)
+const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, surveys, sectionsMap, assignmentsMap }) => {
+    const [allSurveysDialog, setAllSurveysDialog] = useState(false)
     const [tooltip, setTooltip] = useState(false)
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
@@ -35,19 +36,26 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
         return undefined
     }
 
-    const courseHasSurvey = () => survey?.published && survey?.endTime > new Date().toISOString()
-
-    const studentHasFilledOutSurvey = () => survey?.responses && survey?.responses?.[student.ID] !== undefined
+    const surveysVisible = useMemo(() => {
+        return surveys.filter(survey => survey.published)
+    }, [surveys])
 
     return (
         <>
             {/* TODO: multiple surveys */}
-            {survey &&
+            {/* {survey &&
                 <SurveyDialog
                     open={surveyDialog}
                     onClose={() => { setSurveyDialog(false) }}
                     survey={survey}
                     studentID={student.ID}
+                />} */}
+            {surveys &&
+                <AllSurveysDialog
+                    open={allSurveysDialog}
+                    onClose={() => { setAllSurveysDialog(false) }}
+                    surveys={surveys}
+                    student={student}
                 />}
             <Dialog
                 open={tooltip}
@@ -90,9 +98,9 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, survey, se
                             </IconButton>
                         </Tooltip>
                     </Stack>
-                    {courseHasSurvey() &&
-                        <Button variant={isXsScreen ? "outlined" : "text"} startIcon={<CalendarMonth />} onClick={() => { setSurveyDialog(true) }}>
-                            {studentHasFilledOutSurvey() ? "Update Survey Response" : "Fill Out Survey"}
+                    {surveysVisible.length > 0 &&
+                        <Button variant={isXsScreen ? "outlined" : "text"} startIcon={<CalendarMonth />} onClick={() => { setAllSurveysDialog(true) }}>
+                            {/* {studentHasFilledOutSurvey() ? "Update Survey Response" : "Fill Out Survey"} */}
                         </Button>
                     }
                 </Stack>

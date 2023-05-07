@@ -1,11 +1,10 @@
-import { Box, Button, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { useState } from "react";
 import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyCard from "./SurveyCard";
-import SurveyDialog from "./SurveyDialog";
 
 export interface SurveyProps {
   course: Course;
@@ -15,7 +14,6 @@ export interface SurveyProps {
 
 export default function SurveySection({ course, sections, surveys }: SurveyProps) {
   const [createSurveyDialog, setCreateSurveyDialog] = useState(false);
-  const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const isCourseActive = course.status === CourseStatus.CourseActive;
 
   const numStudents = () => {

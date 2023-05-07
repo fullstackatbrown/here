@@ -36,6 +36,10 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         formatSurveyResponses(survey.options, survey.responses),
         [survey.responses, survey.options])
 
+    const hasResults = useMemo(() =>
+        survey.results ? Object.keys(survey.results).length > 0 : false,
+        [survey.results])
+
     const handleRunAlgorithm = () => {
         toast.promise(SurveyAPI.generateResults(survey.courseID, survey.ID), {
             loading: "Running algorithm...",
@@ -44,8 +48,6 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
         })
             .catch(() => { })
     }
-
-    const hasResults = () => survey.results ? Object.keys(survey.results).length > 0 : false
 
     const handleApplyResults = () => {
         toast.promise(SurveyAPI.applyResults(survey.courseID, survey.ID), {
@@ -118,7 +120,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
             <Grid container>
                 <Grid item xs={0} md={2} />
                 <Grid item xs={12} md={8} display="flex" justifyContent="center">
-                    {hasResults() &&
+                    {hasResults &&
                         (survey.sectionCapacity ?
                             <AllocatedSectionsTable sections={sections} results={survey.results} /> :
                             <SurveyResultsTable options={survey.options} results={survey.results} />
@@ -129,8 +131,8 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
             </Grid>
         </DialogContent>
         <DialogActions sx={{ paddingTop: 2 }}>
-            {hasResults() && <Button variant="contained" onClick={handleExportResults}>Export Results</Button>}
-            {hasResults() && <Button variant="contained" onClick={handleApplyResults}>Apply Results</Button>}
+            {hasResults && <Button variant="contained" onClick={handleExportResults}>Export Results</Button>}
+            {hasResults && survey?.sectionCapacity && <Button variant="contained" onClick={handleApplyResults}>Apply Results</Button>}
         </DialogActions>
     </Dialog >
 };

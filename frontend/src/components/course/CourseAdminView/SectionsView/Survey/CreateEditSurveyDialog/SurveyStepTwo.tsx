@@ -123,32 +123,37 @@ const SurveyStepTwo: FC<SurveyStepTwoProps> = ({
             </Box>
         }
         )}
-        <Box mt={1.5}>
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        size="small"
-                        checked={useSectionData}
-                        onChange={(event) => setUseSectionData(event.target.checked)}
-                    />
-                }
-                label="Use Section Data"
-                sx={{
-                    '& .MuiTypography-root': {
-                        fontSize: 14,
-                    },
-                }}
-            />
-            {survey && useSectionData &&
+        {/* If creating survey, show checkbox for using section data */}
+        {/* If updating survey, if survey used section data, show resync button, otherwise show nothing */}
+        {survey ?
+            (useSectionData && <Box mt={1.5}>
                 <Button
                     startIcon={<RefreshIcon />}
-                    sx={{ fontSize: 14, py: 0.5 }}
+                    sx={{ fontSize: 14, py: 0.5, ml: -0.5 }}
                     onClick={handleResyncSectionData}
                 >
-                    Resync
+                    Resync with section data
                 </Button>
-            }
-        </Box>
+            </Box>
+            ) :
+            <Box mt={1.5}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            size="small"
+                            checked={useSectionData}
+                            onChange={(event) => setUseSectionData(event.target.checked)}
+                        />
+                    }
+                    label="Use Section Data"
+                    sx={{
+                        '& .MuiTypography-root': {
+                            fontSize: 14,
+                        },
+                    }}
+                />
+            </Box>
+        }
     </Stack >
 }
 

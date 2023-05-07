@@ -117,7 +117,6 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 return
             }
         } else if (activeStep === 1) {
-            console.log(controlledOptions)
             // Check if all fields are filled
             if (controlledOptions.some((field) => field.option === "" || Number.isNaN(field.capacity))) {
                 toast.error("Please fill in all the fields.")

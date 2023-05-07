@@ -8,11 +8,10 @@ import { useSwapsByStudent } from "api/swaps/hooks";
 import { Course } from "model/course";
 import { User } from "model/user";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import SurveyDialog from "../CourseAdminView/SectionsView/Survey/SurveyDialog";
+import { useEffect } from "react";
 import CourseStudentViewNavigation from "./CourseStudentViewNavigation";
-import StudentRequestsView from "./Requests/StudentRequestsView";
 import StudentHomeView from "./Home/StudentHomeView";
+import StudentRequestsView from "./Requests/StudentRequestsView";
 import StudentSettingsView from "./Settings/StudentSettingsView";
 
 export interface CourseStudentViewProps {
@@ -25,7 +24,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
   const [sectionsMap, sectionsMapLoading] = useSectionsMap(course.ID)
   const [assignmentsMap, assignmentsMapLoading] = useAssignmentsMap(course.ID)
   const [requests, requestsLoading] = useSwapsByStudent(course.ID, student.ID);
-  const [survey, surveyLoading] = useSurveys(course.ID);
+  const [surveys, surveysLoading] = useSurveys(course.ID);
 
   useEffect(() => {
     const view = router.query.view;
@@ -35,7 +34,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
   }, [router, course]);
 
   return (
-    !sectionsMapLoading && !assignmentsMapLoading && !surveyLoading &&
+    !sectionsMapLoading && !assignmentsMapLoading && !surveysLoading &&
     <Grid container>
       <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
         <CourseStudentViewNavigation />
@@ -43,7 +42,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
       <Grid item xs={11} md={7.3}>
         {router.query.view && sectionsMap && assignmentsMap && (
           <>
-            {router.query.view === "home" && !surveyLoading && <StudentHomeView {...{ course, student, survey, sectionsMap, assignmentsMap }} />}
+            {router.query.view === "home" && !surveysLoading && <StudentHomeView {...{ course, student, surveys, sectionsMap, assignmentsMap }} />}
             {router.query.view === "my requests" && !requestsLoading && <StudentRequestsView {...{ course, student, requests, sectionsMap, assignmentsMap }} />}
             {router.query.view === "settings" && <StudentSettingsView course={course} />}
           </>)}
