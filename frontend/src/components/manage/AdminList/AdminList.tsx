@@ -4,6 +4,8 @@ import { unique } from '@util/shared/array';
 import { useAdminInvites, useAdmins } from "api/auth/hooks";
 import { FC } from "react";
 import AdminChip from './AdminChip';
+import { sortByName } from '@util/shared/user';
+import { User } from 'model/user';
 
 export interface AdminListProps {
 }
@@ -18,12 +20,12 @@ const AdminList: FC<AdminListProps> = ({ }) => {
                 Site Admin
             </Typography>
             <Box display="flex" flexDirection="row" alignItems="center" flexWrap="wrap" ml={-1}>
-                {admins?.map(admin =>
+                {admins && (sortByName(admins) as User[]).map(admin =>
                     <Box key={admin.ID} minWidth="25%" display="flex" mr={3} mb={2}>
                         <AdminChip admin={admin} />
                     </Box>
                 )}
-                {adminInvites && unique(adminInvites).map(invite =>
+                {adminInvites && unique(adminInvites).sort().map(invite =>
                     <Box key={invite} minWidth="25%" display="flex" mr={3} mb={2}>
                         <AdminChip email={invite} />
                     </Box>

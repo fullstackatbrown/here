@@ -160,12 +160,18 @@ func bulkUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = repo.Repository.BulkUpload(req)
+	badRequestErrors, err := repo.Repository.BulkUpload(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(200)
-	w.Write([]byte("Successfully uploaded permission"))
+	if len(badRequestErrors) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(badRequestErrors)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Successfully uploaded all permission"))
 }

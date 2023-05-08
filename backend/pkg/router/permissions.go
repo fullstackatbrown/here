@@ -34,9 +34,9 @@ func addPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	req.CourseID = chi.URLParam(r, "courseID")
 
-	hadPermission, err := repo.Repository.AddPermissions(req)
-	if hadPermission {
-		http.Error(w, fmt.Sprintf("Already have %s access", req.Permission), http.StatusBadRequest)
+	exists, badReq, err := repo.Repository.AddPermissions(req)
+	if badReq != nil {
+		http.Error(w, badReq.Error(), http.StatusBadRequest)
 		return
 	}
 	if err != nil {
@@ -45,7 +45,11 @@ func addPermissionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Successfully added course permission to " + req.CourseID))
+	if exists {
+		w.Write([]byte("Permission already exists"))
+	} else {
+		w.Write([]byte("Added permission!"))
+	}
 }
 
 func revokePermissionHandler(w http.ResponseWriter, r *http.Request) {
@@ -79,15 +83,15 @@ func addStudentHandler(w http.ResponseWriter, r *http.Request) {
 	req.CourseID = chi.URLParam(r, "courseID")
 
 	errors := make(map[string]string)
-	studentExists, studentIsStaff, err := repo.Repository.AddStudentToCourse(req)
-	if studentExists {
-		errors[req.Email] = "already enrolled"
-	}
-	if studentIsStaff {
-		errors[req.Email] = "staff member"
+	exists, badReq, err := repo.Repository.AddStudentToCourse(req)
+	if badReq != nil {
+		errors[req.Email] = badReq.Error()
 	}
 	if err != nil {
 		errors[req.Email] = "unknown error"
+	}
+	if exists {
+		errors[req.Email] = "student is already enrolled in course"
 	}
 
 	response := map[string]interface{}{
@@ -100,7 +104,7 @@ func addStudentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Successfully added student %v to course %v", req.Email, req.CourseID)))
+	w.Write([]byte(fmt.Sprintf("Added student %v!", req.Email)))
 }
 
 func deleteStudentHandler(w http.ResponseWriter, r *http.Request) {
@@ -138,18 +142,15 @@ func bulkAddStudentHandler(w http.ResponseWriter, r *http.Request) {
 	errors := make(map[string]string)
 
 	for _, email := range req.Emails {
-		studentExists, studentIsStaff, err := repo.Repository.AddStudentToCourse(&models.AddStudentRequest{
+		_, badReq, err := repo.Repository.AddStudentToCourse(&models.AddStudentRequest{
 			CourseID: req.CourseID,
 			Email:    email,
 		})
-		if studentExists {
-			errors[email] = "already enrolled"
+		if badReq != nil {
+			errors[email] = badReq.Error()
 			continue
 		}
-		if studentIsStaff {
-			errors[email] = "staff member"
-			continue
-		}
+
 		if err != nil {
 			errors[email] = "unknown error"
 			continue

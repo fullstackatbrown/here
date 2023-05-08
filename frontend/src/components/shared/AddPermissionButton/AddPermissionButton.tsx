@@ -68,7 +68,7 @@ const AddPermissionButton: FC<AddPermissionButtonProps> = ({ course, access, suc
         } else {
             toast.promise(CourseAPI.addPermission(course.ID, data.email, access), {
                 loading: "Adding permission...",
-                success: "Added permission!",
+                success: (msg) => msg,
                 error: (err) => handleBadRequestError(err),
             })
                 .then(() => {

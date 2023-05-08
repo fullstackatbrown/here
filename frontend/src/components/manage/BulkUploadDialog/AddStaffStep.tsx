@@ -22,7 +22,7 @@ const AddStaffStep: FC<AddStaffStepProps> = ({ term, courses, addStaffData, setA
         <Typography fontWeight={500}>{capitalizeWords(term)} Courses: {formatCourseCodes(Object.keys(courses))}</Typography>
         <Typography whiteSpace="pre" mb={2}>
             To add staff, paste comma-separated values with the following schema: (email,[staff/admin],course_code).{"\n"}
-            If a person is already a staff member, they will be updated to the new role.{"\n"}
+            If a person already has access, the request will be ignored.{"\n"}
         </Typography>
         <TextField
             required

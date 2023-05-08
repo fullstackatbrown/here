@@ -1,5 +1,5 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Box, Dialog, DialogContent, IconButton, Stack, Theme, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { Box, Dialog, DialogContent, IconButton, Stack, Theme, Tooltip, Typography, tooltipClasses, useMediaQuery } from "@mui/material";
 import formatSectionInfo from "@util/shared/section";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
@@ -58,6 +58,14 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, sectionsMa
                     <Tooltip
                         title="This is the default section you will attend if you have not requested a swap for a particular assignment."
                         placement="right"
+                        PopperProps={{
+                            sx: {
+                                "& .MuiTooltip-tooltip": {
+                                    fontSize: 13,
+                                    maxWidth: 400,
+                                }
+                            }
+                        }}
                         disableTouchListener={isXsScreen}
                         disableHoverListener={isXsScreen}
                         disableFocusListener={isXsScreen}
@@ -80,7 +88,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, sectionsMa
                         <Typography mt={1}>Your instructor has not released any assignments yet</Typography>}
                 </Box>
 
-            </Stack>
+            </Stack >
         </>
     );
 };

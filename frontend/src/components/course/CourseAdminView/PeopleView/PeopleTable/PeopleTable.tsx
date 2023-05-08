@@ -1,6 +1,6 @@
 import { Box, Divider, Grid, TablePagination, Typography, useMediaQuery } from "@mui/material";
 import { Theme, styled } from "@mui/material/styles";
-import { sortStudentsByName } from "@util/shared/formatStudentsList";
+import { sortByName } from "@util/shared/user";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus, CourseUserData } from 'model/course';
 import { Section } from "model/section";
@@ -39,7 +39,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
     const isCourseActive = course.status === CourseStatus.CourseActive;
 
     const studentsDisplayed = useMemo(() => {
-        const enrolledStudents = sortStudentsByName(students).map((student) => ({ type: "enrolled", student } as StudentRowData))
+        const enrolledStudents = sortByName(students).map((student) => ({ type: "enrolled", student } as StudentRowData))
         const invitedStudentsRows = invitedStudents.map((email) => ({ type: "invited", email } as StudentRowData))
         return [...enrolledStudents, ...invitedStudentsRows]
     }, [students, invitedStudents])

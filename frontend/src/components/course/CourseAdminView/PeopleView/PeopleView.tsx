@@ -3,7 +3,7 @@ import SearchBar from "@components/shared/SearchBar/SearchBar";
 import { Box, Stack, Typography } from "@mui/material";
 import { exportStudentList } from "@util/shared/export";
 import formatSectionInfo from "@util/shared/section";
-import { filterStudentsBySearchQuery } from "@util/shared/formatStudentsList";
+import { filterStudentsBySearchQuery } from "@util/shared/user";
 import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
