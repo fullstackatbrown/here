@@ -36,8 +36,8 @@ func (fr *FirebaseRepository) initializeSurveysListener(course *models.Course) e
 			newSurveys[doc.Ref.ID] = &c
 		}
 
-		course.SectionsLock.Lock()
-		defer course.SectionsLock.Unlock()
+		course.SurveysLock.Lock()
+		defer course.SurveysLock.Unlock()
 
 		course.Surveys = newSurveys
 
