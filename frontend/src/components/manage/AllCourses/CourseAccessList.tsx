@@ -94,13 +94,21 @@ const CourseAccessList: FC<CourseAccessListProps> = ({ course }) => {
                                     <EditIcon sx={{ fontSize: 20 }} />
                                 </IconButton>
                             </Tooltip>
-                            {course.status === CourseStatus.CourseInactive &&
-                                <Tooltip title="Delete Course">
-                                    <IconButton sx={{ p: 0.5 }} onClick={handleDeleteCourse}>
+                            <Tooltip
+                                title={
+                                    course.status === CourseStatus.CourseInactive ?
+                                        "Delete Course" :
+                                        "Cannot delete active or archived courses"
+                                }
+                            >
+                                <span>
+                                    <IconButton sx={{ p: 0.5 }} onClick={handleDeleteCourse}
+                                        disabled={course.status !== CourseStatus.CourseInactive}
+                                    >
                                         <CloseIcon sx={{ fontSize: 20 }} />
                                     </IconButton>
-                                </Tooltip>
-                            }
+                                </span>
+                            </Tooltip>
                         </Stack>
                     }
 

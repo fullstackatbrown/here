@@ -36,13 +36,6 @@ const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, 
                 endElement={!(isXsScreen && !allowRequests) &&
                     <Tooltip
                         title="Enabled after regular section is assigned"
-                        PopperProps={{
-                            sx: {
-                                "& .MuiTooltip-tooltip": {
-                                    fontSize: 13,
-                                }
-                            }
-                        }}
                         disableHoverListener={allowRequests}
                         disableFocusListener={allowRequests}
                     >
