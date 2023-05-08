@@ -7,7 +7,7 @@ import MuiTableCell from "@mui/material/TableCell";
 import { Theme, styled } from "@mui/material/styles";
 import { arraySubtract, arrayUnion } from '@util/shared/array';
 import formatSectionInfo from '@util/shared/section';
-import { filterStudentsBySearchQuery, sortStudentsByName } from '@util/shared/formatStudentsList';
+import { filterStudentsBySearchQuery, sortByName } from '@util/shared/user';
 import getStudentsInSection, { ALL_STUDENTS } from '@util/shared/getStudentsInSection';
 import GradeAPI from 'api/grades/api';
 import { Assignment } from 'model/assignment';
@@ -70,7 +70,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
         }
         let students = studentIDs.map((studentID) => course.students[studentID])
         students = filterStudentsBySearchQuery(students, searchQuery)
-        setCurrentStudentsDisplayed(sortStudentsByName(students))
+        setCurrentStudentsDisplayed(sortByName(students) as CourseUserData[])
     }, [filterBySection, page, course.students, assignment.ID, sectionsMap, searchQuery])
 
     const handleSubmitGrade = (userID: string) => {

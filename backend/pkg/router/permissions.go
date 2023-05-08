@@ -104,7 +104,7 @@ func addStudentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Successfully added student %v to course %v", req.Email, req.CourseID)))
+	w.Write([]byte(fmt.Sprintf("Added student %v!", req.Email)))
 }
 
 func deleteStudentHandler(w http.ResponseWriter, r *http.Request) {
