@@ -14,16 +14,16 @@ export interface StudentSurveysViewProps {
 
 const StudentSurveysView: FC<StudentSurveysViewProps> = ({ course, surveys, student }) => {
     const surveySorted = useMemo(() => {
-        return surveys.filter(survey => survey.published).filter(s => s.published).sort((a, b) => {
+        return surveys?.filter(survey => survey.published).filter(s => s.published).sort((a, b) => {
             return new Date(a.endTime).getTime() - new Date(b.endTime).getTime()
-        })
+        }) || []
     }, [surveys])
 
     return (
         <>
             <StudentViewHeader view="surveys" />
             <Stack direction="column" minHeight={60}>
-                {surveys.length === 0 &&
+                {surveys?.length === 0 &&
                     <Typography variant="body1" mt={1}>The instructor has not published any survey</Typography>
                 }
                 {surveySorted

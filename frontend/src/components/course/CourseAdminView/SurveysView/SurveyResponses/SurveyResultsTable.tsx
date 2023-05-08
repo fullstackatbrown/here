@@ -88,11 +88,6 @@ const SurveyResultsTable: FC<SurveyResultsTableProps> = ({ results, options }) =
                             </TableCell>
                             <TableCell open={open}>
                                 <Box display="flex" alignItems="center">
-                                    {/* {notInSurvey &&
-                                        <Tooltip title="Added after survey has been published">
-                                            <ErrorOutlineIcon color="secondary" sx={{ fontSize: 15 }} />
-                                        </Tooltip>
-                                    } */}
                                     {numStudents > 0 && (open ?
                                         <KeyboardArrowUpIcon color="secondary" sx={{ fontSize: 15 }} /> :
                                         <KeyboardArrowDownIcon color="secondary" sx={{ fontSize: 15 }} />)}

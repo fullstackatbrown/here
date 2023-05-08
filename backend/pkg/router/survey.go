@@ -153,12 +153,23 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, exceptions := utils.RunAllocationAlgorithm(survey.Options, survey.Responses)
+	options := survey.Options
+	capacity := survey.SectionCapacity
+
+	if survey.SectionCapacity != nil {
+		options, capacity, err = repo.Repository.UpdateSurveyOptions(courseID, survey)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	res, exceptions := utils.RunAllocationAlgorithm(options, survey.Responses)
 	res = utils.HandleExceptions(survey.Responses, res, exceptions)
 
 	// res is a map from options to list of student data
 	if survey.SectionCapacity != nil {
-		res = utils.GetAssignedSections(res, survey.SectionCapacity)
+		res = utils.GetAssignedSections(res, capacity)
 	}
 	repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
 

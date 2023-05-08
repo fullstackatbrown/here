@@ -133,6 +133,49 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 	return err
 }
 
+func (fr *FirebaseRepository) UpdateSurveyOptions(courseID string, survey *models.Survey) ([]*models.SurveyOption, map[string]map[string]int, error) {
+
+	newOptions := make([]*models.SurveyOption, 0)
+	newCapacity := make(map[string]map[string]int)
+	// Update the options based on the latest capacity of each section
+	// If for an option, all of the sections have been deleted, set its capacity to 0
+	for option, sections := range survey.SectionCapacity {
+		for sectionID := range sections {
+			if _, ok := newCapacity[option]; !ok {
+				newCapacity[option] = make(map[string]int)
+			}
+
+			section, err := fr.GetSectionByID(courseID, sectionID)
+			// if section still exists, add it to newCapacity
+			if err == nil {
+				newCapacity[option][sectionID] = section.Capacity
+			} else {
+				newCapacity[option][sectionID] = 0
+			}
+		}
+	}
+
+	for _, option := range survey.Options {
+		if _, ok := survey.SectionCapacity[option.Option]; ok {
+			capacity := 0
+			for _, sectionCapacity := range survey.SectionCapacity[option.Option] {
+				capacity += sectionCapacity
+			}
+			newOptions = append(newOptions, &models.SurveyOption{
+				Option:   option.Option,
+				Capacity: capacity,
+			})
+		}
+	}
+
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(survey.ID).Update(firebase.Context, []firestore.Update{
+		{Path: "options", Value: newOptions},
+		{Path: "sectionCapacity", Value: newCapacity},
+	})
+	return newOptions, newCapacity, err
+}
+
 func (fr *FirebaseRepository) PublishSurvey(courseID string, surveyID string) error {
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(

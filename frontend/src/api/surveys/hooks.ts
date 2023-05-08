@@ -5,24 +5,24 @@ import { useEffect, useState } from "react";
 
 export function useSurveys(courseID: string): [Survey[] | undefined, boolean] {
     const [loading, setLoading] = useState(true);
-    const [survey, setSurvey] = useState<Survey[] | undefined>(undefined);
+    const [surveys, setSurveys] = useState<Survey[] | undefined>([]);
 
     useEffect(() => {
         const db = getFirestore();
         const unsubscribe = onSnapshot(collection(db, FirestoreCoursesCollection, courseID, FirestoreSurveysCollection), (querySnapshot) => {
             const res: Survey[] = [];
             if (querySnapshot.size === 0) {
-                setSurvey(undefined)
+                setSurveys(undefined)
             } else {
                 querySnapshot.forEach((doc) => {
                     res.push({ ID: doc.id, ...doc.data() } as Survey);
                 });
-                setSurvey(res);
+                setSurveys(res);
             }
             setLoading(false);
         });
         return () => unsubscribe();
     }, [courseID]);
 
-    return [survey, loading];
+    return [surveys, loading];
 }
