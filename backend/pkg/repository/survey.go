@@ -133,17 +133,44 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 	return err
 }
 
-func (fr *FirebaseRepository) UpdateSurveyOptions(
-	courseID string, surveyID string,
-	options []*models.SurveyOption,
-	sectionCapacity map[string]map[string]int,
-) error {
+func (fr *FirebaseRepository) UpdateSurveyOptions(courseID string, survey *models.Survey) ([]*models.SurveyOption, map[string]map[string]int, error) {
+
+	newOptions := make([]*models.SurveyOption, 0)
+	newCapacity := make(map[string]map[string]int)
+	// Update the options based on the latest capacity of each section
+	// If for an option, all of the sections have been deleted, then remove that option
+	for option, sections := range survey.SectionCapacity {
+		for sectionID := range sections {
+			section, err := fr.GetSectionByID(courseID, sectionID)
+			// if section still exists, add it to newCapacity
+			if err == nil {
+				if _, ok := newCapacity[option]; !ok {
+					newCapacity[option] = make(map[string]int)
+				}
+				newCapacity[option][sectionID] = section.Capacity
+			}
+		}
+	}
+
+	for _, option := range survey.Options {
+		if _, ok := survey.SectionCapacity[option.Option]; ok {
+			capacity := 0
+			for _, sectionCapacity := range survey.SectionCapacity[option.Option] {
+				capacity += sectionCapacity
+			}
+			newOptions = append(newOptions, &models.SurveyOption{
+				Option:   option.Option,
+				Capacity: capacity,
+			})
+		}
+	}
+
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
-		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
-		{Path: "options", Value: options},
-		{Path: "sectionCapacity", Value: sectionCapacity},
+		models.FirestoreSurveysCollection).Doc(survey.ID).Update(firebase.Context, []firestore.Update{
+		{Path: "options", Value: newOptions},
+		{Path: "sectionCapacity", Value: newCapacity},
 	})
-	return err
+	return newOptions, newCapacity, err
 }
 
 func (fr *FirebaseRepository) PublishSurvey(courseID string, surveyID string) error {

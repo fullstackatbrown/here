@@ -135,6 +135,10 @@ func makeFlowNetwork(capacity map[string]int, availability map[string][]string) 
 		flow_network[person]["source"] = 0 // The current flow through this edge is 0
 
 		for _, section := range preferences {
+			// if the section does not exist in the flow network, skip (section has been deleted)
+			if _, ok := flow_network[section]; !ok {
+				continue
+			}
 			flow_network[person][section] = 1 // This person can be assigned to this section once
 			flow_network[section][person] = 0 // and isn't currently assigned to the section
 		}
