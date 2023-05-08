@@ -14,7 +14,7 @@ import StudentHomeView from "./Home/StudentHomeView";
 import StudentRequestsView from "./Requests/StudentRequestsView";
 import StudentSettingsView from "./Settings/StudentSettingsView";
 import SurveysView from "./Surveys/StudentSurveysView";
-import { StudentViews } from "model/general";
+import { StudentViews, View } from "model/general";
 
 export interface CourseStudentViewProps {
   course: Course;
@@ -30,7 +30,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
 
   useEffect(() => {
     const view = router.query.view;
-    if (view === undefined || !StudentViews.includes(view as string)) {
+    if (view === undefined || !StudentViews.includes(view as View)) {
       router.push(`${course.ID}/?view=home`, undefined, { shallow: true });
     }
   }, [router, course]);

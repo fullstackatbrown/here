@@ -13,7 +13,7 @@ import PeopleView from "./PeopleView/PeopleView";
 import RequestsView from "./RequestsView/RequestsView";
 import SectionsView from "./SectionsView/SectionsView";
 import SettingsView from "./SettingsView/SettingsView";
-import { AdminViews } from "model/general";
+import { AdminViews, View } from "model/general";
 import { useSurveys } from "api/surveys/hooks";
 import SurveysView from "./SurveysView/SurveysView";
 
@@ -34,7 +34,7 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
   useEffect(() => {
     // Always do navigations after the first render
     const view = router.query.view;
-    if (view === undefined || !AdminViews.includes(view as string)) {
+    if (view === undefined || !AdminViews.includes(view as View)) {
       router.push(`${courseID}/?view=sections`, undefined, { shallow: true });
     }
   }, [router, courseID]);
