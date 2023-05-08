@@ -21,7 +21,7 @@ var NotificationMsg = map[NotificationType]string{
 }
 
 type Notification struct {
-	ID        string           `json:"id" firestore:"id"`
+	ID        string           `json:"id" firestore:"ID"`
 	Title     string           `json:"title" firestore:"title"`
 	Body      string           `json:"body" firestore:"body"`
 	Timestamp time.Time        `json:"timestamp" firestore:"timestamp"`
