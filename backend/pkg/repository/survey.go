@@ -133,6 +133,19 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 	return err
 }
 
+func (fr *FirebaseRepository) UpdateSurveyOptions(
+	courseID string, surveyID string,
+	options []*models.SurveyOption,
+	sectionCapacity map[string]map[string]int,
+) error {
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+		models.FirestoreSurveysCollection).Doc(surveyID).Update(firebase.Context, []firestore.Update{
+		{Path: "options", Value: options},
+		{Path: "sectionCapacity", Value: sectionCapacity},
+	})
+	return err
+}
+
 func (fr *FirebaseRepository) PublishSurvey(courseID string, surveyID string) error {
 
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(

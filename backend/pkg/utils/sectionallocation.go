@@ -14,7 +14,7 @@ import (
 // Availability: map from student id to a list of sections they are available for
 // results: map from sections to list of studentIDs
 // exceptions: list of studentIDs unassigned
-func RunAllocationAlgorithm(options []models.SurveyOption, availability map[string][]string) (results map[string][]string, exceptions []string) {
+func RunAllocationAlgorithm(options []*models.SurveyOption, availability map[string][]string) (results map[string][]string, exceptions []string) {
 	// Convert options to map
 	optionsMap := make(map[string]int)
 	for _, option := range options {

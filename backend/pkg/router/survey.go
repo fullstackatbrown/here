@@ -153,12 +153,52 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, exceptions := utils.RunAllocationAlgorithm(survey.Options, survey.Responses)
+	newOptions := survey.Options
+	newCapacity := make(map[string]map[string]int)
+
+	if survey.SectionCapacity != nil {
+		newOptions = make([]*models.SurveyOption, 0)
+		// Update the options based on the latest capacity of each section
+		// If for an option, all of the sections have been deleted, then remove that option
+		for option, sections := range survey.SectionCapacity {
+			for sectionID := range sections {
+				section, err := repo.Repository.GetSectionByID(courseID, sectionID)
+				// if section still exists, add it to newCapacity
+				if err == nil {
+					if _, ok := newCapacity[option]; !ok {
+						newCapacity[option] = make(map[string]int)
+					}
+					newCapacity[option][sectionID] = section.Capacity
+				}
+			}
+		}
+
+		for _, option := range survey.Options {
+			if _, ok := survey.SectionCapacity[option.Option]; ok {
+				capacity := 0
+				for _, sectionCapacity := range survey.SectionCapacity[option.Option] {
+					capacity += sectionCapacity
+				}
+				newOptions = append(newOptions, &models.SurveyOption{
+					Option:   option.Option,
+					Capacity: capacity,
+				})
+			}
+		}
+
+		err = repo.Repository.UpdateSurveyOptions(courseID, surveyID, newOptions, newCapacity)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	res, exceptions := utils.RunAllocationAlgorithm(newOptions, survey.Responses)
 	res = utils.HandleExceptions(survey.Responses, res, exceptions)
 
 	// res is a map from options to list of student data
 	if survey.SectionCapacity != nil {
-		res = utils.GetAssignedSections(res, survey.SectionCapacity)
+		res = utils.GetAssignedSections(res, newCapacity)
 	}
 	repo.Repository.UpdateSurveyResults(courseID, surveyID, res)
 
