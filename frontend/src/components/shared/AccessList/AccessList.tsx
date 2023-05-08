@@ -8,6 +8,7 @@ import { FC } from "react";
 import toast from "react-hot-toast";
 import AddPermissionButton from "../AddPermissionButton/AddPermissionButton";
 import { useDialog } from "../ConfirmDialog/ConfirmDialogProvider";
+import { UserOrInvite, sortUsersOrInvites } from "@util/shared/user";
 
 interface AccessListProps {
   course?: Course; // if course is passed in, the list is editable
@@ -16,18 +17,13 @@ interface AccessListProps {
   emails: string[];
 }
 
-interface UserData {
-  user?: User;
-  email?: string;
-}
-
 const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
   const showDialog = useDialog();
   const editable = course !== undefined && course.status !== CourseStatus.CourseArchived;
-  const data: UserData[] =
+  const data: UserOrInvite[] =
     users &&
     emails &&
-    users.map((user) => ({ user } as UserData)).concat(emails.map((email) => ({ email } as UserData)));
+    users.map((user) => ({ user } as UserOrInvite)).concat(emails.map((email) => ({ email } as UserOrInvite)));
 
   const handleRevokeUserAccess = (user?: User, email?: string) => {
     return async () => {
@@ -54,7 +50,7 @@ const AccessList: FC<AccessListProps> = ({ course, access, users, emails }) => {
       {data && <Box display="flex" flexWrap="wrap" flexDirection="row" alignItems="center">
         {data.length === 0 ?
           <Typography mx={0.5} my={0.5} color="text.secondary" fontSize={14}>No {access.toLowerCase()} added yet</Typography> :
-          data.map((data) => {
+          sortUsersOrInvites(data).map((data) => {
             if (data.user) {
               return <Tooltip key={data.user.ID} title={data.user.email} placement="right">
                 <Chip

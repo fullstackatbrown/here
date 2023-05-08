@@ -1,6 +1,11 @@
 package qerrors
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/fullstackatbrown/here/pkg/models"
+)
 
 var (
 	// Generic errors
@@ -14,6 +19,9 @@ var (
 	SurveyNotFoundError            = errors.New("survey not found")
 	CourseAlreadyExistsError       = errors.New("course already exists")
 	InvalidEntryCodeError          = errors.New("invalid entry code")
+
+	// Permission errors
+	EnrolledAsStudentError = errors.New("user is enrolled as a student")
 
 	// Section errors
 	SectionAlreadyExistsError = errors.New("a section already exists at the same time and location")
@@ -31,3 +39,7 @@ var (
 	// Swap errors
 	SwapNotFoundError = errors.New("swap not found")
 )
+
+func PermissionExistsError(perm models.CoursePermission) error {
+	return fmt.Errorf("user already has %s access", perm)
+}

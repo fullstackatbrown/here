@@ -12,6 +12,7 @@ import (
 
 func (fr *FirebaseRepository) AddNotification(userID string, courseCode string, notificationType models.NotificationType) error {
 	notification := models.Notification{
+		ID:        uuid.New().String(),
 		Title:     fmt.Sprintf("%s: %s", courseCode, notificationType),
 		Body:      models.NotificationMsg[notificationType],
 		Timestamp: time.Now(),

@@ -6,32 +6,42 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/fullstackatbrown/here/pkg/firebase"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
 	"github.com/fullstackatbrown/here/pkg/utils"
 )
 
-func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) (hadPermission bool, err error) {
+func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) (exists bool, badReq error, err error) {
 	if req.Permission == models.CourseAdmin || req.Permission == models.CourseStaff {
 		// Get user by email.
 		user, err := fr.GetUserByEmail(req.Email)
 		if err != nil {
 			// The user doesn't exist; add an invite to the invites collection and then return.
-			hadPermission, err := fr.createCourseInvite(&models.Invite{
+			exists, badReq, err := fr.createCourseInvite(&models.Invite{
 				Email:      req.Email,
 				CourseID:   req.CourseID,
 				Permission: req.Permission,
 			})
-			return hadPermission, err
+			return exists, badReq, err
 		}
 
 		// check if the user already has permission
 		course, err := fr.GetCourseByID(req.CourseID)
 		if err != nil {
-			return false, err
+			return false, nil, err
 		}
 
 		perm, ok := course.Permissions[user.ID]
-		if ok && perm == req.Permission {
-			return true, nil
+		if ok {
+			if perm == req.Permission {
+				return true, nil, nil
+			}
+			return false, qerrors.PermissionExistsError(perm), nil
+		}
+
+		// check if the user is already a student
+		if _, ok := course.Students[user.ID]; ok {
+			// TODO: return bad request error
+			return false, qerrors.EnrolledAsStudentError, nil
 		}
 
 		batch := fr.firestoreClient.Batch()
@@ -55,11 +65,11 @@ func (fr *FirebaseRepository) AddPermissions(req *models.AddPermissionRequest) (
 		// Commit the batch.
 		_, err = batch.Commit(firebase.Context)
 		if err != nil {
-			return false, err
+			return false, nil, err
 		}
 
 	}
-	return false, nil
+	return false, nil, nil
 }
 
 func (fr *FirebaseRepository) DeletePermission(req *models.DeletePermissionRequest) error {
@@ -96,30 +106,26 @@ func (fr *FirebaseRepository) DeletePermission(req *models.DeletePermissionReque
 	return fmt.Errorf("no user or email specified")
 }
 
-func (fr *FirebaseRepository) AddStudentToCourse(req *models.AddStudentRequest) (studentExists bool, studentIsStaff bool, err error) {
+func (fr *FirebaseRepository) AddStudentToCourse(req *models.AddStudentRequest) (exists bool, badReq error, err error) {
 	user, err := fr.GetUserByEmail(req.Email)
 
 	if err != nil {
 		// No user from this email yet, add invite
-		studentExists, err := fr.createCourseInvite(&models.Invite{
+		exists, badReq, err := fr.createCourseInvite(&models.Invite{
 			Email:      req.Email,
 			CourseID:   req.CourseID,
 			Permission: models.CourseStudent,
 		})
 		// overrides previous invite
-		return studentExists, false, err
+		return exists, badReq, err
 	} else {
 		// User exists, add to course
 		course, err := fr.GetCourseByID(req.CourseID)
 		if err != nil {
-			return false, false, err
+			return false, nil, err
 		}
-		studentExists, studentIsStaff, err = fr.addStudentToCourse(user, course)
-		if (studentExists || studentIsStaff) && err == nil {
-			return studentExists, studentIsStaff, err
-		}
+		return fr.addStudentToCourse(user, course)
 	}
-	return false, false, nil
 }
 
 func (fr *FirebaseRepository) DeleteStudentFromCourse(req *models.DeleteStudentRequest) error {
@@ -145,18 +151,18 @@ func (fr *FirebaseRepository) DeleteStudentFromCourse(req *models.DeleteStudentR
 
 // Helpers
 
-func (fr *FirebaseRepository) addStudentToCourse(user *models.User, course *models.Course) (studentExists bool, studentIsStaff bool, err error) {
+func (fr *FirebaseRepository) addStudentToCourse(user *models.User, course *models.Course) (exists bool, badReq error, err error) {
 
 	// Check if student is already in course
 	_, ok := course.Students[user.ID]
 	if ok {
-		return true, false, nil
+		return true, nil, nil
 	}
 
 	// Check if student is already a staff
-	_, ok = course.Permissions[user.ID]
+	perm, ok := course.Permissions[user.ID]
 	if ok {
-		return false, true, nil
+		return false, qerrors.PermissionExistsError(perm), nil
 	}
 
 	batch := fr.firestoreClient.Batch()
@@ -187,11 +193,7 @@ func (fr *FirebaseRepository) addStudentToCourse(user *models.User, course *mode
 
 	// Commit the batch.
 	_, err = batch.Commit(firebase.Context)
-	if err != nil {
-		return false, false, err
-	}
-
-	return false, false, nil
+	return false, nil, err
 }
 
 // 1. Remove course from student (courses, defaultSections, actualSections)

@@ -38,7 +38,7 @@ const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, 
                         title="Enabled after regular section is assigned"
                         disableHoverListener={allowRequests}
                         disableFocusListener={allowRequests}
-                        placement="right">
+                    >
                         <span>
                             <Button
                                 size="small"
