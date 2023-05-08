@@ -1,5 +1,5 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
-import { handleBadRequestError } from "@util/errors";
+import { handleBadRequestError, handleBulkUploadBadRequest } from "@util/errors";
 import { parseCourses, parseStaffData } from "@util/shared/parseBulkUpload";
 import { getCurrentTerm } from "@util/shared/terms";
 import CourseAPI from "api/course/api";
@@ -43,6 +43,8 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose, coursesByT
     const [courses, setCourses] = useState<Record<string, string> | undefined>(undefined);
     const [permissionsByCourse, setPermissionsByCourse] = useState<Record<string, AddPermissionRequest[]> | undefined>(undefined);
 
+    const [uploadErrors, setUploadErrors] = useState<Record<string, string> | undefined>(undefined)
+
     const theme = useTheme();
 
     const handleNext = () => { setActiveStep((prevActiveStep) => prevActiveStep + 1); };
@@ -60,6 +62,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose, coursesByT
         setAddCoursesData("");
         setAddStaffData("");
         setPermissionsByCourse(undefined);
+        setUploadErrors(undefined);
     }
 
     const handleAddCourses = () => {
@@ -90,6 +93,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose, coursesByT
 
     const handleAddStaff = () => {
         setError(undefined)
+        setUploadErrors(undefined)
 
         const [permissions, error] = parseStaffData(addStaffData, courses)
         if (error !== undefined) {
@@ -117,12 +121,14 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose, coursesByT
         toast.promise(CourseAPI.bulkUpload(courseAndPermReqs), {
             loading: "Uploading...",
             success: "Upload successful",
-            error: (err) => handleBadRequestError(err)
+            error: (err) => handleBulkUploadBadRequest(err)
         })
             .then(() => {
                 handleClose();
             })
-            .catch(() => { })
+            .catch((err) => {
+                setUploadErrors(err.response.data)
+            })
     }
 
     const handleClose = () => {
@@ -158,7 +164,7 @@ const BulkUploadDialog: FC<BulkUploadDialogProps> = ({ open, onClose, coursesByT
                             0: <SelectTermStep {...{ term, setTerm }} />,
                             1: <AddCoursesStep {...{ term, addCoursesData, setAddCoursesData }} courses={coursesByTerm[term] || []} />,
                             2: <AddStaffStep {...{ term, courses, addStaffData, setAddStaffData }} />,
-                            3: <ConfirmUploadStep {...{ term, courses, permissionsByCourse }} />,
+                            3: <ConfirmUploadStep {...{ term, courses, permissionsByCourse, uploadErrors }} />,
                         }[activeStep]
                     }
                 </Box>

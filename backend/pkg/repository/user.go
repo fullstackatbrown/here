@@ -183,16 +183,14 @@ func (fr *FirebaseRepository) HandleJoinCourseRequest(req *models.JoinCourseRequ
 		return nil, nil, fmt.Errorf("Cannot join an inactive or archived course")
 	}
 
-	studentExists, studentIsStaff, err := fr.addStudentToCourse(req.User, course)
-	if studentExists {
-		return nil, nil, fmt.Errorf("Student is already enrolled in course")
-	}
-	if studentIsStaff {
-		return nil, nil, fmt.Errorf("Cannot join course as staff")
+	exists, badReq, err := fr.addStudentToCourse(req.User, course)
+
+	if badReq != nil || err != nil {
+		return nil, err, badReq
 	}
 
-	if err != nil {
-		return nil, err, nil
+	if exists {
+		return nil, nil, fmt.Errorf("user is already enrolled in this course")
 	}
 
 	return course, nil, nil
@@ -313,18 +311,16 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 			}
 
 			if invite.Permission == models.CourseStudent {
-				// Add as student
+				// Add as student, ignore errors
 				fr.addStudentToCourse(user, course)
+
 			} else {
-				// Add as staff
-				_, err = fr.AddPermissions(&models.AddPermissionRequest{
+				// Add as staff, ignore errors
+				fr.AddPermissions(&models.AddPermissionRequest{
 					CourseID:   invite.CourseID,
 					Email:      invite.Email,
 					Permission: invite.Permission,
 				})
-				if err != nil {
-					return err
-				}
 			}
 		}
 
@@ -347,32 +343,24 @@ func (fr *FirebaseRepository) executeInviteForUser(user *models.User) error {
 	return nil
 }
 
-func (fr *FirebaseRepository) createCourseInvite(invite *models.Invite) (hadPermission bool, err error) {
+func (fr *FirebaseRepository) createCourseInvite(invite *models.Invite) (exists bool, badReq error, err error) {
 	inviteID := models.CreateCourseInviteID(invite.Email, invite.CourseID)
 	docRef := fr.firestoreClient.Collection(models.FirestoreInvitesCollection).Doc(inviteID)
 	// Check if invite with the same person and course exists
 	doc, _ := docRef.Get(firebase.Context)
 	if doc.Exists() {
-		if doc.Data()["permission"].(string) == string(invite.Permission) {
-			// invite already exists
-			return true, nil
+		if perm := doc.Data()["permission"].(models.CoursePermission); perm == models.CourseStudent {
+			return false, qerrors.EnrolledAsStudentError, nil
+		} else if perm == invite.Permission {
+			return true, nil, nil
+		} else {
+			return false, qerrors.PermissionExistsError(perm), nil
 		}
-		_, err := docRef.Update(firebase.Context, []firestore.Update{
-			{
-				Path:  "courseID",
-				Value: invite.CourseID,
-			},
-			{
-				Path:  "permission",
-				Value: invite.Permission,
-			},
-		})
-		return false, err
 	}
 
 	// create new invite
 	_, err = docRef.Set(firebase.Context, invite)
-	return false, err
+	return false, nil, err
 }
 
 func (fr *FirebaseRepository) removeCourseInvite(email string, courseID string) error {

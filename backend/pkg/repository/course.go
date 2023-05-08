@@ -532,15 +532,15 @@ func (fr *FirebaseRepository) assignTemporarySection(req *models.AssignSectionsR
 	return batch, nil
 }
 
-func (fr *FirebaseRepository) BulkUpload(req *models.BulkUploadRequest) error {
+func (fr *FirebaseRepository) BulkUpload(req *models.BulkUploadRequest) (badReq map[string]string, err error) {
+	errors := make(map[string]string)
 	for _, r := range req.Requests {
 		// Create course if course doesnt exist
 		course, err := fr.GetCourseByInfo(r.Code, r.Term)
 		if err != nil {
 			if err != qerrors.CourseNotFoundError {
-				return err
+				return nil, err
 			}
-
 			// Course does not exist
 			course, err = fr.CreateCourse(&models.CreateCourseRequest{
 				Title: r.Title,
@@ -548,22 +548,24 @@ func (fr *FirebaseRepository) BulkUpload(req *models.BulkUploadRequest) error {
 				Term:  r.Term,
 			})
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 
 		// Add permissions
 		for _, perm := range r.Permissions {
-			_, err = fr.AddPermissions(&models.AddPermissionRequest{
+			_, badReq, err := fr.AddPermissions(&models.AddPermissionRequest{
 				CourseID:   course.ID,
 				Email:      perm.Email,
 				Permission: perm.Permission,
 			})
-			// Skip if permission already exists
+			if badReq != nil {
+				errors[perm.Email] = badReq.Error()
+			}
 			if err != nil {
-				return err
+				errors[perm.Email] = "unknown error"
 			}
 		}
 	}
-	return nil
+	return errors, nil
 }
