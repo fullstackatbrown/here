@@ -31,7 +31,7 @@ const SurveysView: FC<SurveysViewProps> = ({
   }
 
   const surveysSorted = useMemo(() => {
-    return surveys.sort((a, b) => new Date(a.endTime).getTime() - new Date(b.endTime).getTime())
+    return surveys?.sort((a, b) => new Date(a.endTime).getTime() - new Date(b.endTime).getTime()) || []
   }, [surveys])
 
   return (

@@ -14,9 +14,9 @@ export interface StudentSurveysViewProps {
 
 const StudentSurveysView: FC<StudentSurveysViewProps> = ({ course, surveys, student }) => {
     const surveySorted = useMemo(() => {
-        return surveys.filter(survey => survey.published).filter(s => s.published).sort((a, b) => {
+        return surveys?.filter(survey => survey.published).filter(s => s.published).sort((a, b) => {
             return new Date(a.endTime).getTime() - new Date(b.endTime).getTime()
-        })
+        }) || []
     }, [surveys])
 
     return (
