@@ -23,10 +23,10 @@ export interface SurveyResponsesDialogProps {
     onClose: () => void;
     survey: Survey;
     numStudents: number;
-    sections: Section[];
+    sectionsMap: Record<string, Section>;
 }
 
-const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey, numStudents, sections }) => {
+const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey, numStudents, sectionsMap }) => {
     const numResponses = useMemo(() =>
         survey.responses ? Object.keys(survey.responses).length : 0,
         [survey.responses])
@@ -59,7 +59,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
     }
 
     const handleExportResults = () => {
-        survey.sectionCapacity ? exportSurveyResultsForSections(survey.results, sections) : exportSurveyResults(survey.results)
+        survey.sectionCapacity ? exportSurveyResultsForSections(survey.results, sectionsMap) : exportSurveyResults(survey.results)
     }
 
     const handleExportResponses = () => {
@@ -121,7 +121,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 <Grid item xs={12} md={8} display="flex" justifyContent="center">
                     {hasResults &&
                         (survey.sectionCapacity ?
-                            <AllocatedSectionsTable sections={sections} results={survey.results} /> :
+                            <AllocatedSectionsTable sectionsMap={sectionsMap} results={survey.results} /> :
                             <SurveyResultsTable options={survey.options} results={survey.results} />
                         )
                     }

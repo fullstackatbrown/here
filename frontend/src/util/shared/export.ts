@@ -100,8 +100,7 @@ export function exportSurveyResults(results: Record<string, CourseUserData[]>) {
     csvExporter.generateCsv(data);
 }
 
-export function exportSurveyResultsForSections(results: Record<string, CourseUserData[]>, sections: Section[]) {
-    const sectionsMap = listToMapWithID(sections) as Record<string, Section>;
+export function exportSurveyResultsForSections(results: Record<string, CourseUserData[]>, sectionsMap: Record<string, Section>) {
     options.filename = `survey_results`
     let data = [];
     for (const sectionID of Object.keys(results)) {
