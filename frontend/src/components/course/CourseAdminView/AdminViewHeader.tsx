@@ -1,6 +1,6 @@
 import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import { Stack } from "@mui/material";
-import { View } from "model/general";
+import { AdminViews, View } from "model/general";
 import { CoursePermission } from "model/user";
 
 interface AdminViewHeaderProps {
@@ -17,7 +17,7 @@ export default function AdminViewHeader({ view, access, endElement }: AdminViewH
         justifyContent="space-between" mb={1}
         minHeight={40}
     >
-        <ViewHeader view={view} views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+        <ViewHeader view={view} views={AdminViews} access={access} />
         {endElement}
     </Stack>
 }
