@@ -4,7 +4,8 @@ import {
     DialogTitle,
     DialogContent,
     Stack,
-    Typography
+    Typography,
+    Link
 } from "@mui/material";
 
 export interface AboutDialogProps {
@@ -16,14 +17,18 @@ const AboutDialog: FC<AboutDialogProps> = ({ open, onClose }) => {
     return <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
         <DialogTitle>About Here</DialogTitle>
         <DialogContent>
-            <Stack spacing={2.5} my={1}>
+            <Stack spacing={2.5} mb={1}>
                 <Typography>
-                    Here is a web app created to streamline the lab management process for CS classes at Brown University.
+                    Here is a web app created to streamline lab/section management for classes at Brown University.
+                    We hope this improves your experience and please&nbsp;
+                    <Link href="https://forms.gle/xmLQjz8Psae73Pbp8" underline="hover" target="_blank">
+                        let us know
+                    </Link>
+                    &nbsp;how we can improve!
                 </Typography>
-                {/*<Button startIcon={<GitHubIcon/>} color="inherit" variant="outlined"*/}
-                {/*        href="https://github.com/nthnluu/hours-frontend/wiki/Contributing">*/}
-                {/*    Contribute*/}
-                {/*</Button>*/}
+                <Typography variant="body2">
+                    By: Jenny Yu, Hammad Izhar, Nathan Andrews, Dylan Hu, James Hu, Allen Wang
+                </Typography>
             </Stack>
         </DialogContent>
     </Dialog>;
