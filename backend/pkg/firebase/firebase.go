@@ -3,9 +3,9 @@ package firebase
 import (
 	"context"
 
-	"github.com/fullstackatbrown/here/pkg/config"
-
 	firebaseSDK "firebase.google.com/go"
+	"github.com/fullstackatbrown/here/pkg/config"
+	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
@@ -15,7 +15,7 @@ var Context context.Context
 
 func initializeFirebaseApp() {
 	ctx := context.Background()
-	opt := option.WithCredentialsFile(config.Config.FirebaseConfig)
+	opt := option.WithCredentialsJSON(config.Config.FirebaseConfig)
 	app, err := firebaseSDK.NewApp(ctx, nil, opt)
 	if err != nil {
 		panic(err.Error())
@@ -26,5 +26,6 @@ func initializeFirebaseApp() {
 }
 
 func init() {
+	godotenv.Load()
 	initializeFirebaseApp()
 }

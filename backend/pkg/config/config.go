@@ -3,8 +3,10 @@ package config
 import (
 	"log"
 	"os"
-	"strconv"
+	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 var Config *ServerConfig
@@ -23,54 +25,21 @@ type ServerConfig struct {
 	// SessionCookieExpiration is the amount of time a session cookie is valid. Max 5 days.
 	SessionCookieExpiration time.Duration
 	// Port is the port the server should run on.
-	Port int
-	// FirebaseConfig is the path to the Firebase Admin config JSON.
-	FirebaseConfig string
-}
-
-func DefaultDevelopmentConfig() *ServerConfig {
-	return &ServerConfig{
-		AllowedOrigins:          []string{"http://localhost:3000", "http://jennyyu.local:3000"},
-		AllowedEmailDomains:     []string{"brown.edu", "gmail.com"},
-		IsHTTPS:                 false,
-		SessionCookieName:       "here-session",
-		SessionCookieExpiration: time.Hour * 24 * 14,
-		Port:                    8080,
-		FirebaseConfig:          "dev-firebase-config.json",
-	}
-}
-
-func DefaultStagingConfig() *ServerConfig {
-	return &ServerConfig{
-		AllowedOrigins:          []string{"https://hours.luu.dev"},
-		AllowedEmailDomains:     []string{"brown.edu"},
-		IsHTTPS:                 true,
-		SessionCookieName:       "here-session",
-		SessionCookieExpiration: time.Hour * 24 * 14,
-		Port:                    8080,
-		FirebaseConfig:          "staging-firebase-config.json",
-	}
-}
-
-func DefaultProductionConfig() *ServerConfig {
-	portEnvVar, err := strconv.Atoi(os.Getenv("PORT"))
-	port := 8080
-	if err == nil {
-		port = portEnvVar
-	}
-
-	return &ServerConfig{
-		AllowedOrigins:          []string{"https://hours.cs.brown.edu"},
-		AllowedEmailDomains:     []string{"brown.edu"},
-		IsHTTPS:                 true,
-		SessionCookieName:       "here-session",
-		SessionCookieExpiration: time.Hour * 24 * 14,
-		Port:                    port,
-		FirebaseConfig:          "prod-firebase-config.json",
-	}
+	Port string
+	// FirebaseConfig is the JSON config for the Firebase project.
+	FirebaseConfig []byte
 }
 
 func init() {
 	log.Println("🙂️ No configuration provided. Using the default configuration.")
-	Config = DefaultDevelopmentConfig()
+	godotenv.Load()
+	Config = &ServerConfig{
+		AllowedOrigins:          strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
+		AllowedEmailDomains:     strings.Split(os.Getenv("ALLOWED_EMAIL_DOMAINS"), ","),
+		IsHTTPS:                 os.Getenv("IS_HTTPS") == "true",
+		SessionCookieName:       "here-session",
+		SessionCookieExpiration: time.Hour * 24 * 14,
+		Port:                    os.Getenv("API_PORT"),
+		FirebaseConfig:          []byte(os.Getenv("FIREBASE_CONFIG")),
+	}
 }
