@@ -59,7 +59,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         endDateParsed: survey ? survey.endTime : getNextWeekDate().toISOString(),
         options: survey ? survey.options : options,
         sectionCapacity: survey ? survey.sectionCapacity : capacity
-    }), [survey])
+    }), [survey, options, capacity])
 
     const { register, handleSubmit, control, reset, setValue, getValues, watch, formState: { } } = useForm<SurveyFormData>({
         defaultValues: defaultValues
@@ -89,26 +89,27 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
             endDate.setHours(endTime.getHours(), endTime.getMinutes())
             setValue("endDateParsed", endDate.toISOString())
         }
-    }, [watchenddate, watchendtime])
+    }, [watchenddate, watchendtime, setValue])
 
     const prevUseSectionData: boolean = usePrevious<boolean>(useSectionData);
-
-    useEffect(() => {
-        // if we changed the useSectionData state, we need to resync the section data
-        if (prevUseSectionData !== undefined && prevUseSectionData !== useSectionData) {
-            if (useSectionData) {
-                handleResyncSectionData()
-            } else {
-                setValue("options", [{ option: "", capacity: NaN }])
-                setValue("sectionCapacity", undefined)
-            }
-        }
-    }, [useSectionData, sections])
 
     const handleResyncSectionData = () => {
         setValue("options", options)
         setValue("sectionCapacity", capacity)
     }
+
+    useEffect(() => {
+        // if we changed the useSectionData state, we need to resync the section data
+        if (prevUseSectionData !== undefined && prevUseSectionData !== useSectionData) {
+            if (useSectionData) {
+                setValue("options", options)
+                setValue("sectionCapacity", capacity)
+            } else {
+                setValue("options", [{ option: "", capacity: NaN }])
+                setValue("sectionCapacity", undefined)
+            }
+        }
+    }, [useSectionData, sections, setValue, prevUseSectionData, options, capacity])
 
     const handleNext = () => {
         if (activeStep === 0) {
@@ -217,7 +218,8 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                         {
                             0: <SurveyStepOne {...{ register, control }} />,
                             1: <SurveyStepTwo
-                                options={controlledOptions} {...{ survey, register, remove, setValue, insert, useSectionData, setUseSectionData, handleResyncSectionData }}
+                                options={controlledOptions}
+                                {...{ survey, register, remove, setValue, insert, useSectionData, setUseSectionData, handleResyncSectionData }}
                             />,
                             2: <SurveyStepThree {...{ getValues }} />,
                         }[activeStep]

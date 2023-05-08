@@ -66,6 +66,7 @@ const SurveysView: FC<SurveysViewProps> = ({
       <Stack direction="column" spacing={2} mb={5}>
         {surveysSorted?.map((survey) => (
           <SurveyCard
+            key={survey.ID}
             survey={survey}
             numStudents={numStudents()}
             sections={sections}

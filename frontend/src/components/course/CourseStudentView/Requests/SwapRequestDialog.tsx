@@ -53,19 +53,18 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     const watchAssignmentID = watch("assignmentID")
     const watchOldSectionID = watch("oldSectionID")
 
-    const getCurrentSectionID = (assignmentID: string) => {
-        if ((assignmentID) && (student.actualSections?.[course.ID]?.[assignmentID])) {
-            return student.actualSections?.[course.ID][assignmentID]
+    const currentSectionID = useMemo(() => {
+        if ((watchAssignmentID) && (student.actualSections?.[course.ID]?.[watchAssignmentID])) {
+            return student.actualSections?.[course.ID][watchAssignmentID]
         } else {
             return student.defaultSections?.[course.ID]
         }
-    }
+    }, [watchAssignmentID, student, course])
 
     useEffect(() => {
         if (watchIsPermanent) {
             // If permanent swap, unregister assignmentID and set oldSectionID to current default section
             unregister("assignmentID")
-            const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
         } else {
             // If temporary swap, register assignmentID and set oldSectionID to empty
@@ -74,7 +73,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         }
         setValue("newSectionID", defaultValues["newSectionID"])
         setValue("reason", defaultValues["reason"])
-    }, [watchIsPermanent, watchAssignmentID, defaultValues]);
+    }, [watchIsPermanent, defaultValues, register, unregister, setValue, currentSectionID]);
 
     useEffect(() => {
         if (watchAssignmentID === "") {
@@ -82,14 +81,9 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
             setValue("oldSectionID", "")
         } else {
             // If user selected an assignment, set oldSectionID to the section for that assignment
-            const currentSectionID = getCurrentSectionID(watchAssignmentID)
             setValue("oldSectionID", currentSectionID)
         }
-    }, [watchAssignmentID]);
-
-    useEffect(() => {
-        reset(defaultValues);
-    }, [defaultValues, reset])
+    }, [watchAssignmentID, setValue, currentSectionID]);
 
     const handleOnClose = () => {
         onClose()
@@ -115,7 +109,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                     success: (res) => res === SwapStatus.Approved ? "Request approved!" : "Request submitted",
                     error: (err) => handleBadRequestError(err)
                 })
-                .then((res) => {
+                .then(() => {
                     handleOnClose()
                 }
                 )
@@ -157,6 +151,8 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
                                 <Switch
                                     checked={value}
                                     onChange={(e) => onChange(e.target.checked)}
+                                    // Cannot change isPermanent if swap is already created
+                                    disabled={swap !== undefined}
                                 />
                             )} />
                     </Stack>
