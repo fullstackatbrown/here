@@ -138,16 +138,19 @@ func (fr *FirebaseRepository) UpdateSurveyOptions(courseID string, survey *model
 	newOptions := make([]*models.SurveyOption, 0)
 	newCapacity := make(map[string]map[string]int)
 	// Update the options based on the latest capacity of each section
-	// If for an option, all of the sections have been deleted, then remove that option
+	// If for an option, all of the sections have been deleted, set its capacity to 0
 	for option, sections := range survey.SectionCapacity {
 		for sectionID := range sections {
+			if _, ok := newCapacity[option]; !ok {
+				newCapacity[option] = make(map[string]int)
+			}
+
 			section, err := fr.GetSectionByID(courseID, sectionID)
 			// if section still exists, add it to newCapacity
 			if err == nil {
-				if _, ok := newCapacity[option]; !ok {
-					newCapacity[option] = make(map[string]int)
-				}
 				newCapacity[option][sectionID] = section.Capacity
+			} else {
+				newCapacity[option][sectionID] = 0
 			}
 		}
 	}

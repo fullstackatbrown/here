@@ -54,10 +54,11 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
     const sectionIDs = useMemo(() => arrayUnion(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap])
     const sectionsChanged = useMemo(() => !arraysEqual(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap])
 
-    return <Stack>
+    return <Stack width="100%">
         {sectionsChanged &&
             <Alert severity="warning" sx={{ marginBottom: 2.5 }} style={{ display: 'flex', alignItems: 'center' }} >
-                It looks like sections have been added or removed since the survey was created. Please review the changes and publish another survey if necessary.
+                It looks like sections have been added or removed since the survey was created.&nbsp;
+                Rerun the algorithm to update the results, or publish another survey if necessary.
             </Alert>
         }
         <Table>
@@ -104,7 +105,7 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
                                 {numStudents} / {section?.capacity || "?"}
                             </TableCell>
                             <TableCell open={open}>
-                                <Stack direction="row" spacing={0.8} display="flex" alignItems="center">
+                                <Stack direction="row" spacing={0.8} display="flex" alignItems="center" justifyContent="flex-end">
                                     {notInSurvey &&
                                         <Tooltip title="Added after survey has been published">
                                             <ErrorOutlineIcon color="secondary" sx={{ fontSize: 15 }} />
