@@ -34,7 +34,7 @@ type BulkAddStudentRequest struct {
 }
 
 type DeleteStudentRequest struct {
-	CourseID string `json:"courseID"`
-	UserID   string `json:"userID,omitempty"`
-	Email    string `json:"email,omitempty"`
+	Course *Course `json:"course,omitempty"`
+	UserID string  `json:"userID,omitempty"`
+	Email  string  `json:"email,omitempty"`
 }

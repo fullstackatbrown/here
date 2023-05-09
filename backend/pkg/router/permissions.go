@@ -108,6 +108,7 @@ func addStudentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteStudentHandler(w http.ResponseWriter, r *http.Request) {
+	course := r.Context().Value("course").(*models.Course)
 	var req *models.DeleteStudentRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -115,7 +116,7 @@ func deleteStudentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	req.CourseID = chi.URLParam(r, "courseID")
+	req.Course = course
 
 	err = repo.Repository.DeleteStudentFromCourse(req)
 	if err != nil {
@@ -124,7 +125,7 @@ func deleteStudentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Successfully deleted student %v from course %v", req.UserID, req.CourseID)))
+	w.Write([]byte(fmt.Sprintf("Successfully deleted student %v from course %v", req.UserID, req.Course.ID)))
 
 }
 

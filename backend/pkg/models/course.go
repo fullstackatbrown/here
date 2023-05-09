@@ -14,6 +14,7 @@ var CourseFieldsToExclude = []string{
 	"Sections", "SectionsLock", "SectionsListenerCancelFunc",
 	"Assignments", "AssignmentsLock", "AssignmentsListenerCancelFunc",
 	"PendingSwaps", "PendingSwapsLock", "PendingSwapsListenerCancelFunc",
+	"Surveys", "SurveysLock", "SurveysListenerCancelFunc",
 }
 
 type Course struct {
