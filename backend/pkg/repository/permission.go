@@ -130,7 +130,7 @@ func (fr *FirebaseRepository) AddStudentToCourse(req *models.AddStudentRequest) 
 
 func (fr *FirebaseRepository) DeleteStudentFromCourse(req *models.DeleteStudentRequest) error {
 	if req.UserID != "" {
-		err := fr.deleteStudentFromCourse(req.UserID, req.CourseID)
+		err := fr.deleteStudentFromCourse(req.UserID, req.Course)
 		if err != nil {
 			return err
 		}
@@ -139,7 +139,7 @@ func (fr *FirebaseRepository) DeleteStudentFromCourse(req *models.DeleteStudentR
 
 	if req.Email != "" {
 		// delete invite
-		err := fr.removeCourseInvite(req.Email, req.CourseID)
+		err := fr.removeCourseInvite(req.Email, req.Course.ID)
 		if err != nil {
 			return err
 		}
@@ -200,13 +200,13 @@ func (fr *FirebaseRepository) addStudentToCourse(user *models.User, course *mode
 // 2. Remove student from course
 // 3. Remove student from section, if exists
 // Student grades are kept
-func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, courseID string) error {
+func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, course *models.Course) error {
 	// check if the student is previously enrolled in any section
 	profile, err := fr.GetProfileById(userID)
 	if err != nil {
 		return err
 	}
-	defaultSection, hadOldSection := profile.DefaultSections[courseID]
+	defaultSection, hadOldSection := profile.DefaultSections[course.ID]
 
 	batch := fr.firestoreClient.Batch()
 	// remove course from student
@@ -214,20 +214,20 @@ func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, courseID st
 	batch.Update(userProfileRef, []firestore.Update{
 		{
 			Path:  "courses",
-			Value: firestore.ArrayRemove(courseID),
+			Value: firestore.ArrayRemove(course.ID),
 		},
 		{
-			Path:  "defaultSections." + courseID,
+			Path:  "defaultSections." + course.ID,
 			Value: firestore.Delete,
 		},
 		{
-			Path:  "actualSections." + courseID,
+			Path:  "actualSections." + course.ID,
 			Value: firestore.Delete,
 		},
 	})
 
 	// remove student from course
-	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID)
+	coursesRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID)
 	batch.Update(coursesRef, []firestore.Update{
 		{
 			Path:  "students." + userID,
@@ -237,7 +237,7 @@ func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, courseID st
 
 	if hadOldSection {
 		// decrement section enrolled count
-		sectionRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).
+		sectionRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID).
 			Collection(models.FirestoreSectionsCollection).Doc(defaultSection)
 
 		batch.Update(sectionRef, []firestore.Update{
@@ -247,6 +247,21 @@ func (fr *FirebaseRepository) deleteStudentFromCourse(userID string, courseID st
 			},
 		})
 	}
+
+	// For all surveys in course, remove student response
+	course.SurveysLock.RLock()
+	for _, survey := range course.Surveys {
+		surveyRef := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID).
+			Collection(models.FirestoreSurveysCollection).Doc(survey.ID)
+
+		batch.Update(surveyRef, []firestore.Update{
+			{
+				Path:  "responses." + userID,
+				Value: firestore.Delete,
+			},
+		})
+	}
+	course.SurveysLock.RUnlock()
 
 	// Commit the batch.
 	_, err = batch.Commit(firebase.Context)

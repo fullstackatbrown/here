@@ -185,6 +185,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                         <TextField
                             {...register("location")}
                             label="Location"
+                            placeholder="CIT 101"
                             type="text"
                             fullWidth
                         />
@@ -193,9 +194,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                             label="Capacity"
                             type="number"
                             required
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
+                            inputProps={{ min: 1 }}
                         />
                     </Stack>
                 </Stack>

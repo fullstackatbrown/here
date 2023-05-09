@@ -17,7 +17,7 @@ import SurveyStatusChip from "./SurveyStatusChip";
 export interface SurveyCardProps {
   survey: Survey;
   numStudents: number;
-  sections: Section[];
+  sectionsMap: Record<string, Section>;
   active: boolean;
   admin: boolean;
 }
@@ -26,7 +26,7 @@ export interface SurveyCardProps {
  * SectionCard is a clickable card that is apart of the home page section grid. Contains the course title, section title,
  * number of tickets, location, and the ending time.
  */
-const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active, admin }) => {
+const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sectionsMap, active, admin }) => {
   const [updateSurveyDialog, setUpdateSurveyDialog] = useState(false);
   const [surveyPreviewDialog, setSurveyPreviewDialog] = useState(false);
   const [surveyResponsesDialog, setSurveyResponsesDialog] = useState(false);
@@ -81,7 +81,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
         onClose={() => setUpdateSurveyDialog(false)}
         courseID={survey.courseID}
         survey={survey}
-        sections={sections}
+        sections={Object.values(sectionsMap)}
       />
       <SurveyDialog open={surveyPreviewDialog} onClose={handleCloseSurveyPreview} preview={true} survey={survey} />
       <SurveyResponsesDialog
@@ -89,7 +89,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sections, active
         onClose={() => setSurveyResponsesDialog(false)}
         survey={survey}
         numStudents={numStudents}
-        sections={sections}
+        sectionsMap={sectionsMap}
       />
       <Card sx={{ ":hover": { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">

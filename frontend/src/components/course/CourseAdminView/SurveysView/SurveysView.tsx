@@ -31,12 +31,8 @@ const SurveysView: FC<SurveysViewProps> = ({
   }
 
   const surveysSorted = useMemo(() => {
-    return surveys.sort((a, b) => new Date(a.endTime).getTime() - new Date(b.endTime).getTime())
+    return surveys?.sort((a, b) => new Date(a.endTime).getTime() - new Date(b.endTime).getTime()) || []
   }, [surveys])
-
-  const sections = useMemo(() => {
-    return Object.values(sectionsMap)
-  }, [sectionsMap])
 
   return (
     <>
@@ -44,7 +40,7 @@ const SurveysView: FC<SurveysViewProps> = ({
         open={createSurveyDialog}
         onClose={() => setCreateSurveyDialog(false)}
         courseID={course.ID}
-        sections={sections}
+        sections={Object.values(sectionsMap)}
       />
       <AdminViewHeader
         view="surveys"
@@ -69,7 +65,7 @@ const SurveysView: FC<SurveysViewProps> = ({
             key={survey.ID}
             survey={survey}
             numStudents={numStudents()}
-            sections={sections}
+            sectionsMap={sectionsMap}
             active={isCourseActive}
             admin={access === CoursePermission.CourseAdmin}
           />

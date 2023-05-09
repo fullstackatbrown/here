@@ -197,7 +197,12 @@ func (fr *FirebaseRepository) HandleJoinCourseRequest(req *models.JoinCourseRequ
 }
 
 func (fr *FirebaseRepository) HandleQuitCourseRequest(req *models.QuitCourseRequest) error {
-	err := fr.deleteStudentFromCourse(req.User.ID, req.CourseID)
+	course, err := fr.GetCourseByID(req.CourseID)
+	if err != nil {
+		return err
+	}
+
+	err = fr.deleteStudentFromCourse(req.User.ID, course)
 	return err
 }
 

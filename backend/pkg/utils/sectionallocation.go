@@ -14,7 +14,7 @@ import (
 // Availability: map from student id to a list of sections they are available for
 // results: map from sections to list of studentIDs
 // exceptions: list of studentIDs unassigned
-func RunAllocationAlgorithm(options []models.SurveyOption, availability map[string][]string) (results map[string][]string, exceptions []string) {
+func RunAllocationAlgorithm(options []*models.SurveyOption, availability map[string][]string) (results map[string][]string, exceptions []string) {
 	// Convert options to map
 	optionsMap := make(map[string]int)
 	for _, option := range options {
@@ -135,6 +135,10 @@ func makeFlowNetwork(capacity map[string]int, availability map[string][]string) 
 		flow_network[person]["source"] = 0 // The current flow through this edge is 0
 
 		for _, section := range preferences {
+			// if the section does not exist in the flow network, skip (section has been deleted)
+			if _, ok := flow_network[section]; !ok {
+				continue
+			}
 			flow_network[person][section] = 1 // This person can be assigned to this section once
 			flow_network[section][person] = 0 // and isn't currently assigned to the section
 		}

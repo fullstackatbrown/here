@@ -11,7 +11,7 @@ type Survey struct {
 	Description     string                      `firestore:"description"`
 	Published       bool                        `firestore:"published"`
 	EndTime         string                      `firestore:"endTime"`
-	Options         []SurveyOption              `firestore:"options"`
+	Options         []*SurveyOption             `firestore:"options"`
 	Responses       map[string][]string         `firestore:"responses"`
 	Results         map[string][]CourseUserData `firestore:"results"`
 	SectionCapacity map[string]map[string]int   `firestore:"sectionCapacity,omitempty"`
@@ -27,7 +27,7 @@ type CreateSurveyRequest struct {
 	Name            string                    `json:"name"`
 	Description     string                    `json:"description"`
 	EndTime         string                    `json:"endTime"`
-	Options         []SurveyOption            `json:"options"`
+	Options         []*SurveyOption           `json:"options"`
 	SectionCapacity map[string]map[string]int `json:"sectionCapacity,omitempty"`
 }
 
