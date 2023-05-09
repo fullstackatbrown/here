@@ -39,19 +39,21 @@ export function sortCoursesByTerm(courses: Course[]): Course[] {
     return courses.sort((a, b) => termComparator(a.term, b.term));
 }
 
-export function getTerms(courses: Record<string, Course[]>): string[] {
+export function getTerms(courses: Record<string, Course[]>, includeCurrentTerm: boolean = true): string[] {
     let terms = []
     if (courses) {
         terms = sortTerms(Object.keys(courses));
     }
-    const currentTerm = getCurrentTerm();
-    if (terms.length === 0) { return [currentTerm] }
-    if (!terms.includes(currentTerm)) {
-        // loop through terms and add it to the appropriate index
-        for (let i = 0; i < terms.length; i++) {
-            if (termComparator(terms[i], currentTerm) > 0) {
-                terms.splice(i, 0, currentTerm);
-                break;
+    if (includeCurrentTerm) {
+        const currentTerm = getCurrentTerm();
+        if (terms.length === 0) { return [currentTerm] }
+        if (!terms.includes(currentTerm)) {
+            // loop through terms and add it to the appropriate index
+            for (let i = 0; i < terms.length; i++) {
+                if (termComparator(terms[i], currentTerm) > 0) {
+                    terms.splice(i, 0, currentTerm);
+                    break;
+                }
             }
         }
     }
