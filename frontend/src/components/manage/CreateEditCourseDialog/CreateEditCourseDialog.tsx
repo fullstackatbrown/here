@@ -37,9 +37,11 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
         term: course ? parseCourseTerm(course.term) : parseCourseTerm(courseTerm),
     }), [course, courseTerm])
 
-    const { register, handleSubmit, reset, setValue, getValues, formState: { } } = useForm<FormData>({
+    const { register, handleSubmit, reset, setValue, getValues, watch, formState: { } } = useForm<FormData>({
         defaultValues: defaultValues
     });
+
+    const watchTerm = watch('term');
 
     useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
@@ -94,7 +96,7 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
             <DialogContent>
                 <Stack spacing={2} my={1}>
                     <TermTextfield
-                        term={getValues("term")}
+                        term={watchTerm}
                         setTerm={(term: [Season, string]) => { setValue("term", term) }}
                     />
                     <TextField
