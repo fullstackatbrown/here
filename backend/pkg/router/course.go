@@ -6,9 +6,9 @@ import (
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
 func CourseRoutes() *chi.Mux {
@@ -50,17 +50,21 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err = repo.Repository.GetCourseByInfo(req.Code, req.Term)
 	if err == nil {
-		http.Error(w, "Course already exists", http.StatusBadRequest)
+		http.Error(w, qerrors.CourseAlreadyExistsError.Error(), http.StatusBadRequest)
+		return
+	} else if err != qerrors.CourseNotFoundError {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c, err := repo.Repository.CreateCourse(req)
+	_, err = repo.Repository.CreateCourse(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	render.JSON(w, r, c)
+	w.WriteHeader(200)
+	w.Write([]byte("Successfully created course " + req.Code))
 }
 
 func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
