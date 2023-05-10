@@ -6,6 +6,7 @@ import { FC, useState } from "react";
 import AdminViewHeader from "../AdminViewHeader";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
 import SectionCard from "./SectionCard";
+import { sortSections } from "@util/shared/sortSectionTime";
 
 export interface SectionsViewProps {
   course: Course;
@@ -48,7 +49,7 @@ const SectionsView: FC<SectionsViewProps> = ({
         </Typography>
       )}
       <Stack direction="column" spacing={2} mb={5}>
-        {sections?.map((s) => (
+        {sortSections(sections)?.map((s) => (
           <SectionCard
             key={s.ID}
             active={course.status === CourseStatus.CourseActive}
