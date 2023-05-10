@@ -7,12 +7,16 @@ import { getCurrentTerm, getTerms } from "@util/shared/terms";
 import { useAuth } from "api/auth/hooks";
 import { useCoursesByIDsTerm } from "api/course/hooks";
 import AppLayout from "components/shared/AppLayout";
-import { useState } from "react";
+import { useEffect } from "react";
+import { useMemo, useState } from "react";
 
 export default function Home() {
     const { currentUser, isAuthenticated } = useAuth();
-    // This will not include inactive courses
-    const [courses, loading] = useCoursesByIDsTerm(currentUser && isAuthenticated ? [...currentUser.courses, ...Object.keys(currentUser.permissions)] : []);
+    const coursesToDisplay = useMemo(() =>
+        currentUser && isAuthenticated ? [...currentUser.courses, ...Object.keys(currentUser.permissions)] : [],
+        [currentUser, isAuthenticated])
+    // This hook will not include inactive courses
+    const [courses, loading] = useCoursesByIDsTerm(coursesToDisplay);
     const [joinCourseDialog, setJoinCourseDialog] = useState(false);
 
     return (
