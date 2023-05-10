@@ -31,11 +31,11 @@ const CourseActions: FC<CourseActionsProps> = ({ course }) => {
             switch (status) {
                 case CourseStatus.CourseInactive:
                     title = `Deactivate ${course.code}?`
-                    message = `All past data will be kept, but students will not be able to see or join the course.`;
+                    message = `All past data will be kept, but cannot be accessed by anyone, including admins. Students will not be able to see or join the course.`;
                     break;
                 case CourseStatus.CourseArchived:
                     title = `Archive ${course.code}?`
-                    message = `Students and TAs can still see the course but cannot make any modifications.`;
+                    message = `Students and TAs can still see the course but all data is read-only.`;
                     break;
                 case CourseStatus.CourseActive:
                     title = `Re-activate ${course.code}?`
