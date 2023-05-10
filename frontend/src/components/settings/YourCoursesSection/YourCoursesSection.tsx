@@ -2,7 +2,7 @@ import { Box, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 import { sortCoursesByTerm } from "@util/shared/terms";
 import { useCoursesByIDs } from "api/course/hooks";
 import { CoursePermission, User } from "model/user";
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import CourseListItem from "../CourseListItem/CourseListItem";
 import { CourseStatus } from "model/course";
 
@@ -11,7 +11,8 @@ export interface YourCoursesSectionProps {
 }
 
 const YourCoursesSection: FC<YourCoursesSectionProps> = ({ user }) => {
-    const [courses, loading] = useCoursesByIDs(user ? [...user.courses, ...Object.keys(user.permissions)] : []);
+    const courseIDs = useMemo(() => user ? [...user.courses, ...Object.keys(user.permissions)] : [], [user])
+    const [courses, loading] = useCoursesByIDs(courseIDs);
     return <Paper variant="outlined">
         <Stack p={3} spacing={3}>
             <Typography variant="h6" fontWeight={600}>Your Courses</Typography>
