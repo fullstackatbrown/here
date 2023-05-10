@@ -2,7 +2,7 @@ import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvide
 import ClearIcon from "@mui/icons-material/Clear";
 import CreateIcon from "@mui/icons-material/Create";
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Box, Card, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Card, Grid, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import SurveyAPI from "api/surveys/api";
 import { Section } from "model/section";
@@ -94,18 +94,16 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sectionsMap, act
       <Card sx={{ ":hover": { boxShadow: 2 } }} onClick={handleClick} variant={"outlined"}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>
-            <Stack direction="row" alignItems="center" mb={0.5}>
-              <Typography variant="body2">
-                {survey.name}
-              </Typography>
-              <SurveyStatusChip survey={survey} style={{ marginLeft: 6 }} />
-            </Stack>
+            <Typography variant="body2" display="inline-block" lineHeight={2} sx={{ verticalAlign: "middle" }}>
+              {survey.name}&nbsp;&nbsp;
+              <SurveyStatusChip survey={survey} />
+            </Typography>
             <Typography variant="body2" fontWeight={400} sx={{ color: "text.disabled" }}>
               {survey.published ? `${getNumResponses()}/${numStudents} responded` : "Click to preview"}
             </Typography>
           </Stack>
 
-          <Stack direction="row">
+          <Stack display="flex" direction="row" justifyContent="flex-end">
             {survey.published &&
               <Tooltip title="Preview">
                 <IconButton onClick={handleShowPreview} size={"small"} disabled={!active} sx={{ marginRight: 0.5, marginTop: 0.3 }}>
@@ -122,8 +120,8 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sectionsMap, act
               </IconButton>
             </>
             }
-
           </Stack>
+
         </Box>
       </Card>
     </>

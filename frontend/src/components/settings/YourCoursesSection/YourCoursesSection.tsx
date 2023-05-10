@@ -22,8 +22,8 @@ const YourCoursesSection: FC<YourCoursesSectionProps> = ({ user }) => {
                         sortCoursesByTerm(courses).map((course, index) => {
                             const access = user.permissions?.[course.ID] as CoursePermission || CoursePermission.CourseStudent
                             if (access === CoursePermission.CourseStudent && course.status === CourseStatus.CourseInactive) return <></>
-                            return <Stack spacing={1.5}>
-                                <CourseListItem key={course.ID} {...{ course, access }} />
+                            return <Stack spacing={1.5} key={course.ID}>
+                                <CourseListItem {...{ course, access }} />
                                 {index < courses.length - 1 && <Divider />}
                             </Stack>
                         })

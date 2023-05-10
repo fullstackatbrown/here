@@ -65,12 +65,11 @@ const AssignmentCard = ({ course, assignment, handleNavigate, admin }: Assignmen
       <Card sx={{ ":hover": { boxShadow: 2 } }} variant={"outlined"} onClick={() => { handleNavigate(assignment.ID) }}>
         <Box display="flex" flexDirection="row" justifyContent="space-between" px={2.5} py={1.5} alignItems="center">
           <Stack spacing={0.5}>
-            <Stack direction="row" alignItems="center" mb={0.5}>
-              <Typography variant="body2">
-                {assignment.name}
-              </Typography>
+            <Typography variant="body2" display="inline-block" lineHeight={2} sx={{ verticalAlign: "middle" }}>
+              {assignment.name}&nbsp;
               {assignment.optional && <MyChip label="optional" variant="outlined" color="primary" style={{ marginLeft: 6 }} />}
-            </Stack>
+            </Typography>
+
             <Stack
               spacing={{ xs: 0, md: 2, }}
               direction={{ xs: "column", md: "row" }}

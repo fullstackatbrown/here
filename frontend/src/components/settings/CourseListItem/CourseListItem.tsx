@@ -22,7 +22,7 @@ const CourseListItem: FC<CourseListItemProps> = ({ course, access }) => {
         >
             <Grid item xs={12} md={10.5}>
                 <Stack direction="row" display="inline-block" sx={{ verticalAlign: "middle" }} mb={1}>
-                    <Typography display="inline-block" sx={{ verticalAlign: "middle" }}>
+                    <Typography display="inline-block" lineHeight={1.7} sx={{ verticalAlign: "middle" }}>
                         {course.code}: {course.title}&nbsp;&nbsp;
                         <Stack direction="row" display="inline-block" spacing={.5}>
                             <CourseStatusChip status={course.status} />
