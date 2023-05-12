@@ -178,6 +178,7 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *m
 		if enrolled < section.Capacity {
 			// auto approve the swap
 			swap.Status = models.STATUS_APPROVED
+			swap.HandledTime = time.Now()
 		}
 
 	}
