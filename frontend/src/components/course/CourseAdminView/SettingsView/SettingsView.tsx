@@ -58,7 +58,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
     }
 
     function handleAuthorizeGCal() {
-        CourseAPI.authorizeGapi(course.ID, `${process.env.NEXT_PUBLIC_CLIENT_URL}/course/${course.ID}?view=settings`)
+        location.href = `http://localhost:8080/courses/${course.ID}/gapi/authorize?from=${process.env.NEXT_PUBLIC_API_URL}/courses/${course.ID}`
     }
 
     return (

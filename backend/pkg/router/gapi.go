@@ -17,21 +17,38 @@ import (
 func GapiRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
+	router.With(middleware.RequireCourseAdmin()).HandleFunc("/authorize", authorizeGapiHandler)
+	router.HandleFunc("/callback", gapiCallbackHandler)
 	router.With(middleware.RequireCourseAdmin()).Post("/email", sendEmailHandler)
 	router.With(middleware.RequireCourseAdmin()).Post("/gcal/event", createGcalEventHandler)
 
 	return router
 }
 
-func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
+func authorizeGapiHandler(w http.ResponseWriter, r *http.Request) {
+	courseID := chi.URLParam(r, "courseID")
+	from := r.URL.Query().Get("from")
+	state, err := json.Marshal(map[string]string{
+		"from":     from,
+		"courseID": courseID,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	url := config.Config.OAuthConfig.AuthCodeURL(string(state))
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func gapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: Include courseID in state
 	// TODO: Check OAuth state
 	code := r.URL.Query().Get("code")
 	state := r.URL.Query().Get("state")
 
 	type State struct {
-		RedirectUrl string `json:"redirectUrl"`
-		CourseID    string `json:"courseID"`
+		From     string `json:"from"`
+		CourseID string `json:"courseID"`
 	}
 
 	var stateObj State
@@ -45,7 +62,7 @@ func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := config.Config.OAuthConfig.Exchange(context.Background(), code)
 	if err != nil {
 		fmt.Println(err)
-		http.Redirect(w, r, stateObj.RedirectUrl, http.StatusPermanentRedirect)
+		http.Redirect(w, r, stateObj.From, http.StatusPermanentRedirect)
 		// TODO: how to Redirect with error?
 		// http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -63,7 +80,7 @@ func authorizeGapiCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Redirect to course page
-	http.Redirect(w, r, stateObj.RedirectUrl, http.StatusPermanentRedirect)
+	http.Redirect(w, r, stateObj.From, http.StatusPermanentRedirect)
 }
 
 func sendEmailHandler(w http.ResponseWriter, r *http.Request) {
