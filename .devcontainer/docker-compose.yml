@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    container_name: codespace
+    container_name: here
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,4 +19,4 @@ services:
       ALLOWED_EMAIL_DOMAINS: "@brown.edu,@gmail.com"
       IS_HTTPS: "false"
     volumes:
-      - ..:/workspaces/auth:cached
+      - ..:/workspaces/here:cached
