@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: codespace
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VARIANT: "1-bullseye"
+        NODE_VERSION: "18"
+    command: sleep infinity
+    ports:
+      - "8000:8000"
+      - "3000:3000"
+    environment:
+      SERVER_PORT: "8000"
+      ALLOWED_ORIGINS: "http://localhost:3000"
+      ALLOWED_EMAIL_DOMAINS: "@brown.edu,@gmail.com"
+      IS_HTTPS: "false"
+    volumes:
+      - ..:/workspaces/auth:cached
