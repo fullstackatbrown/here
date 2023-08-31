@@ -15,7 +15,7 @@ services:
       - "3000:3000"
     environment:
       ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
-      ALLOWED_EMAIL_DOMAINS: "@brown.edu,@gmail.com"
+      ALLOWED_EMAIL_DOMAINS: "brown.edu,gmail.com"
       IS_HTTPS: "false"
       SERVER_PORT: "8000"
       NEXT_PUBLIC_API_URL: "http://localhost:8000"
