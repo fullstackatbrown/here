@@ -14,9 +14,9 @@ services:
       - "8000:8000"
       - "3000:3000"
     environment:
-      SERVER_PORT: "8000"
       ALLOWED_ORIGINS: "http://localhost:3000"
       ALLOWED_EMAIL_DOMAINS: "@brown.edu,@gmail.com"
       IS_HTTPS: "false"
+      SERVER_PORT: "8000"
     volumes:
       - ..:/workspaces/here:cached
