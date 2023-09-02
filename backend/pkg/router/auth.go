@@ -184,7 +184,7 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set session expiration to 5 days.
+	// Set session expiration.
 	expiresIn := config.Config.SessionCookieExpiration
 
 	// Create the session cookie. This will also verify the ID token in the process.
