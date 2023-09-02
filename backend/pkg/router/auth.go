@@ -216,7 +216,6 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("success"))
-	return
 }
 
 // POST: /signout
@@ -240,7 +239,6 @@ func signOutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("success"))
-	return
 }
 
 // POST: notification clear
