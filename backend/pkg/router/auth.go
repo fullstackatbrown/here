@@ -251,6 +251,7 @@ func clearNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = repo.Repository.ClearNotification(user.ID, notificationID)
 	if err != nil {
+		// TODO: we might want to differentiate bad notification ID from internal server error
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
