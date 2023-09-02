@@ -68,6 +68,7 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
 	course := r.Context().Value("course").(*models.Course)
 
 	// Cannot delete course if currently active or archived
@@ -87,6 +88,7 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
 	course := r.Context().Value("course").(*models.Course)
 
 	var req *models.UpdateCourseRequest
@@ -110,6 +112,7 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCourseInfoHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
 	course := r.Context().Value("course").(*models.Course)
 
 	var req *models.UpdateCourseInfoRequest
@@ -133,6 +136,7 @@ func updateCourseInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
 	course := r.Context().Value("course").(*models.Course)
 
 	var req *models.AssignSectionsRequest
