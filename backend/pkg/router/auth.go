@@ -164,10 +164,7 @@ func editAdminAccessHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(200)
-	_, err = w.Write([]byte("Successfully edited user " + req.Email))
-	if err != nil {
-		return
-	}
+	w.Write([]byte("Successfully edited user " + req.Email))
 }
 
 // POST: /session
