@@ -54,6 +54,8 @@ You will need to install the GitHub Codespaces VSCode extension (Extension ID: G
 
 Then follow this demo to setup a codespace. The codespace comes with all the secrets out-of-the-box.
 
+https://github.com/fullstackatbrown/here/assets/46831725/b2c9f088-6086-4973-b0ae-752679624678
+
 ### Devcontainer
 
 1. Obtain the secret files needed for local development.
