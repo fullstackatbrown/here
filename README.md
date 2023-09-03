@@ -5,37 +5,56 @@
 The frontend is a React (Next.js) app written in Typescript, while the backend is a REST API written in Go. We also use Firebase Authentication and Firestore.
 
 ## Set up
+
+### Local development
+
 1. Make sure you have Go and npm/yarn installed on your device
-2. Install backend dependencies
-    ```
-    cd backend
-    go mod tidy
-    go get .
-    ```
-3. Install frontend dependencies
-    ```
-    cd frontend
-    npm install // or yarn install
-    ```
+2. Make sure you have two secret files: `.env` and `.env.local` (see below for examples)
+3. To download dependencies and start the backend service, run `make backend` from the repository root.
+4. To download dependencies and launch the frontend dashboard, run `make frontend` from the repository root.
 
+#### Secret file examples
 
-4. In the Firebase console, go to **Project Settings > Service Accounts** and generate a new private key file. Detailed steps can be found [here](https://firebase.google.com/docs/admin/setup#initialize-sdk). Take the downloaded JSON file, put it in the root of backend folder and rename it as `dev-firebase-config.json`
+In the `backend/` folder, there should be a `.env` secret file with contents similar to:
 
-5. Create a `.env.local` file under the root of frontend folder. Copy the contents in `example.env` and copy over the corresponding Firebase credentials from earlier. For the last environment variable, set it to `http://localhost:8080`.
+```bash
+# Allowed origins of requests
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+# Allowed email domains for user accounts
+ALLOWED_EMAIL_DOMAINS=brown.edu,gmail.com
+# Whether the backend is served over HTTPS
+IS_HTTPS=false
+# The port the backend is listening from
+SERVER_PORT=8080
+# The Firebase config JSON string
+FIREBASE_CONFIG=[REDACTED]
+```
 
-    - Make sure to not push `.env.local` to remote (it should be already git-ignored) 
+In the `frontend/` folder, there should be a `.env.local` secret file with contents similar to:
 
-6. Run backend
-    ```
-    cd backend
-    go run main.go
-    ```
-7. Run frontend
-    ```
-    cd frontend
-    npm run dev // or yarn dev
-    ```
+```bash
+# Firebase config
+NEXT_PUBLIC_API_KEY=[REDACTED]
+NEXT_PUBLIC_AUTH_DOMAIN=[REDACTED]
+NEXT_PUBLIC_PROJECT_ID=[REDACTED]
+NEXT_PUBLIC_STORAGE_BUCKET=[REDACTED]
+NEXT_PUBLIC_MESSAGING_SENDER_ID=[REDACTED]
+NEXT_PUBLIC_APP_ID=[REDACTED]
+NEXT_PUBLIC_MEASUREMENT_ID=[REDACTED]
 
-## Backend APIs
-For a full list of the backend APIs, visit [API documentation](./API.md).
+# Backend API URL
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
 
+### Codespace
+
+You will need to install the GitHub Codespaces VSCode extension (Extension ID: GitHub.codespaces).
+
+Then follow this demo to setup a codespace. The codespace comes with all the secrets out-of-the-box.
+
+### Devcontainer
+
+1. Obtain the secret files needed for local development.
+2. Make sure the docker daemon is running.
+3. In VSCode, install the Dev Containers extension (Extension ID: ms-vscode-remote.remote-containers).
+4. Open the repository, and execute the command "Dev Containers: Reopen in Container". Tip: you can use the CMD+Shift+P shortcut to open the command palette to quickly execute the command.
