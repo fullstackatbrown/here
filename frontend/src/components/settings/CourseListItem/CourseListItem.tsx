@@ -33,7 +33,7 @@ const CourseListItem: FC<CourseListItemProps> = ({ course, access }) => {
                 <Typography color="secondary" fontSize={14}>{capitalizeWords(course.term)}</Typography>
             </Grid>
 
-            <Grid item xs={12} md={1.5} display="flex" direction="row" width="100%" justifyContent="flex-end" mt={{ xs: -1, md: 0 }}>
+            <Grid item xs={12} md={1.5} display="flex" width="100%" justifyContent="flex-end" mt={{ xs: -1, md: 0 }}>
                 {access === CoursePermission.CourseAdmin && <CourseActions course={course} />}
             </Grid>
         </Grid >
