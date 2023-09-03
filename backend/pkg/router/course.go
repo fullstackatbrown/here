@@ -68,8 +68,11 @@ func createCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
-	course := r.Context().Value("course").(*models.Course)
+	course, err := middleware.GetCourseFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	// Cannot delete course if currently active or archived
 	if course.Status != models.CourseInactive {
@@ -77,7 +80,7 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: course.ID})
+	err = repo.Repository.DeleteCourse(&models.DeleteCourseRequest{CourseID: course.ID})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -88,12 +91,15 @@ func deleteCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
-	course := r.Context().Value("course").(*models.Course)
+	course, err := middleware.GetCourseFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	var req *models.UpdateCourseRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -112,12 +118,15 @@ func updateCourseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCourseInfoHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
-	course := r.Context().Value("course").(*models.Course)
+	course, err := middleware.GetCourseFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	var req *models.UpdateCourseInfoRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -136,12 +145,15 @@ func updateCourseInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func assignSectionHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: we should use a helper to get the course, so we can throw a bad request error when there is no course, like GetUserFromRequest
-	course := r.Context().Value("course").(*models.Course)
+	course, err := middleware.GetCourseFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	var req *models.AssignSectionsRequest
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
