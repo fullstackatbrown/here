@@ -15,6 +15,8 @@ The frontend is a React (Next.js) app written in Typescript, while the backend i
 
 #### Secret file examples
 
+You will can find the secrets [here](https://drive.google.com/drive/folders/1tOnm-TKXMWO8eJRhpFyfpbDcGy1ZM5r3?usp=share_link). Please contact Jenny or Tianren for access.
+
 In the `backend/` folder, there should be a `.env` secret file with contents similar to:
 
 ```bash
