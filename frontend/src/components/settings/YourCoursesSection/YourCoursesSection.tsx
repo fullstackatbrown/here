@@ -16,8 +16,11 @@ const YourCoursesSection: FC<YourCoursesSectionProps> = ({ user }) => {
     return <Paper variant="outlined">
         <Stack p={3} spacing={2}>
             <Typography variant="h6" fontWeight={600}>Your Courses</Typography>
-            {courses ?
-                <Stack spacing={3}>
+            {loading ?
+                <Box textAlign="center" py={2}>
+                    <CircularProgress />
+                </Box> :
+                courses ? <Stack spacing={3}>
                     {
                         sortCoursesByTerm(courses).map((course, index) => {
                             const access = user.permissions?.[course.ID] as CoursePermission || CoursePermission.CourseStudent
@@ -28,10 +31,7 @@ const YourCoursesSection: FC<YourCoursesSectionProps> = ({ user }) => {
                             </Stack>
                         })
                     }
-                </Stack> :
-                <Box textAlign="center" py={2}>
-                    <CircularProgress />
-                </Box>
+                </Stack> : <Typography variant="body1">You do not have any courses.</Typography>
             }
         </Stack>
     </Paper >;
