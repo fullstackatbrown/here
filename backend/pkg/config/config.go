@@ -39,7 +39,7 @@ func init() {
 		IsHTTPS:                 os.Getenv("IS_HTTPS") == "true",
 		SessionCookieName:       "here-session",
 		SessionCookieExpiration: time.Hour * 24 * 14,
-		Port:                    os.Getenv("PORT"),
+		Port:                    os.Getenv("SERVER_PORT"),
 		FirebaseConfig:          []byte(os.Getenv("FIREBASE_CONFIG")),
 	}
 }
