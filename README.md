@@ -62,3 +62,7 @@ https://github.com/fullstackatbrown/here/assets/46831725/b2c9f088-6086-4973-b0ae
 2. Make sure the docker daemon is running.
 3. In VSCode, install the Dev Containers extension (Extension ID: ms-vscode-remote.remote-containers).
 4. Open the repository, and execute the command "Dev Containers: Reopen in Container". Tip: you can use the CMD+Shift+P shortcut to open the command palette to quickly execute the command.
+
+## API
+
+For a full list of the backend APIs, visit [API documentation](./API.md).
