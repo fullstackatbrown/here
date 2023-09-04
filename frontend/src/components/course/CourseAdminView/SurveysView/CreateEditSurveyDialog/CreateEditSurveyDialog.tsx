@@ -83,7 +83,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
     });
 
     useEffect(() => {
-        if (watchenddate && watchendtime) {
+        if ((!isNaN(watchenddate.valueOf())) && (!isNaN(watchendtime.valueOf()))) {
             const endDate = new Date(watchenddate)
             const endTime = new Date(watchendtime)
             endDate.setHours(endTime.getHours(), endTime.getMinutes())
