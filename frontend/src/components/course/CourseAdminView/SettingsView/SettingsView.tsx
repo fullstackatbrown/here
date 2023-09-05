@@ -3,7 +3,7 @@ import AccessList from "@components/shared/AccessList/AccessList";
 import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
 import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, FormControlLabel, Stack, Switch, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
@@ -37,8 +37,8 @@ export default function SettingsView({ course }: SettingsViewProps) {
         }
     }, [course.entryCode]);
 
-    const changeAutoApproveRequests = () => {
-        toast.promise(CourseAPI.updateCourse(course.ID, undefined, !course.autoApproveRequests),
+    const changeAutoApproveRequests = (autoApprove: boolean) => {
+        toast.promise(CourseAPI.updateCourse(course.ID, undefined, autoApprove),
             {
                 loading: "Updating course...",
                 success: "Course updated!",
@@ -94,15 +94,23 @@ export default function SettingsView({ course }: SettingsViewProps) {
                 >
                     <Stack direction="column" maxWidth={{ md: "70%" }} spacing={0.5}>
                         <Typography fontWeight={500} whiteSpace="pre">
-                            Auto-Approve Swap Requests:  {course.autoApproveRequests ? "ON" : "OFF"}
+                            Auto-Approve Swap Requests
                         </Typography>
                         <Typography>
                             If this feature is turned on, swap requests will be automatically approved if the capacity is not reached.
                         </Typography>
                     </Stack>
-                    <Button disabled={!isCourseActive} variant="outlined" onClick={() => changeAutoApproveRequests()}>
-                        Turn {course.autoApproveRequests ? "Off" : "On"}
-                    </Button>
+                    <FormControlLabel
+                        control={<Switch
+                            disabled={!isCourseActive}
+                            checked={course.autoApproveRequests}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                changeAutoApproveRequests(event.target.checked);
+                            }}
+                        />}
+                        label={course.autoApproveRequests ? "On" : "Off"}
+                    />
+
                 </Stack>
 
                 <Stack direction="column" spacing={1.5}>

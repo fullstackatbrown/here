@@ -114,7 +114,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         }
     })
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth>
+    return <Dialog open={open} fullWidth>
         <form onSubmit={onSubmit}>
             <DialogTitle>Request Swap</DialogTitle>
             <DialogContent>

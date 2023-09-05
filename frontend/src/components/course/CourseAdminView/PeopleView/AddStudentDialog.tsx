@@ -38,7 +38,7 @@ const AddStudentDialog: FC<AddStudentDialogProps> = ({ course, open, onClose }) 
 
     const placeholder =
         ["Enter student email\nor emails separated by new lines\nPress enter to submit",
-            "Example:\njenny_yu2@brown.edu\nhammad_izhar@brown.edu"
+            "Example:\nstudent_name1@brown.edu\nstudent_name2@brown.edu"
         ]
 
     return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>

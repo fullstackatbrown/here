@@ -35,7 +35,7 @@ const AddStaffStep: FC<AddStaffStepProps> = ({ term, courses, addStaffData, setA
             size="small"
             variant="outlined"
             value={addStaffData}
-            placeholder={`jenny_yu2@brown.edu,staff,cs1300\nhammad_izhar@brown.edu,admin,cs0200`}
+            placeholder={`student_name1@brown.edu,staff,cs1300\nstudent_name2@brown.edu,admin,cs0200`}
             onChange={(e) => setAddStaffData(e.target.value)}
         />
     </Stack>
