@@ -188,7 +188,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         setUseSectionData(true)
     }
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>
                 {survey ? "Update" : "Create"} Survey

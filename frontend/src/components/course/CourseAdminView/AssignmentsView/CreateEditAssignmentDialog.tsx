@@ -102,7 +102,7 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
         onSubmit()
     }
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>{assignment ? "Edit" : "Create"} Assignment</DialogTitle>
             <DialogContent>

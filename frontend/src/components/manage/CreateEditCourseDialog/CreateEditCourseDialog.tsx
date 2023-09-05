@@ -90,7 +90,7 @@ const CreateEditCourseDialog: FC<CreateEditCourseDialogProps> = ({ open, onClose
         reset()
     }
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>{course ? "Edit" : "Create"} Course</DialogTitle>
             <DialogContent>

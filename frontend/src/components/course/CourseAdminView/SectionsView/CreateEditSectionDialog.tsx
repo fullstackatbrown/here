@@ -102,7 +102,7 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         reset()
     }
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
+    return <Dialog open={open} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
             <DialogContent>
