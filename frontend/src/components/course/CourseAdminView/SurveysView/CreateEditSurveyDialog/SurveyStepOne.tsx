@@ -67,7 +67,7 @@ const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control, watch, setEr
                                     type: "manual",
                                     message: "Invalid End Date",
                                 })
-                                else clearErrors()
+                                else clearErrors("enddate")
                             }}
                         />
                     )}
