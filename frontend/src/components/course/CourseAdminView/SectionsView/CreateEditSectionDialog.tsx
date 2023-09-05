@@ -16,6 +16,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { handleBadRequestError } from "@util/errors";
 import SectionAPI from "api/section/api";
+import dayjs from "dayjs";
 import { Day, Section } from "model/section";
 import { FC, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -30,8 +31,8 @@ export interface CreateEditSectionDialogProps {
 
 type FormData = {
     day: Day;
-    starttime: string;
-    endtime: string;
+    starttime: dayjs.Dayjs;
+    endtime: dayjs.Dayjs;
     location: string | null;
     capacity: number | null;
     notifyStudent: boolean;
@@ -40,8 +41,8 @@ type FormData = {
 const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClose, section, courseID }) => {
     const defaultValues = useMemo(() => ({
         day: section ? section.day : undefined,
-        starttime: section ? section.startTime : '2001-01-01T05:00:00.000Z',
-        endtime: section ? section.endTime : '2001-01-01T05:00:00.000Z',
+        starttime: section ? dayjs(section.startTime) : dayjs('2001-01-01T05:00:00.000Z'),
+        endtime: section ? dayjs(section.endTime) : dayjs('2001-01-01T05:00:00.000Z'),
         location: section ? section.location : undefined,
         capacity: section ? section.capacity : undefined,
         notifyStudent: section?.numEnrolled > 0 ? true : false
@@ -54,8 +55,9 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
     useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
     const onSubmit = handleSubmit(async data => {
-        const startTime = new Date(data.starttime).toISOString()
-        const endTime = new Date(data.endtime).toISOString()
+        const startTime = data.starttime.toISOString()
+        const endTime = data.endtime.toISOString()
+
         if (section) {
             let notifyStudent = data.notifyStudent
             // Check if there are changes
@@ -152,34 +154,30 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
                         </Select>
                     </FormControl>
                     <Stack direction="row" spacing={2}>
-                        <Controller
-                            control={control}
-                            name="starttime"
-                            render={({ field: { onChange, value } }) => (
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Controller
+                                control={control}
+                                name="starttime"
+                                render={({ field: { onChange, value } }) => (
                                     <TimePicker
                                         label="Start Time"
                                         value={value}
                                         onChange={onChange}
-                                        renderInput={(params) => <TextField fullWidth {...params} />}
                                     />
-                                </LocalizationProvider>
-                            )}
-                        />
-                        <Controller
-                            control={control}
-                            name="endtime"
-                            render={({ field: { onChange, value } }) => (
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                )}
+                            />
+                            <Controller
+                                control={control}
+                                name="endtime"
+                                render={({ field: { onChange, value } }) => (
                                     <TimePicker
                                         label="End Time"
                                         value={value}
                                         onChange={onChange}
-                                        renderInput={(params) => <TextField fullWidth {...params} />}
                                     />
-                                </LocalizationProvider>
-                            )}
-                        />
+                                )}
+                            />
+                        </LocalizationProvider>
                     </Stack>
                     <Stack direction="row" spacing={2}>
                         <TextField
