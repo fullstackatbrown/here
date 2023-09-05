@@ -201,7 +201,7 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var sameSite http.SameSite
-	if config.Config.IsHTTPS {
+	if config.Config.IsCookieCrossSite {
 		sameSite = http.SameSiteNoneMode
 	} else {
 		sameSite = http.SameSiteLaxMode
@@ -213,7 +213,7 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   int(expiresIn.Seconds()),
 		HttpOnly: true,
 		SameSite: sameSite,
-		Secure:   config.Config.IsHTTPS,
+		Secure:   config.Config.IsCookieCrossSite,
 		Path:     "/",
 	})
 
@@ -225,7 +225,7 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 // POST: /signout
 func signOutHandler(w http.ResponseWriter, r *http.Request) {
 	var sameSite http.SameSite
-	if config.Config.IsHTTPS {
+	if config.Config.IsCookieCrossSite {
 		sameSite = http.SameSiteNoneMode
 	} else {
 		sameSite = http.SameSiteLaxMode
@@ -237,7 +237,7 @@ func signOutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		SameSite: sameSite,
-		Secure:   config.Config.IsHTTPS,
+		Secure:   config.Config.IsCookieCrossSite,
 		Path:     "/",
 	})
 
