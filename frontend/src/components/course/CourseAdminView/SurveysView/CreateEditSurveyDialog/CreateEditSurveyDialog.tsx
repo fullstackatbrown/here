@@ -24,6 +24,7 @@ import toast from "react-hot-toast";
 import SurveyStepOne from "./SurveyStepOne";
 import SurveyStepThree from "./SurveyStepThree";
 import SurveyStepTwo from "./SurveyStepTwo";
+import dayjs from 'dayjs';
 
 export interface CreateEditSurveyDialogProps {
     open: boolean;
@@ -36,34 +37,32 @@ export interface CreateEditSurveyDialogProps {
 export type SurveyFormData = {
     name: string,
     description: string,
-    enddate: Date,
-    endtime: Date,
-    endDateParsed: string,
+    enddate: dayjs.Dayjs, // user input
+    endDateParsed: string, // end date gets stored as an ISO string
     options: SurveyOption[],
     sectionCapacity?: Record<string, Record<string, number>>
 };
 
 const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose, courseID, survey, sections }) => {
+    const steps = ['Basic Information', 'Survey Fields', 'Preview'];
     const [activeStep, setActiveStep] = useState(0);
     // if we have a survey, we look at whether if it uses section data by checking if sectionCapacity is defined
     const [useSectionData, setUseSectionData] = useState(survey ? survey.sectionCapacity !== undefined : true)
-    const steps = ['Basic Information', 'Survey Fields', 'Preview'];
 
     const [options, capacity] = useMemo(() => getUniqueSectionTimes(sections), [sections])
 
     const defaultValues = useMemo(() => ({
         name: survey ? survey.name : "Section Availability Survey",
         description: survey ? survey.description : "Please select all the times that you will be available.",
-        enddate: survey ? new Date(survey.endTime) : getNextWeekDate(),
-        endtime: survey ? new Date(survey.endTime) : getNextWeekDate(),
-        endDateParsed: survey ? survey.endTime : getNextWeekDate().toISOString(),
+        enddate: survey ? dayjs(survey.endTime) : getNextWeekDate(),
         options: survey ? survey.options : options,
         sectionCapacity: survey ? survey.sectionCapacity : capacity
     }), [survey, options, capacity])
 
-    const { register, handleSubmit, control, reset, setValue, getValues, watch, formState: { } } = useForm<SurveyFormData>({
-        defaultValues: defaultValues
-    });
+    const { register, handleSubmit, control, reset, setValue, getValues, setError, clearErrors,
+        watch, formState: { errors } } = useForm<SurveyFormData>({
+            defaultValues: defaultValues
+        });
 
     const { fields, remove, insert } = useFieldArray({
         name: "options",
@@ -71,7 +70,6 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
     });
 
     const watchenddate = watch("enddate")
-    const watchendtime = watch("endtime")
 
     // control the entire field array, which means each onChange reflects on the fields object.
     const watchOptions = watch("options");
@@ -81,15 +79,6 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
             ...watchOptions[index]
         };
     });
-
-    useEffect(() => {
-        if ((!isNaN(watchenddate.valueOf())) && (!isNaN(watchendtime.valueOf()))) {
-            const endDate = new Date(watchenddate)
-            const endTime = new Date(watchendtime)
-            endDate.setHours(endTime.getHours(), endTime.getMinutes())
-            setValue("endDateParsed", endDate.toISOString())
-        }
-    }, [watchenddate, watchendtime, setValue])
 
     const prevUseSectionData: boolean = usePrevious<boolean>(useSectionData);
 
@@ -113,10 +102,16 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
 
     const handleNext = () => {
         if (activeStep === 0) {
-            if (new Date(getValues("endDateParsed")) < new Date()) {
-                toast.error("The time you selected is in the past.")
+            // TODO: clean code here
+            if (errors.name) {
+                toast.error(errors.name.message)
                 return
             }
+            if (errors.enddate) {
+                toast.error(errors.enddate.message)
+                return
+            }
+            setValue("endDateParsed", watchenddate.toISOString())
         } else if (activeStep === 1) {
             // Check if all fields are filled
             if (controlledOptions.some((field) => field.option === "" || Number.isNaN(field.capacity))) {
@@ -177,7 +172,10 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                     }
                 }
             })
-                .then(() => handleOnClose())
+                .then(() => {
+                    console.log("then")
+                    handleOnClose()
+                })
                 .catch(() => { })
         }
     });
@@ -216,7 +214,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 <Box mx={1} mt={3}>
                     {
                         {
-                            0: <SurveyStepOne {...{ register, control }} />,
+                            0: <SurveyStepOne {...{ register, control, watch, setError, clearErrors }} />,
                             1: <SurveyStepTwo
                                 options={controlledOptions}
                                 {...{ survey, register, remove, setValue, insert, useSectionData, setUseSectionData, handleResyncSectionData }}
