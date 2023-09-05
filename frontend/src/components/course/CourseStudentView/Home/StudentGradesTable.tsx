@@ -35,12 +35,12 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     const getSectionInfo = (assignmentID: string): string => {
-        let sectionID = student.actualSections?.[course.ID]?.[assignmentID]
-        if (sectionID) return formatSectionInfo(sectionsMap[sectionID], true)
-
-        sectionID = student.defaultSections?.[course.ID]
-        if (sectionID) return "Regular"
-
+        const actualSectionID = student.actualSections?.[course.ID]?.[assignmentID]
+        const regularSectionID = student.defaultSections?.[course.ID]
+        
+        if (actualSectionID === regularSectionID) return "Regular"
+        if (actualSectionID) return formatSectionInfo(sectionsMap[actualSectionID], true)
+        if (regularSectionID) return "Regular"
         return "Unassigned"
     }
 
