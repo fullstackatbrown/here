@@ -46,15 +46,36 @@ const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control, setError, cl
                 />
             )}
         />
-        <TextField
-            {...register("description")}
-            multiline
-            required
-            label="Description"
-            type="text"
-            fullWidth
-            size="small"
-            variant="standard"
+        <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, value } }) => (
+                <TextField
+                    value={value}
+                    multiline
+                    required
+                    autoFocus
+                    label="Description"
+                    type="text"
+                    fullWidth
+                    size="small"
+                    variant="standard"
+                    error={value.trim() === ""}
+                    helperText={value.trim() === "" ? "Survey description cannot be empty" : ""}
+                    onChange={(e) => {
+                        onChange(e)
+                        if (e.target.value.trim() === "") {
+                            setError("description", {
+                                type: "manual",
+                                message: "Survey Description cannot be empty",
+                            })
+                        } else {
+                            clearErrors()
+                        }
+                    }}
+
+                />
+            )}
         />
         <Stack direction="row" spacing={3} pt={1} pb={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -71,7 +92,7 @@ const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control, setError, cl
                             onError={(e) => {
                                 if (e) setError("enddate", {
                                     type: "manual",
-                                    message: "Invalid End Date",
+                                    message: "Invalid End Date Value",
                                 })
                                 else clearErrors("enddate")
                             }}

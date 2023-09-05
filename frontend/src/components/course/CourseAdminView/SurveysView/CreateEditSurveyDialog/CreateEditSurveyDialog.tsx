@@ -102,13 +102,14 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
 
     const handleNext = () => {
         if (activeStep === 0) {
-            // TODO: clean code here
-            if (errors.name) {
-                toast.error(errors.name.message)
-                return
-            }
-            if (errors.enddate) {
-                toast.error(errors.enddate.message)
+            if (errors) {
+                let error = "Please fix the following errors: \n"
+                for (const key in errors) {
+                    error += "- "
+                    error += errors[key].message
+                    error += "\n"
+                }
+                toast.error(error, { style: { whiteSpace: "pre-line" } })
                 return
             }
             setValue("endDateParsed", watchenddate.toISOString())

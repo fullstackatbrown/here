@@ -89,8 +89,14 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
     }
 
     const validateAndSubmit = () => {
-        if (errors.releaseDate || errors.dueDate) {
-            toast.error("Invalid date value")
+        if (errors) {
+            let error = "Please fix the following errors: \n"
+            for (const key in errors) {
+                error += "- "
+                error += errors[key].message
+                error += "\n"
+            }
+            toast.error(error, { style: { whiteSpace: "pre-line" } })
             return
         }
         onSubmit()
@@ -125,7 +131,7 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
                                         onError={(e) => {
                                             if (e) setError("releaseDate", {
                                                 type: "manual",
-                                                message: "Invalid Date",
+                                                message: "Invalid Release Date Value",
                                             })
                                             else clearErrors("releaseDate")
                                         }}
@@ -147,7 +153,7 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
                                         onError={(e) => {
                                             if (e) setError("dueDate", {
                                                 type: "manual",
-                                                message: "Invalid Date",
+                                                message: "Invalid Due Date Value",
                                             })
                                             else clearErrors("dueDate")
                                         }}
