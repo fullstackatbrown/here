@@ -9,36 +9,42 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 export interface SurveyStepOneProps {
     register: UseFormRegister<SurveyFormData>;
     control: Control<SurveyFormData, any>;
-    watch: UseFormWatch<SurveyFormData>;
     setError: UseFormSetError<SurveyFormData>;
     clearErrors: UseFormClearErrors<SurveyFormData>;
 }
 
-const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control, watch, setError, clearErrors }) => {
-    const watchname = watch("name")
+const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control, setError, clearErrors }) => {
 
     return <Stack spacing={2}>
-        <TextField
-            {...register("name")}
-            error={watchname.trim() === ""}
-            required
-            autoFocus
-            label="Survey Name"
-            type="text"
-            fullWidth
-            size="small"
-            variant="standard"
-            helperText={watchname.trim() === "" ? "Survey name cannot be empty" : ""}
-            onChange={(e) => {
-                if (e.target.value.trim() === "") {
-                    setError("name", {
-                        type: "manual",
-                        message: "Survey Name cannot be empty",
-                    })
-                } else {
-                    clearErrors()
-                }
-            }}
+        <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+                <TextField
+                    value={value}
+                    required
+                    autoFocus
+                    label="Survey Name"
+                    type="text"
+                    fullWidth
+                    size="small"
+                    variant="standard"
+                    error={value.trim() === ""}
+                    helperText={value.trim() === "" ? "Survey name cannot be empty" : ""}
+                    onChange={(e) => {
+                        onChange(e)
+                        if (e.target.value.trim() === "") {
+                            setError("name", {
+                                type: "manual",
+                                message: "Survey Name cannot be empty",
+                            })
+                        } else {
+                            clearErrors()
+                        }
+                    }}
+
+                />
+            )}
         />
         <TextField
             {...register("description")}
