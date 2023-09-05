@@ -89,7 +89,7 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
     }
 
     const validateAndSubmit = () => {
-        if (errors) {
+        if (Object.keys(errors).length !== 0) {
             let error = "Please fix the following errors: \n"
             for (const key in errors) {
                 error += "- "

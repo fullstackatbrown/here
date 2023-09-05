@@ -39,7 +39,7 @@ const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control, setError, cl
                                 message: "Survey Name cannot be empty",
                             })
                         } else {
-                            clearErrors()
+                            clearErrors("name")
                         }
                     }}
 
@@ -70,7 +70,7 @@ const SurveyStepOne: FC<SurveyStepOneProps> = ({ register, control, setError, cl
                                 message: "Survey Description cannot be empty",
                             })
                         } else {
-                            clearErrors()
+                            clearErrors("description")
                         }
                     }}
 
