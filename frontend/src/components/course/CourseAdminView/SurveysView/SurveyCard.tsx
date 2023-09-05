@@ -99,7 +99,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sectionsMap, act
               <SurveyStatusChip survey={survey} />
             </Typography>
             <Typography variant="body2" fontWeight={400} sx={{ color: "text.disabled" }}>
-              {survey.published ? `${getNumResponses()}/${numStudents} responded` : "Click to preview"}
+              {survey.published ? `${getNumResponses()}/${numStudents} responded` : "Click to preview and publish"}
             </Typography>
           </Stack>
 
