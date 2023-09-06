@@ -1,7 +1,8 @@
 import {
     getAuth,
+    getRedirectResult,
     GoogleAuthProvider,
-    signInWithPopup,
+    signInWithRedirect,
 } from "firebase/auth";
 import APIClient from "api/APIClient";
 import { User } from "model/user";
@@ -48,7 +49,7 @@ async function quitCourse(courseID: string): Promise<string> {
 /**
  * Redirects the user to a Google sign in page, then creates a session with the SMU API.
  */
-async function signInWithGoogle() {
+function signInWithGoogle() {
     const auth = getAuth();
 
     const provider = new GoogleAuthProvider();
@@ -56,7 +57,8 @@ async function signInWithGoogle() {
         'hd': 'brown.edu'
     });
 
-    return signInWithPopup(auth, provider)
+    signInWithRedirect(auth, provider);
+    return getRedirectResult(auth)
         .then((userCredential) => {
             // Signed in
             return userCredential.user.getIdToken(true)
