@@ -1,5 +1,6 @@
 export enum Errors {
-    UNKNOWN = "Something went wrong. Try again later."
+    UNKNOWN = "Something went wrong. Try again later.",
+    POPUP_BLOCKED = "Popup blocked. Please click the button again."
 }
 
 export const handleBadRequestError = (err: any) => {

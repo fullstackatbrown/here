@@ -8,7 +8,13 @@ export default function Login() {
     function handleSignIn() {
         AuthAPI.signInWithGoogle()
             .then(() => (window.location.href = "/"))
-            .catch(() => toast.error(Errors.UNKNOWN));
+            .catch((err) => {
+                if (err.code === 'auth/popup-blocked') {
+                    toast.error(Errors.POPUP_BLOCKED)
+                } else {
+                    toast.error(Errors.UNKNOWN)
+                }
+            });
     }
 
     return (
