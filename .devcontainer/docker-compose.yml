@@ -19,5 +19,6 @@ services:
       IS_COOKIE_CROSS_SITE: "false"
       SERVER_PORT: "8000"
       NEXT_PUBLIC_API_URL: "http://localhost:8000"
+      DEBUG: "false"
     volumes:
       - ..:/workspaces/here:cached

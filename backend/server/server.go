@@ -39,7 +39,7 @@ func Start() {
 		AllowedMethods:   []string{"GET", "POST", "DELETE", "PATCH"},
 		ExposedHeaders:   []string{"Set-Cookie"},
 		AllowCredentials: true,
-		Debug:            true,
+		Debug:            config.Config.Debug,
 	})
 
 	handler := c.Handler(router)
