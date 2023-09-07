@@ -123,7 +123,7 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                                     </ListItem>
                                     <ListItem disablePadding>
                                         <ListItemButton
-                                            onClick={() => handleOpenLink("https://forms.gle/xmLQjz8Psae73Pbp8")}>
+                                            onClick={() => handleOpenLink("https://forms.gle/VM4rjFnEHqddjRc28")}>
                                             <ListItemIcon>
                                                 <Feedback />
                                             </ListItemIcon>

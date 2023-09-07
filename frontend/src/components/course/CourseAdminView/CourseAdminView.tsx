@@ -39,22 +39,21 @@ export default function CourseAdminView({ course, access }: CourseAdminViewProps
     }
   }, [router, courseID]);
 
-  const loading = sectionsMapLoading || assignmentsMapLoading || invitedStudentsLoading || pendingRequestsLoading || surveysLoading;
   return (
     <Grid container>
       <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
         <CourseAdminViewNavigation {...{ access, pendingRequests }} />
       </Grid>
       <Grid item xs={11} md={7.3}>
-        {router.query.view && !loading && (
+        {router.query.view && !sectionsMapLoading && (
           <>
             {router.query.view === "sections" && <SectionsView {...{ course, access, sectionsMap }} />}
-            {router.query.view === "assignments" && (
+            {router.query.view === "assignments" && !assignmentsMapLoading &&
               <AssignmentsView {...{ course, access, sectionsMap, assignmentsMap }} />
-            )}
-            {router.query.view === "surveys" && <SurveysView {...{ course, access, surveys, sectionsMap }} />}
-            {router.query.view === "people" && <PeopleView {...{ course, access, sectionsMap, assignmentsMap, invitedStudents }} />}
-            {router.query.view === "requests" && <RequestsView {...{ course, access, sectionsMap, assignmentsMap, pendingRequests }} />}
+            }
+            {router.query.view === "surveys" && !surveysLoading && <SurveysView {...{ course, access, surveys, sectionsMap }} />}
+            {router.query.view === "people" && !invitedStudentsLoading && !assignmentsMapLoading && <PeopleView {...{ course, access, sectionsMap, assignmentsMap, invitedStudents }} />}
+            {router.query.view === "requests" && !assignmentsMapLoading && !pendingRequestsLoading && <RequestsView {...{ course, access, sectionsMap, assignmentsMap, pendingRequests }} />}
             {router.query.view === "settings" &&
               (access === CoursePermission.CourseAdmin ? (
                 <SettingsView course={course} />
