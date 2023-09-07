@@ -138,14 +138,16 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                                             <ListItemText primary="Settings" />
                                         </ListItemButton>
                                     </ListItem>
-                                    <ListItem disablePadding>
-                                        <ListItemButton onClick={() => handleClick("/manage")}>
-                                            <ListItemIcon>
-                                                <School />
-                                            </ListItemIcon>
-                                            <ListItemText primary="Manage Site" />
-                                        </ListItemButton>
-                                    </ListItem>
+                                    {user.isAdmin &&
+                                        <ListItem disablePadding>
+                                            <ListItemButton onClick={() => handleClick("/manage")}>
+                                                <ListItemIcon>
+                                                    <School />
+                                                </ListItemIcon>
+                                                <ListItemText primary="Manage Site" />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    }
                                     <ListItem disablePadding>
                                         <ListItemButton onClick={() => {
                                             setOpenAbout(true);
