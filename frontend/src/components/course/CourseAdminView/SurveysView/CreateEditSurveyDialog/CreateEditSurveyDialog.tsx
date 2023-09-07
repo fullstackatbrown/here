@@ -174,7 +174,6 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
                 }
             })
                 .then(() => {
-                    console.log("then")
                     handleOnClose()
                 })
                 .catch(() => { })
