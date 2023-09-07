@@ -55,6 +55,7 @@ const CreateEditSurveyDialog: FC<CreateEditSurveyDialogProps> = ({ open, onClose
         name: survey ? survey.name : "Section Availability Survey",
         description: survey ? survey.description : "Please select all the times that you will be available.",
         enddate: survey ? dayjs(survey.endTime) : getNextWeekDate(),
+        endDateParsed: survey ? survey.endTime : getNextWeekDate().toISOString(),
         options: survey ? survey.options : options,
         sectionCapacity: survey ? survey.sectionCapacity : capacity
     }), [survey, options, capacity])
