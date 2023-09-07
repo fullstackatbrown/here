@@ -62,8 +62,7 @@ func RequireAdmin() func(http.Handler) http.Handler {
 	}
 }
 
-// GetUserFromRequest returns a User if it exists within the request context. Only works with routes that implement the
-// RequireAuth middleware.
+// GetUserFromRequest returns a User if it exists within the request context. Only works with routes that implement the RequireAuth middleware.
 func GetUserFromRequest(r *http.Request) (*models.User, error) {
 	user := r.Context().Value("currentUser").(*models.User)
 	if user != nil {
