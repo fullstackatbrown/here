@@ -68,7 +68,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                 studentIDs = arrayUnion(studentIDs, section.swappedInStudents[assignment.ID])
             }
         }
-        let students = studentIDs.map((studentID) => course.students[studentID])
+        let students = studentIDs.map((studentID) => course.students[studentID]).filter(s => s !== undefined)
         students = filterStudentsBySearchQuery(students, searchQuery)
         setCurrentStudentsDisplayed(sortByName(students) as CourseUserData[])
     }, [filterBySection, page, course.students, assignment.ID, sectionsMap, searchQuery])

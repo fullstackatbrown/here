@@ -977,15 +977,10 @@
   dependencies:
     glob "7.1.7"
 
-"@next/swc-linux-x64-gnu@12.3.1":
+"@next/swc-darwin-arm64@12.3.1":
   version "12.3.1"
-  resolved "https://registry.npmjs.org/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-12.3.1.tgz"
-  integrity sha512-JWEaMyvNrXuM3dyy9Pp5cFPuSSvG82+yABqsWugjWlvfmnlnx9HOQZY23bFq3cNghy5V/t0iPb6cffzRWylgsA==
-
-"@next/swc-linux-x64-musl@12.3.1":
-  version "12.3.1"
-  resolved "https://registry.npmjs.org/@next/swc-linux-x64-musl/-/swc-linux-x64-musl-12.3.1.tgz"
-  integrity sha512-xoEWQQ71waWc4BZcOjmatuvPUXKTv6MbIFzpm4LFeCHsg2iwai0ILmNXf81rJR+L1Wb9ifEke2sQpZSPNz1Iyg==
+  resolved "https://registry.npmjs.org/@next/swc-darwin-arm64/-/swc-darwin-arm64-12.3.1.tgz"
+  integrity sha512-hT/EBGNcu0ITiuWDYU9ur57Oa4LybD5DOQp4f22T6zLfpoBMfBibPtR8XktXmOyFHrL/6FC2p9ojdLZhWhvBHg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
