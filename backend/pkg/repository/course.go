@@ -215,8 +215,8 @@ func (fr *FirebaseRepository) CreateCourse(req *models.CreateCourseRequest) (cou
 		EntryCode:           entryCode,
 		AutoApproveRequests: false,
 		Status:              models.CourseInactive,
-		Students:            map[string]models.CourseUserData{},
-		Permissions:         map[string]models.CoursePermission{},
+		Students:            make(map[string]models.CourseUserData),
+		Permissions:         make(map[string]models.CoursePermission),
 	}
 
 	ref, _, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Add(firebase.Context, course)

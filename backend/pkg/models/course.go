@@ -25,8 +25,8 @@ type Course struct {
 	EntryCode           string                      `firestore:"entryCode"`
 	Status              CourseStatus                `firestore:"status"`
 	AutoApproveRequests bool                        `firestore:"autoApproveRequests"`
-	Students            map[string]CourseUserData   `firestore:"students,omitempty"`    // map from userID to student data
-	Permissions         map[string]CoursePermission `firestore:"permissions,omitempty"` // map from userID to permission
+	Students            map[string]CourseUserData   `firestore:"students"`    // map from userID to student data
+	Permissions         map[string]CoursePermission `firestore:"permissions"` // map from userID to permission
 
 	SectionsLock               sync.RWMutex        `firestore:"-"`
 	Sections                   map[string]*Section `firestore:"-"`
