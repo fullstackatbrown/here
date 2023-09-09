@@ -71,7 +71,7 @@ const SurveyResponsesBarChart: FC<SurveyResponsesBarChartProps> = ({ formattedRe
 
     useEffect(() => {
         setChartData({
-            labels: formattedResponses.map((data) => data.option),
+            labels: formattedResponses.map((data) => data.option + (!data.optionExists ? " (deleted)" : "")),
             datasets: [
                 {
                     data: formattedResponses.map((data) => data.count),
