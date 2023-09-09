@@ -15,7 +15,7 @@ interface StudentGradesTableProps {
     student: User;
     sectionsMap: Record<string, Section>;
     assignments: Assignment[];
-    instructor?: boolean;
+    isInstructor?: boolean;
 }
 
 
@@ -30,8 +30,8 @@ const GridItem = styled(Grid)(({ theme }) => ({
 }))
 
 
-const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap, instructor = false }) => {
-    const assignmentsDisplayed = instructor ? sortAssignments(assignments) : sortAssignments(filterAssignmentsByReleaseDate(assignments))
+const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assignments, sectionsMap, isInstructor = false }) => {
+    const assignmentsDisplayed = isInstructor ? sortAssignments(assignments) : sortAssignments(filterAssignmentsByReleaseDate(assignments))
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
     const getSectionInfo = (assignmentID: string): string => {

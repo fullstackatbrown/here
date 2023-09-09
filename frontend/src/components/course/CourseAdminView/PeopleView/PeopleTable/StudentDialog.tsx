@@ -153,7 +153,7 @@ const StudentDialog: FC<StudentDialogProps> = ({ course, studentID, assignments,
                     </Stack>
                     <Stack direction="column" spacing={0.5}>
                         {isXsScreen && <Typography variant="button" fontSize={15} fontWeight={500}>Assignments & Grades</Typography>}
-                        <StudentGradesTable {...{ course, student, sectionsMap, assignments }} instructor />
+                        <StudentGradesTable {...{ course, student, sectionsMap, assignments }} isInstructor />
                     </Stack>
                 </Stack>
             </DialogContent>
