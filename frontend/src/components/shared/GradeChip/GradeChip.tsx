@@ -9,8 +9,8 @@ interface GradeChipProps {
   maxScore: number;
   // readOnly determines whether the grade can be changed
   readOnly?: boolean;
-  // editable is the component shown for the grade
-  editable?: boolean;
+  // inEditMode is whether the grade component is displayed as a text field
+  inEditMode?: boolean;
   handleCreateGrade?: (grade: number) => void;
   handleDeleteGrade?: () => void;
 }
@@ -19,7 +19,7 @@ type FormData = {
   grade: string
 };
 
-const GradeChip: FC<GradeChipProps> = ({ score, maxScore, readOnly = true, editable = false, handleCreateGrade, handleDeleteGrade }) => {
+const GradeChip: FC<GradeChipProps> = ({ score, maxScore, readOnly = true, inEditMode = false, handleCreateGrade, handleDeleteGrade }) => {
   const defaultValues = useMemo(() => ({ grade: score ? score.toString() : "" }), [score])
   const { register, handleSubmit, reset, formState: { } } = useForm<FormData>({
     defaultValues: defaultValues
@@ -70,8 +70,8 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, readOnly = true, edita
 
   return (
     <Stack direction="row" spacing={0.5} alignItems="center">
-      <Box width={readOnly ? 28 : 40} ml={editable ? -1 : 0} mr={editable ? 1 : 0} height={30} display="flex" alignItems="center">
-        {editable ?
+      <Box width={readOnly ? 28 : 40} ml={inEditMode ? -1 : 0} mr={inEditMode ? 1 : 0} height={30} display="flex" alignItems="center">
+        {inEditMode ?
           <form onSubmit={onSubmit}>
             <TextField
               size="small" variant="outlined"

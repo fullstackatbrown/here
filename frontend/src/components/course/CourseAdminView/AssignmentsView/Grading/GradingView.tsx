@@ -41,7 +41,7 @@ const TableCell = styled(MuiTableCell)(({ theme }) => ({
 const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, access }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
-    const [editGrade, setEditGrade] = useState<string | null>(null) // userid of the grade that is being edited
+    const [editingGradeFor, setEditingGradeFor] = useState<string | null>(null) // user for which the grade is edited
 
     const rowsPerPage = 10;
     const [page, setPage] = useState(0);
@@ -81,8 +81,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                     success: "Grade submitted!",
                     error: "Error submitting grade"
                 })
-                .then(() => setEditGrade(null))
-                .catch(() => setEditGrade(null))
+                .then(() => setEditingGradeFor(null))
+                .catch(() => setEditingGradeFor(null))
         }
     }
 
@@ -94,8 +94,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                     success: "Grade deleted",
                     error: "Error deleting grade"
                 })
-                .then(() => setEditGrade(null))
-                .catch(() => setEditGrade(null))
+                .then(() => setEditingGradeFor(null))
+                .catch(() => setEditingGradeFor(null))
         }
     }
 
@@ -164,14 +164,14 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                                 {!isXsScreen && <TableCell>Graded on</TableCell>}
                             </TableRow>
                         </TableHead>
-                        <ClickAwayListener onClickAway={() => setEditGrade(null)}>
+                        <ClickAwayListener onClickAway={() => setEditingGradeFor(null)}>
                             <TableBody>
                                 {currentStudentsDisplayed
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((student) => {
                                         const userID = student.studentID
                                         const grade = userID in assignment.grades ? assignment.grades[userID] : undefined
-                                        return <TableRow hover key={userID} onClick={() => setEditGrade(userID)}>
+                                        return <TableRow hover key={userID} onClick={() => setEditingGradeFor(userID)}>
                                             <TableCell component="th" scope="row">
                                                 {course.students && course.students[userID] && course.students[userID].displayName}
                                             </TableCell>
@@ -180,7 +180,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                                                     score={grade ? grade.grade : undefined}
                                                     maxScore={assignment.maxScore}
                                                     readOnly={false}
-                                                    editable={editGrade && editGrade === userID}
+                                                    inEditMode={editingGradeFor && editingGradeFor === userID}
                                                     handleCreateGrade={handleSubmitGrade(userID)}
                                                     handleDeleteGrade={grade ? handleDeleteGrade(userID) : undefined}
                                                 />
