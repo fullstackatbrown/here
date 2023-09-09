@@ -38,10 +38,21 @@ const GradeChip: FC<GradeChipProps> = ({ score, maxScore, readOnly = true, inEdi
       return
     }
 
-    if (grade > maxScore) {
-      alert("Invalid grade")
+    if (grade < 0) {
+      alert("Grade must be non-negative")
       reset()
       return
+    }
+
+    if (grade > maxScore) {
+      const confirmed = await showDialog({
+        title: "Extra Credit",
+        message: "Do you want to assign extra credit?",
+      })
+      if (!confirmed) {
+        reset()
+        return
+      }
     }
 
     // if there existed a grade
