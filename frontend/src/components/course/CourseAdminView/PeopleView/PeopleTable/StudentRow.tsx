@@ -7,6 +7,7 @@ import formatSectionInfo from "@util/shared/section";
 import CourseAPI from "api/course/api";
 import { CourseUserData } from "model/course";
 import { Section } from "model/section";
+import { CoursePermission } from "model/user";
 import { FC } from "react";
 import toast from "react-hot-toast";
 
@@ -17,6 +18,7 @@ export interface EnrolledStudentRowProps {
     isXsScreen: boolean;
     sectionsMap: Record<string, Section>;
     setSelectedStudent: (studentID: string) => void;
+    access: CoursePermission;
 }
 
 export interface InvitedStudentRowProps {
@@ -35,7 +37,7 @@ const TableCell = styled(Typography)(({ theme }) => ({
     fontSize: 14
 }))
 
-export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, courseID, isCourseActive, isXsScreen, sectionsMap, setSelectedStudent }) => {
+export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, courseID, isCourseActive, isXsScreen, sectionsMap, setSelectedStudent, access }) => {
     const theme = useTheme();
     const showDialog = useDialog();
 
@@ -57,8 +59,8 @@ export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, cours
         }
     }
     return <Box
-        sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
-        onClick={() => { setSelectedStudent(student.studentID) }}
+        sx={access !== CoursePermission.CourseStudent && { "&:hover": { backgroundColor: theme.palette.action.hover } }}
+        onClick={() => { access !== CoursePermission.CourseStudent && setSelectedStudent(student.studentID) }}
     >
         <Grid container py={1.8}>
             <GridItem item xs={10.8} md={11.5}>
@@ -76,13 +78,15 @@ export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, cours
                     </GridItem>
                 </Grid>
             </GridItem>
-            <GridItem item xs={1.2} md={0.5}>
-                <Tooltip title="Remove from course" placement="right" disableTouchListener>
-                    <IconButton onClick={handleRemoveStudent(student)} size={"small"} disabled={!isCourseActive}>
-                        <ClearIcon fontSize="small" />
-                    </IconButton>
-                </Tooltip>
-            </GridItem>
+            {access === CoursePermission.CourseAdmin &&
+                <GridItem item xs={1.2} md={0.5}>
+                    <Tooltip title="Remove from course" placement="right" disableTouchListener>
+                        <IconButton onClick={handleRemoveStudent(student)} size={"small"} disabled={!isCourseActive}>
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </GridItem>
+            }
         </Grid>
     </Box>
 }

@@ -67,6 +67,7 @@ export default function CourseStudentViewNavigation({ surveys, student }: Course
         {getNavigationButton("home")}
         {getNavigationButton("my requests")}
         {getNavigationButton("surveys", numPendingSurvey)}
+        {getNavigationButton("people")}
         {getNavigationButton("settings")}
       </Stack>
     </Stack>

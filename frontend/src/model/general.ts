@@ -2,4 +2,4 @@ export type View = "sections" | "assignments" | "people" | "requests" | "setting
 
 export const AdminViews = ["sections", "assignments", "surveys", "people", "requests", "settings"] as View[]
 
-export const StudentViews = ["home", "my requests", "surveys", "settings"] as View[]
+export const StudentViews = ["home", "my requests", "surveys", "people", "settings"] as View[]

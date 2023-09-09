@@ -7,6 +7,7 @@ import { Section } from "model/section";
 import { FC, useEffect, useMemo, useState } from "react";
 import StudentDialog from "./StudentDialog";
 import { EnrolledStudentRow, InvitedStudentRow } from './StudentRow';
+import { CoursePermission } from "model/user";
 
 export interface PeopleTableProps {
     course: Course;
@@ -14,6 +15,7 @@ export interface PeopleTableProps {
     sectionsMap: Record<string, Section>;
     assignments: Assignment[];
     invitedStudents: string[];
+    access: CoursePermission;
 }
 
 const GridItem = styled(Grid)(({ theme }) => ({
@@ -32,7 +34,7 @@ interface StudentRowData {
     email?: string,
 }
 
-const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents, access }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const rowsPerPage = isXsScreen ? -1 : 8;
     const [page, setPage] = useState(0);
@@ -83,9 +85,10 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                     {student.type === "enrolled" ?
                         <EnrolledStudentRow
                             courseID={course.ID}
-                            {...{ student: student.student, sectionsMap, isCourseActive, setSelectedStudent, isXsScreen }}
+                            {...{ student: student.student, sectionsMap, isCourseActive, setSelectedStudent, isXsScreen, access }}
                         />
                         :
+                        // We do not need to pass "access" to InvitedStudentRow because invited students cannot be seen by other students
                         <InvitedStudentRow
                             courseID={course.ID}
                             {...{ email: student.email, isCourseActive, isXsScreen }}
