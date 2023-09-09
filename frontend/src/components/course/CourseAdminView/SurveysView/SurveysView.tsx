@@ -68,6 +68,7 @@ const SurveysView: FC<SurveysViewProps> = ({
             sectionsMap={sectionsMap}
             active={isCourseActive}
             admin={access === CoursePermission.CourseAdmin}
+            students={course.students}
           />
         ))}
       </Stack >

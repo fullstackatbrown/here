@@ -2,9 +2,12 @@ import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import DownloadIcon from '@mui/icons-material/Download';
 import {
     Alert,
+    Box,
     Button, Dialog, DialogActions, DialogContent,
     DialogTitle,
     Grid,
+    Tab,
+    Tabs,
     Typography
 } from "@mui/material";
 import { handleBadRequestError } from '@util/errors';
@@ -13,11 +16,13 @@ import formatSurveyResponses from '@util/shared/survey';
 import SurveyAPI from 'api/surveys/api';
 import { Section } from 'model/section';
 import { Survey, SurveyResponse } from "model/survey";
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 import toast from 'react-hot-toast';
 import AllocatedSectionsTable from './AllocatedSectionsTable';
 import SurveyResponsesBarChart from './SurveyResponsesBarChart';
 import SurveyResultsTable from './SurveyResultsTable';
+import SurveyResponsesTable from './SurveyResponsesTable';
+import { CourseUserData } from 'model/course';
 
 export interface SurveyResponsesDialogProps {
     open: boolean;
@@ -25,9 +30,17 @@ export interface SurveyResponsesDialogProps {
     survey: Survey;
     numStudents: number;
     sectionsMap: Record<string, Section>;
+    students: Record<string, CourseUserData>;
 }
 
-const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey, numStudents, sectionsMap }) => {
+enum SurveyResponsesView {
+    SUMMARY = 0,
+    DETAILS = 1
+}
+
+const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, survey, numStudents, sectionsMap, students }) => {
+    const [surveyResponsesView, setSurveyResponsesView] = useState<SurveyResponsesView>(SurveyResponsesView.SUMMARY)
+
     const numResponses = useMemo(() =>
         survey.responses ? Object.keys(survey.responses).length : 0,
         [survey.responses])
@@ -92,13 +105,33 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 </Grid>
             </Grid>
 
-            <Grid container>
-                <Grid item xs={0} md={2} />
-                <Grid item xs={12} md={8} justifyContent="center" sx={{ minHeight: 240 }} mt={3} mb={5}>
-                    <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} numStudents={numStudents} />
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={surveyResponsesView} onChange={(e, v) => setSurveyResponsesView(v)}>
+                    <Tab label="summary" />
+                    <Tab label="details" />
+                </Tabs>
+            </Box>
+
+            {surveyResponsesView === SurveyResponsesView.SUMMARY &&
+                <Grid container>
+                    <Grid item xs={0} md={2} />
+                    <Grid item xs={12} md={8} justifyContent="center" sx={{ minHeight: 240 }} mt={3} mb={5}>
+                        <SurveyResponsesBarChart formattedResponses={formattedResponses} numResponses={numResponses} numStudents={numStudents} />
+                    </Grid>
+                    <Grid item xs={0} md={2} />
                 </Grid>
-                <Grid item xs={0} md={2} />
-            </Grid>
+            }
+
+            {surveyResponsesView === SurveyResponsesView.DETAILS &&
+                <Grid container>
+                    <Grid item xs={0} md={1} />
+                    <Grid item xs={12} md={10} justifyContent="center" sx={{ minHeight: 240 }} mt={3} mb={5}>
+                        <SurveyResponsesTable formattedResponses={formattedResponses} students={students} />
+                    </Grid>
+                    <Grid item xs={0} md={1} />
+                </Grid>
+
+            }
 
             <Grid container>
                 <Grid item xs={12} md={9}>
