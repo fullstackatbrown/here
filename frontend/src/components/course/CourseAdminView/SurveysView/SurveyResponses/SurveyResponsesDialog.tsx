@@ -1,6 +1,7 @@
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import DownloadIcon from '@mui/icons-material/Download';
 import {
+    Alert,
     Button, Dialog, DialogActions, DialogContent,
     DialogTitle,
     Grid,
@@ -106,7 +107,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                     </Typography>
                     <Typography mb={3}>
                         This will run an algorithm to automatically match students to options based on capacity and student availability.
-                        Capacity may be overridden if there is no solution.
+                        Capacity may be overridden if there is no solution. You will be able to view the results before applying them.
                     </Typography>
                 </Grid>
                 <Grid item xs={12} md={3} display="flex" alignItems="center" justifyContent={{ xs: "flex-start", md: "flex-end" }}>
@@ -115,6 +116,11 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                     </Button>
                 </Grid>
             </Grid>
+
+            <Alert severity="info">
+                The table only reflects the results when you ran the algorithm.
+                We recommend running the algorithm again after the survey closes and the course enrollment list is finalized, in case students changed their responses or dropped the class.
+            </Alert>
 
             <Grid container>
                 <Grid item xs={0} md={1.3} />

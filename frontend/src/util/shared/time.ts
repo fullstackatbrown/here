@@ -1,4 +1,5 @@
 import { format } from "date-fns-tz";
+import dayjs from "dayjs";
 import { Section } from "model/section";
 
 const days = {
@@ -53,5 +54,5 @@ export function getNextWeekDate() {
   const nextWeek = new Date()
   nextWeek.setDate(new Date().getDate() + 7)
   nextWeek.setHours(23, 59)
-  return nextWeek
+  return dayjs(nextWeek)
 }

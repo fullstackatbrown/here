@@ -123,7 +123,7 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                                     </ListItem>
                                     <ListItem disablePadding>
                                         <ListItemButton
-                                            onClick={() => handleOpenLink("https://forms.gle/xmLQjz8Psae73Pbp8")}>
+                                            onClick={() => handleOpenLink("https://forms.gle/VM4rjFnEHqddjRc28")}>
                                             <ListItemIcon>
                                                 <Feedback />
                                             </ListItemIcon>
@@ -138,14 +138,16 @@ const AccountMenu: FC<AccountMenuProps> = ({ user }) => {
                                             <ListItemText primary="Settings" />
                                         </ListItemButton>
                                     </ListItem>
-                                    <ListItem disablePadding>
-                                        <ListItemButton onClick={() => handleClick("/manage")}>
-                                            <ListItemIcon>
-                                                <School />
-                                            </ListItemIcon>
-                                            <ListItemText primary="Manage Site" />
-                                        </ListItemButton>
-                                    </ListItem>
+                                    {user.isAdmin &&
+                                        <ListItem disablePadding>
+                                            <ListItemButton onClick={() => handleClick("/manage")}>
+                                                <ListItemIcon>
+                                                    <School />
+                                                </ListItemIcon>
+                                                <ListItemText primary="Manage Site" />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    }
                                     <ListItem disablePadding>
                                         <ListItemButton onClick={() => {
                                             setOpenAbout(true);

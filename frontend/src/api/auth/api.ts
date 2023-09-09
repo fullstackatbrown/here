@@ -66,8 +66,8 @@ async function signInWithGoogle() {
                     return APIClient.post(Endpoint.GET_SESSION, { token: idToken.toString() });
                 });
         })
-        .catch(() => {
-            throw Error("Invalid credentials");
+        .catch((err) => {
+            throw err;
         });
 }
 

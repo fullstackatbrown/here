@@ -164,10 +164,7 @@ func editAdminAccessHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(200)
-	_, err = w.Write([]byte("Successfully edited user " + req.Email))
-	if err != nil {
-		return
-	}
+	w.Write([]byte("Successfully edited user " + req.Email))
 }
 
 // POST: /session
@@ -187,7 +184,7 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set session expiration to 5 days.
+	// Set session expiration.
 	expiresIn := config.Config.SessionCookieExpiration
 
 	// Create the session cookie. This will also verify the ID token in the process.
@@ -201,7 +198,7 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var sameSite http.SameSite
-	if config.Config.IsHTTPS {
+	if config.Config.IsCookieCrossSite {
 		sameSite = http.SameSiteNoneMode
 	} else {
 		sameSite = http.SameSiteLaxMode
@@ -213,19 +210,18 @@ func createSessionHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   int(expiresIn.Seconds()),
 		HttpOnly: true,
 		SameSite: sameSite,
-		Secure:   config.Config.IsHTTPS,
+		Secure:   config.Config.IsCookieCrossSite,
 		Path:     "/",
 	})
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("success"))
-	return
 }
 
 // POST: /signout
 func signOutHandler(w http.ResponseWriter, r *http.Request) {
 	var sameSite http.SameSite
-	if config.Config.IsHTTPS {
+	if config.Config.IsCookieCrossSite {
 		sameSite = http.SameSiteNoneMode
 	} else {
 		sameSite = http.SameSiteLaxMode
@@ -237,13 +233,12 @@ func signOutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		SameSite: sameSite,
-		Secure:   config.Config.IsHTTPS,
+		Secure:   config.Config.IsCookieCrossSite,
 		Path:     "/",
 	})
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("success"))
-	return
 }
 
 // POST: notification clear

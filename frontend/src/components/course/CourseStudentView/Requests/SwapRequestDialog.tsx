@@ -76,10 +76,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
     }, [watchIsPermanent, defaultValues, register, unregister, setValue, currentSectionID]);
 
     useEffect(() => {
-        if (watchAssignmentID === "") {
-            // If user did not select an assignment, set oldSectionID to empty
-            setValue("oldSectionID", "")
-        } else {
+        if (watchAssignmentID !== "") {
             // If user selected an assignment, set oldSectionID to the section for that assignment
             setValue("oldSectionID", currentSectionID)
         }
@@ -117,7 +114,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         }
     })
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth>
+    return <Dialog open={open} fullWidth>
         <form onSubmit={onSubmit}>
             <DialogTitle>Request Swap</DialogTitle>
             <DialogContent>

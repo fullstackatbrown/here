@@ -36,17 +36,16 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
   }, [router, course]);
 
   return (
-    !sectionsMapLoading && !assignmentsMapLoading && !surveysLoading &&
     <Grid container>
       <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
         <CourseStudentViewNavigation {...{ student, surveys }} />
       </Grid>
       <Grid item xs={11} md={7.3}>
-        {router.query.view && sectionsMap && assignmentsMap && (
+        {router.query.view && !sectionsMapLoading && !assignmentsMapLoading && (
           <>
             {router.query.view === "home" && !surveysLoading && <StudentHomeView {...{ course, student, surveys, sectionsMap, assignmentsMap }} />}
             {router.query.view === "my requests" && !requestsLoading && <StudentRequestsView {...{ course, student, requests, sectionsMap, assignmentsMap }} />}
-            {router.query.view === "surveys" && <SurveysView {...{ course, student, surveys }} />}
+            {router.query.view === "surveys" && !surveysLoading && <SurveysView {...{ course, student, surveys }} />}
             {router.query.view === "settings" && <StudentSettingsView course={course} />}
           </>)}
       </Grid>

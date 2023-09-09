@@ -69,13 +69,13 @@ export function getCurrentSeason(): Season {
     const date = new Date();
     const month = date.getMonth();
 
-    if (month >= 0 && month <= 5) {
+    if (month >= 0 && month <= 4) {
         return Season.Spring;
     }
-    if (month >= 6 && month <= 8) {
+    if (month >= 5 && month <= 7) {
         return Season.Summer;
     }
-    if (month >= 9 && month <= 12) {
+    if (month >= 8 && month <= 11) {
         return Season.Fall;
     }
 }

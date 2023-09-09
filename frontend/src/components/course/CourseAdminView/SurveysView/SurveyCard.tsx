@@ -9,7 +9,7 @@ import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";
-import CreateSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
+import CreateEditSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyDialog from "./SurveyDialog";
 import SurveyResponsesDialog from "./SurveyResponses/SurveyResponsesDialog";
 import SurveyStatusChip from "./SurveyStatusChip";
@@ -76,7 +76,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sectionsMap, act
 
   return (
     <>
-      <CreateSurveyDialog
+      <CreateEditSurveyDialog
         open={updateSurveyDialog}
         onClose={() => setUpdateSurveyDialog(false)}
         courseID={survey.courseID}
@@ -99,7 +99,7 @@ const SurveyCard: FC<SurveyCardProps> = ({ survey, numStudents, sectionsMap, act
               <SurveyStatusChip survey={survey} />
             </Typography>
             <Typography variant="body2" fontWeight={400} sx={{ color: "text.disabled" }}>
-              {survey.published ? `${getNumResponses()}/${numStudents} responded` : "Click to preview"}
+              {survey.published ? `${getNumResponses()}/${numStudents} responded` : "Click to preview and publish"}
             </Typography>
           </Stack>
 

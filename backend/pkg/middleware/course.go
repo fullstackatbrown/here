@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/qerrors"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 )
@@ -109,4 +110,14 @@ func hasCourseStaffPermission(u *models.User, courseID string) bool {
 func hasCourseAdminPermission(u *models.User, courseID string) bool {
 	perm, ok := u.Profile.Permissions[courseID]
 	return ok && perm == models.CourseAdmin
+}
+
+// GetCourseFromRequest returns a Course if it exists within the request context. Only works with routes that implement the CourseCtx middleware.
+func GetCourseFromRequest(r *http.Request) (*models.Course, error) {
+	course := r.Context().Value("course").(*models.Course)
+	if course != nil {
+		return course, nil
+	}
+
+	return nil, qerrors.CourseNotFoundError
 }

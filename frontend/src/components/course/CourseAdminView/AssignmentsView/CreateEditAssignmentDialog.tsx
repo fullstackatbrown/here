@@ -1,9 +1,10 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Errors, handleBadRequestError } from "@util/errors";
 import { getNextWeekDate } from '@util/shared/time';
 import AssignmentAPI from "api/assignment/api";
+import dayjs from "dayjs";
 import { Assignment } from 'model/assignment';
 import { Course } from "model/course";
 import { FC, useEffect, useMemo } from "react";
@@ -20,8 +21,8 @@ export interface CreateEditAssignmentDialogProps {
 type FormData = {
     name: string | null;
     optional: boolean;
-    releaseDate: string;
-    dueDate: string;
+    releaseDate: dayjs.Dayjs;
+    dueDate: dayjs.Dayjs;
     maxScore: number;
 };
 
@@ -29,30 +30,26 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
     const defaultValues = useMemo(() => ({
         name: assignment ? assignment.name : undefined,
         optional: assignment ? assignment.optional : false,
-        releaseDate: assignment ? assignment.releaseDate.toISOString() : new Date().toISOString(),
-        dueDate: assignment ? assignment.dueDate.toISOString() : getNextWeekDate().toISOString(),
+        releaseDate: assignment ? dayjs(assignment.releaseDate) : dayjs(new Date()),
+        dueDate: assignment ? dayjs(assignment.dueDate) : dayjs(getNextWeekDate()),
         maxScore: assignment ? assignment.maxScore : 1,
     }), [assignment])
 
-    const { register, handleSubmit, control, reset, formState: { } } = useForm<FormData>({
+    const { register, handleSubmit, control, reset, setError, clearErrors, formState: { errors } } = useForm<FormData>({
         defaultValues: defaultValues
     });
 
     useEffect(() => { reset(defaultValues) }, [defaultValues, reset]);
 
-    const clearTime = (isoTime: string) => {
-        const date = new Date(isoTime)
-        date.setHours(0, 0, 0, 0)
-        return date.toISOString()
-    }
-
     const onSubmit = handleSubmit(async data => {
-        const releaseDate = clearTime(data.releaseDate)
-        const dueDate = clearTime(data.dueDate)
-        if (releaseDate > dueDate) {
+        if (data.releaseDate > data.dueDate) {
             toast.error("Release date must be before due date.")
             return
         }
+
+        const releaseDate = data.releaseDate.toISOString()
+        const dueDate = data.dueDate.toISOString()
+
         if (assignment) {
             // Check if there are changes
             if (assignment.name === data.name &&
@@ -91,7 +88,21 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
         reset()
     }
 
-    return <Dialog open={open} onClose={handleOnClose} fullWidth maxWidth="sm" keepMounted={false}>
+    const validateAndSubmit = () => {
+        if (Object.keys(errors).length !== 0) {
+            let error = "Please fix the following errors: \n"
+            for (const key in errors) {
+                error += "- "
+                error += errors[key].message
+                error += "\n"
+            }
+            toast.error(error, { style: { whiteSpace: "pre-line" } })
+            return
+        }
+        onSubmit()
+    }
+
+    return <Dialog open={open} fullWidth maxWidth="sm" keepMounted={false}>
         <form onSubmit={onSubmit}>
             <DialogTitle>{assignment ? "Edit" : "Create"} Assignment</DialogTitle>
             <DialogContent>
@@ -107,34 +118,49 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
                         required
                     />
                     <Stack direction="row" spacing={4}>
-                        <Controller
-                            control={control}
-                            name="releaseDate"
-                            render={({ field: { onChange, value } }) => (
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Controller
+                                control={control}
+                                name="releaseDate"
+                                render={({ field: { onChange, value } }) => (
+                                    <DateTimePicker
                                         label="Release Date"
                                         value={value}
                                         onChange={onChange}
-                                        renderInput={(params) => <TextField fullWidth required variant="standard" {...params} />}
+                                        views={['year', 'month', 'day', 'hours', 'minutes']}
+                                        onError={(e) => {
+                                            if (e) setError("releaseDate", {
+                                                type: "manual",
+                                                message: "Invalid Release Date Value",
+                                            })
+                                            else clearErrors("releaseDate")
+                                        }}
                                     />
-                                </LocalizationProvider>
-                            )}
-                        />
-                        <Controller
-                            control={control}
-                            name="dueDate"
-                            render={({ field: { onChange, value } }) => (
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
+                                )}
+                            />
+                        </LocalizationProvider>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Controller
+                                control={control}
+                                name="dueDate"
+                                render={({ field: { onChange, value } }) => (
+                                    <DateTimePicker
                                         label="Due Date"
                                         value={value}
                                         onChange={onChange}
-                                        renderInput={(params) => <TextField fullWidth required variant="standard" {...params} />}
+                                        disablePast
+                                        views={['year', 'month', 'day', 'hours', 'minutes']}
+                                        onError={(e) => {
+                                            if (e) setError("dueDate", {
+                                                type: "manual",
+                                                message: "Invalid Due Date Value",
+                                            })
+                                            else clearErrors("dueDate")
+                                        }}
                                     />
-                                </LocalizationProvider>
-                            )}
-                        />
+                                )}
+                            />
+                        </LocalizationProvider>
                     </Stack>
                     <Stack direction="row" spacing={4} alignItems="flex-end">
                         <TextField
@@ -167,7 +193,7 @@ const CreateEditAssignmentDialog: FC<CreateEditAssignmentDialogProps> = ({ open,
 
             <DialogActions>
                 <Button onClick={handleOnClose}>Cancel</Button>
-                <Button type="submit" variant="contained">{assignment ? "Update" : "Add"}</Button>
+                <Button onClick={validateAndSubmit} variant="contained">{assignment ? "Update" : "Add"}</Button>
             </DialogActions>
         </form>
     </Dialog>
