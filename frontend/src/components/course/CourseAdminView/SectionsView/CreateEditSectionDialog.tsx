@@ -108,6 +108,13 @@ const CreateEditSectionDialog: FC<CreateEditSectionDialogProps> = ({ open, onClo
         <form onSubmit={onSubmit}>
             <DialogTitle>{section ? "Edit" : "Create"} Section</DialogTitle>
             <DialogContent>
+                {section && <Alert
+                    severity="info" sx={{ marginBottom: 2.5 }}
+                    style={{ display: 'flex', alignItems: 'center' }}
+                >
+                    We do not recommend changing the section times if you have any survey that depends on it.
+                    If you do, make sure to update the survey (if it is unpublished) or create a new survey.
+                </Alert>}
                 {section?.numEnrolled > 0 &&
                     <Alert
                         severity="warning" sx={{ marginBottom: 2.5 }}
