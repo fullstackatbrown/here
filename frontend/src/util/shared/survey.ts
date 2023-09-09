@@ -9,14 +9,14 @@ export function mapToList<T>(map: Record<string, T>): SurveyOption[] {
 }
 
 // count: number of students who chose the option
-export type OptionCount = {
+export type OptionDetails = {
     option: string,
     count: number,
     students: string[],
     optionExists: boolean,
 }
 
-export default function formatSurveyResponses(options: SurveyOption[], responses: Record<string, string[]>): OptionCount[] {
+export default function formatSurveyResponses(options: SurveyOption[], responses: Record<string, string[]>): OptionDetails[] {
     // Map from option to number of students who chose that option
     let resCount: Record<string, number> = {};
 
@@ -46,7 +46,7 @@ export default function formatSurveyResponses(options: SurveyOption[], responses
         }
     }
 
-    let list: OptionCount[] = [];
+    let list: OptionDetails[] = [];
     for (const option in resCount) {
         list.push({
             option: option, count: resCount[option],

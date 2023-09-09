@@ -1,5 +1,5 @@
 import { blue } from '@mui/material/colors';
-import { OptionCount } from "@util/shared/survey";
+import { OptionDetails } from "@util/shared/survey";
 import {
     BarElement, CategoryScale, Chart as ChartJS, LinearScale
 } from 'chart.js';
@@ -8,7 +8,7 @@ import { FC, useEffect, useState } from "react";
 import { Bar } from 'react-chartjs-2';
 
 export interface SurveyResponsesBarChartProps {
-    formattedResponses: OptionCount[];
+    formattedResponses: OptionDetails[];
     numResponses: number;
     numStudents: number;
 }

@@ -7,13 +7,13 @@ import {
 } from "@mui/material";
 import MuiTableCell, { TableCellProps } from "@mui/material/TableCell";
 import { grey, red } from "@mui/material/colors";
-import { OptionCount } from "@util/shared/survey";
+import { OptionDetails } from "@util/shared/survey";
 import { CourseUserData } from "model/course";
 import { SurveyOption } from 'model/survey';
 import React, { FC } from "react";
 
 export interface SurveyResponsesTableProps {
-    formattedResponses: OptionCount[];
+    formattedResponses: OptionDetails[];
     students: Record<string, CourseUserData>;
 }
 
