@@ -7,8 +7,10 @@ import dayjs from "dayjs";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
+import toast from 'react-hot-toast';
 import { User } from "model/user";
-import { FC } from "react";
+import { FC, useState } from "react";
+import GradeAPI from "api/grades/api";
 
 interface StudentGradesTableProps {
     course: Course;
@@ -37,11 +39,38 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
     const getSectionInfo = (assignmentID: string): string => {
         const actualSectionID = student.actualSections?.[course.ID]?.[assignmentID]
         const regularSectionID = student.defaultSections?.[course.ID]
-        
+
         if (actualSectionID === regularSectionID) return "Regular"
         if (actualSectionID) return formatSectionInfo(sectionsMap[actualSectionID], true)
         if (regularSectionID) return "Regular"
         return "Unassigned"
+    }
+
+    const [editingGradeFor, setEditingGradeFor] = useState<string | null>(null) // assignment for which the grade is edited
+    const handleSubmitGrade = (assignmentID: string) => {
+        return (grade: number) => {
+            toast.promise(GradeAPI.createGrade(course.ID, assignmentID, student.ID, grade),
+                {
+                    loading: "Submitting grade...",
+                    success: "Grade submitted!",
+                    error: "Error submitting grade"
+                })
+                .then(() => setEditingGradeFor(null))
+                .catch(() => setEditingGradeFor(null))
+        }
+    }
+
+    const handleDeleteGrade = (assignmentID: string) => {
+        return () => {
+            toast.promise(GradeAPI.deleteGrade(course.ID, assignmentID, student.ID),
+                {
+                    loading: "Deleting grade...",
+                    success: "Grade deleted",
+                    error: "Error deleting grade"
+                })
+                .then(() => setEditingGradeFor(null))
+                .catch(() => setEditingGradeFor(null))
+        }
     }
 
     return <Stack direction="column">
@@ -66,8 +95,9 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
             </Grid>
         }
         <Divider />
-        {assignmentsDisplayed.map((assignment) => (
-            <Box key={assignment.ID}>
+        {assignmentsDisplayed.map((assignment) => {
+            const grade = assignment.grades?.[student.ID]?.grade;
+            return (<Box key={assignment.ID} onClick={() => setEditingGradeFor(assignment.ID)}>
                 <Grid container my={1}>
                     <GridItem item xs={12} md={4.8} mb={isXsScreen ? 1 : 0} flexWrap="wrap">
                         <Typography fontSize={14} fontWeight={isXsScreen ? 500 : 400} sx={{ marginRight: 1 }}>
@@ -90,16 +120,24 @@ const StudentGradesTable: FC<StudentGradesTableProps> = ({ course, student, assi
                         </Grid>
                     </GridItem>
                     <GridItem item xs={3.2} md={2}>
-                        <GradeChip
-                            score={assignment.grades?.[student.ID]?.grade}
-                            maxScore={assignment.maxScore}
-                            readOnly={true}
-                        />
+                        {isInstructor ?
+                            <GradeChip
+                                score={assignment.grades?.[student.ID]?.grade}
+                                maxScore={assignment.maxScore}
+                                readOnly={false}
+                                inEditMode={editingGradeFor && editingGradeFor === assignment.ID}
+                                handleCreateGrade={handleSubmitGrade(assignment.ID)}
+                                handleDeleteGrade={grade ? handleDeleteGrade(assignment.ID) : undefined}
+                            /> : <GradeChip
+                                score={assignment.grades?.[student.ID]?.grade}
+                                maxScore={assignment.maxScore}
+                                readOnly={true}
+                            />}
                     </GridItem>
                 </Grid>
                 <Divider />
-            </Box>
-        ))}
+            </Box>);
+        })}
     </Stack >
 
 }
