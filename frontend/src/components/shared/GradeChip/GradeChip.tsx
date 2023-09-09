@@ -7,7 +7,9 @@ import { useDialog } from '../ConfirmDialog/ConfirmDialogProvider';
 interface GradeChipProps {
   score: number | undefined;
   maxScore: number;
+  // readOnly determines whether the grade can be changed
   readOnly?: boolean;
+  // editable is the component shown for the grade
   editable?: boolean;
   handleCreateGrade?: (grade: number) => void;
   handleDeleteGrade?: () => void;
