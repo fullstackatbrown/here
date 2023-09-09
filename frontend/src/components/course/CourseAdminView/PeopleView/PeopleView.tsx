@@ -9,7 +9,7 @@ import { filterStudentsBySearchQuery } from "@util/shared/user";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
-import { CoursePermission } from "model/user";
+import { CoursePermission, User } from "model/user";
 import { useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AdminViewHeader from "../AdminViewHeader";
@@ -19,12 +19,13 @@ import PeopleTable from "./PeopleTable/PeopleTable";
 export interface PeopleViewProps {
   course: Course;
   access: CoursePermission;
+  student?: User;
   sectionsMap: Record<string, Section>;
   assignmentsMap: Record<string, Assignment>;
   invitedStudents?: string[];
 }
 
-export default function PeopleView({ course, access, sectionsMap, assignmentsMap, invitedStudents = [] }: PeopleViewProps) {
+export default function PeopleView({ course, access, sectionsMap, assignmentsMap, invitedStudents = [], student }: PeopleViewProps) {
   const assignments = Object.values(assignmentsMap)
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
@@ -94,7 +95,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
         (sectionsMap && assignments &&
           <PeopleTable
-            {...{ course, assignments, sectionsMap }}
+            {...{ course, assignments, sectionsMap, student }}
             students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
             invitedStudents={(filterBySection === UNASSIGNED || filterBySection === ALL_STUDENTS) ? invitedStudents : []}
             access={access}

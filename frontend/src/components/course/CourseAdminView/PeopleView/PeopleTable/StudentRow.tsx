@@ -19,6 +19,7 @@ export interface EnrolledStudentRowProps {
     sectionsMap: Record<string, Section>;
     setSelectedStudent: (studentID: string) => void;
     access: CoursePermission;
+    isMe: boolean;
 }
 
 export interface InvitedStudentRowProps {
@@ -37,7 +38,7 @@ const TableCell = styled(Typography)(({ theme }) => ({
     fontSize: 14
 }))
 
-export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, courseID, isCourseActive, isXsScreen, sectionsMap, setSelectedStudent, access }) => {
+export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, courseID, isCourseActive, isXsScreen, sectionsMap, setSelectedStudent, access, isMe }) => {
     const theme = useTheme();
     const showDialog = useDialog();
 
@@ -67,7 +68,7 @@ export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, cours
                 <Grid container>
                     <GridItem item xs={12} md={3.5}>
                         <Typography fontSize={isXsScreen ? 15 : 14} fontWeight={isXsScreen ? 500 : 400}>
-                            {student.displayName}
+                            {student.displayName} {isMe && "(Me)"}
                         </Typography>
                     </GridItem>
                     <GridItem item xs={12} md={4.2}>

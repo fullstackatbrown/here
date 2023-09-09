@@ -7,7 +7,7 @@ import { Section } from "model/section";
 import { FC, useEffect, useMemo, useState } from "react";
 import StudentDialog from "./StudentDialog";
 import { EnrolledStudentRow, InvitedStudentRow } from './StudentRow';
-import { CoursePermission } from "model/user";
+import { CoursePermission, User } from "model/user";
 
 export interface PeopleTableProps {
     course: Course;
@@ -16,6 +16,7 @@ export interface PeopleTableProps {
     assignments: Assignment[];
     invitedStudents: string[];
     access: CoursePermission;
+    student?: User;
 }
 
 const GridItem = styled(Grid)(({ theme }) => ({
@@ -34,7 +35,7 @@ interface StudentRowData {
     email?: string,
 }
 
-const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents, access }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents, access, student }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const rowsPerPage = isXsScreen ? -1 : 8;
     const [page, setPage] = useState(0);
@@ -80,12 +81,12 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
             {(rowsPerPage > 0
                 ? studentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : studentsDisplayed
-            ).map((student) =>
-                <Box key={student.type === "enrolled" ? student.student.studentID : student.email}>
-                    {student.type === "enrolled" ?
+            ).map((s) =>
+                <Box key={s.type === "enrolled" ? s.student.studentID : student.email}>
+                    {s.type === "enrolled" ?
                         <EnrolledStudentRow
                             courseID={course.ID}
-                            {...{ student: student.student, sectionsMap, isCourseActive, setSelectedStudent, isXsScreen, access }}
+                            {...{ student: s.student, sectionsMap, isCourseActive, setSelectedStudent, isXsScreen, access, isMe: s.student.studentID === student?.ID }}
                         />
                         :
                         // We do not need to pass "access" to InvitedStudentRow because invited students cannot be seen by other students
