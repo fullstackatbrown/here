@@ -9,7 +9,7 @@ import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
 import { useCourseStaff } from "api/course/hooks";
 import ClipboardJS from 'clipboard';
-import { Course, CourseStatus } from "model/course";
+import { Course, CourseConfig, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
@@ -37,8 +37,8 @@ export default function SettingsView({ course }: SettingsViewProps) {
         }
     }, [course.entryCode]);
 
-    const changeAutoApproveRequests = (autoApprove: boolean) => {
-        toast.promise(CourseAPI.updateCourse(course.ID, undefined, autoApprove),
+    const changeCourseConfig = (config: CourseConfig) => {
+        toast.promise(CourseAPI.updateCourse(course.ID, undefined, config),
             {
                 loading: "Updating course...",
                 success: "Course updated!",
@@ -100,17 +100,31 @@ export default function SettingsView({ course }: SettingsViewProps) {
                             If this feature is turned on, swap requests will be automatically approved if the capacity is not reached.
                         </Typography>
                     </Stack>
-                    <FormControlLabel
-                        control={<Switch
-                            disabled={!isCourseActive}
-                            checked={course.autoApproveRequests}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                changeAutoApproveRequests(event.target.checked);
-                            }}
-                        />}
-                        label={course.autoApproveRequests ? "On" : "Off"}
+                    <Switch
+                        disabled={!isCourseActive}
+                        checked={course.config.autoApproveRequests}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            changeCourseConfig({ ...course.config, autoApproveRequests: event.target.checked });
+                        }}
                     />
 
+                </Stack>
+                <Stack direction="row" display="flex" justifyContent="space-between">
+                    <Stack direction="column" maxWidth="80%">
+                        <Typography fontWeight={500}>
+                            Share People List With Students
+                        </Typography>
+                        <Typography>
+                            If this feature is turned on, students will be able to see the list of other students enrolled in the course and their sections.
+                        </Typography>
+                    </Stack>
+                    <Switch
+                        disabled={!isCourseActive}
+                        checked={course.config.sharePeopleListWithStudents}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            changeCourseConfig({ ...course.config, sharePeopleListWithStudents: event.target.checked });
+                        }}
+                    />
                 </Stack>
 
                 <Stack direction="column" spacing={1.5}>

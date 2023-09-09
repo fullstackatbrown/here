@@ -25,6 +25,11 @@ export interface CourseUserData {
   defaultSection: string;
 }
 
+export interface CourseConfig {
+  autoApproveRequests: boolean;
+  sharePeopleListWithStudents: boolean;
+}
+
 export interface Course {
   ID: string;
   title: string;
@@ -32,7 +37,7 @@ export interface Course {
   term: string;
   entryCode: string;
   status: CourseStatus;
-  autoApproveRequests: boolean;
+  config: CourseConfig;
   students: Record<string, CourseUserData>;
   permissions: Record<string, CoursePermission>;
 }

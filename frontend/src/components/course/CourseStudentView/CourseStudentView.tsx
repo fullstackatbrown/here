@@ -39,7 +39,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
   return (
     <Grid container>
       <Grid item xs={0.5} md={2.5} pt={1} pl={{ md: 10 }}>
-        <CourseStudentViewNavigation {...{ student, surveys }} />
+        <CourseStudentViewNavigation {...{ student, surveys, course }} />
       </Grid>
       <Grid item xs={11} md={7.3}>
         {router.query.view && !sectionsMapLoading && !assignmentsMapLoading && (
@@ -47,7 +47,7 @@ function CourseStudentView({ course, student }: CourseStudentViewProps) {
             {router.query.view === "home" && !surveysLoading && <StudentHomeView {...{ course, student, surveys, sectionsMap, assignmentsMap }} />}
             {router.query.view === "my requests" && !requestsLoading && <StudentRequestsView {...{ course, student, requests, sectionsMap, assignmentsMap }} />}
             {router.query.view === "surveys" && !surveysLoading && <SurveysView {...{ course, student, surveys }} />}
-            {router.query.view === "people" && <PeopleView {...{ course, student, sectionsMap, assignmentsMap }} access={CoursePermission.CourseStudent} />}
+            {router.query.view === "people" && course.config.sharePeopleListWithStudents && <PeopleView {...{ course, student, sectionsMap, assignmentsMap }} access={CoursePermission.CourseStudent} />}
             {router.query.view === "settings" && <StudentSettingsView course={course} />}
           </>)}
       </Grid>

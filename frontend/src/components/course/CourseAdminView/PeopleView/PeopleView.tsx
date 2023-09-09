@@ -1,10 +1,11 @@
 import SelectMenu from "@components/shared/Menu/SelectMenu";
 import SearchBar from "@components/shared/SearchBar/SearchBar";
-import { Box, Stack, Typography } from "@mui/material";
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import { Stack, Typography } from "@mui/material";
 import { exportStudentList } from "@util/shared/export";
+import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
 import formatSectionInfo from "@util/shared/section";
 import { filterStudentsBySearchQuery } from "@util/shared/user";
-import getStudentsInSection, { ALL_STUDENTS, UNASSIGNED } from "@util/shared/getStudentsInSection";
 import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
@@ -14,8 +15,6 @@ import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AdminViewHeader from "../AdminViewHeader";
 import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
-import StudentViewHeader from "@components/course/CourseStudentView/StudentViewHeader";
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 
 export interface PeopleViewProps {
   course: Course;

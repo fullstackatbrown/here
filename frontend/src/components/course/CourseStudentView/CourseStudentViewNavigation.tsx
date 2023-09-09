@@ -1,5 +1,6 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { capitalizeWords } from "@util/shared/string";
+import { Course } from "model/course";
 import { View } from "model/general";
 import { Survey } from "model/survey";
 import { User } from "model/user";
@@ -9,9 +10,10 @@ import { useMemo } from "react";
 interface CourseStudentViewNavigationProps {
   surveys: Survey[];
   student: User;
+  course: Course;
 }
 
-export default function CourseStudentViewNavigation({ surveys, student }: CourseStudentViewNavigationProps) {
+export default function CourseStudentViewNavigation({ surveys, student, course }: CourseStudentViewNavigationProps) {
   const router = useRouter();
   const { query } = router;
 
@@ -67,7 +69,7 @@ export default function CourseStudentViewNavigation({ surveys, student }: Course
         {getNavigationButton("home")}
         {getNavigationButton("my requests")}
         {getNavigationButton("surveys", numPendingSurvey)}
-        {getNavigationButton("people")}
+        {course.config.sharePeopleListWithStudents && getNavigationButton("people")}
         {getNavigationButton("settings")}
       </Stack>
     </Stack>

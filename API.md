@@ -76,7 +76,7 @@
     title: string                                  # name of the course
     code: string                                   # course's course code
     entryCode: string                              # course's entry code, 6 randomly generated characters
-    autoApproveRequests: boolean                   # whether swap requests will be automatically approved
+    config: CourseConfig                           # course configurations, such as whether swap requests will be automatically approvedAuto-Approve Swap Requests
     term: string                                   # semester this course is offered
     students: map[string]CourseUserData            # map from studentIDs to student info
     permissions: map[string]CoursePermission       # map from userID to their permission for the course (admin or staff)
