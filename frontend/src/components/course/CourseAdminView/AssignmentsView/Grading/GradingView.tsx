@@ -17,7 +17,7 @@ import { CoursePermission } from 'model/user';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/Menu/SelectMenu';
-import ViewHeader from '../../../../shared/ViewHeader/ViewHeader';
+import ViewHeaderContent from '../../../../shared/ViewHeader/ViewHeaderContent';
 
 interface GradingViewProps {
     course: Course;
@@ -115,7 +115,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
     return (
         <>
             <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
-                <ViewHeader view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+                <ViewHeaderContent view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
             </Stack>
             <Stack
                 direction={{ xs: "column", md: "row" }}

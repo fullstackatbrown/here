@@ -1,18 +1,17 @@
 import MoreMenu from "@components/shared/Menu/MoreMenu";
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import { Button, Stack, Typography } from "@mui/material";
+import { sortAssignments } from "@util/shared/assignments";
+import { exportGrades } from "@util/shared/export";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { useRouter } from "next/router";
 import { FC, useState } from "react";
-import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
-import { exportGrades } from "@util/shared/export";
-import AdminViewHeader from "../AdminViewHeader";
-import { sortAssignments } from "@util/shared/assignments";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -54,8 +53,9 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
         }}
         course={course}
       />
-      <AdminViewHeader
+      <ViewHeader
         view="assignments"
+        course={course}
         access={access}
         endElement={access === CoursePermission.CourseAdmin && (
           <Stack direction="row">

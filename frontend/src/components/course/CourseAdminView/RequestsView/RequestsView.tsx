@@ -1,3 +1,4 @@
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import { ExpandMore } from "@mui/icons-material";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
@@ -13,7 +14,6 @@ import { Section } from "model/section";
 import { Swap } from "model/swap";
 import { CoursePermission } from "model/user";
 import { useState } from "react";
-import AdminViewHeader from "../AdminViewHeader";
 import RequestsList from "./RequestsList";
 
 export interface RequestsViewProps {
@@ -31,7 +31,7 @@ export default function RequestsView({ course, access, sectionsMap, assignmentsM
 
   return (
     <>
-      <AdminViewHeader view="requests" access={access} />
+      <ViewHeader course={course} view="requests" access={access} />
       <Stack ml={-1}>
         <Stack direction="row" justifyContent="space-between">
           <Button

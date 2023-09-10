@@ -1,5 +1,6 @@
 import SelectMenu from "@components/shared/Menu/SelectMenu";
 import SearchBar from "@components/shared/SearchBar/SearchBar";
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import { Stack, Typography } from "@mui/material";
 import { exportStudentList } from "@util/shared/export";
@@ -12,7 +13,6 @@ import { Section } from "model/section";
 import { CoursePermission, User } from "model/user";
 import { useMemo, useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
-import AdminViewHeader from "../AdminViewHeader";
 import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
 import PeopleTableForStudents from "./PeopleTable/PeopleTableForStudents";
@@ -73,7 +73,8 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   return (
     <>
       <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
-      <AdminViewHeader
+      <ViewHeader
+        course={course}
         view="people"
         access={access}
         endElement={
