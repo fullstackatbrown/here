@@ -2,10 +2,9 @@ import { ExportToCsv } from 'export-to-csv';
 import { Assignment } from "model/assignment";
 import { Course, CourseUserData } from "model/course";
 import { Section } from "model/section";
-import { formatSectionTime } from "./time";
-import listToMapWithID from "./listToMap";
 import { SurveyResponse } from "model/survey";
 import formatSectionInfo from './section';
+import { formatSectionTime } from "./time";
 
 const options = {
     filename: "",
@@ -51,6 +50,9 @@ export function exportGrades(course: Course, assignments: Assignment[], invitedS
     }
 
     const csvExporter = new ExportToCsv(options);
+    if (data.length === 0) {
+        data.push({ "name": "No students found", "email": "" });
+    }
     csvExporter.generateCsv(data);
 }
 
@@ -77,6 +79,9 @@ export function exportStudentList(course: Course, sectionsMap: Record<string, Se
     }
 
     const csvExporter = new ExportToCsv(options);
+    if (data.length === 0) {
+        data.push({ "name": "No students found", "email": "", "section": "" });
+    }
     csvExporter.generateCsv(data);
 }
 
@@ -97,6 +102,9 @@ export function exportSurveyResults(results: Record<string, CourseUserData[]>) {
     }
 
     const csvExporter = new ExportToCsv(options);
+    if (data.length === 0) {
+        data.push({ "option": "No survey results", "students": "" });
+    }
     csvExporter.generateCsv(data);
 }
 
@@ -113,6 +121,9 @@ export function exportSurveyResultsForSections(results: Record<string, CourseUse
     }
 
     const csvExporter = new ExportToCsv(options);
+    if (data.length === 0) {
+        data.push({ "section": "No survey results", "location": "", "students": "" });
+    }
     csvExporter.generateCsv(data);
 }
 
@@ -127,6 +138,9 @@ export function exportSurveyResponses(responses: SurveyResponse[]) {
         });
     }
     const csvExporter = new ExportToCsv(options);
+    if (data.length === 0) {
+        data.push({ "name": "No survey responses", "email": "", "availability": "" });
+    }
     csvExporter.generateCsv(data);
 
 }
