@@ -75,14 +75,14 @@ func (fr *FirebaseRepository) GetSectionByID(courseID string, sectionID string) 
 	return section, nil
 }
 
-func (fr *FirebaseRepository) GetSectionByInfo(course *models.Course, startTime string, endTime string, location string) (*models.Section, error) {
+func (fr *FirebaseRepository) GetSectionByInfo(course *models.Course, day models.Day, startTime string, endTime string, location string) (*models.Section, error) {
 	locationCollapsed := utils.CollapseString(location)
 
 	course.SectionsLock.RLock()
 	defer course.SectionsLock.RUnlock()
 
 	for _, section := range course.Sections {
-		if section.StartTime == startTime && section.EndTime == endTime && utils.CollapseString(section.Location) == locationCollapsed {
+		if string(section.Day) == string(day) && section.StartTime == startTime && section.EndTime == endTime && utils.CollapseString(section.Location) == locationCollapsed {
 			return section, nil
 		}
 	}
