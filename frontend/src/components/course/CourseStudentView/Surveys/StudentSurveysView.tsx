@@ -21,7 +21,7 @@ const StudentSurveysView: FC<StudentSurveysViewProps> = ({ course, surveys, stud
 
     return (
         <>
-            <StudentViewHeader view="surveys" />
+            <StudentViewHeader course={course} view="surveys" />
             <Stack direction="column" minHeight={60}>
                 {surveys?.length === 0 &&
                     <Typography variant="body1" mt={1}>The instructor has not published any survey</Typography>

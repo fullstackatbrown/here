@@ -9,7 +9,6 @@ import { FC, useState } from "react";
 interface ViewHeaderProps {
     view: View;
     views: View[];
-    access: CoursePermission;
 }
 
 const StyledMenu = styled((props: MenuProps) => (
@@ -31,7 +30,7 @@ const StyledMenu = styled((props: MenuProps) => (
     },
 }));
 
-const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
+const ViewHeader: FC<ViewHeaderProps> = ({ view, views }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const router = useRouter();
@@ -67,8 +66,6 @@ const ViewHeader: FC<ViewHeaderProps> = ({ view, views, access }) => {
                 sx={{ display: { md: "none" } }}
             >
                 {views.map((view) => {
-                    // Make course settings only accessible to admin
-                    if (view === "settings" && access === CoursePermission.CourseStaff) return null;
                     return <MenuItem key={view} sx={{ fontSize: 18, py: 0, mr: 2 }} onClick={() => navigateTo(view)} >
                         {capitalizeWords(view)}
                     </MenuItem>

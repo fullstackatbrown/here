@@ -35,7 +35,7 @@ const StudentSettingsView: FC<StudentSettingsViewProps> = ({ course }) => {
 
     return (
         <>
-            <StudentViewHeader view="settings" />
+            <StudentViewHeader course={course} view="settings" />
             <Button
                 variant="outlined"
                 startIcon={<ExitToAppIcon />}

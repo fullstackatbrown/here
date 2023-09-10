@@ -46,7 +46,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, sectionsMa
                 </DialogContent>
             </Dialog>
 
-            <StudentViewHeader view="home" display={isXsScreen ? "block" : "none"} />
+            <StudentViewHeader course={course} view="home" display={isXsScreen ? "block" : "none"} />
             <Stack direction="column" spacing={5}>
                 <Stack direction="row" flexWrap="wrap" alignItems="center" spacing={1} mt={{ xs: 0, md: 1.5 }}>
                     <Typography fontSize={17} variant="button" fontWeight={600}>

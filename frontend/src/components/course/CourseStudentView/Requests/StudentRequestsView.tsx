@@ -31,6 +31,7 @@ const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, 
                     {...{ course, assignmentsMap, student, sectionsMap }}
                 />}
             <StudentViewHeader
+                course={course}
                 view="my requests"
                 // button doesnt show on mobile if requests are not allowed
                 endElement={!(isXsScreen && !allowRequests) &&
