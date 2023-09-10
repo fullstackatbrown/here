@@ -7,9 +7,11 @@ interface UserData {
 }
 
 export const filterStudentsBySearchQuery = (students: CourseUserData[], searchQuery: string): CourseUserData[] => {
+    // return students whose display name or email contains the search query
     return students.filter((student) => {
-        // either student.displayName starts with the search query or student.email starts with the search query
-        return student.displayName.toLowerCase().startsWith(searchQuery.toLowerCase()) || student.email.toLowerCase().startsWith(searchQuery.toLowerCase())
+        const matchesDisplayName = student.displayName.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesEmail = student.email.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesDisplayName || matchesEmail;
     })
 }
 
