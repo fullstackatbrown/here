@@ -19,7 +19,6 @@ export interface EnrolledStudentRowProps {
     sectionsMap: Record<string, Section>;
     setSelectedStudent: (studentID: string) => void;
     access: CoursePermission;
-    isMe: boolean;
 }
 
 export interface InvitedStudentRowProps {
@@ -27,6 +26,7 @@ export interface InvitedStudentRowProps {
     courseID: string;
     isCourseActive: boolean;
     isXsScreen: boolean;
+    access: CoursePermission;
 }
 
 const GridItem = styled(Grid)(({ theme }) => ({
@@ -38,7 +38,7 @@ const TableCell = styled(Typography)(({ theme }) => ({
     fontSize: 14
 }))
 
-export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, courseID, isCourseActive, isXsScreen, sectionsMap, setSelectedStudent, access, isMe }) => {
+export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, courseID, isCourseActive, isXsScreen, sectionsMap, setSelectedStudent, access }) => {
     const theme = useTheme();
     const showDialog = useDialog();
 
@@ -60,15 +60,15 @@ export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, cours
         }
     }
     return <Box
-        sx={access !== CoursePermission.CourseStudent && { "&:hover": { backgroundColor: theme.palette.action.hover } }}
-        onClick={() => { access !== CoursePermission.CourseStudent && setSelectedStudent(student.studentID) }}
+        sx={{ "&:hover": { backgroundColor: theme.palette.action.hover } }}
+        onClick={() => setSelectedStudent(student.studentID)}
     >
         <Grid container py={1.8}>
             <GridItem item xs={10.8} md={11.5}>
                 <Grid container>
                     <GridItem item xs={12} md={3.5}>
                         <Typography fontSize={isXsScreen ? 15 : 14} fontWeight={isXsScreen ? 500 : 400}>
-                            {student.displayName} {isMe && "(Me)"}
+                            {student.displayName}
                         </Typography>
                     </GridItem>
                     <GridItem item xs={12} md={4.2}>
@@ -92,7 +92,7 @@ export const EnrolledStudentRow: FC<EnrolledStudentRowProps> = ({ student, cours
     </Box>
 }
 
-export const InvitedStudentRow: FC<InvitedStudentRowProps> = ({ email, courseID, isCourseActive, isXsScreen }) => {
+export const InvitedStudentRow: FC<InvitedStudentRowProps> = ({ email, courseID, isCourseActive, isXsScreen, access }) => {
     const showDialog = useDialog();
 
     const handleRemoveInvite = (email: string) => {
@@ -130,13 +130,15 @@ export const InvitedStudentRow: FC<InvitedStudentRowProps> = ({ email, courseID,
                     </GridItem>
                 </Grid>
             </GridItem>
-            <GridItem item xs={1.2} md={0.5}>
-                <Tooltip title="Remove from course" placement="right" disableTouchListener>
-                    <IconButton onClick={handleRemoveInvite(email)} size={"small"} disabled={!isCourseActive}>
-                        <ClearIcon fontSize="small" />
-                    </IconButton>
-                </Tooltip>
-            </GridItem>
+            {access === CoursePermission.CourseAdmin &&
+                <GridItem item xs={1.2} md={0.5}>
+                    <Tooltip title="Remove from course" placement="right" disableTouchListener>
+                        <IconButton onClick={handleRemoveInvite(email)} size={"small"} disabled={!isCourseActive}>
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </GridItem>
+            }
         </Grid>
     </Tooltip>
 }

@@ -10,11 +10,12 @@ import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission, User } from "model/user";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AdminViewHeader from "../AdminViewHeader";
 import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
+import PeopleTableForStudents from "./PeopleTable/PeopleTableForStudents";
 
 export interface PeopleViewProps {
   course: Course;
@@ -26,7 +27,7 @@ export interface PeopleViewProps {
 }
 
 export default function PeopleView({ course, access, sectionsMap, assignmentsMap, invitedStudents = [], student }: PeopleViewProps) {
-  const assignments = Object.values(assignmentsMap)
+  const assignments = useMemo(() => Object.values(assignmentsMap), [assignmentsMap])
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
@@ -91,16 +92,24 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         }
       />
 
-      {invitedStudents && hasNoStudent() ?
+      {hasNoStudent() ?
         <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-        (sectionsMap && assignments &&
+
+        (access === CoursePermission.CourseStudent ?
+          <PeopleTableForStudents
+            {...{ course, sectionsMap }}
+            students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+            currentUser={student}
+          /> :
           <PeopleTable
-            {...{ course, assignments, sectionsMap, student }}
+            {...{ course, assignments, sectionsMap }}
             students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
             invitedStudents={(filterBySection === UNASSIGNED || filterBySection === ALL_STUDENTS) ? invitedStudents : []}
             access={access}
           />
+
         )
+
       }
     </>
   );
