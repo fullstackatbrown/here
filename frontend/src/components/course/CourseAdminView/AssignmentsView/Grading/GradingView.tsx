@@ -18,6 +18,7 @@ import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/Menu/SelectMenu';
 import ViewHeaderContent from '../../../../shared/ViewHeader/ViewHeaderContent';
+import ViewHeader from '@components/shared/ViewHeader/ViewHeader';
 
 interface GradingViewProps {
     course: Course;
@@ -114,9 +115,11 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
 
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
-                <ViewHeaderContent view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} />
-            </Stack>
+            <ViewHeader
+                view="assignments"
+                course={course}
+                access={access}
+            />
             <Stack
                 direction={{ xs: "column", md: "row" }}
                 alignItems={{ xs: "start", md: "center" }}
