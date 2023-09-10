@@ -52,8 +52,8 @@ export default function SettingsView({ course }: SettingsViewProps) {
             <AdminViewHeader view="settings" access={CoursePermission.CourseAdmin} />
             <Stack direction="column" spacing={4} my={2}>
                 <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    alignItems={{ xs: "start", md: "center" }}
+                    direction="row"
+                    alignItems="center"
                     justifyContent="space-between"
                     spacing={2}
                 >
@@ -87,12 +87,12 @@ export default function SettingsView({ course }: SettingsViewProps) {
                 </Stack>
 
                 <Stack
-                    direction={{ xs: "column", md: "row" }}
+                    direction="row"
                     alignItems={{ xs: "start", md: "center" }}
                     justifyContent="space-between"
                     spacing={2}
                 >
-                    <Stack direction="column" maxWidth={{ md: "70%" }} spacing={0.5}>
+                    <Stack direction="column" maxWidth={{ md: "70%", xs: "85%" }} spacing={0.5}>
                         <Typography fontWeight={500} whiteSpace="pre">
                             Auto-Approve Swap Requests
                         </Typography>
@@ -109,8 +109,13 @@ export default function SettingsView({ course }: SettingsViewProps) {
                     />
 
                 </Stack>
-                <Stack direction="row" display="flex" justifyContent="space-between">
-                    <Stack direction="column" maxWidth="80%">
+                <Stack
+                    direction="row"
+                    alignItems={{ xs: "start", md: "center" }}
+                    justifyContent="space-between"
+                    spacing={2}
+                >
+                    <Stack direction="column" maxWidth={{ md: "70%", xs: "85%" }} spacing={0.5}>
                         <Typography fontWeight={500}>
                             Share People List With Students
                         </Typography>
