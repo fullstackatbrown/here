@@ -1,9 +1,9 @@
 import CourseActions from "@components/settings/CourseListItem/CourseActions";
 import AccessList from "@components/shared/AccessList/AccessList";
 import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
-import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Box, Button, CircularProgress, FormControlLabel, Stack, Switch, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Switch, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
@@ -13,7 +13,6 @@ import { Course, CourseConfig, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
-import AdminViewHeader from "../AdminViewHeader";
 
 export interface SettingsViewProps {
     course: Course;
@@ -49,7 +48,7 @@ export default function SettingsView({ course }: SettingsViewProps) {
 
     return (
         <>
-            <AdminViewHeader view="settings" access={CoursePermission.CourseAdmin} />
+            <ViewHeader course={course} view="settings" access={CoursePermission.CourseAdmin} />
             <Stack direction="column" spacing={4} my={2}>
                 <Stack
                     direction="row"

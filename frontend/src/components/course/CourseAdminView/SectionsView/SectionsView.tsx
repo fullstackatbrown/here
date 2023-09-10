@@ -1,12 +1,12 @@
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import { Button, Stack, Typography } from "@mui/material";
+import { sortSections } from "@util/shared/sortSectionTime";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission } from "model/user";
 import { FC, useState } from "react";
-import AdminViewHeader from "../AdminViewHeader";
 import CreateEditSectionDialog from "./CreateEditSectionDialog";
 import SectionCard from "./SectionCard";
-import { sortSections } from "@util/shared/sortSectionTime";
 
 export interface SectionsViewProps {
   course: Course;
@@ -29,7 +29,8 @@ const SectionsView: FC<SectionsViewProps> = ({
         onClose={() => setcreateSectionDialog(false)}
         courseID={course.ID}
       />
-      <AdminViewHeader
+      <ViewHeader
+        course={course}
         view="sections"
         access={access}
         endElement={

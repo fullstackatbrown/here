@@ -5,9 +5,9 @@ import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
-import { User } from "model/user";
+import { CoursePermission, User } from "model/user";
 import { FC, useState } from "react";
-import StudentViewHeader from "../StudentViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import StudentGradesTable from "./StudentGradesTable";
 
 export interface StudentHomeViewProps {
@@ -46,7 +46,7 @@ const StudentHomeView: FC<StudentHomeViewProps> = ({ course, student, sectionsMa
                 </DialogContent>
             </Dialog>
 
-            <StudentViewHeader course={course} view="home" display={isXsScreen ? "block" : "none"} />
+            <ViewHeader course={course} view="home" display={isXsScreen ? "block" : "none"} access={CoursePermission.CourseStudent} />
             <Stack direction="column" spacing={5}>
                 <Stack direction="row" flexWrap="wrap" alignItems="center" spacing={1} mt={{ xs: 0, md: 1.5 }}>
                     <Typography fontSize={17} variant="button" fontWeight={600}>
