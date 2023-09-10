@@ -115,7 +115,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
     return (
         <>
             <Stack direction="row" justifyContent="space-between" mb={1} alignItems="center" height={40}>
-                <ViewHeaderContent view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} access={access} />
+                <ViewHeaderContent view="assignments" views={["sections", "assignments", "people", "requests", "settings"]} />
             </Stack>
             <Stack
                 direction={{ xs: "column", md: "row" }}
