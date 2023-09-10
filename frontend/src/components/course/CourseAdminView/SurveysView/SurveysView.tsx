@@ -1,10 +1,10 @@
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import { Button, Stack, Typography } from "@mui/material";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Survey } from "model/survey";
 import { CoursePermission } from "model/user";
 import { FC, useMemo, useState } from "react";
-import AdminViewHeader from "../AdminViewHeader";
 import CreateEditSurveyDialog from "./CreateEditSurveyDialog/CreateEditSurveyDialog";
 import SurveyCard from "./SurveyCard";
 
@@ -42,7 +42,8 @@ const SurveysView: FC<SurveysViewProps> = ({
         courseID={course.ID}
         sections={Object.values(sectionsMap)}
       />
-      <AdminViewHeader
+      <ViewHeader
+        course={course}
         view="surveys"
         access={access}
         endElement={

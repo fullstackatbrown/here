@@ -4,7 +4,8 @@ import { sortByName } from "@util/shared/user";
 import { Assignment } from "model/assignment";
 import { Course, CourseStatus, CourseUserData } from 'model/course';
 import { Section } from "model/section";
-import { FC, useEffect, useMemo, useState } from "react";
+import { CoursePermission, User } from "model/user";
+import { FC, useMemo, useState } from "react";
 import StudentDialog from "./StudentDialog";
 import { EnrolledStudentRow, InvitedStudentRow } from './StudentRow';
 
@@ -14,6 +15,7 @@ export interface PeopleTableProps {
     sectionsMap: Record<string, Section>;
     assignments: Assignment[];
     invitedStudents: string[];
+    access: CoursePermission;
 }
 
 const GridItem = styled(Grid)(({ theme }) => ({
@@ -32,7 +34,7 @@ interface StudentRowData {
     email?: string,
 }
 
-const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents, access }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const rowsPerPage = isXsScreen ? -1 : 8;
     const [page, setPage] = useState(0);
@@ -78,17 +80,18 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
             {(rowsPerPage > 0
                 ? studentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : studentsDisplayed
-            ).map((student) =>
-                <Box key={student.type === "enrolled" ? student.student.studentID : student.email}>
-                    {student.type === "enrolled" ?
+            ).map((rowData) =>
+                <Box key={rowData.type === "enrolled" ? rowData.student.studentID : rowData.email}>
+                    {rowData.type === "enrolled" ?
                         <EnrolledStudentRow
                             courseID={course.ID}
-                            {...{ student: student.student, sectionsMap, isCourseActive, setSelectedStudent, isXsScreen }}
+                            {...{ student: rowData.student, sectionsMap, isCourseActive, setSelectedStudent, isXsScreen, access }}
                         />
                         :
+                        // We do not need to pass "access" to InvitedStudentRow because invited students cannot be seen by other students
                         <InvitedStudentRow
                             courseID={course.ID}
-                            {...{ email: student.email, isCourseActive, isXsScreen }}
+                            {...{ email: rowData.email, isCourseActive, isXsScreen, access }}
                         />
                     }
                     <Divider />

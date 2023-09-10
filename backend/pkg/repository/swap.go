@@ -158,7 +158,7 @@ func (fr *FirebaseRepository) CreateSwap(req *models.CreateSwapRequest) (swap *m
 		Status:       models.STATUS_PENDING,
 	}
 
-	if req.Course.AutoApproveRequests {
+	if req.Course.Config.AutoApproveRequests {
 		// check the availability of the new section
 		section, err := fr.GetSectionByID(req.Course.ID, req.NewSectionID)
 		if err != nil {

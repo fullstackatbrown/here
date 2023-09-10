@@ -1,19 +1,18 @@
 import CourseActions from "@components/settings/CourseListItem/CourseActions";
 import AccessList from "@components/shared/AccessList/AccessList";
 import CourseStatusChip from "@components/shared/CourseStatusChip/CourseStatusChip";
-import { useSnackbar } from "@components/shared/Snackbar/SnackbarProvider";
+import ViewHeader from "@components/shared/ViewHeader/ViewHeader";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Box, Button, CircularProgress, FormControlLabel, Stack, Switch, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Switch, Typography } from "@mui/material";
 import { handleBadRequestError } from "@util/errors";
 import { useCourseInvites } from "api/auth/hooks";
 import CourseAPI from "api/course/api";
 import { useCourseStaff } from "api/course/hooks";
 import ClipboardJS from 'clipboard';
-import { Course, CourseStatus } from "model/course";
+import { Course, CourseConfig, CourseStatus } from "model/course";
 import { CoursePermission } from "model/user";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
-import AdminViewHeader from "../AdminViewHeader";
 
 export interface SettingsViewProps {
     course: Course;
@@ -37,8 +36,8 @@ export default function SettingsView({ course }: SettingsViewProps) {
         }
     }, [course.entryCode]);
 
-    const changeAutoApproveRequests = (autoApprove: boolean) => {
-        toast.promise(CourseAPI.updateCourse(course.ID, undefined, autoApprove),
+    const changeCourseConfig = (config: CourseConfig) => {
+        toast.promise(CourseAPI.updateCourse(course.ID, undefined, config),
             {
                 loading: "Updating course...",
                 success: "Course updated!",
@@ -49,11 +48,11 @@ export default function SettingsView({ course }: SettingsViewProps) {
 
     return (
         <>
-            <AdminViewHeader view="settings" access={CoursePermission.CourseAdmin} />
+            <ViewHeader course={course} view="settings" access={CoursePermission.CourseAdmin} />
             <Stack direction="column" spacing={4} my={2}>
                 <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    alignItems={{ xs: "start", md: "center" }}
+                    direction="row"
+                    alignItems="center"
                     justifyContent="space-between"
                     spacing={2}
                 >
@@ -87,12 +86,12 @@ export default function SettingsView({ course }: SettingsViewProps) {
                 </Stack>
 
                 <Stack
-                    direction={{ xs: "column", md: "row" }}
+                    direction="row"
                     alignItems={{ xs: "start", md: "center" }}
                     justifyContent="space-between"
                     spacing={2}
                 >
-                    <Stack direction="column" maxWidth={{ md: "70%" }} spacing={0.5}>
+                    <Stack direction="column" maxWidth={{ md: "70%", xs: "85%" }} spacing={0.5}>
                         <Typography fontWeight={500} whiteSpace="pre">
                             Auto-Approve Swap Requests
                         </Typography>
@@ -100,17 +99,36 @@ export default function SettingsView({ course }: SettingsViewProps) {
                             If this feature is turned on, swap requests will be automatically approved if the capacity is not reached.
                         </Typography>
                     </Stack>
-                    <FormControlLabel
-                        control={<Switch
-                            disabled={!isCourseActive}
-                            checked={course.autoApproveRequests}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                changeAutoApproveRequests(event.target.checked);
-                            }}
-                        />}
-                        label={course.autoApproveRequests ? "On" : "Off"}
+                    <Switch
+                        disabled={!isCourseActive}
+                        checked={course.config.autoApproveRequests}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            changeCourseConfig({ ...course.config, autoApproveRequests: event.target.checked });
+                        }}
                     />
 
+                </Stack>
+                <Stack
+                    direction="row"
+                    alignItems={{ xs: "start", md: "center" }}
+                    justifyContent="space-between"
+                    spacing={2}
+                >
+                    <Stack direction="column" maxWidth={{ md: "70%", xs: "85%" }} spacing={0.5}>
+                        <Typography fontWeight={500}>
+                            Share People List With Students
+                        </Typography>
+                        <Typography>
+                            If this feature is turned on, students will be able to see the list of other students enrolled in the course and their sections.
+                        </Typography>
+                    </Stack>
+                    <Switch
+                        disabled={!isCourseActive}
+                        checked={course.config.sharePeopleListWithStudents}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            changeCourseConfig({ ...course.config, sharePeopleListWithStudents: event.target.checked });
+                        }}
+                    />
                 </Stack>
 
                 <Stack direction="column" spacing={1.5}>

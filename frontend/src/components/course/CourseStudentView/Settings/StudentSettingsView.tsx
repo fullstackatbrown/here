@@ -1,13 +1,14 @@
 import { Button } from "@mui/material";
 import { Course } from "model/course";
 import { FC } from "react";
-import StudentViewHeader from "../StudentViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AuthAPI from "api/auth/api";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { handleBadRequestError } from "@util/errors";
 import { useDialog } from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
+import { CoursePermission } from "model/user";
 
 export interface StudentSettingsViewProps {
     course: Course;
@@ -35,7 +36,7 @@ const StudentSettingsView: FC<StudentSettingsViewProps> = ({ course }) => {
 
     return (
         <>
-            <StudentViewHeader view="settings" />
+            <ViewHeader course={course} view="settings" access={CoursePermission.CourseStudent} />
             <Button
                 variant="outlined"
                 startIcon={<ExitToAppIcon />}

@@ -1,5 +1,5 @@
 import APIClient from "api/APIClient";
-import { createCourseAndPermissionsRequest } from "model/course";
+import { CourseConfig, createCourseAndPermissionsRequest } from "model/course";
 import { CoursePermission } from "model/user";
 
 async function deleteCourse(courseID: string): Promise<boolean> {
@@ -28,10 +28,10 @@ async function createCourse(
 async function updateCourse(
   courseID: string,
   title?: string,
-  autoApproveRequests?: boolean,
+  config?: CourseConfig,
   status?: string,
 ): Promise<string> {
-  return APIClient.patch(`/courses/${courseID}`, { title, autoApproveRequests, status });
+  return APIClient.patch(`/courses/${courseID}`, { title, config, status });
 }
 
 async function updateCourseInfo(

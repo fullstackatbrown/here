@@ -8,6 +8,7 @@ interface SelectMenuProps {
     onSelect: (value: string) => void;
     formatOption: (value: string) => string;
     defaultValue?: string; // if this is set, the button will be colored differently if the value is the default
+    startIcon?: JSX.Element;
 }
 
 const StyledMenu = styled((props: MenuProps) => {
@@ -47,7 +48,7 @@ const StyledMenu = styled((props: MenuProps) => {
     },
 }));
 
-const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOption, defaultValue }) => {
+const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOption, defaultValue, startIcon }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const theme = useTheme();
@@ -63,6 +64,7 @@ const SelectMenu: FC<SelectMenuProps> = ({ value, options, onSelect, formatOptio
             variant="text"
             disableElevation
             onClick={handleClick}
+            startIcon={startIcon}
             endIcon={<KeyboardArrowDownIcon sx={{ ml: -.5 }} />}
             color={defaultValue !== undefined && value === defaultValue ? "secondary" : "primary"}
             sx={{

@@ -3,9 +3,9 @@ import { Assignment } from "model/assignment";
 import { Course, CourseStatus } from "model/course";
 import { Section } from "model/section";
 import { Swap } from "model/swap";
-import { User } from "model/user";
+import { CoursePermission, User } from "model/user";
 import { FC, useState } from "react";
-import StudentViewHeader from "../StudentViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import StudentRequestsList from "./StudentRequestsList";
 import SwapRequestDialog from "./SwapRequestDialog";
 
@@ -30,7 +30,8 @@ const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, 
                     onClose={() => { setSwapRequestDialog(false) }}
                     {...{ course, assignmentsMap, student, sectionsMap }}
                 />}
-            <StudentViewHeader
+            <ViewHeader
+                course={course}
                 view="my requests"
                 // button doesnt show on mobile if requests are not allowed
                 endElement={!(isXsScreen && !allowRequests) &&
@@ -50,6 +51,7 @@ const StudentsRequestsView: FC<StudentsRequestsViewProps> = ({ course, student, 
                         </span>
                     </Tooltip >
                 }
+                access={CoursePermission.CourseStudent}
             />
             < StudentRequestsList {...{ course, sectionsMap, student, requests, assignmentsMap }} />
         </>

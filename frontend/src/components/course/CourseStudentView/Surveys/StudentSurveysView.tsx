@@ -1,9 +1,9 @@
 import { Stack, Typography } from "@mui/material";
 import { Course } from "model/course";
 import { Survey } from "model/survey";
-import { User } from "model/user";
+import { CoursePermission, User } from "model/user";
 import { FC, useMemo } from "react";
-import StudentViewHeader from "../StudentViewHeader";
+import ViewHeader from "../../../shared/ViewHeader/ViewHeader";
 import StudentSurveyCard from "./StudentSurveyCard";
 
 export interface StudentSurveysViewProps {
@@ -21,7 +21,7 @@ const StudentSurveysView: FC<StudentSurveysViewProps> = ({ course, surveys, stud
 
     return (
         <>
-            <StudentViewHeader view="surveys" />
+            <ViewHeader course={course} view="surveys" access={CoursePermission.CourseStudent} />
             <Stack direction="column" minHeight={60}>
                 {surveys?.length === 0 &&
                     <Typography variant="body1" mt={1}>The instructor has not published any survey</Typography>

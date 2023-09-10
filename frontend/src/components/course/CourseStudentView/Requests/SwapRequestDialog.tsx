@@ -118,7 +118,7 @@ const SwapRequestDialog: FC<SwapRequestDialogProps> = ({ open, onClose, course, 
         <form onSubmit={onSubmit}>
             <DialogTitle>Request Swap</DialogTitle>
             <DialogContent>
-                {course.autoApproveRequests ?
+                {course.config.autoApproveRequests ?
                     <Typography variant="body1" mb={2}>
                         Swaps are automatically accepted if the requested section has availability,&nbsp;
                         otherwise a staff member will handle the request manually.

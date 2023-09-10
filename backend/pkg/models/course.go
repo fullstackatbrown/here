@@ -18,15 +18,15 @@ var CourseFieldsToExclude = []string{
 }
 
 type Course struct {
-	ID                  string                      `firestore:"id,omitempty"`
-	Title               string                      `firestore:"title"`
-	Code                string                      `firestore:"code"`
-	Term                string                      `firestore:"term"`
-	EntryCode           string                      `firestore:"entryCode"`
-	Status              CourseStatus                `firestore:"status"`
-	AutoApproveRequests bool                        `firestore:"autoApproveRequests"`
-	Students            map[string]CourseUserData   `firestore:"students"`    // map from userID to student data
-	Permissions         map[string]CoursePermission `firestore:"permissions"` // map from userID to permission
+	ID          string                      `firestore:"id,omitempty"`
+	Title       string                      `firestore:"title"`
+	Code        string                      `firestore:"code"`
+	Term        string                      `firestore:"term"`
+	EntryCode   string                      `firestore:"entryCode"`
+	Status      CourseStatus                `firestore:"status"`
+	Config      CourseConfig                `firestore:"config"`
+	Students    map[string]CourseUserData   `firestore:"students"`    // map from userID to student data
+	Permissions map[string]CoursePermission `firestore:"permissions"` // map from userID to permission
 
 	SectionsLock               sync.RWMutex        `firestore:"-"`
 	Sections                   map[string]*Section `firestore:"-"`
@@ -60,6 +60,11 @@ type CourseUserData struct {
 	DefaultSection string `firestore:"defaultSection,omitempty"`
 }
 
+type CourseConfig struct {
+	AutoApproveRequests         bool `firestore:"autoApproveRequests"`
+	SharePeopleListWithStudents bool `firestore:"sharePeopleListWithStudents"`
+}
+
 type GetCourseRequest struct {
 	CourseID string `json:"courseid"`
 }
@@ -79,6 +84,7 @@ type UpdateCourseRequest struct {
 	Title               *string       `json:"title,omitempty"`
 	Status              *CourseStatus `json:"status"`
 	AutoApproveRequests *bool         `json:"autoApproveRequests,omitempty"`
+	Config              *CourseConfig `json:"config,omitempty"`
 }
 
 type UpdateCourseInfoRequest struct {
