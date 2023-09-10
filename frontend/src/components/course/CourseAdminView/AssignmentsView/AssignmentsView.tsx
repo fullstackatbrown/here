@@ -12,6 +12,7 @@ import { FC, useState } from "react";
 import AssignmentCard from "./AssignmentCard";
 import CreateEditAssignmentDialog from "./CreateEditAssignmentDialog";
 import GradingView from "./Grading/GradingView";
+import toast from "react-hot-toast";
 
 export interface AssignmentsViewProps {
   course: Course;
@@ -44,6 +45,14 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
     );
   }
 
+  const handleExportGrade = () => {
+    if (!course.students || Object.keys(course.students).length === 0) {
+      toast.error("Cannot export grades: no students in this course")
+      return
+    }
+    exportGrades(course, assignments)
+  }
+
   return (
     <>
       <CreateEditAssignmentDialog
@@ -62,7 +71,7 @@ const AssignmentsView: FC<AssignmentsViewProps> = ({ course, access, sectionsMap
             <Button disabled={course.status === CourseStatus.CourseArchived} onClick={() => setCreateAssignmentDialog(true)}>
               + New
             </Button>
-            <MoreMenu keys={["Export Grades"]} handlers={[() => { exportGrades(course, assignments) }]} />
+            <MoreMenu keys={["Export Grades"]} handlers={[handleExportGrade]} />
           </Stack>
         )}
       />

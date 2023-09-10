@@ -16,6 +16,7 @@ import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
 import PeopleTableForStudents from "./PeopleTable/PeopleTableForStudents";
+import toast from "react-hot-toast";
 
 export interface PeopleViewProps {
   course: Course;
@@ -63,6 +64,10 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   }
 
   const handleExportStudentList = () => {
+    if (!course.students || Object.keys(course.students).length === 0) {
+      toast.error("Cannot export student list: no students in this course")
+      return
+    }
     exportStudentList(course, sectionsMap, invitedStudents)
   }
 
