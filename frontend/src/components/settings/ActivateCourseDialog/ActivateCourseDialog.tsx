@@ -27,7 +27,7 @@ const ActivateCourseDialog: FC<ActivateCourseDialogProps> = ({ course, open, onC
         code: course.code,
         title: course.title,
         term: course.term,
-        autoApproveRequests: course.config.sharePeopleListWithStudents,
+        autoApproveRequests: course.config.autoApproveRequests,
         sharePeopleListWithStudents: course.config.sharePeopleListWithStudents,
         status: CourseStatus.CourseActive
     }
