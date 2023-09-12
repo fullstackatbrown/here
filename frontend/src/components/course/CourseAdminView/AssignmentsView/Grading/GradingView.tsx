@@ -136,7 +136,9 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                     >
                         {assignment.name}
                     </Typography>
-                    <MyChip label="optional" variant="outlined" color="primary" style={{ marginLeft: 6 }} size="medium" />
+                    {assignment.optional &&
+                        <MyChip label="optional" variant="outlined" color="primary" style={{ marginLeft: 6 }} size="medium" />
+                    }
                 </Stack>
                 <Stack direction="row" display="flex" alignItems="center" spacing={1}>
                     <SelectMenu
