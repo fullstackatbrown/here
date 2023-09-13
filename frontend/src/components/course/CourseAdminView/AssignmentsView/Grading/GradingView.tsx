@@ -44,7 +44,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editingGradeFor, setEditingGradeFor] = useState<string | null>(null) // user for which the grade is edited
 
-    const rowsPerPage = 1;
+    const rowsPerPage = 10;
     const [page, setPage] = useState(0);
     const [currentStudentsDisplayed, setCurrentStudentsDisplayed] = useState<CourseUserData[]>([])
     const [searchQuery, setSearchQuery] = useState<string>("")
