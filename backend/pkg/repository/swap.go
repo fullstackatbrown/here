@@ -311,6 +311,7 @@ func (fr *FirebaseRepository) CancelSwap(courseID string, swapID string) error {
 	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
 		models.FirestoreSwapsCollection).Doc(swapID).Update(firebase.Context, []firestore.Update{
 		{Path: "status", Value: models.STATUS_CANCELLED},
+		{Path: "handledTime", Value: time.Now()},
 	})
 	return err
 }
