@@ -153,8 +153,14 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
 
             </Stack >
             {
+                // there are three scenarios in which no students are displayed:
+                // 1. the user is searching for a student that does not exist
+                // 2. the user is filtering by section and no students joined that section yet
+                // 3. no students joined the course yet
                 currentStudentsDisplayed.length === 0 ?
-                    <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
+                    searchQuery !== "" ? <Typography mt={3} textAlign="center">No students matches your search.</Typography> :
+                        filterBySection === ALL_STUDENTS ? <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> : 
+                            <Typography mt={3} textAlign="center">No students have joined this section yet.</Typography> :
                     (<Table>
                         {!isXsScreen &&
                             <colgroup>
@@ -172,6 +178,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                         <ClickAwayListener onClickAway={() => setEditingGradeFor(null)}>
                             <TableBody>
                                 {currentStudentsDisplayed
+                                    // only paginate when the number of students displayed is greater than the number of rows per page
                                     .slice(currentStudentsDisplayed.length > rowsPerPage ? page * rowsPerPage : 0, currentStudentsDisplayed.length > rowsPerPage ? page * rowsPerPage + rowsPerPage : currentStudentsDisplayed.length)
                                     .map((student) => {
                                         const userID = student.studentID
