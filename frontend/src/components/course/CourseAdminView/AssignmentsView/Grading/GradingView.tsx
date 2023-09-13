@@ -17,7 +17,6 @@ import { CoursePermission } from 'model/user';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/Menu/SelectMenu';
-import ViewHeaderContent from '../../../../shared/ViewHeader/ViewHeaderContent';
 import ViewHeader from '@components/shared/ViewHeader/ViewHeader';
 
 interface GradingViewProps {
