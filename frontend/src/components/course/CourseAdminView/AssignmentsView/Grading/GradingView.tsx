@@ -44,7 +44,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
     const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
     const [editingGradeFor, setEditingGradeFor] = useState<string | null>(null) // user for which the grade is edited
 
-    const rowsPerPage = 10;
+    const rowsPerPage = 1;
     const [page, setPage] = useState(0);
     const [currentStudentsDisplayed, setCurrentStudentsDisplayed] = useState<CourseUserData[]>([])
     const [searchQuery, setSearchQuery] = useState<string>("")
@@ -172,7 +172,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                         <ClickAwayListener onClickAway={() => setEditingGradeFor(null)}>
                             <TableBody>
                                 {currentStudentsDisplayed
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .slice(currentStudentsDisplayed.length > rowsPerPage ? page * rowsPerPage : 0, currentStudentsDisplayed.length > rowsPerPage ? page * rowsPerPage + rowsPerPage : currentStudentsDisplayed.length)
                                     .map((student) => {
                                         const userID = student.studentID
                                         const grade = userID in assignment.grades ? assignment.grades[userID] : undefined
