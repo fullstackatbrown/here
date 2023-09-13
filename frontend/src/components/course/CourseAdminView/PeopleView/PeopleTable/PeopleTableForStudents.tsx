@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, TableCell, TablePagination, Typography, useMediaQuery } from "@mui/material";
+import { Box, Divider, Grid, TablePagination, Typography, useMediaQuery } from "@mui/material";
 import { Theme, styled } from "@mui/material/styles";
 import formatSectionInfo from "@util/shared/section";
 import { sortByName } from "@util/shared/user";
