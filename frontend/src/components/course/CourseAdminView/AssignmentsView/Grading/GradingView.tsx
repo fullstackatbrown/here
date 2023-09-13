@@ -17,7 +17,6 @@ import { CoursePermission } from 'model/user';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/Menu/SelectMenu';
-import ViewHeaderContent from '../../../../shared/ViewHeader/ViewHeaderContent';
 import ViewHeader from '@components/shared/ViewHeader/ViewHeader';
 
 interface GradingViewProps {
@@ -171,8 +170,10 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                         </TableHead>
                         <ClickAwayListener onClickAway={() => setEditingGradeFor(null)}>
                             <TableBody>
-                                {currentStudentsDisplayed
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {(rowsPerPage > 0 && currentStudentsDisplayed.length > rowsPerPage
+                                    // only paginate when the number of students displayed is greater than the number of rows per page
+                                    ? currentStudentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    : currentStudentsDisplayed)
                                     .map((student) => {
                                         const userID = student.studentID
                                         const grade = userID in assignment.grades ? assignment.grades[userID] : undefined

@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, TableCell, TablePagination, Typography, useMediaQuery } from "@mui/material";
+import { Box, Divider, Grid, TablePagination, Typography, useMediaQuery } from "@mui/material";
 import { Theme, styled } from "@mui/material/styles";
 import formatSectionInfo from "@util/shared/section";
 import { sortByName } from "@util/shared/user";
@@ -48,7 +48,8 @@ const PeopleTableForStudents: FC<PeopleTableForStudentsProps> = ({ students, sec
                     <Divider />
                 </>
             }
-            {(rowsPerPage > 0
+            {(rowsPerPage > 0 && studentsDisplayed.length > rowsPerPage
+                // only paginate when the number of students displayed is greater than the number of rows per page
                 ? studentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : studentsDisplayed
             ).map((s) =>
