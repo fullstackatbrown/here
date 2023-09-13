@@ -26,7 +26,7 @@ const TableHeader = styled(Typography)(({ theme }) => ({
 
 const PeopleTableForStudents: FC<PeopleTableForStudentsProps> = ({ students, sectionsMap, currentUser }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
-    const rowsPerPage = isXsScreen ? -1 : 8;
+    const rowsPerPage = isXsScreen ? -1 : 1;
     const [page, setPage] = useState(0);
 
     const studentsDisplayed = useMemo(() => {
@@ -48,7 +48,8 @@ const PeopleTableForStudents: FC<PeopleTableForStudentsProps> = ({ students, sec
                     <Divider />
                 </>
             }
-            {(rowsPerPage > 0
+            {(rowsPerPage > 0 && studentsDisplayed.length > rowsPerPage
+                // only paginate when the number of students displayed is greater than the number of rows per page
                 ? studentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : studentsDisplayed
             ).map((s) =>
