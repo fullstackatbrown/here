@@ -158,7 +158,7 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                 // 3. no students joined the course yet
                 currentStudentsDisplayed.length === 0 ?
                     searchQuery !== "" ? <Typography mt={3} textAlign="center">No students matches your search.</Typography> :
-                        filterBySection === ALL_STUDENTS ? <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> : 
+                        filterBySection === ALL_STUDENTS ? <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
                             <Typography mt={3} textAlign="center">No students have joined this section yet.</Typography> :
                     (<Table>
                         {!isXsScreen &&
@@ -176,9 +176,10 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                         </TableHead>
                         <ClickAwayListener onClickAway={() => setEditingGradeFor(null)}>
                             <TableBody>
-                                {currentStudentsDisplayed
+                                {(rowsPerPage > 0 && currentStudentsDisplayed.length > rowsPerPage
                                     // only paginate when the number of students displayed is greater than the number of rows per page
-                                    .slice(currentStudentsDisplayed.length > rowsPerPage ? page * rowsPerPage : 0, currentStudentsDisplayed.length > rowsPerPage ? page * rowsPerPage + rowsPerPage : currentStudentsDisplayed.length)
+                                    ? currentStudentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    : currentStudentsDisplayed)
                                     .map((student) => {
                                         const userID = student.studentID
                                         const grade = userID in assignment.grades ? assignment.grades[userID] : undefined

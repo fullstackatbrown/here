@@ -78,6 +78,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                 </>
             }
             {(rowsPerPage > 0 && studentsDisplayed.length > rowsPerPage
+                // only paginate when the number of students displayed is greater than the number of rows per page
                 ? studentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : studentsDisplayed
             ).map((rowData) =>
