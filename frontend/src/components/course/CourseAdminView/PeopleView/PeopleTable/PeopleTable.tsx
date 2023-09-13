@@ -77,7 +77,7 @@ const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sect
                     <Divider />
                 </>
             }
-            {(rowsPerPage > 0
+            {(rowsPerPage > 0 && studentsDisplayed.length > rowsPerPage
                 ? studentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : studentsDisplayed
             ).map((rowData) =>
