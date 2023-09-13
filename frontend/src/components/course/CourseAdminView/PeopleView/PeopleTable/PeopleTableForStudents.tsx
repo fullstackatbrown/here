@@ -26,7 +26,7 @@ const TableHeader = styled(Typography)(({ theme }) => ({
 
 const PeopleTableForStudents: FC<PeopleTableForStudentsProps> = ({ students, sectionsMap, currentUser }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
-    const rowsPerPage = isXsScreen ? -1 : 1;
+    const rowsPerPage = isXsScreen ? -1 : 8;
     const [page, setPage] = useState(0);
 
     const studentsDisplayed = useMemo(() => {
