@@ -24,8 +24,8 @@ In the `backend/` folder, there should be a `.env` secret file with contents sim
 ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 # Allowed email domains for user accounts
 ALLOWED_EMAIL_DOMAINS=brown.edu,gmail.com
-# Whether the backend is served over HTTPS
-IS_HTTPS=false
+# Whether cross-site cookies are allowed
+IS_COOKIE_CROSS_SITE=false
 # The port the backend is listening from
 SERVER_PORT=8080
 # The Firebase config JSON string
@@ -52,9 +52,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 
 You will need to install the GitHub Codespaces VSCode extension (Extension ID: GitHub.codespaces).
 
-Then follow this demo to setup a codespace. The codespace comes with all the secrets out-of-the-box.
-
-https://github.com/fullstackatbrown/here/assets/46831725/b2c9f088-6086-4973-b0ae-752679624678
+A newly created codespace works out-of-the-box. It will contain all the secrets and environment variables needed for local development. The backend is configured to listen on localhost port 8000 and the frontend will start on localhost port 3000.
 
 ### Devcontainer
 
