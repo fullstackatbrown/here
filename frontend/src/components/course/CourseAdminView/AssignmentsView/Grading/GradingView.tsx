@@ -71,7 +71,8 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
         let students = studentIDs.map((studentID) => course.students[studentID]).filter(s => s !== undefined)
         students = filterStudentsBySearchQuery(students, searchQuery)
         setCurrentStudentsDisplayed(sortByName(students) as CourseUserData[])
-    }, [filterBySection, page, course.students, assignment.ID, sectionsMap, searchQuery])
+        setPage(0)
+    }, [filterBySection, course.students, assignment.ID, sectionsMap, searchQuery])
 
     const handleSubmitGrade = (userID: string) => {
         return (grade: number) => {
