@@ -12,6 +12,8 @@ export interface PeopleTableForStudentsProps {
     students: CourseUserData[];
     sectionsMap: Record<string, Section>;
     currentUser?: User;
+    page: number;
+    setPage: (page: number) => void;
 }
 
 const GridItem = styled(Grid)(({ theme }) => ({
@@ -24,10 +26,9 @@ const TableHeader = styled(Typography)(({ theme }) => ({
     fontSize: 14
 }))
 
-const PeopleTableForStudents: FC<PeopleTableForStudentsProps> = ({ students, sectionsMap, currentUser }) => {
+const PeopleTableForStudents: FC<PeopleTableForStudentsProps> = ({ students, sectionsMap, currentUser, page, setPage }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const rowsPerPage = isXsScreen ? -1 : 8;
-    const [page, setPage] = useState(0);
 
     const studentsDisplayed = useMemo(() => {
         return sortByName(students) as CourseUserData[]

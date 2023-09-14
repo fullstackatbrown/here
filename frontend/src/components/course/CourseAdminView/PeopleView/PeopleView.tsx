@@ -11,7 +11,7 @@ import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission, User } from "model/user";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
@@ -32,6 +32,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
+  const [page, setPage] = useState(0);
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
@@ -75,6 +76,10 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     return (!course.students || Object.keys(course.students).length === 0) && (invitedStudents.length === 0)
   }
 
+  useEffect(() => {
+    setPage(0)
+  }, [filterBySection, searchQuery])
+
   return (
     <>
       <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
@@ -103,15 +108,14 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
 
         (access === CoursePermission.CourseStudent ?
           <PeopleTableForStudents
-            {...{ course, sectionsMap }}
+            {...{ course, sectionsMap, page, setPage }}
             students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
             currentUser={student}
           /> :
           <PeopleTable
-            {...{ course, assignments, sectionsMap }}
+            {...{ course, assignments, sectionsMap, page, setPage, access }}
             students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
             invitedStudents={(filterBySection === UNASSIGNED || filterBySection === ALL_STUDENTS) ? invitedStudents : []}
-            access={access}
           />
 
         )
