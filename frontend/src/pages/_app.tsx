@@ -17,6 +17,14 @@ import { useSession, AuthProvider } from "api/auth/hooks";
 import { ThemeMode, ThemeModeProvider } from "@util/mui/useThemeMode";
 import DialogProvider from "@components/shared/ConfirmDialog/ConfirmDialogProvider";
 import SnackbarProvider from "@components/shared/Snackbar/SnackbarProvider";
+import LogRocket from 'logrocket';
+
+LogRocket.init(process.env.NEXT_PUBLIC_LOGROCKET_APP_ID, {
+    dom: {
+        textSanitizer: true,
+        inputSanitizer: true,
+      },
+});
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
