@@ -160,7 +160,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 <Grid item xs={12} md={9.4} display="flex" justifyContent="center">
                     {hasResults &&
                         (survey.sectionCapacity ?
-                            <AllocatedSectionsTable sectionsMap={sectionsMap} results={survey.results} /> :
+                            <AllocatedSectionsTable sectionsMap={sectionsMap} sectionCapacity={survey.sectionCapacity} results={survey.results} /> :
                             <SurveyResultsTable options={survey.options} results={survey.results} />
                         )
                     }

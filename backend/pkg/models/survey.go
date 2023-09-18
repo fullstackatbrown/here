@@ -14,6 +14,7 @@ type Survey struct {
 	Options         []*SurveyOption             `firestore:"options"`
 	Responses       map[string][]string         `firestore:"responses"`
 	Results         map[string][]CourseUserData `firestore:"results"`
+	// Map from the option to a map from sectionID to capacity
 	SectionCapacity map[string]map[string]int   `firestore:"sectionCapacity,omitempty"`
 }
 

@@ -23,6 +23,7 @@ import { Section } from 'model/section';
 import React, { FC, useMemo, useState } from "react";
 
 export interface AllocatedSectionsTableProps {
+    sectionCapacity: Record<string, Record<string, number>>;
     results: Record<string, CourseUserData[]>;
     sectionsMap: Record<string, Section>;
 }
@@ -40,7 +41,7 @@ const TableCell = styled(MuiTableCell)<StyledTableCellProps>(({ theme, open }) =
 }))
 
 
-const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sectionsMap }) => {
+const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sectionsMap, sectionCapacity }) => {
     const [selectedSection, setSelectedSection] = useState<string>(undefined); // sectionID
 
     const toggleOpen = (sectionID: string) => {
@@ -53,6 +54,17 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
 
     const sectionIDs = useMemo(() => arrayUnion(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap])
     const sectionsChanged = useMemo(() => !arraysEqual(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap])
+    // a map from sectionID to the current capacity of each section
+    const currentCapacityMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        for (const [_, sectionCapacityMap] of Object.entries(sectionCapacity)) {
+            for (const [sectionID, capacity] of Object.entries(sectionCapacityMap)) {
+                map[sectionID] = capacity;
+            }
+        }
+        return map;
+    }, [sectionCapacity])
+
 
     return <Stack width="100%">
         {sectionsChanged &&
@@ -64,15 +76,15 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
         <Table>
             <colgroup>
                 <col style={{ width: "43%" }} />
-                <col style={{ width: "32%" }} />
-                <col style={{ width: "17%" }} />
+                <col style={{ width: "28%" }} />
+                <col style={{ width: "21%" }} />
                 <col style={{ width: "8%" }} />
             </colgroup>
             <TableHead>
                 <TableRow>
                     <TableCell>Section Time</TableCell>
                     <TableCell>Location</TableCell>
-                    <TableCell align="center">Capacity</TableCell>
+                    <TableCell align="center">Current Capacity</TableCell>
                     <TableCell />
                 </TableRow>
             </TableHead>
@@ -83,6 +95,14 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
                     const students = results?.[sectionID] || [];
                     const numStudents = students.length;
                     const open = selectedSection === sectionID;
+
+                    let capacity = undefined;
+                    if (sectionID in currentCapacityMap) {
+                        capacity = currentCapacityMap[sectionID];
+                    } else if (section) {
+                        capacity = section.capacity - section.numEnrolled;
+                    }
+
                     return <React.Fragment key={sectionID}>
                         <TableRow
                             hover={numStudents > 0}
@@ -102,7 +122,7 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
                                 {section ? (section.location ? section.location : "TBD") : "/"}
                             </TableCell>
                             <TableCell sx={{ color: numStudents > section?.capacity ? red[500] : "default" }} align="center" open={open}>
-                                {numStudents} / {section?.capacity || "?"}
+                                {section ? `${numStudents} / ${capacity}` : "/"}
                             </TableCell>
                             <TableCell open={open}>
                                 <Stack direction="row" spacing={0.8} display="flex" alignItems="center" justifyContent="flex-end">

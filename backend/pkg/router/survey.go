@@ -147,6 +147,12 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 	courseID := chi.URLParam(r, "courseID")
 	surveyID := chi.URLParam(r, "surveyID")
 
+	course, err := repo.Repository.GetCourseByID(courseID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	survey, err := repo.Repository.GetSurveyByID(courseID, surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -157,7 +163,7 @@ func generateResultsHandler(w http.ResponseWriter, r *http.Request) {
 	capacity := survey.SectionCapacity
 
 	if survey.SectionCapacity != nil {
-		options, capacity, err = repo.Repository.UpdateSurveyOptions(courseID, survey)
+		options, capacity, err = repo.Repository.UpdateSurveyOptions(course, survey)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
