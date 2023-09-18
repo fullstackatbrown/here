@@ -116,11 +116,12 @@ func GetAssignedSections(results map[string][]string, capacity map[string]map[st
 			}
 
 			// use round robin to assign the remaining students
-			for i := 0; i < allocatedStudentAmount-totalAssigned; i++ {
-				for sectionID := range sections {
-					finalResults[sectionID] = append(finalResults[sectionID], results[time][studentIndex])
-					studentIndex += 1
+			for sectionID := range sections {
+				if studentIndex >= allocatedStudentAmount {
+					break
 				}
+				finalResults[sectionID] = append(finalResults[sectionID], results[time][studentIndex])
+				studentIndex++
 			}
 		}
 	}
