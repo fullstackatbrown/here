@@ -101,15 +101,26 @@ func GetAssignedSections(results map[string][]string, capacity map[string]map[st
 				totalCapacity += sectionCapacity
 			}
 
+			totalAssigned := 0
 			sectionToEnrollment := make(map[string]int)
 			for sectionID, sectionCapacity := range sections {
-				sectionToEnrollment[sectionID] = int(math.Floor(float64(allocatedStudentAmount) * float64(sectionCapacity) / float64(totalCapacity)))
+				enrollmentAmt := int(math.Floor(float64(allocatedStudentAmount) * float64(sectionCapacity) / float64(totalCapacity)))
+				totalAssigned += enrollmentAmt
+				sectionToEnrollment[sectionID] = enrollmentAmt
 			}
 
-			runningSum := 0
+			studentIndex := 0
 			for sectionID, enrollmentAmt := range sectionToEnrollment {
-				finalResults[sectionID] = results[time][runningSum : runningSum+enrollmentAmt]
-				runningSum += enrollmentAmt
+				finalResults[sectionID] = results[time][studentIndex : studentIndex+enrollmentAmt]
+				studentIndex += enrollmentAmt
+			}
+
+			// use round robin to assign the remaining students
+			for i := 0; i < allocatedStudentAmount-totalAssigned; i++ {
+				for sectionID := range sections {
+					finalResults[sectionID] = append(finalResults[sectionID], results[time][studentIndex])
+					studentIndex += 1
+				}
 			}
 		}
 	}
