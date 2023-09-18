@@ -56,14 +56,12 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
     const sectionsChanged = useMemo(() => !arraysEqual(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap])
     // a map from sectionID to the current capacity of each section
     const currentCapacityMap = useMemo(() => {
-        console.log(sectionCapacity)
         const map: Record<string, number> = {};
         for (const [_, sectionCapacityMap] of Object.entries(sectionCapacity)) {
             for (const [sectionID, capacity] of Object.entries(sectionCapacityMap)) {
                 map[sectionID] = capacity;
             }
         }
-        console.log(map)
         return map;
     }, [sectionCapacity])
 
