@@ -101,12 +101,9 @@ func GetAssignedSections(results map[string][]string, capacity map[string]map[st
 				totalCapacity += sectionCapacity
 			}
 
-			totalAssigned := 0
 			sectionToEnrollment := make(map[string]int)
 			for sectionID, sectionCapacity := range sections {
-				enrollmentAmt := int(math.Floor(float64(allocatedStudentAmount) * float64(sectionCapacity) / float64(totalCapacity)))
-				totalAssigned += enrollmentAmt
-				sectionToEnrollment[sectionID] = enrollmentAmt
+				sectionToEnrollment[sectionID] = int(math.Floor(float64(allocatedStudentAmount) * float64(sectionCapacity) / float64(totalCapacity)))
 			}
 
 			studentIndex := 0
