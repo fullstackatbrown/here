@@ -90,7 +90,7 @@ func (u *User) Accesses() []pal.Locator {
 }
 
 func (u *User) GetData(mode pal.GetDataMode) string {
-	return ""
+	return "user: "
 }
 
 func (p *Profile) Owns() []pal.Locator {
@@ -102,5 +102,5 @@ func (p *Profile) Accesses() []pal.Locator {
 }
 
 func (p *Profile) GetData(mode pal.GetDataMode) string {
-	return p.DisplayName
+	return fmt.Sprintf("display name: %s", p.DisplayName)
 }
