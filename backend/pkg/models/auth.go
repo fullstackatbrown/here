@@ -1,6 +1,11 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/fullstackatbrown/here/pkg/firebase"
+	pal "github.com/tianrendong/privacy-pal"
+)
 
 const (
 	FirestoreProfilesCollection = "user_profiles"
@@ -71,4 +76,42 @@ type QuitCourseRequest struct {
 type EditAdminAccessRequest struct {
 	Email   string `json:"email"`
 	IsAdmin bool   `json:"isAdmin"`
+}
+
+func (u *User) Owns() []pal.Locator {
+	return []pal.Locator{{
+		ID:         "45UwrbxU9caxNqI5caWdxPYJ8pO2",
+		Collection: FirestoreProfilesCollection,
+		Document:   &Profile{},
+	}}
+}
+
+func (u *User) Accesses() []pal.Locator {
+	return []pal.Locator{}
+}
+
+func (u *User) GetData(mode pal.GetDataMode) string {
+	return ""
+}
+
+func (p *Profile) Owns() []pal.Locator {
+	return []pal.Locator{}
+}
+
+func (p *Profile) Accesses() []pal.Locator {
+	return []pal.Locator{}
+}
+
+func (p *Profile) GetData(mode pal.GetDataMode) string {
+	return p.DisplayName
+}
+
+func init() {
+	user := &User{}
+	firestoreClient, err := firebase.App.Firestore(firebase.Context)
+	if err != nil {
+		panic(err.Error())
+	}
+	f := pal.NewPrivacyPal(firestoreClient)
+	fmt.Println(f.ProcessAccessRequest(user))
 }
