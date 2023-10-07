@@ -10,6 +10,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 
 	"cloud.google.com/go/firestore"
+	pal "github.com/tianrendong/privacy-pal"
 )
 
 var Repository *FirebaseRepository
@@ -37,6 +38,8 @@ type FirebaseRepository struct {
 
 	profilesLock sync.RWMutex
 	profiles     map[string]*models.Profile
+
+	PrivacyPal *pal.PrivacyPal
 }
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {
@@ -64,6 +67,8 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 	for _, initFn := range initFns {
 		initFn()
 	}
+
+	fr.PrivacyPal = pal.NewPrivacyPal(fr.firestoreClient)
 
 	return fr, nil
 }

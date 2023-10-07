@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 
-	"github.com/fullstackatbrown/here/pkg/firebase"
 	pal "github.com/tianrendong/privacy-pal"
 )
 
@@ -80,7 +79,7 @@ type EditAdminAccessRequest struct {
 
 func (u *User) Owns() []pal.Locator {
 	return []pal.Locator{{
-		ID:         "45UwrbxU9caxNqI5caWdxPYJ8pO2",
+		ID:         u.Profile.ID,
 		Collection: FirestoreProfilesCollection,
 		Document:   &Profile{},
 	}}
@@ -104,14 +103,4 @@ func (p *Profile) Accesses() []pal.Locator {
 
 func (p *Profile) GetData(mode pal.GetDataMode) string {
 	return p.DisplayName
-}
-
-func init() {
-	user := &User{}
-	firestoreClient, err := firebase.App.Firestore(firebase.Context)
-	if err != nil {
-		panic(err.Error())
-	}
-	f := pal.NewPrivacyPal(firestoreClient)
-	fmt.Println(f.ProcessAccessRequest(user))
 }
