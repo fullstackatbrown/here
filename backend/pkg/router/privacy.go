@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/fullstackatbrown/here/pkg/middleware"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -11,16 +12,15 @@ import (
 func PrivacyRoutes() *chi.Mux {
 	router := chi.NewRouter()
 
+	router.Use(middleware.AuthCtx())
 	router.Get("/data", handleAccessRequest)
 	return router
 }
 
 func handleAccessRequest(w http.ResponseWriter, r *http.Request) {
-	userID := chi.URLParam(r, "userID")
-
-	user, err := repo.Repository.GetUserByID(userID)
+	user, err := middleware.GetUserFromRequest(r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
