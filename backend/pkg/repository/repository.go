@@ -39,7 +39,7 @@ type FirebaseRepository struct {
 	profilesLock sync.RWMutex
 	profiles     map[string]*models.Profile
 
-	PrivacyPal *pal.PrivacyPal
+	PrivacyPal *pal.Client
 }
 
 func NewFirebaseRepository() (*FirebaseRepository, error) {
@@ -68,7 +68,7 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 		initFn()
 	}
 
-	fr.PrivacyPal = pal.NewPrivacyPal(fr.firestoreClient)
+	fr.PrivacyPal = pal.NewClient(fr.firestoreClient)
 
 	return fr, nil
 }

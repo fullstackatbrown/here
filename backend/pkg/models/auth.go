@@ -77,30 +77,46 @@ type EditAdminAccessRequest struct {
 	IsAdmin bool   `json:"isAdmin"`
 }
 
-func (u *User) Owns() []pal.Locator {
-	return []pal.Locator{{
+func (u *User) GetOwnedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+	locators := make(map[string][]pal.Locator)
+	data := make(map[string]interface{})
+
+	locators["profile"] = []pal.Locator{{
 		ID:         u.Profile.ID,
 		Collection: FirestoreProfilesCollection,
-		Document:   &Profile{},
+		DataNode:   &Profile{},
 	}}
+
+	return locators, data
 }
 
-func (u *User) Accesses() []pal.Locator {
-	return []pal.Locator{}
+func (u *User) GetAccessedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+	locators := make(map[string][]pal.Locator)
+	data := make(map[string]interface{})
+	return locators, data
 }
 
-func (u *User) GetData(mode pal.GetDataMode) string {
-	return "user: "
+func (p *Profile) GetOwnedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+	locators := make(map[string][]pal.Locator)
+	data := make(map[string]interface{})
+
+	data["name"] = p.DisplayName
+	data["email"] = p.Email
+	data["photoUrl"] = p.PhotoURL
+	return locators, data
 }
 
-func (p *Profile) Owns() []pal.Locator {
-	return []pal.Locator{}
-}
+func (p *Profile) GetAccessedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+	locators := make(map[string][]pal.Locator)
 
-func (p *Profile) Accesses() []pal.Locator {
-	return []pal.Locator{}
-}
-
-func (p *Profile) GetData(mode pal.GetDataMode) string {
-	return fmt.Sprintf("display name: %s", p.DisplayName)
+	locators["courses"] = []pal.Locator{}
+	for _, courseID := range p.Courses {
+		locators["courses"] = append(locators["courses"], pal.Locator{
+			ID:         courseID,
+			Collection: FirestoreCoursesCollection,
+			DataNode:   &Course{},
+		})
+	}
+	data := make(map[string]interface{})
+	return locators, data
 }

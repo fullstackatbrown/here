@@ -24,5 +24,5 @@ func handleAccessRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, repo.Repository.PrivacyPal.ProcessAccessRequest(user))
+	render.JSON(w, r, repo.Repository.PrivacyPal.ProcessAccessRequest(user, user.ID))
 }

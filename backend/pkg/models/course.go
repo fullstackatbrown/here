@@ -3,6 +3,8 @@ package models
 import (
 	"strings"
 	"sync"
+
+	pal "github.com/tianrendong/privacy-pal"
 )
 
 const (
@@ -104,4 +106,21 @@ type AssignSectionsRequest struct {
 
 func CreateCourseID(req *CreateCourseRequest) string {
 	return strings.ToLower(req.Code + req.Term)
+}
+
+func (c *Course) GetOwnedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+	locators := make(map[string][]pal.Locator)
+	data := make(map[string]interface{})
+
+	data["course user data"] = c.Students[dataSubjectID]
+
+	return locators, data
+}
+
+func (c *Course) GetAccessedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+	locators := make(map[string][]pal.Locator)
+	data := make(map[string]interface{})
+
+	data["title"] = c.Title
+	return locators, data
 }
