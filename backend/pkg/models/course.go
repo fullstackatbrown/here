@@ -4,6 +4,7 @@ import (
 	"strings"
 	"sync"
 
+	"cloud.google.com/go/firestore"
 	pal "github.com/tianrendong/privacy-pal"
 )
 
@@ -108,19 +109,16 @@ func CreateCourseID(req *CreateCourseRequest) string {
 	return strings.ToLower(req.Code + req.Term)
 }
 
-func (c *Course) GetOwnedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+func (c *Course) HandleAccess(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
 	locators := make(map[string][]pal.Locator)
 	data := make(map[string]interface{})
 
 	data["course user data"] = c.Students[dataSubjectID]
+	data["title"] = c.Title
 
 	return locators, data
 }
 
-func (c *Course) GetAccessedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
-	locators := make(map[string][]pal.Locator)
-	data := make(map[string]interface{})
-
-	data["title"] = c.Title
-	return locators, data
+func (c *Course) HandleDeletion(dataSubjectID string) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate []firestore.Update) {
+	return
 }

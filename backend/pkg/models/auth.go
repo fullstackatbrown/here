@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 
+	"cloud.google.com/go/firestore"
 	pal "github.com/tianrendong/privacy-pal"
 )
 
@@ -77,36 +78,7 @@ type EditAdminAccessRequest struct {
 	IsAdmin bool   `json:"isAdmin"`
 }
 
-func (u *User) GetOwnedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
-	locators := make(map[string][]pal.Locator)
-	data := make(map[string]interface{})
-
-	locators["profile"] = []pal.Locator{{
-		ID:         u.Profile.ID,
-		Collection: FirestoreProfilesCollection,
-		DataNode:   &Profile{},
-	}}
-
-	return locators, data
-}
-
-func (u *User) GetAccessedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
-	locators := make(map[string][]pal.Locator)
-	data := make(map[string]interface{})
-	return locators, data
-}
-
-func (p *Profile) GetOwnedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
-	locators := make(map[string][]pal.Locator)
-	data := make(map[string]interface{})
-
-	data["name"] = p.DisplayName
-	data["email"] = p.Email
-	data["photoUrl"] = p.PhotoURL
-	return locators, data
-}
-
-func (p *Profile) GetAccessedData(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
+func (p *Profile) HandleAccess(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
 	locators := make(map[string][]pal.Locator)
 
 	locators["courses"] = []pal.Locator{}
@@ -117,6 +89,15 @@ func (p *Profile) GetAccessedData(dataSubjectID string) (map[string][]pal.Locato
 			DataNode:   &Course{},
 		})
 	}
+
 	data := make(map[string]interface{})
+
+	data["name"] = p.DisplayName
+	data["email"] = p.Email
+	data["photoUrl"] = p.PhotoURL
 	return locators, data
+}
+
+func (p *Profile) HandleDeletion(dataSubjectID string) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate []firestore.Update) {
+	return
 }
