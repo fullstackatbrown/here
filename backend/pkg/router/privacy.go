@@ -32,11 +32,12 @@ func handleAccessRequest(w http.ResponseWriter, r *http.Request) {
 		DataNode:   &models.Profile{},
 	}
 
-	ret, err := repo.Repository.PrivacyPal.ProcessAccessRequest(locator, user.ID)
+	data, err := repo.Repository.PrivacyPal.ProcessAccessRequest(locator, user.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	render.JSON(w, r, ret)
+	w.Header().Set("Content-Type", "application/json")
+	render.JSON(w, r, data)
 }
