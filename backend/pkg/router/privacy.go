@@ -8,7 +8,7 @@ import (
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	pal "github.com/tianrendong/privacy-pal"
+	pal "github.com/tianrendong/privacy-pal/pkg"
 )
 
 func PrivacyRoutes() *chi.Mux {
@@ -27,9 +27,10 @@ func handleAccessRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	locator := pal.Locator{
-		ID:         user.ID,
-		Collection: "user_profiles",
-		DataNode:   &models.Profile{},
+		Type:           pal.Document,
+		DocIDs:         []string{user.ID},
+		CollectionPath: []string{models.FirestoreProfilesCollection},
+		NewDataNode:    func() pal.DataNode { return &models.Profile{} },
 	}
 
 	data, err := repo.Repository.PrivacyPal.ProcessAccessRequest(locator, user.ID)

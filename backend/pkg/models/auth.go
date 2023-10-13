@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
-	pal "github.com/tianrendong/privacy-pal"
+	pal "github.com/tianrendong/privacy-pal/pkg"
 )
 
 const (
@@ -78,24 +78,24 @@ type EditAdminAccessRequest struct {
 	IsAdmin bool   `json:"isAdmin"`
 }
 
-func (p *Profile) HandleAccess(dataSubjectID string) (map[string][]pal.Locator, map[string]interface{}) {
-	locators := make(map[string][]pal.Locator)
-
-	locators["courses"] = []pal.Locator{}
-	for _, courseID := range p.Courses {
-		locators["courses"] = append(locators["courses"], pal.Locator{
-			ID:         courseID,
-			Collection: FirestoreCoursesCollection,
-			DataNode:   &Course{},
-		})
-	}
-
+func (p *Profile) HandleAccess(dataSubjectID string, currentDocumentID string) map[string]interface{} {
 	data := make(map[string]interface{})
 
 	data["name"] = p.DisplayName
 	data["email"] = p.Email
 	data["photoUrl"] = p.PhotoURL
-	return locators, data
+
+	data["courses"] = []pal.Locator{}
+	for _, courseID := range p.Courses {
+		data["courses"] = append(data["courses"].([]pal.Locator), pal.Locator{
+			Type:           pal.Document,
+			DocIDs:         []string{courseID},
+			CollectionPath: []string{FirestoreCoursesCollection},
+			NewDataNode:    func() pal.DataNode { return &Course{} },
+		})
+	}
+
+	return data
 }
 
 func (p *Profile) HandleDeletion(dataSubjectID string) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate []firestore.Update) {

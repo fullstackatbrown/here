@@ -1,5 +1,10 @@
 package models
 
+import (
+	"cloud.google.com/go/firestore"
+	pal "github.com/tianrendong/privacy-pal/pkg"
+)
+
 const (
 	FirestoreSectionsCollection = "sections"
 )
@@ -58,4 +63,18 @@ type UpdateSectionRequest struct {
 type DeleteSectionRequest struct {
 	Course    *Course
 	SectionID string
+}
+
+func (s *Section) HandleAccess(dataSubjectID string, currentDocumentID string) map[string]interface{} {
+	data := make(map[string]interface{})
+
+	data["start time"] = s.StartTime
+	data["end time"] = s.EndTime
+	data["location"] = s.Location
+
+	return data
+}
+
+func (s *Section) HandleDeletion(dataSubjectID string) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate []firestore.Update) {
+	return
 }

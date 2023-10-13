@@ -10,7 +10,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 
 	"cloud.google.com/go/firestore"
-	pal "github.com/tianrendong/privacy-pal"
+	pal "github.com/tianrendong/privacy-pal/pkg"
 )
 
 var Repository *FirebaseRepository
