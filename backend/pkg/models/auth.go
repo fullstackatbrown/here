@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
-	pal "github.com/tianrendong/privacy-pal/pkg"
+	pal "github.com/privacy-pal/privacy-pal/pkg"
 )
 
 const (

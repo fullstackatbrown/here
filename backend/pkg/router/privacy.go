@@ -8,7 +8,7 @@ import (
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	pal "github.com/tianrendong/privacy-pal/pkg"
+	pal "github.com/privacy-pal/privacy-pal/pkg"
 )
 
 func PrivacyRoutes() *chi.Mux {
