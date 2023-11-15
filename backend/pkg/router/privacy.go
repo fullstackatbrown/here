@@ -5,10 +5,11 @@ import (
 
 	"github.com/fullstackatbrown/here/pkg/middleware"
 	"github.com/fullstackatbrown/here/pkg/models"
+	"github.com/fullstackatbrown/here/pkg/privacy"
 	repo "github.com/fullstackatbrown/here/pkg/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	pal "github.com/privacy-pal/privacy-pal/pkg"
+	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
 func PrivacyRoutes() *chi.Mux {
@@ -27,13 +28,15 @@ func handleAccessRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	locator := pal.Locator{
-		Type:           pal.Document,
-		DocIDs:         []string{user.ID},
-		CollectionPath: []string{models.FirestoreProfilesCollection},
-		NewDataNode:    func() pal.DataNode { return &models.Profile{} },
+		LocatorType: pal.Document,
+		DataType:    privacy.UserDataType,
+		FirestoreLocator: pal.FirestoreLocator{
+			DocIDs:         []string{user.ID},
+			CollectionPath: []string{models.FirestoreProfilesCollection},
+		},
 	}
 
-	data, err := repo.Repository.PrivacyPal.ProcessAccessRequest(locator, user.ID)
+	data, err := repo.Repository.PrivacyPal.ProcessAccessRequest(privacy.HandleAccess, locator, user.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

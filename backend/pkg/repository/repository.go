@@ -10,7 +10,7 @@ import (
 	"github.com/fullstackatbrown/here/pkg/models"
 
 	"cloud.google.com/go/firestore"
-	pal "github.com/privacy-pal/privacy-pal/pkg"
+	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
 var Repository *FirebaseRepository
@@ -68,7 +68,7 @@ func NewFirebaseRepository() (*FirebaseRepository, error) {
 		initFn()
 	}
 
-	fr.PrivacyPal = pal.NewClient(fr.firestoreClient)
+	fr.PrivacyPal = pal.NewClientWithFirestore(fr.firestoreClient)
 
 	return fr, nil
 }

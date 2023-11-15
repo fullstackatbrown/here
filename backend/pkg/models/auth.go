@@ -2,9 +2,6 @@ package models
 
 import (
 	"fmt"
-
-	"cloud.google.com/go/firestore"
-	pal "github.com/privacy-pal/privacy-pal/pkg"
 )
 
 const (
@@ -76,28 +73,4 @@ type QuitCourseRequest struct {
 type EditAdminAccessRequest struct {
 	Email   string `json:"email"`
 	IsAdmin bool   `json:"isAdmin"`
-}
-
-func (p *Profile) HandleAccess(dataSubjectID string, currentDocumentID string) map[string]interface{} {
-	data := make(map[string]interface{})
-
-	data["name"] = p.DisplayName
-	data["email"] = p.Email
-	data["photoUrl"] = p.PhotoURL
-
-	data["courses"] = []pal.Locator{}
-	for _, courseID := range p.Courses {
-		data["courses"] = append(data["courses"].([]pal.Locator), pal.Locator{
-			Type:           pal.Document,
-			DocIDs:         []string{courseID},
-			CollectionPath: []string{FirestoreCoursesCollection},
-			NewDataNode:    func() pal.DataNode { return &Course{} },
-		})
-	}
-
-	return data
-}
-
-func (p *Profile) HandleDeletion(dataSubjectID string) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate []firestore.Update) {
-	return
 }

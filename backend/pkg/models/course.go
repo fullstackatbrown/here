@@ -3,9 +3,6 @@ package models
 import (
 	"strings"
 	"sync"
-
-	"cloud.google.com/go/firestore"
-	pal "github.com/privacy-pal/privacy-pal/pkg"
 )
 
 const (
@@ -107,27 +104,4 @@ type AssignSectionsRequest struct {
 
 func CreateCourseID(req *CreateCourseRequest) string {
 	return strings.ToLower(req.Code + req.Term)
-}
-
-func (c *Course) HandleAccess(dataSubjectID string, currentDocumentID string) map[string]interface{} {
-	data := make(map[string]interface{})
-	data["title"] = c.Title
-	data["course user data"] = c.Students[dataSubjectID]
-	if c.Students[dataSubjectID].DefaultSection != "" {
-		data["default section"] = []pal.Locator{
-			{
-				Type:           pal.Document,
-				DocIDs:         []string{currentDocumentID, c.Students[dataSubjectID].DefaultSection},
-				CollectionPath: []string{FirestoreCoursesCollection, FirestoreSectionsCollection},
-				NewDataNode:    func() pal.DataNode { return &Section{} },
-			},
-		}
-	} else {
-		data["default section"] = "unassigned"
-	}
-	return data
-}
-
-func (c *Course) HandleDeletion(dataSubjectID string) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate []firestore.Update) {
-	return
 }
