@@ -6,11 +6,13 @@ import (
 )
 
 func accessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
-	data := make(map[string]interface{})
-
-	data["name"] = dbObj["displayName"]
-	data["email"] = dbObj["email"]
-	data["photoUrl"] = dbObj["photoUrl"]
+	data := map[string]interface{}{
+		"name":          dbObj["displayName"],
+		"email":         dbObj["email"],
+		"photoUrl":      dbObj["photoUrl"],
+		"isAdmin":       dbObj["isAdmin"],
+		"notifications": dbObj["notifications"],
+	}
 
 	slice, ok := dbObj["courses"].([]interface{})
 	if !ok {
@@ -28,17 +30,18 @@ func accessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal
 		courses[i] = course
 	}
 
-	data["courses"] = []pal.Locator{}
+	courseMap := make(map[string]pal.Locator)
 	for _, courseID := range courses {
-		data["courses"] = append(data["courses"].([]pal.Locator), pal.Locator{
+		courseMap[courseID] = pal.Locator{
 			LocatorType: pal.Document,
 			DataType:    CourseDataType,
 			FirestoreLocator: pal.FirestoreLocator{
 				CollectionPath: []string{models.FirestoreCoursesCollection},
 				DocIDs:         []string{courseID},
 			},
-		})
+		}
 	}
+	data["courses"] = courseMap
 
 	sections, ok := dbObj["defaultSections"].(map[string]interface{})
 	if !ok {

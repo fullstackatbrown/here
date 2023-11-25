@@ -5,11 +5,11 @@ import (
 )
 
 func accessSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
-	data := make(map[string]interface{})
-
-	data["start time"] = dbObj["startTime"]
-	data["end time"] = dbObj["endTime"]
-	data["location"] = dbObj["location"]
+	data := map[string]interface{}{
+		"startTime": dbObj["startTime"],
+		"endTime":   dbObj["endTime"],
+		"location":  dbObj["location"],
+	}
 
 	return data
 }

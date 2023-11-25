@@ -5,9 +5,12 @@ import (
 )
 
 const (
-	UserDataType    = "user"
-	CourseDataType  = "course"
-	SectionDataType = "section"
+	UserDataType       = "user"
+	CourseDataType     = "course"
+	SectionDataType    = "section"
+	AssignmentDataType = "assignment"
+	SurveyDataType     = "survey"
+	SwapDataType       = "swap"
 )
 
 func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
@@ -18,6 +21,12 @@ func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 		return accessCourse(dataSubjectId, currentDbObjLocator, dbObj)
 	case SectionDataType:
 		return accessSection(dataSubjectId, currentDbObjLocator, dbObj)
+	case AssignmentDataType:
+		return accessAssignment(dataSubjectId, currentDbObjLocator, dbObj)
+	case SurveyDataType:
+		return accessSurvey(dataSubjectId, currentDbObjLocator, dbObj)
+	case SwapDataType:
+		return accessSwap(dataSubjectId, currentDbObjLocator, dbObj)
 	default:
 		// TODO: should return error
 		return nil

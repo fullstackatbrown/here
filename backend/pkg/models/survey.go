@@ -5,17 +5,19 @@ const (
 )
 
 type Survey struct {
-	ID              string                      `firestore:"id,omitempty"`
-	CourseID        string                      `firestore:"courseID"`
-	Name            string                      `firestore:"name"`
-	Description     string                      `firestore:"description"`
-	Published       bool                        `firestore:"published"`
-	EndTime         string                      `firestore:"endTime"`
-	Options         []*SurveyOption             `firestore:"options"`
-	Responses       map[string][]string         `firestore:"responses"`
-	Results         map[string][]CourseUserData `firestore:"results"`
+	ID          string          `firestore:"id,omitempty"`
+	CourseID    string          `firestore:"courseID"`
+	Name        string          `firestore:"name"`
+	Description string          `firestore:"description"`
+	Published   bool            `firestore:"published"`
+	EndTime     string          `firestore:"endTime"`
+	Options     []*SurveyOption `firestore:"options"`
+	// Map from userID to list of chosen options
+	Responses map[string][]string `firestore:"responses"`
+	// Map from option to list of student data
+	Results map[string][]CourseUserData `firestore:"results"`
 	// Map from the option to a map from sectionID to capacity
-	SectionCapacity map[string]map[string]int   `firestore:"sectionCapacity,omitempty"`
+	SectionCapacity map[string]map[string]int `firestore:"sectionCapacity,omitempty"`
 }
 
 type SurveyOption struct {
