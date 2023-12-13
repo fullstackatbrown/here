@@ -35,7 +35,7 @@ func accessCourse(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 			CollectionPath: []string{models.FirestoreCoursesCollection, models.FirestoreSwapsCollection},
 			DocIDs:         []string{currentDbObjLocator.FirestoreLocator.DocIDs[0]},
 			// Query for swaps where studentID is the dataSubjectID
-			Queries: []pal.Query{
+			Filters: []pal.Filter{
 				{
 					Path:  "studentID",
 					Op:    "==",
