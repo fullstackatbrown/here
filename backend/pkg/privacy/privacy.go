@@ -32,3 +32,22 @@ func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 		return nil
 	}
 }
+
+func HandleDelete(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
+	switch currentDbObjLocator.DataType {
+	case UserDataType:
+		return deleteUser(dataSubjectId, currentDbObjLocator, dbObj)
+	case CourseDataType:
+		return deleteCourse(dataSubjectId, currentDbObjLocator, dbObj)
+	case SectionDataType:
+		return deleteSection(dataSubjectId, currentDbObjLocator, dbObj)
+	case AssignmentDataType:
+		return deleteAssignment(dataSubjectId, currentDbObjLocator, dbObj)
+	case SurveyDataType:
+		return deleteSurvey(dataSubjectId, currentDbObjLocator, dbObj)
+	case SwapDataType:
+		return deleteSwap(dataSubjectId, currentDbObjLocator, dbObj)
+	default:
+		return
+	}
+}

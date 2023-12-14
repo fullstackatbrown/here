@@ -15,7 +15,7 @@ require (
 	github.com/go-chi/render v1.0.2
 	github.com/google/go-cmp v0.6.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/privacy-pal/privacy-pal/go v1.0.0
+	github.com/privacy-pal/privacy-pal/go v1.1.0
 	github.com/rs/cors v1.8.3
 	golang.org/x/exp v0.0.0-20230213192124-5e25df0256eb
 	google.golang.org/grpc v1.58.3

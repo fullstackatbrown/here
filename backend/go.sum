@@ -90,6 +90,8 @@ github.com/privacy-pal/privacy-pal/go v0.6.0 h1:ShjRa0vO+CBPJgD/B1OjiIBfit8B8bu7
 github.com/privacy-pal/privacy-pal/go v0.6.0/go.mod h1:iVFaK4o+EYLTOyetSv6pjtWGcmPcTMXL6oUNHVyhoX0=
 github.com/privacy-pal/privacy-pal/go v1.0.0 h1:Oti8tPCzAxKzqb9EPP6l1E4P5gJZbL10gHRkoEn7Kxo=
 github.com/privacy-pal/privacy-pal/go v1.0.0/go.mod h1:iVFaK4o+EYLTOyetSv6pjtWGcmPcTMXL6oUNHVyhoX0=
+github.com/privacy-pal/privacy-pal/go v1.1.0 h1:Fm03J8kbOuuQxV8ayvf+NJSCdToQt0FI2r1SLKfzthA=
+github.com/privacy-pal/privacy-pal/go v1.1.0/go.mod h1:4mjmDe2nLDBPMuhiOx1GIy04AQaBWzRUL1YOUZTEi0o=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
 github.com/rs/cors v1.8.3 h1:O+qNyWn7Z+F9M0ILBHgMVPuB1xTOucVd5gtaYyXBpRo=
 github.com/rs/cors v1.8.3/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU=

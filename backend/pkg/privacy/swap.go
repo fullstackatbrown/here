@@ -18,3 +18,8 @@ func accessSwap(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal
 
 	return data
 }
+
+func deleteSwap(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
+	deleteNode = true
+	return
+}
