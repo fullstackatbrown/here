@@ -1,6 +1,8 @@
 package privacy
 
 import (
+	"fmt"
+
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
@@ -13,7 +15,7 @@ const (
 	SwapDataType       = "swap"
 )
 
-func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
+func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (data map[string]interface{}, err error) {
 	switch currentDbObjLocator.DataType {
 	case UserDataType:
 		return handleAccessUser(dataSubjectId, currentDbObjLocator, dbObj)
@@ -28,8 +30,8 @@ func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 	case SwapDataType:
 		return handleAccessSwap(dataSubjectId, currentDbObjLocator, dbObj)
 	default:
-		// TODO: should return error
-		return nil
+		err = fmt.Errorf("invalid data type")
+		return
 	}
 }
 

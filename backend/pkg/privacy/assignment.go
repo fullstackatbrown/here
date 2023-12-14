@@ -5,8 +5,8 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func handleAccessAssignment(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
-	data := map[string]interface{}{
+func handleAccessAssignment(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (data map[string]interface{}, err error) {
+	data = map[string]interface{}{
 		"name":        dbObj["name"],
 		"optional":    dbObj["optional"],
 		"maxScore":    dbObj["maxScore"],
@@ -15,7 +15,7 @@ func handleAccessAssignment(dataSubjectId string, currentDbObjLocator pal.Locato
 		"grade":       dbObj["grades"].(map[string]interface{})[dataSubjectId],
 	}
 
-	return data
+	return
 }
 
 func handleDeleteAssignment(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {

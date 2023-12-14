@@ -7,8 +7,8 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
-	data := map[string]interface{}{
+func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (data map[string]interface{}, err error) {
+	data = map[string]interface{}{
 		"name":          dbObj["displayName"],
 		"email":         dbObj["email"],
 		"photoUrl":      dbObj["photoUrl"],
@@ -18,13 +18,13 @@ func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 
 	slice, ok := dbObj["courses"].([]interface{})
 	if !ok {
-		return data
+		return
 	}
 	courses := make([]string, len(slice))
 	for i, v := range slice {
 		course, ok := v.(string)
 		if !ok {
-			return data
+			return
 		}
 		courses[i] = course
 	}
@@ -44,7 +44,7 @@ func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 
 	sections, ok := dbObj["defaultSections"].(map[string]interface{})
 	if !ok {
-		return data
+		return
 	}
 	data["defaultSections"] = []pal.Locator{}
 	for courseID, sectionID := range sections {
@@ -58,7 +58,7 @@ func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 		})
 	}
 
-	return data
+	return
 }
 
 func handleDeleteUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {

@@ -7,14 +7,14 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func handleAccessSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
-	data := map[string]interface{}{
+func handleAccessSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (data map[string]interface{}, err error) {
+	data = map[string]interface{}{
 		"startTime": dbObj["startTime"],
 		"endTime":   dbObj["endTime"],
 		"location":  dbObj["location"],
 	}
 
-	return data
+	return
 }
 
 func handleDeleteSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
