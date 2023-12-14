@@ -7,7 +7,7 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func accessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
+func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
 	data := map[string]interface{}{
 		"name":          dbObj["displayName"],
 		"email":         dbObj["email"],
@@ -61,7 +61,7 @@ func accessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal
 	return data
 }
 
-func deleteUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
+func handleDeleteUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
 	deleteNode = true
 
 	// add courses to nodesToTraverse

@@ -6,7 +6,7 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func accessCourse(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
+func handleAccessCourse(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
 	data := map[string]interface{}{
 		"title": dbObj["title"],
 	}
@@ -49,7 +49,7 @@ func accessCourse(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 	return data
 }
 
-func deleteCourse(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
+func handleDeleteCourse(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
 	deleteNode = false
 
 	updates := []firestore.Update{}

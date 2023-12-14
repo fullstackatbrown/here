@@ -16,17 +16,17 @@ const (
 func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
 	switch currentDbObjLocator.DataType {
 	case UserDataType:
-		return accessUser(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleAccessUser(dataSubjectId, currentDbObjLocator, dbObj)
 	case CourseDataType:
-		return accessCourse(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleAccessCourse(dataSubjectId, currentDbObjLocator, dbObj)
 	case SectionDataType:
-		return accessSection(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleAccessSection(dataSubjectId, currentDbObjLocator, dbObj)
 	case AssignmentDataType:
-		return accessAssignment(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleAccessAssignment(dataSubjectId, currentDbObjLocator, dbObj)
 	case SurveyDataType:
-		return accessSurvey(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleAccessSurvey(dataSubjectId, currentDbObjLocator, dbObj)
 	case SwapDataType:
-		return accessSwap(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleAccessSwap(dataSubjectId, currentDbObjLocator, dbObj)
 	default:
 		// TODO: should return error
 		return nil
@@ -36,17 +36,17 @@ func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 func HandleDelete(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
 	switch currentDbObjLocator.DataType {
 	case UserDataType:
-		return deleteUser(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleDeleteUser(dataSubjectId, currentDbObjLocator, dbObj)
 	case CourseDataType:
-		return deleteCourse(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleDeleteCourse(dataSubjectId, currentDbObjLocator, dbObj)
 	case SectionDataType:
-		return deleteSection(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleDeleteSection(dataSubjectId, currentDbObjLocator, dbObj)
 	case AssignmentDataType:
-		return deleteAssignment(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleDeleteAssignment(dataSubjectId, currentDbObjLocator, dbObj)
 	case SurveyDataType:
-		return deleteSurvey(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleDeleteSurvey(dataSubjectId, currentDbObjLocator, dbObj)
 	case SwapDataType:
-		return deleteSwap(dataSubjectId, currentDbObjLocator, dbObj)
+		return handleDeleteSwap(dataSubjectId, currentDbObjLocator, dbObj)
 	default:
 		return
 	}

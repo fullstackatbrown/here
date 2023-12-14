@@ -7,7 +7,7 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func accessSurvey(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
+func handleAccessSurvey(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
 	data := map[string]interface{}{
 		"name":        dbObj["name"],
 		"description": dbObj["description"],
@@ -19,7 +19,7 @@ func accessSurvey(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 	return data
 }
 
-func deleteSurvey(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
+func handleDeleteSurvey(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
 	deleteNode = false
 
 	// remove responses[dataSubjectId] if exists

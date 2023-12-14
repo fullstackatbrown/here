@@ -7,7 +7,7 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func accessSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
+func handleAccessSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
 	data := map[string]interface{}{
 		"startTime": dbObj["startTime"],
 		"endTime":   dbObj["endTime"],
@@ -17,7 +17,7 @@ func accessSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj 
 	return data
 }
 
-func deleteSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
+func handleDeleteSection(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
 	deleteNode = false
 
 	// decrement numEnrolled in course
