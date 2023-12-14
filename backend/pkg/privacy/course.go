@@ -79,6 +79,13 @@ func handleDeleteCourse(dataSubjectId string, currentDbObjLocator pal.Locator, d
 		FirestoreLocator: pal.FirestoreLocator{
 			CollectionPath: []string{models.FirestoreCoursesCollection, models.FirestoreSurveysCollection},
 			DocIDs:         []string{currentDbObjLocator.FirestoreLocator.DocIDs[0]},
+			Filters: []pal.Filter{
+				{
+					Path:  "studentID",
+					Op:    "==",
+					Value: dataSubjectId,
+				},
+			},
 		},
 	})
 
