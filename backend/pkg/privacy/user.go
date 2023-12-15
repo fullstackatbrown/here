@@ -18,12 +18,14 @@ func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 
 	slice, ok := dbObj["courses"].([]interface{})
 	if !ok {
+		err = cannotCastFieldToType("courses", "[]interface{}")
 		return
 	}
 	courses := make([]string, len(slice))
 	for i, v := range slice {
 		course, ok := v.(string)
 		if !ok {
+			err = cannotCastFieldToType(fmt.Sprintf("courses element %v", v), "string")
 			return
 		}
 		courses[i] = course
@@ -44,6 +46,7 @@ func handleAccessUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 
 	sections, ok := dbObj["defaultSections"].(map[string]interface{})
 	if !ok {
+		err = cannotCastFieldToType("defaultSections", "map[string]interface{}")
 		return
 	}
 	data["defaultSections"] = []pal.Locator{}
@@ -67,14 +70,14 @@ func handleDeleteUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 	// add courses to nodesToTraverse
 	slice, ok := dbObj["courses"].([]interface{})
 	if !ok {
-		err = fmt.Errorf("courses field is not a slice")
+		err = cannotCastFieldToType("courses", "[]interface{}")
 		return
 	}
 	courses := make([]string, len(slice))
 	for i, v := range slice {
 		course, ok := v.(string)
 		if !ok {
-			err = fmt.Errorf("elements in course field is not a string")
+			err = cannotCastFieldToType(fmt.Sprintf("courses element %v", v), "string")
 			return
 		}
 		courses[i] = course
@@ -93,7 +96,7 @@ func handleDeleteUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 	// add defaultSections to nodesToTraverse
 	sections, ok := dbObj["defaultSections"].(map[string]interface{})
 	if !ok {
-		err = fmt.Errorf("defaultSections field is not a map")
+		err = cannotCastFieldToType("defaultSections", "map[string]interface{}")
 		return
 	}
 	for courseID, sectionID := range sections {
@@ -110,19 +113,19 @@ func handleDeleteUser(dataSubjectId string, currentDbObjLocator pal.Locator, dbO
 	// add actualSections to nodesToTraverse
 	actualSections, ok := dbObj["actualSections"].(map[string]interface{})
 	if !ok {
-		err = fmt.Errorf("actualSections field is not a map")
+		err = cannotCastFieldToType("actualSections", "map[string]interface{}")
 		return
 	}
 	for courseID, sectionsMap := range actualSections {
 		sections, ok := sectionsMap.(map[string]interface{})
 		if !ok {
-			err = fmt.Errorf("sectionsMap is not a map")
+			err = cannotCastFieldToType(fmt.Sprintf("actualSections entry %v", sectionsMap), "map[string]interface{}")
 			return
 		}
 		for _, sectionID := range sections {
 			id, ok := sectionID.(string)
 			if !ok {
-				err = fmt.Errorf("sectionID is not a string")
+				err = cannotCastFieldToType(fmt.Sprintf("actualSections nested entry %v", sectionID), "string")
 				return
 			}
 			nodesToTraverse = append(nodesToTraverse, pal.Locator{

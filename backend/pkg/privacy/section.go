@@ -31,19 +31,19 @@ func handleDeleteSection(dataSubjectId string, currentDbObjLocator pal.Locator, 
 	// remove dataSubjectId from swappedInStudents if exists
 	swappedInStudents, ok := dbObj["swappedInStudents"].(map[string]interface{})
 	if !ok {
-		err = fmt.Errorf("swappedInStudents is not a map[string]interface{}")
+		err = cannotCastFieldToType("swappedInStudents", "map[string]interface{}")
 		return
 	}
 	for _, studentIDs := range swappedInStudents {
 		studentIDsSlice, ok := studentIDs.([]interface{})
 		if !ok {
-			err = fmt.Errorf("studentIDs is not a []interface{}")
+			err = cannotCastFieldToType(fmt.Sprintf("swappedInStudents entry %v", studentIDs), "[]interface{}")
 			return
 		}
 		for _, studentID := range studentIDsSlice {
 			id, ok := studentID.(string)
 			if !ok {
-				err = fmt.Errorf("studentID is not a string")
+				err = cannotCastFieldToType(fmt.Sprintf("swappedInStudents nested entry %v", studentID), "string")
 				return
 			}
 			if id == dataSubjectId {
@@ -58,19 +58,19 @@ func handleDeleteSection(dataSubjectId string, currentDbObjLocator pal.Locator, 
 	// remove dataSubjectId from swappedOutStudents if exists
 	swappedOutStudents, ok := dbObj["swappedOutStudents"].(map[string]interface{})
 	if !ok {
-		err = fmt.Errorf("swappedOutStudents is not a map[string]interface{}")
+		err = cannotCastFieldToType("swappedOutStudents", "map[string]interface{}")
 		return
 	}
 	for _, studentIDs := range swappedOutStudents {
 		studentIDsSlice, ok := studentIDs.([]interface{})
 		if !ok {
-			err = fmt.Errorf("studentIDs is not a []interface{}")
+			err = cannotCastFieldToType(fmt.Sprintf("swappedOutStudents entry %v", studentIDs), "[]interface{}")
 			return
 		}
 		for _, studentID := range studentIDsSlice {
 			id, ok := studentID.(string)
 			if !ok {
-				err = fmt.Errorf("studentID is not a string")
+				err = cannotCastFieldToType(fmt.Sprintf("swappedOutStudents nested entry %v", studentID), "string")
 				return
 			}
 			if id == dataSubjectId {

@@ -1,8 +1,6 @@
 package privacy
 
 import (
-	"fmt"
-
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
@@ -30,7 +28,7 @@ func HandleAccess(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 	case SwapDataType:
 		return handleAccessSwap(dataSubjectId, currentDbObjLocator, dbObj)
 	default:
-		err = fmt.Errorf("invalid data type")
+		err = invalidLocatorDataType
 		return
 	}
 }
@@ -50,6 +48,7 @@ func HandleDelete(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj p
 	case SwapDataType:
 		return handleDeleteSwap(dataSubjectId, currentDbObjLocator, dbObj)
 	default:
+		err = invalidLocatorDataType
 		return
 	}
 }
