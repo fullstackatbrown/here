@@ -17,7 +17,7 @@ func PrivacyRoutes() *chi.Mux {
 
 	router.Use(middleware.AuthCtx())
 	router.Get("/data", handleAccessRequest)
-	router.Delete("/data", handleDeleteRequest)
+	router.Get("/data/delete", handleDeleteRequest)
 	return router
 }
 
@@ -63,7 +63,7 @@ func handleDeleteRequest(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	res, err := repo.Repository.PrivacyPal.ProcessDeletionRequest(privacy.HandleDelete, locator, user.ID, false)
+	res, err := repo.Repository.PrivacyPal.ProcessDeletionRequest(privacy.HandleDelete, locator, user.ID, true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
