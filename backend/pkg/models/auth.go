@@ -1,6 +1,8 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	FirestoreProfilesCollection = "user_profiles"
