@@ -17,6 +17,7 @@ func PrivacyRoutes() *chi.Mux {
 
 	router.Use(middleware.AuthCtx())
 	router.Get("/data", handleAccessRequest)
+	router.Get("/data/delete", handleDeleteRequest)
 	return router
 }
 
@@ -44,4 +45,30 @@ func handleAccessRequest(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	render.JSON(w, r, data)
+}
+
+func handleDeleteRequest(w http.ResponseWriter, r *http.Request) {
+	user, err := middleware.GetUserFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	locator := pal.Locator{
+		LocatorType: pal.Document,
+		DataType:    privacy.UserDataType,
+		FirestoreLocator: pal.FirestoreLocator{
+			DocIDs:         []string{user.ID},
+			CollectionPath: []string{models.FirestoreProfilesCollection},
+		},
+	}
+
+	res, err := repo.Repository.PrivacyPal.ProcessDeletionRequest(privacy.HandleDelete, locator, user.ID, true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(res))
+
+	// w.WriteHeader(http.StatusNoContent)
 }

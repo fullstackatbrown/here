@@ -4,8 +4,8 @@ import (
 	pal "github.com/privacy-pal/privacy-pal/go/pkg"
 )
 
-func accessSwap(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) map[string]interface{} {
-	data := map[string]interface{}{
+func handleAccessSwap(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (data map[string]interface{}, err error) {
+	data = map[string]interface{}{
 		"oldSectionID": dbObj["oldSectionID"],
 		"newSectionID": dbObj["newSectionID"],
 		"assignmentID": dbObj["assignmentID"],
@@ -16,5 +16,10 @@ func accessSwap(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal
 		"handledBy":    dbObj["handledBy"],
 	}
 
-	return data
+	return
+}
+
+func handleDeleteSwap(dataSubjectId string, currentDbObjLocator pal.Locator, dbObj pal.DatabaseObject) (nodesToTraverse []pal.Locator, deleteNode bool, fieldsToUpdate pal.FieldUpdates, err error) {
+	deleteNode = true
+	return
 }
