@@ -66,7 +66,7 @@ const Navbar: FC<NavbarProps> = ({
                         </Tooltip>
                     }
                     <Stack sx={{ flexGrow: 1 }} direction="row" alignItems="center" spacing={1}>
-                        <NextLink href="/">
+                        <NextLink href="/" style={{color: 'inherit'}}>
                             <Link variant="h6" component="button" color="inherit" underline="hover"
                                 sx={{ display: "inline-flex", alignItems: "center" }}>
                                 <Box mr={1} width={30} height={30}>
