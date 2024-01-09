@@ -17,6 +17,7 @@ import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
 import PeopleTableForStudents from "./PeopleTable/PeopleTableForStudents";
 import toast from "react-hot-toast";
+import StudentTableWrapper from "@components/shared/StudentTableWrapper/StudentTableWrapper";
 
 export interface PeopleViewProps {
   course: Course;
@@ -29,7 +30,7 @@ export interface PeopleViewProps {
 
 export default function PeopleView({ course, access, sectionsMap, assignmentsMap, invitedStudents = [], student }: PeopleViewProps) {
   const assignments = useMemo(() => Object.values(assignmentsMap), [assignmentsMap])
-  const [filterBySection, setFilterBySection] = useState<string>(ALL_STUDENTS)
+  const [sectionFilter, setSectionFilter] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
   const [page, setPage] = useState(0);
@@ -48,17 +49,21 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     return formatSectionInfo(sectionsMap[val], true)
   }
 
-  const filterStudentsBySection = () => {
+  const filteredBySection = useMemo(() => {
     // get students based on filtered section
     let studentIDs = []
-    if (!filterBySection) {
+    if (!sectionFilter) {
       studentIDs = course.students ? Object.keys(course.students) : []
     } else {
       if (!course.students) return []
-      studentIDs = getStudentsInSection(course.students, filterBySection)
+      studentIDs = getStudentsInSection(course.students, sectionFilter)
     }
     return studentIDs.map((studentID) => course.students[studentID])
-  }
+  }, [course.students, sectionFilter])
+
+  const filteredStudents = useMemo(() => {
+    return filterStudentsBySearchQuery(filteredBySection, searchQuery)
+  }, [filteredBySection, searchQuery])
 
   const handleAddStudent = () => {
     setAddStudentDialogOpen(true)
@@ -72,13 +77,9 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     exportStudentList(course, sectionsMap, invitedStudents)
   }
 
-  const hasNoStudent = () => {
-    return (!course.students || Object.keys(course.students).length === 0) && (invitedStudents.length === 0)
-  }
-
   useEffect(() => {
     setPage(0)
-  }, [filterBySection, searchQuery])
+  }, [sectionFilter, searchQuery])
 
   return (
     <>
@@ -90,10 +91,10 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         endElement={
           <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
             <SelectMenu
-              value={filterBySection}
+              value={sectionFilter}
               formatOption={formatOptions}
               options={sectionOptions()}
-              onSelect={(val) => setFilterBySection(val)}
+              onSelect={(val) => setSectionFilter(val)}
               defaultValue={ALL_STUDENTS}
               startIcon={<FilterAltOutlinedIcon sx={{ mr: -.5 }} />}
             />
@@ -103,24 +104,23 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         }
       />
 
-      {hasNoStudent() ?
-        <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-
-        (access === CoursePermission.CourseStudent ?
+      <StudentTableWrapper
+        students={filteredStudents}
+        searchQuery={searchQuery}
+        sectionFilter={sectionFilter}>
+        {access === CoursePermission.CourseStudent ?
           <PeopleTableForStudents
             {...{ course, sectionsMap, page, setPage }}
-            students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
+            students={filteredStudents}
             currentUser={student}
           /> :
           <PeopleTable
             {...{ course, assignments, sectionsMap, page, setPage, access }}
-            students={filterStudentsBySearchQuery(filterStudentsBySection(), searchQuery)}
-            invitedStudents={(filterBySection === UNASSIGNED || filterBySection === ALL_STUDENTS) ? invitedStudents : []}
-          />
-
-        )
-
-      }
+            students={filteredStudents}
+            invitedStudents={(sectionFilter === UNASSIGNED || sectionFilter === ALL_STUDENTS) ? invitedStudents : []}
+            access={access}
+          />}
+      </StudentTableWrapper>
     </>
   );
 }
