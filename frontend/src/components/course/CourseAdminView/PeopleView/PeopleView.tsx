@@ -17,6 +17,7 @@ import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
 import PeopleTableForStudents from "./PeopleTable/PeopleTableForStudents";
 import toast from "react-hot-toast";
+import StudentTableWrapper from "@components/shared/StudentTableWrapper/StudentTableWrapper";
 
 export interface PeopleViewProps {
   course: Course;
@@ -98,26 +99,23 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         }
       />
 
-      {
-        filteredStudents.length === 0 ?
-        searchQuery !== "" ? <Typography mt={3} textAlign="center">No students matches your search.</Typography> :
-          sectionFilter !== ALL_STUDENTS ? <Typography mt={3} textAlign="center">No students in this section.</Typography> :
-            <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-        (
-          access === CoursePermission.CourseStudent ?
-            <PeopleTableForStudents
-              {...{ course, sectionsMap }}
-              students={filteredStudents}
-              currentUser={student}
-            /> :
-            <PeopleTable
-              {...{ course, assignments, sectionsMap }}
-              students={filteredStudents}
-              invitedStudents={(sectionFilter === UNASSIGNED || sectionFilter === ALL_STUDENTS) ? invitedStudents : []}
-              access={access}
-            />
-        )
-      }
+      <StudentTableWrapper
+        students={filteredStudents}
+        searchQuery={searchQuery}
+        sectionFilter={sectionFilter}>
+        {access === CoursePermission.CourseStudent ?
+          <PeopleTableForStudents
+            {...{ course, sectionsMap }}
+            students={filteredStudents}
+            currentUser={student}
+          /> :
+          <PeopleTable
+            {...{ course, assignments, sectionsMap }}
+            students={filteredStudents}
+            invitedStudents={(sectionFilter === UNASSIGNED || sectionFilter === ALL_STUDENTS) ? invitedStudents : []}
+            access={access}
+          />}
+      </StudentTableWrapper>
     </>
   );
 }

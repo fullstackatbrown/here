@@ -18,6 +18,7 @@ import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import SelectMenu from '../../../../shared/Menu/SelectMenu';
 import ViewHeader from '@components/shared/ViewHeader/ViewHeader';
+import StudentTableWrapper from '@components/shared/StudentTableWrapper/StudentTableWrapper';
 
 interface GradingViewProps {
     course: Course;
@@ -151,62 +152,57 @@ const GradingView: FC<GradingViewProps> = ({ course, assignment, sectionsMap, ac
                 </Stack>
 
             </Stack >
-            {
-                // there are three scenarios in which no students are displayed:
-                // 1. the user is searching for a student that does not exist
-                // 2. the user is filtering by section and no students joined that section yet
-                // 3. no students joined the course yet
-                currentStudentsDisplayed.length === 0 ?
-                    searchQuery !== "" ? <Typography mt={3} textAlign="center">No students matches your search.</Typography> :
-                        filterBySection === ALL_STUDENTS ? <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-                            <Typography mt={3} textAlign="center">No students have joined this section yet.</Typography> :
-                    (<Table>
-                        {!isXsScreen &&
-                            <colgroup>
-                                <col width="40%" />
-                                <col width="30%" />
-                                <col width="30%" />
-                            </colgroup>}
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Student</TableCell>
-                                <TableCell>Grade</TableCell>
-                                {!isXsScreen && <TableCell>Graded on</TableCell>}
-                            </TableRow>
-                        </TableHead>
-                        <ClickAwayListener onClickAway={() => setEditingGradeFor(null)}>
-                            <TableBody>
-                                {(rowsPerPage > 0 && currentStudentsDisplayed.length > rowsPerPage
-                                    // only paginate when the number of students displayed is greater than the number of rows per page
-                                    ? currentStudentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    : currentStudentsDisplayed)
-                                    .map((student) => {
-                                        const userID = student.studentID
-                                        const grade = userID in assignment.grades ? assignment.grades[userID] : undefined
-                                        return <TableRow hover key={userID} onClick={() => setEditingGradeFor(userID)}>
-                                            <TableCell component="th" scope="row">
-                                                {course.students && course.students[userID] && course.students[userID].displayName}
-                                            </TableCell>
-                                            <TableCell component="th" scope="row">
-                                                <GradeChip
-                                                    score={grade ? grade.grade : undefined}
-                                                    maxScore={assignment.maxScore}
-                                                    readOnly={false}
-                                                    inEditMode={editingGradeFor && editingGradeFor === userID}
-                                                    handleCreateGrade={handleSubmitGrade(userID)}
-                                                    handleDeleteGrade={grade ? handleDeleteGrade(userID) : undefined}
-                                                />
-                                            </TableCell>
-                                            {!isXsScreen && <TableCell component="th" scope="row">
-                                                {grade ? new Date(grade.timeUpdated).toLocaleDateString() : "/"}
-                                            </TableCell>}
-                                        </TableRow>
-                                    }
-                                    )}
-                            </TableBody>
-                        </ClickAwayListener>
-                    </Table>)
-            }
+            <StudentTableWrapper
+                students={currentStudentsDisplayed}
+                searchQuery={searchQuery}
+                sectionFilter={filterBySection}>
+                <Table>
+                    {!isXsScreen &&
+                        <colgroup>
+                            <col width="40%" />
+                            <col width="30%" />
+                            <col width="30%" />
+                        </colgroup>}
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Student</TableCell>
+                            <TableCell>Grade</TableCell>
+                            {!isXsScreen && <TableCell>Graded on</TableCell>}
+                        </TableRow>
+                    </TableHead>
+                    <ClickAwayListener onClickAway={() => setEditingGradeFor(null)}>
+                        <TableBody>
+                            {(rowsPerPage > 0 && currentStudentsDisplayed.length > rowsPerPage
+                                // only paginate when the number of students displayed is greater than the number of rows per page
+                                ? currentStudentsDisplayed.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : currentStudentsDisplayed)
+                                .map((student) => {
+                                    const userID = student.studentID
+                                    const grade = userID in assignment.grades ? assignment.grades[userID] : undefined
+                                    return <TableRow hover key={userID} onClick={() => setEditingGradeFor(userID)}>
+                                        <TableCell component="th" scope="row">
+                                            {course.students && course.students[userID] && course.students[userID].displayName}
+                                        </TableCell>
+                                        <TableCell component="th" scope="row">
+                                            <GradeChip
+                                                score={grade ? grade.grade : undefined}
+                                                maxScore={assignment.maxScore}
+                                                readOnly={false}
+                                                inEditMode={editingGradeFor && editingGradeFor === userID}
+                                                handleCreateGrade={handleSubmitGrade(userID)}
+                                                handleDeleteGrade={grade ? handleDeleteGrade(userID) : undefined}
+                                            />
+                                        </TableCell>
+                                        {!isXsScreen && <TableCell component="th" scope="row">
+                                            {grade ? new Date(grade.timeUpdated).toLocaleDateString() : "/"}
+                                        </TableCell>}
+                                    </TableRow>
+                                }
+                                )}
+                        </TableBody>
+                    </ClickAwayListener>
+                </Table>
+            </StudentTableWrapper>
             {
                 currentStudentsDisplayed.length > rowsPerPage && <TablePagination
                     rowsPerPageOptions={[]}
