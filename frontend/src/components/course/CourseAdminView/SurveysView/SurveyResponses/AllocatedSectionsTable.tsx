@@ -20,6 +20,7 @@ import { arrayUnion, arraysEqual } from '@util/shared/array';
 import { formatSectionTime } from "@util/shared/time";
 import { CourseUserData } from "model/course";
 import { Section } from 'model/section';
+import { sortSections } from "@util/shared/sortSectionTime";
 import React, { FC, useMemo, useState } from "react";
 
 export interface AllocatedSectionsTableProps {
@@ -52,7 +53,7 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
         }
     }
 
-    const sectionIDs = useMemo(() => arrayUnion(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap])
+    const sections = sortSections(useMemo(() => arrayUnion(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap]).map(id => sectionsMap[id]))
     const sectionsChanged = useMemo(() => !arraysEqual(Object.keys(results), Object.keys(sectionsMap)), [results, sectionsMap])
     // a map from sectionID to the current capacity of each section
     const currentCapacityMap = useMemo(() => {
@@ -89,9 +90,9 @@ const AllocatedSectionsTable: FC<AllocatedSectionsTableProps> = ({ results, sect
                 </TableRow>
             </TableHead>
             <TableBody>
-                {sectionIDs.map((sectionID) => {
+                {sections.map(section => {
+                    const sectionID = section.ID;
                     const notInSurvey = !(sectionID in results)
-                    const section = sectionsMap[sectionID]
                     const students = results?.[sectionID] || [];
                     const numStudents = students.length;
                     const open = selectedSection === sectionID;
