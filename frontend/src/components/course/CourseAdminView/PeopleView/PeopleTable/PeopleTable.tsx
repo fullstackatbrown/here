@@ -16,6 +16,8 @@ export interface PeopleTableProps {
     assignments: Assignment[];
     invitedStudents: string[];
     access: CoursePermission;
+    page: number;
+    setPage: (page: number) => void;
 }
 
 const GridItem = styled(Grid)(({ theme }) => ({
@@ -34,10 +36,9 @@ interface StudentRowData {
     email?: string,
 }
 
-const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents, access }) => {
+const PeopleTable: FC<PeopleTableProps> = ({ course, assignments, students, sectionsMap, invitedStudents, access, page, setPage }) => {
     const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const rowsPerPage = isXsScreen ? -1 : 8;
-    const [page, setPage] = useState(0);
     const isCourseActive = course.status === CourseStatus.CourseActive;
 
     const studentsDisplayed = useMemo(() => {

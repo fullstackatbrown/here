@@ -133,7 +133,7 @@ func (fr *FirebaseRepository) UpdateSurvey(req *models.UpdateSurveyRequest) erro
 	return err
 }
 
-func (fr *FirebaseRepository) UpdateSurveyOptions(courseID string, survey *models.Survey) ([]*models.SurveyOption, map[string]map[string]int, error) {
+func (fr *FirebaseRepository) UpdateSurveyOptions(course *models.Course, survey *models.Survey) ([]*models.SurveyOption, map[string]map[string]int, error) {
 
 	newOptions := make([]*models.SurveyOption, 0)
 	newCapacity := make(map[string]map[string]int)
@@ -145,10 +145,29 @@ func (fr *FirebaseRepository) UpdateSurveyOptions(courseID string, survey *model
 				newCapacity[option] = make(map[string]int)
 			}
 
-			section, err := fr.GetSectionByID(courseID, sectionID)
-			// if section still exists, add it to newCapacity
+			section, err := fr.GetSectionByID(course.ID, sectionID)
+			// if section still exists, add it to newCapacity with the current effective capacity
 			if err == nil {
-				newCapacity[option][sectionID] = section.Capacity
+				// effective capacity = capacity of the section - the number of students enrolled
+				// + overlap(students enrolled, students who filled out survey)
+				effectiveCapacity := section.Capacity - section.NumEnrolled
+
+				if survey.Responses != nil {
+					// for each student who filled out the survey
+					// check if the student is enrolled in the section
+					for studentID := range survey.Responses {
+						if studentData, ok := course.Students[studentID]; ok {
+							if studentData.DefaultSection == sectionID {
+								effectiveCapacity++
+							}
+						}
+					}
+				}
+
+				if effectiveCapacity < 0 {
+					effectiveCapacity = 0
+				}
+				newCapacity[option][sectionID] = effectiveCapacity
 			} else {
 				newCapacity[option][sectionID] = 0
 			}
@@ -168,7 +187,7 @@ func (fr *FirebaseRepository) UpdateSurveyOptions(courseID string, survey *model
 		}
 	}
 
-	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(courseID).Collection(
+	_, err := fr.firestoreClient.Collection(models.FirestoreCoursesCollection).Doc(course.ID).Collection(
 		models.FirestoreSurveysCollection).Doc(survey.ID).Update(firebase.Context, []firestore.Update{
 		{Path: "options", Value: newOptions},
 		{Path: "sectionCapacity", Value: newCapacity},

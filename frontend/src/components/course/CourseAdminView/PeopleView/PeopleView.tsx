@@ -11,7 +11,7 @@ import { Assignment } from "model/assignment";
 import { Course } from "model/course";
 import { Section } from "model/section";
 import { CoursePermission, User } from "model/user";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MoreMenu from "../../../shared/Menu/MoreMenu";
 import AddStudentDialog from "./AddStudentDialog";
 import PeopleTable from "./PeopleTable/PeopleTable";
@@ -33,6 +33,7 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
   const [sectionFilter, setSectionFilter] = useState<string>(ALL_STUDENTS)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
+  const [page, setPage] = useState(0);
 
   const sectionOptions = () => {
     let options = [ALL_STUDENTS, UNASSIGNED]
@@ -76,6 +77,10 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     exportStudentList(course, sectionsMap, invitedStudents)
   }
 
+  useEffect(() => {
+    setPage(0)
+  }, [sectionFilter, searchQuery])
+
   return (
     <>
       <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
@@ -105,12 +110,12 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         sectionFilter={sectionFilter}>
         {access === CoursePermission.CourseStudent ?
           <PeopleTableForStudents
-            {...{ course, sectionsMap }}
+            {...{ course, sectionsMap, page, setPage }}
             students={filteredStudents}
             currentUser={student}
           /> :
           <PeopleTable
-            {...{ course, assignments, sectionsMap }}
+            {...{ course, assignments, sectionsMap, page, setPage, access }}
             students={filteredStudents}
             invitedStudents={(sectionFilter === UNASSIGNED || sectionFilter === ALL_STUDENTS) ? invitedStudents : []}
             access={access}
