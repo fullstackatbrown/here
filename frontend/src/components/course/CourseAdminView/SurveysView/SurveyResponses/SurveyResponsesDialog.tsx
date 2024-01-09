@@ -145,7 +145,7 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                     </Typography>
                 </Grid>
                 <Grid item xs={12} md={3} display="flex" alignItems="center" justifyContent={{ xs: "flex-start", md: "flex-end" }}>
-                    <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={numResponses === 0} onClick={handleRunAlgorithm}>
+                    <Button variant="outlined" startIcon={<DirectionsRunIcon />} disabled={numResponses === 0} onClick={handleRunAlgorithm} style={{marginBottom: 10}}>
                         Run Algorithm
                     </Button>
                 </Grid>
