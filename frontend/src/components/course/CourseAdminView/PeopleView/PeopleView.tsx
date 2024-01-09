@@ -75,10 +75,6 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
     exportStudentList(course, sectionsMap, invitedStudents)
   }
 
-  const hasNoStudent = () => {
-    return (!course.students || Object.keys(course.students).length === 0) && (invitedStudents.length === 0)
-  }
-
   return (
     <>
       <AddStudentDialog course={course} open={addStudentDialogOpen} onClose={() => { setAddStudentDialogOpen(false) }} />
@@ -102,29 +98,25 @@ export default function PeopleView({ course, access, sectionsMap, assignmentsMap
         }
       />
 
-      {hasNoStudent() ?
-        <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-
+      {
         filteredStudents.length === 0 ?
-          searchQuery !== "" ? <Typography mt={3} textAlign="center">No students matches your search.</Typography> :
-            sectionFilter !== ALL_STUDENTS ? <Typography mt={3} textAlign="center">No students in this section.</Typography> :
-              <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
-          (
-            access === CoursePermission.CourseStudent ?
-              <PeopleTableForStudents
-                {...{ course, sectionsMap }}
-                students={filteredStudents}
-                currentUser={student}
-              /> :
-              <PeopleTable
-                {...{ course, assignments, sectionsMap }}
-                students={filteredStudents}
-                invitedStudents={(sectionFilter === UNASSIGNED || sectionFilter === ALL_STUDENTS) ? invitedStudents : []}
-                access={access}
-              />
-
-          )
-
+        searchQuery !== "" ? <Typography mt={3} textAlign="center">No students matches your search.</Typography> :
+          sectionFilter !== ALL_STUDENTS ? <Typography mt={3} textAlign="center">No students in this section.</Typography> :
+            <Typography mt={3} textAlign="center">No students have joined this course yet.</Typography> :
+        (
+          access === CoursePermission.CourseStudent ?
+            <PeopleTableForStudents
+              {...{ course, sectionsMap }}
+              students={filteredStudents}
+              currentUser={student}
+            /> :
+            <PeopleTable
+              {...{ course, assignments, sectionsMap }}
+              students={filteredStudents}
+              invitedStudents={(sectionFilter === UNASSIGNED || sectionFilter === ALL_STUDENTS) ? invitedStudents : []}
+              access={access}
+            />
+        )
       }
     </>
   );
