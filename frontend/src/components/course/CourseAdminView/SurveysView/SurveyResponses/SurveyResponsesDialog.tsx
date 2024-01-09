@@ -6,6 +6,7 @@ import {
     Button, Dialog, DialogActions, DialogContent,
     DialogTitle,
     Grid,
+    Stack,
     Tab,
     Tabs,
     Typography
@@ -150,20 +151,21 @@ const SurveyResponsesDialog: FC<SurveyResponsesDialogProps> = ({ open, onClose, 
                 </Grid>
             </Grid>
 
-            <Alert severity="info">
-                The table only reflects the results when you ran the algorithm.
-                We recommend running the algorithm again after the survey closes and the course enrollment list is finalized, in case students changed their responses or dropped the class.
-            </Alert>
-
             <Grid container>
                 <Grid item xs={0} md={1.3} />
                 <Grid item xs={12} md={9.4} display="flex" justifyContent="center">
-                    {hasResults &&
-                        (survey.sectionCapacity ?
-                            <AllocatedSectionsTable sectionsMap={sectionsMap} sectionCapacity={survey.sectionCapacity} results={survey.results} /> :
-                            <SurveyResultsTable options={survey.options} results={survey.results} />
-                        )
-                    }
+                    <Stack width="100%" spacing={1}>
+                        <Alert severity="info">
+                            The table only reflects the results when you ran the algorithm.
+                            We recommend running the algorithm again after the survey closes and the course enrollment list is finalized, in case students changed their responses or dropped the class.
+                        </Alert>
+                        {hasResults &&
+                            (survey.sectionCapacity ?
+                                <AllocatedSectionsTable sectionsMap={sectionsMap} sectionCapacity={survey.sectionCapacity} results={survey.results} /> :
+                                <SurveyResultsTable options={survey.options} results={survey.results} />
+                            )
+                        }
+                    </Stack>
                 </Grid>
                 <Grid item xs={0} md={1.3} />
             </Grid>
